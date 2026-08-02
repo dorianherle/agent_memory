@@ -1,0 +1,8 @@
+.agent_memory/
+.agent_memory_archive_*/
+.env
+memory/_sandbox*/
+__pycache__/
+.venv/
+.codegraph/
+.pytest_cache/
