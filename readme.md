@@ -1,110 +1,126 @@
-# agent-memory
+# Agent Memory
 
-Git as the memory for a long-running research agent. Commits are the log,
-branches are the hypotheses, and the test suite is the only thing it trusts.
+Minimal Git-backed memory for AI agents.
 
 ```bash
-uv pip install -e ".[search]"     # drop [search] if you do not want semantic search
+pip install agent-memory
 ```
 
-Semantic search needs `GEMINI_API_KEY` in a `.env` at the project root. It is
-gitignored, and the memory refuses to commit it.
-
-## The one rule
-
-**Always pass the test results to `record()`.** Everything that makes this
-better than a pile of commits is derived from them. A commit without them is
-invisible to the frontier, the pivot, the loop detector and the prompt.
-
 ```python
-memory.record("Add the implicit solver", passed=["test_mass"], failed=["test_order"])
-```
-
-## The loop
-
-```python
-from memory import Memory, Tag
+from agent_memory import Memory
 
 memory = Memory(".")
 
-while True:
-    worker(memory.prompt_for("worker"))          # write code
-    passed, failed = run_tests()
-    memory.record(what_i_did, passed=passed, failed=failed)
+item_id = memory.save(
+    "Updated matrix_math.py",
+    payload={"type": "action", "files_changed": 1},
+)
 
-    if not failed:
-        memory.record("Milestone reached", Tag.MILESTONE, passed=passed)
-        continue
+items = memory.find(ids=item_id)
+items = memory.find(text="matrix")
+items = memory.find(payload={"type": "action"})
+items = memory.find(since=items[0].datetime, k=10)
 
-    memory.record(diagnosis, Tag.FAIL, passed=passed, failed=failed)
+replacement_id = memory.supersede(item_id, "Corrected matrix implementation")
+memory.delete(replacement_id)
 
-    plan = thinker(memory.prompt_for("thinker"))  # decide what to try next
-    memory.branch_from(memory.last_passing().id, plan.branch_name)
-    memory.record(plan.directive, Tag.PLAN)
+with memory.revisit(id=item_id):
+    print(open("matrix_math.py").read())
+
+feature = memory.branch(base_id=item_id, name="fix-bug")
+
+memory.clear()
+memory.clear(archive=False)
 ```
 
-`prompt_for()` is the product. It leads with what has already been ruled out
-for the tests failing right now, and its size does not grow with history.
+`find()` searches the current branch and returns at most 10 items by default.
+Each `MemoryItem` has `id`, `message`, `payload`, a timezone-aware `datetime`,
+and an optional semantic `score`. Pass `branch=None` to search every branch or
+`include_historical=True` to include deleted and superseded memories.
 
-## Recording
+## Execution state
 
-| call | meaning |
+When an agent finishes a subtask, save a one-line summary that covers the
+raw steps. `state()` returns the whole current branch oldest to newest, with
+covered items folded behind their summary. Nothing is deleted; hiding happens
+only at read time, and covered steps stay reachable via `find(ids=...)` and
+`revisit()`.
+
+```python
+a = memory.save("opened login page")
+b = memory.save("created project")
+summary = memory.save("Set up account and project", covers=[a, b])
+
+memory.state()  # [summary]
+
+deeper = memory.save("Finished setup phase", covers=[summary])
+```
+
+Summaries covering summaries build higher abstraction levels with the same
+verb. `agent_memory.prompt` renders the state for an agent and ships the
+matching system prompt:
+
+```python
+from agent_memory.prompt import SYSTEM_PROMPT, render
+
+context = render(memory.state())
+```
+
+The agent-facing tools compose from existing verbs:
+
+| agent tool | implementation |
 |---|---|
-| `record(msg, passed=, failed=, metrics=)` | a work step and what the suite said |
-| `record(msg, Tag.FAIL, ...)` | a diagnosed dead end |
-| `record(msg, Tag.PLAN)` | the directive for the next worker |
-| `record(msg, Tag.LESSON, tests=["test_x"])` | a claim that `test_x` is unreachable this way; retires itself if it ever passes |
-| `record(msg, Tag.MILESTONE, ...)` | worth syncing to the remote |
+| summary | `save(text, covers=[ids])` |
+| investigate(id) | `find(ids=item.payload["covers"])` |
+| revise(id, reason) | `branch(id, name)` then `save(reason, {"tag": "hint"})` |
 
-## Asking
+## Semantic search
 
-```python
-memory.prompt_for("worker" | "thinker")  # the context block; start here
-memory.last_passing("test_x")            # where to branch back to
-memory.frontier()                        # best state ever reached
-memory.elites()                          # best state per distinct failure signature
-memory.ruled_out()                       # attempts already known to fail here
-memory.advice()                          # directives that worked in this same predicament
-memory.attempts("test_x")                # every commit that failed one test
-memory.episodes()                        # every directive scored by what followed it
-memory.regressions()                     # tests traded away (the Goodhart alarm)
-memory.stuck()                           # the same failure n times running
-memory.lessons()                         # live lessons, disproven ones dropped
-memory.history(tag=Tag.FAIL, all_branches=True, limit=0)
-memory.visualize()                       # the branch tree, for humans
+Install or write an embedding provider, then set:
+
+```bash
+export AGENT_MEMORY_PROVIDER=my_package.embeddings:MyProvider
 ```
 
-## Moving
+The provider contract is:
 
 ```python
-memory.branch_from(commit, "new-branch")  # pivot; commit may be an int index or a SHA
-memory.switch_to("branch")
-memory.inspect(commit); memory.inspect_exit()   # look at an old state, then come back
-memory.worktree("branch")                 # a second checkout to run in parallel
-memory.diff(); memory.working_diff()
+class MyProvider:
+    fingerprint = "model-name:dimensions"
+
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        ...
+
+    def embed_query(self, text: str) -> list[float]:
+        ...
 ```
 
-Uncommitted work is never lost: anything dirty is committed as
-`[CODE] work in progress` before HEAD moves.
-
-## Searching
+Then use:
 
 ```python
-from memory.semantic import Search
-
-Search(memory).find("have we tried an explicit stepper", tag=Tag.FAIL)
+memory.find(
+    "attempts to optimize matrix multiplication",
+    k=6,
+    max_tokens=4000,
+)
 ```
 
-Ranks across every branch. Trust the order, not the number: a real match scores
-around 0.72 and nonsense around 0.50, so anything near 0.65 is a coin flip.
-Prefer `attempts()` and `ruled_out()` when the question has an exact answer.
+Gemini is optional:
 
-The index is a `.npz` inside `.agent_memory/`, derived and disposable. Delete it
-and the next search rebuilds it.
+```bash
+pip install "agent-memory[gemini]"
+export GEMINI_API_KEY="..."
+export AGENT_MEMORY_PROVIDER=agent_memory.providers.gemini:GeminiProvider
+```
 
-## Notes
+Git stores the immutable memory history. SQLite stores its incremental metadata
+projection, FTS index, document embeddings, and query embeddings. HNSW performs
+bounded semantic search. A document or query is embedded only once for each
+provider fingerprint. A missing HNSW file is rebuilt from cached vectors without
+calling the embedding provider.
 
-- The memory lives in `.agent_memory/`, never in your project's `.git`.
-- `set_remote(url)` plus `auto_sync=True` pushes on milestones and new branches.
-- `clear()` archives the old memory; `clear(archive=False)` deletes it.
-- Writes are locked, so parallel agent processes can share one memory safely.
+## Tests
+
+```bash
+python -m unittest discover -s agent_memory/tests
+```
