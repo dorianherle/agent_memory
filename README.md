@@ -1,122 +1,94 @@
 # Agent Memory
 
-Your agent can remember without carrying its entire chat history.
-
-Agent Memory is a tiny, Git-backed notebook for agents. Save what happened,
-fold old details into short summaries, and retrieve the original facts when
-they matter again.
+Git-backed memory for agents. The model does not keep a chat transcript.
+It only sees the current memory state, then calls tools to change it.
 
 ```text
-Read 12 files  →  save one summary  →  keep the prompt small
-                                      →  recover any original detail later
+work  →  save  →  fold finished steps into a summary  →  find detail later
 ```
 
 ## Install
-
-Install directly from this repository:
 
 ```bash
 pip install "agent-memory @ git+https://github.com/dorianherle/agent_memory.git@main"
 ```
 
-Then create memory in the project your agent works in:
-
 ```python
 from agent_memory import Memory
 
 memory = Memory(".")
 ```
 
-This creates `.agent_memory/` in that project. It is a separate Git repository
-that records the agent's memory without changing the project's Git history.
+This creates `.agent_memory/` next to your project. It is a separate Git
+repo for agent memory and does not touch the project's own Git history.
 
-## The idea
+## How it works
 
-Every `save()` creates an immutable memory item. An item can be a file read, a
-decision, a tool result, or a short summary of earlier items.
+| Piece | Role |
+|---|---|
+| `Memory` | Stores immutable entries with `save`, `find`, `branch`, `state`. |
+| `MEMORY_INSTRUCTIONS` | System prompt: when to call each tool. |
+| `TOOLS` | OpenAI function-calling schemas for `save`, `find`, `branch`. |
+| `call_tool(...)` | Runs one tool call and returns `(memory, observation)`. |
+| `render(state)` | Turns `memory.state()` into the MEMORY STATE block. |
+
+`state` is not a tool. Every prompt already includes it.
 
 ```python
-read_api = memory.save("Read checkout/api.py")
-read_docs = memory.save("Read the payment retry documentation")
-
-summary = memory.save(
-    "The checkout endpoint retries requests, so payment needs an idempotency key.",
-    covers=[read_api, read_docs],
-)
+from agent_memory.prompt import MEMORY_INSTRUCTIONS, render
+from agent_memory.tools import TOOLS, call_tool
 ```
 
-`memory.state()` now shows the summary instead of the two raw steps. The
-original steps still exist and can always be found by ID.
+### Folding detail away
 
-```python
-for item in memory.state():
-    print(item.message)
+Each save shows up in Recent:
 
-# The checkout endpoint retries requests, so payment needs an idempotency key.
+```text
+## Recent
+[a1b2c3d4] Read checkout/api.py
+[e5f6a7b8] Read payment retry docs
 ```
 
-This is useful when your agent's context is getting large: it keeps the
-important conclusion visible and hides the supporting detail until it is needed.
-
-## Everyday use
+When that piece of work is done, save one sentence with `summary=True`:
 
 ```python
-# Save something the agent learned.
-item_id = memory.save(
-    "Found a duplicate payment caused by retries",
-    payload={"area": "checkout", "severity": "high"},
-)
-
-# Look up an exact memory or filter the current branch.
-memory.find(ids=item_id)
-memory.find(text="payment")
-memory.find(payload={"area": "checkout"})
-
-# Replace a wrong conclusion without losing the old one.
-memory.supersede(item_id, "The duplicate payment is caused by a missing idempotency key")
-
-# Hide a memory from normal searches without deleting its history.
-memory.delete(item_id)
+memory.save("Checkout retries payments, so it needs an idempotency key.", summary=True)
 ```
 
-`find()` searches the current branch and returns up to 10 items by default.
-Each returned `MemoryItem` has an `id`, `message`, `payload`, `datetime`, and
-an optional semantic-search `score`.
+Everything in Recent is folded behind it. No ids, no tags, no lists:
 
-Pass `include_historical=True` to include deleted and superseded memories, or
-`branch=None` to search every memory branch.
+```text
+## History
+[9c8d7e6f] Checkout retries payments, so it needs an idempotency key.
 
-## Give the agent a compact state
-
-`agent_memory.prompt` turns the current state into a prompt-ready block and
-includes a system prompt that tells the agent how to summarize and investigate.
-
-```python
-from agent_memory.prompt import SYSTEM_PROMPT, render
-
-context = render(memory.state())
-prompt = f"{SYSTEM_PROMPT}\n\n{context}"
+## Recent
 ```
 
-## Copy-paste agent prompt
+The folded steps are still stored. `find(ids="9c8d7e6f")` returns the summary
+and the steps behind it.
 
-Use this as the prompt you send on every agent turn. Replace `goal` and
-`constraints` with the user's request, and rebuild it after every memory action.
+## Use with the OpenAI API
+
+Pass `TOOLS` to Chat Completions. Rebuild the user prompt every turn from
+GOAL, CONSTRAINTS, MEMORY STATE, and the last tool observation. When the
+model returns plain text instead of a tool call, it is done.
 
 ```python
+import json
+from openai import OpenAI
 from agent_memory import Memory
-from agent_memory.prompt import SYSTEM_PROMPT, render
+from agent_memory.prompt import MEMORY_INSTRUCTIONS, render
+from agent_memory.tools import TOOLS, call_tool
 
+client = OpenAI()
 memory = Memory(".")
 
 goal = "Find why checkout orders are occasionally charged twice."
-constraints = """
-- Do not change production code.
-- Keep the final answer under 200 words.
-- Quote exact source lines for the root cause.
-""".strip()
+constraints = "- Do not change production code."
+observation = "Nothing yet."
 
-prompt = f"""
+while True:
+    prompt = f"""
 GOAL
 {goal}
 
@@ -126,48 +98,154 @@ CONSTRAINTS
 MEMORY STATE
 {render(memory.state())}
 
-MEMORY INSTRUCTIONS
-{SYSTEM_PROMPT}
+OBSERVATION
+{observation}
 """.strip()
+
+    response = client.chat.completions.create(
+        model="gpt-5",
+        messages=[
+            {"role": "system", "content": MEMORY_INSTRUCTIONS},
+            {"role": "user", "content": prompt},
+        ],
+        tools=TOOLS,
+    )
+    message = response.choices[0].message
+
+    if not message.tool_calls:
+        print(message.content)
+        break
+
+    call = message.tool_calls[0]
+    memory, observation = call_tool(
+        memory,
+        call.function.name,
+        json.loads(call.function.arguments),
+    )
 ```
 
-Give the model tools that call `memory.save()`, `memory.find()`, and
-`memory.branch()`. After it reads a file or reaches a conclusion, save that
-step. When Recent gets long, save a one-sentence summary with `covers=[ids]`.
-On the next turn, build the prompt again. The model sees a compact state rather
-than a growing chat transcript.
+Works with any OpenAI-compatible endpoint. Add your own task tools next to
+`TOOLS` (read a file, run a command) and save each result.
 
-When the agent needs detail behind a summary, inspect the IDs in its `covers`
-payload:
+## Use with the OpenAI Agents SDK
 
-```python
-summary = memory.state()[0]
-source_items = memory.find(ids=summary.payload["covers"])
+Install the SDK, then wrap the same memory methods as `@tool`s.
+Put `Memory` on the run context and rebuild MEMORY STATE in dynamic
+instructions so every model turn sees the latest compact state.
+
+```bash
+pip install openai-agents
 ```
 
-## Change your mind safely
-
-Use branches when new evidence proves an earlier direction wrong:
-
 ```python
-feature_memory = memory.branch(
-    base_id=summary.id,
-    name="missing-idempotency-key",
+from dataclasses import dataclass
+from agents import Agent, Runner, RunContextWrapper
+from agents.decorators import tool
+from agent_memory import Memory
+from agent_memory.prompt import MEMORY_INSTRUCTIONS, render
+from agent_memory.tools import call_tool
+
+
+@dataclass
+class Ctx:
+    memory: Memory
+
+
+def instructions(ctx: RunContextWrapper[Ctx], agent: Agent[Ctx]) -> str:
+    state = render(ctx.context.memory.state())
+    return f"{MEMORY_INSTRUCTIONS}\n\nMEMORY STATE\n{state}"
+
+
+@tool
+def save(ctx: RunContextWrapper[Ctx], text: str, summary: bool = False) -> str:
+    """Store a step. Set summary to true to fold Recent behind this text."""
+    memory, result = call_tool(
+        ctx.context.memory,
+        "save",
+        {"text": text, "summary": summary},
+    )
+    ctx.context.memory = memory
+    return result
+
+
+@tool
+def find(
+    ctx: RunContextWrapper[Ctx],
+    ids: list[str] | None = None,
+    text: str | None = None,
+    query: str | None = None,
+) -> str:
+    """Read stored entries, including the steps folded behind a summary."""
+    memory, result = call_tool(
+        ctx.context.memory,
+        "find",
+        {"ids": ids, "text": text, "query": query},
+    )
+    ctx.context.memory = memory
+    return result
+
+
+@tool
+def branch(ctx: RunContextWrapper[Ctx], id: str, name: str) -> str:
+    """Go back to an entry on a new branch when earlier work proved wrong."""
+    memory, result = call_tool(
+        ctx.context.memory,
+        "branch",
+        {"id": id, "name": name},
+    )
+    ctx.context.memory = memory
+    return result
+
+
+agent = Agent[Ctx](
+    name="Memory agent",
+    instructions=instructions,
+    tools=[save, find, branch],
 )
-feature_memory.save("Confirmed the payment provider accepts idempotency keys")
+
+result = Runner.run_sync(
+    agent,
+    """
+GOAL
+Find why checkout orders are occasionally charged twice.
+
+CONSTRAINTS
+- Do not change production code.
+- Quote exact source lines for the root cause.
+""".strip(),
+    context=Ctx(memory=Memory(".")),
+)
+print(result.final_output)
 ```
 
-The original branch remains intact. To inspect exactly what the project looked
-like at a memory item, use `revisit()`:
+The Agents SDK owns the tool loop. You own the memory: keep it on the
+context, refresh MEMORY STATE in instructions, and let `call_tool` update
+it when `branch` returns a new `Memory`.
 
-```python
-with memory.revisit(item_id):
-    print(open("checkout/api.py").read())
-```
+## Mini API
+
+| Method | What it does |
+|---|---|
+| `Memory(path)` | Open or create memory in `path/.agent_memory/`. |
+| `save(message, payload=None, allow_empty=False, summary=False)` | Save an entry. `summary=True` folds Recent behind it. `allow_empty=True` saves with no file changes. |
+| `state()` | Current compact state. |
+| `find(query=None, ids=None, text=None, payload=None, k=10)` | Find by meaning, id, text, or payload. Short ids work. |
+| `branch(base_id, name)` | Start a new branch from an earlier entry. |
+| `revisit(id)` | Temporarily restore project files at that entry. |
+| `supersede(old_id, message)` | Replace a conclusion, keep history. |
+| `delete(item_id)` | Hide from normal search, keep history. |
+| `clear(archive=True)` | Start fresh; archive the old store by default. |
+
+Host helpers:
+
+| Helper | What it does |
+|---|---|
+| `MEMORY_INSTRUCTIONS` | System prompt for when to call tools. |
+| `render(state)` | Format state for the prompt. |
+| `TOOLS` | OpenAI tool schemas. |
+| `call_tool(memory, name, arguments)` | Execute one tool call. |
 
 ## Semantic search
-
-For meaning-based search, configure an embedding provider:
 
 ```bash
 pip install "agent-memory[gemini]"
@@ -175,47 +253,12 @@ export GEMINI_API_KEY="..."
 export AGENT_MEMORY_PROVIDER=agent_memory.providers.gemini:GeminiProvider
 ```
 
-Then search naturally:
-
 ```python
-results = memory.find(
-    "Why could a customer be charged twice?",
-    k=6,
-    max_tokens=4000,
-)
+memory.find("Why could a customer be charged twice?", k=6)
 ```
 
-You can bring your own provider too:
-
-```python
-class MyProvider:
-    fingerprint = "model-name:dimensions"
-
-    def embed_documents(self, texts: list[str]) -> list[list[float]]:
-        ...
-
-    def embed_query(self, text: str) -> list[float]:
-        ...
-```
-
-Set `AGENT_MEMORY_PROVIDER` to its import path, for example:
-
-```bash
-export AGENT_MEMORY_PROVIDER=my_package.embeddings:MyProvider
-```
-
-## See it work
-
-`examples/debug_agent.py` gives a live agent a checkout incident to solve.
-It has no chat history; its memory is rebuilt from `memory.state()` every turn.
-
-```bash
-export OPENROUTER_API_KEY="..."
-python examples/debug_agent.py
-```
-
-The agent reads files, summarizes them to shrink its prompt, investigates old
-summaries for exact source text, and branches if its first hypothesis is wrong.
+Any provider works if it exposes `fingerprint`, `embed_documents`, and
+`embed_query`. Point `AGENT_MEMORY_PROVIDER` at `module:Class`.
 
 ## Test
 

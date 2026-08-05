@@ -32,6 +32,15 @@ class MemoryItem:
     score: float | None = None
 
 
+def split_state(items: list[MemoryItem]) -> tuple[list[MemoryItem], list[MemoryItem]]:
+    """Split a state into history (up to the last summary) and recent steps."""
+    last_summary = -1
+    for index, item in enumerate(items):
+        if "covers" in item.payload:
+            last_summary = index
+    return items[: last_summary + 1], items[last_summary + 1 :]
+
+
 class Memory:
     def __init__(self, path: str | Path) -> None:
         self._path = Path(path).resolve()
@@ -207,16 +216,18 @@ class Memory:
         message: str,
         payload: dict | None = None,
         allow_empty: bool = False,
-        covers: list[str] | None = None,
+        summary: bool = False,
         _operation: dict | None = None,
     ) -> str:
         payload = payload or {}
         if OPERATION_KEY in payload:
             raise ValueError(f"{OPERATION_KEY!r} is reserved")
         stored_payload = dict(payload)
-        if covers is not None:
-            stored_payload["covers"] = [self._resolve(item) for item in covers]
+        if summary:
             allow_empty = True
+            recent = split_state(self.state())[1]
+            if recent:
+                stored_payload["covers"] = [item.id for item in recent]
         if _operation is not None:
             stored_payload[OPERATION_KEY] = _operation
         body = f"{message}\n\n{PAYLOAD_PREFIX}{json.dumps(stored_payload)}"
@@ -255,6 +266,14 @@ class Memory:
         wanted = None
         if ids is not None:
             wanted = [ids] if isinstance(ids, str) else ids
+            # Short ids from a rendered state resolve to full ids;
+            # unknown ids stay as given and simply match nothing.
+            wanted = [
+                self._run(
+                    "rev-parse", "--verify", f"{item}^{{commit}}", check=False
+                ) or item
+                for item in wanted
+            ]
 
         if query is not None:
             ranked = self._searcher().find(

@@ -5,10 +5,10 @@ from agent_memory.tests.helpers import MemoryTestCase
 
 
 class StateTests(MemoryTestCase):
-    def test_summary_hides_covered_steps(self) -> None:
+    def test_summary_hides_recent_steps(self) -> None:
         a = self.save("step a")
-        b = self.save("step b")
-        summary = self.memory.save("did a and b", covers=[a, b])
+        self.save("step b")
+        summary = self.memory.save("did a and b", summary=True)
 
         ids = [item.id for item in self.memory.state()]
         self.assertEqual(ids, [summary])
@@ -17,31 +17,32 @@ class StateTests(MemoryTestCase):
         self.assertEqual(found[0].message, "step a")
 
     def test_state_orders_oldest_to_newest(self) -> None:
-        a = self.save("step a")
+        self.save("step a")
+        summary = self.memory.save("did a", summary=True)
         b = self.save("step b")
-        summary = self.memory.save("did a", covers=[a])
 
         ids = [item.id for item in self.memory.state()]
-        self.assertEqual(ids, [b, summary])
+        self.assertEqual(ids, [summary, b])
 
-    def test_summary_of_summaries_hides_transitively(self) -> None:
-        a = self.save("step a")
-        b = self.save("step b")
-        first = self.memory.save("summary one", covers=[a, b])
-        c = self.save("step c")
-        second = self.memory.save("summary two", covers=[c])
-        top = self.memory.save("top summary", covers=[first, second])
+    def test_summary_keeps_earlier_summaries_visible(self) -> None:
+        self.save("step a")
+        first = self.memory.save("summary one", summary=True)
+        self.save("step b")
+        second = self.memory.save("summary two", summary=True)
 
         ids = [item.id for item in self.memory.state()]
-        self.assertEqual(ids, [top])
+        self.assertEqual(ids, [first, second])
 
-    def test_covers_accepts_short_ids(self) -> None:
-        a = self.save("step a")
-        summary = self.memory.save("did a", covers=[a[:8]])
+    def test_summary_without_recent_steps_is_a_plain_entry(self) -> None:
+        self.save("step a")
+        first = self.memory.save("did a", summary=True)
+        second = self.memory.save("nothing left to fold", summary=True)
 
-        item = self.memory.find(ids=summary)[0]
-        self.assertEqual(item.payload["covers"], [a])
-        self.assertEqual([entry.id for entry in self.memory.state()], [summary])
+        item = self.memory.find(ids=second)[0]
+        self.assertNotIn("covers", item.payload)
+        self.assertEqual(
+            [entry.id for entry in self.memory.state()], [first, second]
+        )
 
     def test_state_keeps_duplicate_messages(self) -> None:
         self.memory.save("same message", allow_empty=True)
@@ -52,9 +53,9 @@ class StateTests(MemoryTestCase):
 
     def test_branch_isolates_summary(self) -> None:
         a = self.save("step a")
-        b = self.save("step b")
-        c = self.save("step c")
-        self.memory.save("summary of b and c", covers=[b, c])
+        self.save("step b")
+        self.save("step c")
+        self.memory.save("summary of a, b and c", summary=True)
 
         branched = self.memory.branch(a, "retry")
         note = branched.save(
@@ -68,7 +69,7 @@ class StateTests(MemoryTestCase):
 
     def test_render_splits_history_and_recent(self) -> None:
         a = self.save("step a")
-        summary = self.memory.save("did a", covers=[a])
+        summary = self.memory.save("did a", summary=True)
         b = self.save("step b")
 
         text = render(self.memory.state())
