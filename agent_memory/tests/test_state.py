@@ -74,7 +74,7 @@ class StateTests(MemoryTestCase):
 
         text = render(self.memory.state())
         self.assertIn("## History", text)
-        self.assertIn(f"[{summary[:8]}] did a", text)
+        self.assertIn(f"[{summary[:8]}] Summary: did a", text)
         self.assertIn("## Recent", text)
         self.assertIn(f"[{b[:8]}] step b", text)
         self.assertNotIn(a[:8], text)
@@ -116,6 +116,14 @@ class StateTests(MemoryTestCase):
         text = render(self.memory.state(), self.memory.branches())
 
         self.assertNotIn("## Branches", text)
+
+    def test_render_marks_summaries(self) -> None:
+        self.save("step a")
+        summary = self.memory.save("did a", summary=True)
+
+        text = render(self.memory.state())
+
+        self.assertIn(f"[{summary[:8]}] Summary: did a", text)
 
     def test_render_user_lines(self) -> None:
         item = self.memory.save_user("fix the bug")

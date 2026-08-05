@@ -360,6 +360,12 @@ class Memory:
         rows = self._catalog.state(self._home_branch())
         return [self._row_item(row) for row in rows]
 
+    def history(self) -> list[MemoryItem]:
+        """Every entry on the current branch, oldest first, folded or not."""
+        self._sync_catalog()
+        rows = self._catalog.select(branch=self._home_branch())
+        return [self._row_item(row) for row in reversed(rows)]
+
     def branches(self) -> list[dict]:
         """Every branch with its name, tip entry and whether it is current."""
         self._sync_catalog()

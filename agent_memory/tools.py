@@ -1,4 +1,5 @@
 from agent_memory.core import Memory
+from agent_memory.prompt import _line, render_timeline
 
 MEMORY_TOOLS = [
     {
@@ -74,6 +75,24 @@ MEMORY_TOOLS = [
                     },
                 },
                 "required": ["ids", "text", "payload", "query", "all_branches"],
+                "additionalProperties": False,
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "history",
+            "strict": True,
+            "description": (
+                "The full timeline of the current branch, oldest first: "
+                "every entry, with folded steps shown under the summary "
+                "that folded them. Use it to show the user everything."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": [],
                 "additionalProperties": False,
             },
         },
@@ -188,8 +207,10 @@ def _run_tool(memory: Memory, name: str, arguments: dict) -> str:
         )
         covered = [c for item in items for c in item.payload.get("covers", [])]
         items += memory.find(ids=covered, k=50, branch=branch)
-        lines = "\n".join(f"[{item.id[:8]}] {item.message}" for item in items)
+        lines = "\n".join(_line(item) for item in items)
         return lines or "Nothing found."
+    if name == "history":
+        return render_timeline(memory.history())
     if name == "branch":
         before = memory._branch_name()
         memory.branch(arguments["id"], arguments["name"], arguments.get("summary"))

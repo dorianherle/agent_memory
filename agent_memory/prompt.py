@@ -14,7 +14,9 @@ JSON reply format and do not write tool calls as plain text.
 MEMORY STATE
 - Branches: one line per branch: its id, name and the summary it was
   left at. The branch you are on is marked "you are here".
-- History: one-line summaries of finished work, oldest first.
+- History: one-line summaries of finished work, oldest first. A
+  summary starts with "Summary:"; find its id to unfold the steps
+  behind it.
 - Recent: your raw steps since the last summary. Lines starting with
   "user:" are the user's own words, recorded automatically.
 - Every entry starts with an id like [1a2b3c4d]. Use only ids you can
@@ -26,6 +28,8 @@ WHEN TO CALL TOOLS
   so Recent stays short.
 - find when you need the exact detail behind a summary. Set
   all_branches to true to also search entries on other branches.
+- history when the user asks what happened: the full timeline of this
+  branch, with folded steps shown under their summary.
 - branch to move to any entry: back past a dead end, or forward to a
   branch shown under Branches. It folds the current branch behind your
   summary and restores every working file to that entry's snapshot.
@@ -46,8 +50,29 @@ RULES
 
 
 def _line(item: MemoryItem) -> str:
-    prefix = "user: " if item.payload.get("user") else ""
+    prefix = ""
+    if item.payload.get("covers"):
+        prefix = "Summary: "
+    elif item.payload.get("user"):
+        prefix = "user: "
     return f"[{item.id[:8]}] {prefix}{item.message}"
+
+
+def render_timeline(items: list[MemoryItem]) -> str:
+    """The full history: raw steps indented under the summary that
+    folded them, everything oldest first."""
+    by_id = {item.id: item for item in items}
+    covered = {c for item in items for c in item.payload.get("covers", [])}
+    lines = []
+    for item in items:
+        if item.id in covered:
+            continue
+        lines.append(_line(item))
+        for child_id in item.payload.get("covers", []):
+            child = by_id.get(child_id)
+            if child is not None:
+                lines.append(f"    {_line(child)}")
+    return "\n".join(lines) or "Nothing saved yet."
 
 
 def render(

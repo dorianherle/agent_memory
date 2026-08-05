@@ -89,7 +89,8 @@ class TestWrapper(MemoryTestCase):
         self.assertIn("MEMORY STATE", first["messages"][1]["content"])
         names = [tool["function"]["name"] for tool in first["tools"]]
         self.assertEqual(
-            names, ["save", "find", "branch", "inspect", "inspect_done"]
+            names,
+            ["save", "find", "history", "branch", "inspect", "inspect_done"],
         )
 
         second = fake.requests[1]
@@ -118,7 +119,15 @@ class TestWrapper(MemoryTestCase):
         names = [tool["function"]["name"] for tool in fake.requests[0]["tools"]]
         self.assertEqual(
             names,
-            ["save", "find", "branch", "inspect", "inspect_done", "weather"],
+            [
+                "save",
+                "find",
+                "history",
+                "branch",
+                "inspect",
+                "inspect_done",
+                "weather",
+            ],
         )
 
     def test_streaming_memory_tool_loop(self):
@@ -254,6 +263,22 @@ class TestWrapper(MemoryTestCase):
         self.assertIn("Summarized 'main'", result)
         self.assertIn(f"You are now at [{first[:8]}] on branch 'retry'", result)
         self.assertIn("Working files were restored", result)
+
+    def test_call_tool_history_shows_folded_steps(self):
+        from agent_memory import call_tool
+
+        a = self.save("step a")
+        b = self.save("step b")
+        summary = self.memory.save("did a and b", summary=True)
+        c = self.save("step c")
+
+        result = call_tool(self.memory, "history", {})
+
+        lines = result.split("\n")
+        self.assertEqual(lines[0], f"[{summary[:8]}] Summary: did a and b")
+        self.assertEqual(lines[1], f"    [{a[:8]}] step a")
+        self.assertEqual(lines[2], f"    [{b[:8]}] step b")
+        self.assertEqual(lines[3], f"[{c[:8]}] step c")
 
     def test_call_tool_inspect_round_trip(self):
         from agent_memory import call_tool

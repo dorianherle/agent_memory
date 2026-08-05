@@ -102,7 +102,7 @@ agent.send("...")  # MEMORY STATE is prepended here
 ## How memory works
 
 The model never sees a transcript. Every request carries a compact
-MEMORY STATE, and the model manages it with five tools. Your own words
+MEMORY STATE, and the model manages it with six tools. Your own words
 are part of it too: every prompt is recorded automatically as a
 `user:` entry, so intent is never lost.
 
@@ -116,13 +116,24 @@ are part of it too: every prompt is recorded automatically as a
 ```
 
 **save with summary** — a finished piece of work folds into one line.
-History grows by one, Recent empties:
+History grows by one, Recent empties. Summaries are labeled, so the
+model always knows what can be unfolded:
 
 ```text
 ## History
-[9c8d7e6f] Checkout retries payments, so it needs an idempotency key.
+[9c8d7e6f] Summary: Checkout retries payments, so it needs an idempotency key.
 
 ## Recent
+```
+
+**history** — the full timeline for the user: every entry oldest
+first, folded steps indented under the summary that folded them:
+
+```text
+[9c8d7e6f] Summary: Checkout retries payments, so it needs an idempotency key.
+    [3f2e1d0c] user: why does checkout double-charge?
+    [a1b2c3d4] Read checkout/api.py
+    [e5f6a7b8] Read payment retry docs
 ```
 
 **find** — the folded steps are not gone. Anything ever saved can be
