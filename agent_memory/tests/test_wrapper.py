@@ -90,7 +90,15 @@ class TestWrapper(MemoryTestCase):
         names = [tool["function"]["name"] for tool in first["tools"]]
         self.assertEqual(
             names,
-            ["save", "find", "history", "branch", "inspect", "inspect_done"],
+            [
+                "save",
+                "find",
+                "history",
+                "graph",
+                "branch",
+                "inspect",
+                "inspect_done",
+            ],
         )
 
         second = fake.requests[1]
@@ -123,6 +131,7 @@ class TestWrapper(MemoryTestCase):
                 "save",
                 "find",
                 "history",
+                "graph",
                 "branch",
                 "inspect",
                 "inspect_done",
@@ -279,6 +288,25 @@ class TestWrapper(MemoryTestCase):
         self.assertEqual(lines[1], f"    [{a[:8]}] step a")
         self.assertEqual(lines[2], f"    [{b[:8]}] step b")
         self.assertEqual(lines[3], f"[{c[:8]}] step c")
+
+    def test_call_tool_graph_shows_every_branch(self):
+        from agent_memory import call_tool
+
+        first = self.save("first")
+        self.save("second")
+        call_tool(
+            self.memory,
+            "branch",
+            {"id": first, "name": "retry", "summary": "dead end"},
+        )
+
+        result = call_tool(self.memory, "graph", {})
+
+        self.assertIn("* ", result)
+        self.assertIn("Summary: dead end", result)
+        self.assertIn("main", result)
+        self.assertIn("HEAD -> retry", result)
+        self.assertIn(f"[{first[:8]}] first", result)
 
     def test_call_tool_inspect_round_trip(self):
         from agent_memory import call_tool

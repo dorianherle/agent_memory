@@ -30,6 +30,8 @@ WHEN TO CALL TOOLS
   all_branches to true to also search entries on other branches.
 - history when the user asks what happened: the full timeline of this
   branch, with folded steps shown under their summary.
+- graph when the user wants the whole tree: every branch and entry in
+  one picture.
 - branch to move to any entry: back past a dead end, or forward to a
   branch shown under Branches. It folds the current branch behind your
   summary and restores every working file to that entry's snapshot.

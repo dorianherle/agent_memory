@@ -366,6 +366,28 @@ class Memory:
         rows = self._catalog.select(branch=self._home_branch())
         return [self._row_item(row) for row in reversed(rows)]
 
+    def graph(self) -> str:
+        """An ASCII graph of every branch and entry, newest first."""
+        from agent_memory.prompt import _line
+
+        self._sync_catalog()
+        raw = self._run(
+            "log", "--graph", "--all", "--format=%H%x00%D", check=False
+        )
+        lines = []
+        for line in raw.splitlines():
+            if FIELD_SEPARATOR not in line:
+                lines.append(line)
+                continue
+            left, refs = line.split(FIELD_SEPARATOR, 1)
+            prefix, sha = left[:-40], left[-40:]
+            row = self._catalog.get(sha)
+            text = f"{prefix}{_line(self._row_item(row))}"
+            if refs.strip():
+                text += f" ({refs.strip()})"
+            lines.append(text)
+        return "\n".join(lines) or "Nothing saved yet."
+
     def branches(self) -> list[dict]:
         """Every branch with its name, tip entry and whether it is current."""
         self._sync_catalog()

@@ -102,7 +102,7 @@ agent.send("...")  # MEMORY STATE is prepended here
 ## How memory works
 
 The model never sees a transcript. Every request carries a compact
-MEMORY STATE, and the model manages it with six tools. Your own words
+MEMORY STATE, and the model manages it with seven tools. Your own words
 are part of it too: every prompt is recorded automatically as a
 `user:` entry, so intent is never lost.
 
@@ -134,6 +134,15 @@ first, folded steps indented under the summary that folded them:
     [3f2e1d0c] user: why does checkout double-charge?
     [a1b2c3d4] Read checkout/api.py
     [e5f6a7b8] Read payment retry docs
+```
+
+**graph** — the whole tree in one picture, every branch and entry:
+
+```text
+* [55667788] Summary: retry without key works. (HEAD -> retry-without-key)
+| * [11223344] Summary: tried the key fix, dead end. (main)
+|/
+* [a1b2c3d4] Read checkout/api.py
 ```
 
 **find** — the folded steps are not gone. Anything ever saved can be

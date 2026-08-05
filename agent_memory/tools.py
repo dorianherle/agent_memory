@@ -100,6 +100,23 @@ MEMORY_TOOLS = [
     {
         "type": "function",
         "function": {
+            "name": "graph",
+            "strict": True,
+            "description": (
+                "A visual graph of every branch and entry at once, like "
+                "git log --graph. Use it to show the user the whole tree."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": False,
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
             "name": "branch",
             "strict": True,
             "description": (
@@ -211,6 +228,8 @@ def _run_tool(memory: Memory, name: str, arguments: dict) -> str:
         return lines or "Nothing found."
     if name == "history":
         return render_timeline(memory.history())
+    if name == "graph":
+        return memory.graph()
     if name == "branch":
         before = memory._branch_name()
         memory.branch(arguments["id"], arguments["name"], arguments.get("summary"))
