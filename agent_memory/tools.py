@@ -108,8 +108,16 @@ MEMORY_TOOLS = [
             ),
             "parameters": {
                 "type": "object",
-                "properties": {},
-                "required": [],
+                "properties": {
+                    "html": {
+                        "type": "boolean",
+                        "description": (
+                            "True to also write an explorable HTML page "
+                            "the user can open in a browser."
+                        ),
+                    },
+                },
+                "required": ["html"],
                 "additionalProperties": False,
             },
         },
@@ -229,7 +237,11 @@ def _run_tool(memory: Memory, name: str, arguments: dict) -> str:
     if name == "history":
         return render_timeline(memory.history())
     if name == "graph":
-        return memory.graph()
+        result = memory.graph()
+        if arguments.get("html"):
+            page = memory.export_html()
+            result += f"\n\nExplorable version written to {page}"
+        return result
     if name == "branch":
         before = memory._branch_name()
         memory.branch(arguments["id"], arguments["name"], arguments.get("summary"))

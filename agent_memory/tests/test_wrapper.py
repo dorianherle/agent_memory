@@ -300,13 +300,32 @@ class TestWrapper(MemoryTestCase):
             {"id": first, "name": "retry", "summary": "dead end"},
         )
 
-        result = call_tool(self.memory, "graph", {})
+        result = call_tool(self.memory, "graph", {"html": False})
 
         self.assertIn("* ", result)
         self.assertIn("Summary: dead end", result)
         self.assertIn("main", result)
         self.assertIn("HEAD -> retry", result)
         self.assertIn(f"[{first[:8]}] first", result)
+        self.assertNotIn("graph.html", result)
+
+        result = call_tool(self.memory, "graph", {"html": True})
+        self.assertIn("Explorable version written to", result)
+        self.assertIn("graph.html", result)
+
+    def test_export_html(self):
+        first = self.save("first")
+        self.save("second")
+        summary = self.memory.save("did both", summary=True)
+
+        page = self.memory.export_html()
+
+        text = page.read_text()
+        self.assertEqual(page.name, "graph.html")
+        self.assertIn(first[:8], text)
+        self.assertIn(summary[:8], text)
+        self.assertIn("vis-network", text)
+        self.assertIn("you are here", text)
 
     def test_call_tool_inspect_round_trip(self):
         from agent_memory import call_tool

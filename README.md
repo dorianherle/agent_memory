@@ -145,6 +145,11 @@ first, folded steps indented under the summary that folded them:
 * [a1b2c3d4] Read checkout/api.py
 ```
 
+With `html` set to true, graph also writes `.agent_memory/graph.html`
+— an explorable page: pan, zoom, click any node for its full entry.
+Summaries, user turns and branch tips are color coded. You can also
+create it yourself with `memory.export_html()`.
+
 **find** — the folded steps are not gone. Anything ever saved can be
 looked up again by id, text match, saved metadata, or meaning (with an
 embedding provider). An explicit id is found even if it lives on

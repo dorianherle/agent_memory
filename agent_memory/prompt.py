@@ -31,7 +31,8 @@ WHEN TO CALL TOOLS
 - history when the user asks what happened: the full timeline of this
   branch, with folded steps shown under their summary.
 - graph when the user wants the whole tree: every branch and entry in
-  one picture.
+  one picture. Set html to true to also write an explorable HTML page
+  for the user; give them its path.
 - branch to move to any entry: back past a dead end, or forward to a
   branch shown under Branches. It folds the current branch behind your
   summary and restores every working file to that entry's snapshot.

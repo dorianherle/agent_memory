@@ -366,6 +366,12 @@ class Memory:
         rows = self._catalog.select(branch=self._home_branch())
         return [self._row_item(row) for row in reversed(rows)]
 
+    def export_html(self, path: str | Path | None = None) -> Path:
+        """Write an explorable HTML page of the whole store and return it."""
+        from agent_memory.viz import export_html
+
+        return export_html(self, path)
+
     def graph(self) -> str:
         """An ASCII graph of every branch and entry, newest first."""
         from agent_memory.prompt import _line
