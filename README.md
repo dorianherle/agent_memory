@@ -21,14 +21,16 @@ pip install "agent-memory @ git+https://github.com/dorianherle/agent_memory.git@
 
 ## Quick start
 
-Wrap your OpenAI client. Everything else is normal OpenAI code.
+One `wrap(...)` call. Everything else is normal SDK code.
+
+### OpenAI
 
 ```python
 from openai import OpenAI
-from agent_memory import Memory, wrap_client
+from agent_memory import Memory, wrap
 
 memory = Memory(".")
-client = wrap_client(OpenAI(), memory)
+client = wrap(OpenAI(), memory)
 
 response = client.chat.completions.create(
     model="gpt-5",
@@ -59,13 +61,42 @@ for chunk in stream:
     print(chunk.choices[0].delta.content or "", end="")
 ```
 
+### Cursor SDK
+
+Cursor owns the tool loop, so the wrapper acts at the two places you
+talk to Cursor instead: `Agent.create` registers the memory tools, and
+every `agent.send` gets MEMORY STATE prepended before Cursor sees the
+prompt.
+
+```python
+from cursor_sdk import Agent
+from agent_memory import Memory, wrap
+
+memory = Memory(".")
+
+with wrap(Agent, memory, model="composer-2.5", cwd=".") as agent:
+    agent.send("Why does checkout double-charge?").wait()
+```
+
+Everything else (`model=`, `cwd=`, `api_key=`, your own
+`custom_tools=`, ...) passes through to `Agent.create` unchanged.
+
+Already have an agent, for example from `Agent.resume`? Wrapping it
+adds the send-side injection; register the tools yourself with
+`agent_memory.wrappers.memory_custom_tools(memory)`:
+
+```python
+agent = wrap(existing_agent, memory)
+agent.send("...")  # MEMORY STATE is prepended here
+```
+
 - `Memory(".")` creates `.agent_memory/` next to your project. It is a
   separate Git store; your repo stays untouched.
 - Next session, open `Memory(".")` again — everything is still there.
   You never reload an old transcript.
-- Your own `tools=` still work. Memory calls are handled silently; a
-  response that calls your tools is returned to you as usual.
-- Sync client only for now — `AsyncOpenAI` is not wrapped yet.
+- Your own `tools=` / `custom_tools` still work. Memory calls are
+  handled silently.
+- OpenAI: sync client only for now — `AsyncOpenAI` is not wrapped yet.
 
 ## How memory works
 
@@ -91,8 +122,8 @@ History grows by one, Recent empties:
 ```
 
 **find** — the folded steps are not gone. Anything ever saved can be
-looked up again by id, text match, saved metadata, or meaning (see
-Semantic search).
+looked up again by id, text match, saved metadata, or meaning (with an
+embedding provider).
 
 **branch** — a past conclusion proved wrong. Instead of rewriting
 history, the model goes back to an earlier entry on a new branch. The
@@ -185,148 +216,3 @@ while True:
 Each request then holds only the instructions, your prompt, MEMORY STATE
 and the last tool result. No transcript at all. Folding Recent into a
 summary visibly shrinks the next request.
-
-## Other SDKs
-
-### Cursor SDK
-
-Cursor runs the loop. Register the three tools as custom tools — the
-schemas come from `MEMORY_TOOLS`, each `execute` writes to the store:
-
-```python
-from cursor_sdk import Agent, LocalAgentOptions, CustomTool
-from agent_memory import Memory, MEMORY_TOOLS, call_tool
-
-memory = Memory(".")
-
-def run(name):
-    def execute(**args):
-        return call_tool(memory, name, args)
-    return execute
-
-custom_tools = {}
-for tool in MEMORY_TOOLS:
-    spec = tool["function"]
-    custom_tools[spec["name"]] = CustomTool(
-        description=spec["description"],
-        input_schema=spec["parameters"],
-        execute=run(spec["name"]),
-    )
-
-with Agent.create(
-    model="composer-2.5",
-    local=LocalAgentOptions(cwd=".", custom_tools=custom_tools),
-) as agent:
-    system, user = memory.messages("Investigate why checkout double-charges.")
-    agent.send(f"{system['content']}\n\n{user['content']}")
-```
-
-### OpenAI Agents SDK
-
-Wrap `call_tool` as function tools:
-
-```python
-from agents import Agent, function_tool
-from agent_memory import Memory, call_tool
-
-memory = Memory(".")
-
-@function_tool
-def save(text: str, payload: dict | None = None, summary: bool = False) -> str:
-    """Store a step. summary=True folds Recent."""
-    return call_tool(memory, "save", {"text": text, "payload": payload, "summary": summary})
-
-@function_tool
-def find(ids: list[str] | None = None, text: str | None = None,
-         payload: dict | None = None, query: str | None = None) -> str:
-    """Look up stored entries."""
-    return call_tool(memory, "find", {"ids": ids, "text": text, "payload": payload, "query": query})
-
-@function_tool
-def branch(id: str, name: str) -> str:
-    """Go back to an entry on a new branch."""
-    return call_tool(memory, "branch", {"id": id, "name": name})
-
-system, user = memory.messages("You investigate checkout bugs.")
-agent = Agent(
-    name="Researcher",
-    instructions=f"{system['content']}\n\n{user['content']}",
-    tools=[save, find, branch],
-)
-```
-
-## API
-
-| Call | Does |
-|---|---|
-| `Memory(path, provider=None)` | open or create the store |
-| `memory.save(text, payload=None, summary=False)` | remember a step; `summary=True` folds Recent |
-| `memory.find(query=None, ids=..., text=..., payload=...)` | look something up |
-| `memory.branch(id, name)` | start a new branch from an earlier entry |
-| `memory.state()` | current entries (History + Recent) |
-| `memory.messages(prompt)` | plain `[system, user]` list for one turn |
-| `memory.revisit(id)` | temporarily restore files as they were at that entry |
-| `memory.clear()` | archive the store and start fresh |
-| `MEMORY_TOOLS` | OpenAI tool schemas for `save` / `find` / `branch` |
-| `call_tool(memory, name, args)` | run one tool call, return the result string |
-| `wrap_client(client, memory)` | drop-in client with the memory loop built in |
-
-`payload` is optional metadata on a save — a plain dict you can filter
-on later: `memory.find(payload={"file": "docs/retries.md"})`.
-
-## Semantic search
-
-Give `Memory` an embedding provider and `find` can search by meaning:
-
-```python
-memory.find("why could a customer be charged twice?", k=6)
-```
-
-Without a provider, `find` still works by id / text / payload.
-
-Any OpenAI-compatible `/v1/embeddings` endpoint (OpenAI, vLLM, Ollama, ...):
-
-```python
-from agent_memory.providers.openai_compatible import OpenAICompatibleProvider
-
-memory = Memory(".", provider=OpenAICompatibleProvider(
-    base_url="https://api.openai.com/v1",
-    model="text-embedding-3-small",
-    api_key="...",
-))
-```
-
-Gemini:
-
-```bash
-pip install "agent-memory[gemini]"
-export GEMINI_API_KEY="..."
-```
-
-```python
-from agent_memory.providers.gemini import GeminiProvider
-
-memory = Memory(".", provider=GeminiProvider())
-```
-
-Your own — any object with these three members:
-
-```python
-class MyProvider:
-    fingerprint = "my-model:1536"  # change when the model or vector size changes
-
-    def embed_documents(self, texts: list[str]) -> list[list[float]]: ...
-    def embed_query(self, text: str) -> list[float]: ...
-```
-
-Or set it through the environment, without touching code:
-
-```bash
-export AGENT_MEMORY_PROVIDER=agent_memory.providers.gemini:GeminiProvider
-```
-
-## Test
-
-```bash
-python -m unittest discover -s agent_memory/tests
-```

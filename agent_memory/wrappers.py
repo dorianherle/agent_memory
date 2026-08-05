@@ -8,13 +8,98 @@ from agent_memory.tools import MEMORY_TOOLS, call_tool
 MEMORY_TOOL_NAMES = {tool["function"]["name"] for tool in MEMORY_TOOLS}
 
 
-def wrap_client(client, memory: Memory):
-    """Wrap an SDK client so its requests get memory injected and handled."""
-    if hasattr(client, "chat"):
-        return MemoryEnhancedOpenAI(client, memory)
+def wrap(target, memory: Memory, **options):
+    """Give a supported SDK long-term memory with one call.
+
+    OpenAI (and compatible) clients::
+
+        client = wrap(OpenAI(), memory)
+        client.chat.completions.create(...)
+
+    Cursor SDK, from the Agent class — registers the memory tools and
+    prepends MEMORY STATE on every send::
+
+        with wrap(Agent, memory, model="composer-2.5", cwd=".") as agent:
+            agent.send("...").wait()
+
+    Cursor SDK, from an agent that already exists — send injection only::
+
+        agent = wrap(existing_agent, memory)
+    """
+    if isinstance(target, type) and callable(getattr(target, "create", None)):
+        return wrap_agent(target, memory, **options)
+    if hasattr(target, "chat"):
+        return MemoryEnhancedOpenAI(target, memory)
+    if callable(getattr(target, "send", None)):
+        return MemoryEnhancedCursor(target, memory)
     raise ValueError(
-        "unsupported client: expected something with chat.completions.create"
+        "unsupported target: pass an OpenAI-style client, the cursor_sdk "
+        "Agent class, or a created agent"
     )
+
+
+def memory_custom_tools(memory: Memory) -> dict:
+    """The save / find / branch tools as Cursor CustomTool objects."""
+    from cursor_sdk import CustomTool
+
+    def runner(name):
+        def execute(args, context=None):
+            return call_tool(memory, name, dict(args or {}))
+
+        return execute
+
+    tools = {}
+    for tool in MEMORY_TOOLS:
+        spec = tool["function"]
+        tools[spec["name"]] = CustomTool(
+            description=spec["description"],
+            input_schema=spec["parameters"],
+            execute=runner(spec["name"]),
+        )
+    return tools
+
+
+def wrap_agent(agent_cls, memory: Memory, *, cwd=".", custom_tools=None, **options):
+    """Create a Cursor agent with memory.
+
+    The memory tools are registered as custom tools at creation, and every
+    send() prepends the memory instructions and the current MEMORY STATE.
+    All other options go through to Agent.create unchanged.
+    """
+    from cursor_sdk import LocalAgentOptions
+
+    tools = {**memory_custom_tools(memory), **dict(custom_tools or {})}
+    local = options.pop("local", None)
+    if local is None:
+        local = LocalAgentOptions(cwd=cwd, custom_tools=tools)
+    else:
+        local.custom_tools = {**tools, **dict(local.custom_tools or {})}
+    return MemoryEnhancedCursor(agent_cls.create(local=local, **options), memory)
+
+
+class MemoryEnhancedCursor:
+    """Wraps a Cursor agent so every send() carries the memory
+    instructions and the current MEMORY STATE. Everything else passes
+    through to the real agent."""
+
+    def __init__(self, agent, memory: Memory) -> None:
+        self.agent = agent
+        self.memory = memory
+
+    def send(self, message, *args, **kwargs):
+        system, user = self.memory.messages(str(message))
+        prompt = f"{system['content']}\n\n{user['content']}"
+        return self.agent.send(prompt, *args, **kwargs)
+
+    def __enter__(self):
+        self.agent.__enter__()
+        return self
+
+    def __exit__(self, *args):
+        return self.agent.__exit__(*args)
+
+    def __getattr__(self, name):
+        return getattr(self.agent, name)
 
 
 class MemoryEnhancedOpenAI:

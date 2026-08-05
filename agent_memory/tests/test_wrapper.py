@@ -1,8 +1,9 @@
 import json
 from types import SimpleNamespace
 
-from agent_memory import wrap_client
+from agent_memory import wrap
 from agent_memory.tests.helpers import MemoryTestCase
+from agent_memory.wrappers import MemoryEnhancedCursor
 
 
 def tool_call(name, arguments):
@@ -43,6 +44,25 @@ class FakeClient:
         return self.replies.pop(0)
 
 
+class FakeAgent:
+    def __init__(self):
+        self.sent = []
+        self.entered = False
+        self.exited = False
+
+    def send(self, message, options=None, **kwargs):
+        self.sent.append(message)
+        return "run"
+
+    def __enter__(self):
+        self.entered = True
+        return self
+
+    def __exit__(self, *args):
+        self.exited = True
+        return False
+
+
 class TestWrapper(MemoryTestCase):
     def test_memory_tool_loop(self):
         fake = FakeClient([
@@ -54,7 +74,7 @@ class TestWrapper(MemoryTestCase):
             ]),
             reply(content="Done."),
         ])
-        client = wrap_client(fake, self.memory)
+        client = wrap(fake, self.memory)
 
         response = client.chat.completions.create(
             model="gpt-5",
@@ -82,7 +102,7 @@ class TestWrapper(MemoryTestCase):
         fake = FakeClient([
             reply(tool_calls=[tool_call("weather", {"city": "Paris"})]),
         ])
-        client = wrap_client(fake, self.memory)
+        client = wrap(fake, self.memory)
 
         response = client.chat.completions.create(
             model="gpt-5",
@@ -109,7 +129,7 @@ class TestWrapper(MemoryTestCase):
             ],
             [chunk(content="Got"), chunk(content=" it.")],
         ])
-        client = wrap_client(fake, self.memory)
+        client = wrap(fake, self.memory)
 
         stream = client.chat.completions.create(
             model="gpt-5",
@@ -135,7 +155,7 @@ class TestWrapper(MemoryTestCase):
                 ]),
             ],
         ])
-        client = wrap_client(fake, self.memory)
+        client = wrap(fake, self.memory)
 
         stream = client.chat.completions.create(
             model="gpt-5",
@@ -148,3 +168,28 @@ class TestWrapper(MemoryTestCase):
         self.assertEqual(len(chunks), 1)
         piece = chunks[0].choices[0].delta.tool_calls[0]
         self.assertEqual(piece.function.name, "weather")
+
+    def test_cursor_send_prepends_memory(self):
+        fake = FakeAgent()
+        agent = wrap(fake, self.memory)
+        self.memory.save("Already knew the city")
+
+        result = agent.send("Why does checkout double-charge?")
+
+        self.assertEqual(result, "run")
+        self.assertEqual(len(fake.sent), 1)
+        self.assertIn("You work without chat history", fake.sent[0])
+        self.assertIn("MEMORY STATE", fake.sent[0])
+        self.assertIn("Already knew the city", fake.sent[0])
+        self.assertIn("Why does checkout double-charge?", fake.sent[0])
+        self.assertIsInstance(agent, MemoryEnhancedCursor)
+
+    def test_cursor_context_manager_and_passthrough(self):
+        fake = FakeAgent()
+        fake.agent_id = "agent-123"
+
+        with wrap(fake, self.memory) as agent:
+            self.assertIsInstance(agent, MemoryEnhancedCursor)
+            self.assertEqual(agent.agent_id, "agent-123")
+        self.assertTrue(fake.entered)
+        self.assertTrue(fake.exited)
