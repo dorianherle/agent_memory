@@ -86,6 +86,17 @@ class StateTests(MemoryTestCase):
         self.assertIn("## Recent", text)
         self.assertIn(f"[{a[:8]}] step a", text)
 
+    def test_render_nudges_when_recent_is_long(self) -> None:
+        self.save("step a")
+        self.save("step b")
+        self.save("step c")
+
+        text = render(self.memory.state(), nudge_after=2)
+        self.assertIn("Recent has 3 steps", text)
+
+        text = render(self.memory.state(), nudge_after=5)
+        self.assertNotIn("Recent has", text)
+
 
 if __name__ == "__main__":
     unittest.main()

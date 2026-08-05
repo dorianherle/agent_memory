@@ -1,0 +1,4 @@
+hnswlib>=0.8.0
+numpy>=2.2.6
+google-genai
+pytest>=8

@@ -17,12 +17,13 @@ Rules:
 """.strip()
 
 
-def render(items: list[MemoryItem]) -> str:
+def render(items: list[MemoryItem], nudge_after: int = 30) -> str:
     last_summary = -1
     for index, item in enumerate(items):
         if "covers" in item.payload:
             last_summary = index
 
+    recent = items[last_summary + 1 :]
     lines = []
     if last_summary >= 0:
         lines.append("## History")
@@ -30,6 +31,12 @@ def render(items: list[MemoryItem]) -> str:
             lines.append(f"[{item.id[:8]}] {item.message}")
         lines.append("")
     lines.append("## Recent")
-    for item in items[last_summary + 1 :]:
+    for item in recent:
         lines.append(f"[{item.id[:8]}] {item.message}")
+    if len(recent) > nudge_after:
+        lines.append("")
+        lines.append(
+            f"Recent has {len(recent)} steps. "
+            "Summarize whatever is finished before continuing."
+        )
     return "\n".join(lines)
