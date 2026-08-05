@@ -7,15 +7,20 @@ import numpy
 
 from agent_memory.ann import HnswIndex
 from agent_memory.catalog import Catalog, content_hash
-from agent_memory.providers.base import load_provider
+from agent_memory.providers.base import EmbeddingProvider, load_provider
 
 WAIT_SECONDS = 600
 
 
 class Search:
-    def __init__(self, catalog: Catalog, git_dir: Path) -> None:
+    def __init__(
+        self,
+        catalog: Catalog,
+        git_dir: Path,
+        provider: EmbeddingProvider | None = None,
+    ) -> None:
         self.catalog = catalog
-        self.provider = load_provider()
+        self.provider = provider or load_provider()
         base = self.provider.fingerprint
         self.document_fingerprint = f"{base}:document:v1"
         query_config = getattr(self.provider, "query_instruction", "")

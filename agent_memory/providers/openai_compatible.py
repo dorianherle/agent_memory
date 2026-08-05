@@ -8,10 +8,17 @@ MAX_WORKERS = 8
 
 
 class OpenAICompatibleProvider:
-    def __init__(self) -> None:
-        self.base_url = os.environ["AGENT_MEMORY_EMBEDDING_BASE_URL"].rstrip("/")
-        self.model = os.environ["AGENT_MEMORY_EMBEDDING_MODEL"]
-        self.api_key = os.getenv("AGENT_MEMORY_EMBEDDING_API_KEY", "EMPTY")
+    def __init__(
+        self,
+        base_url: str | None = None,
+        model: str | None = None,
+        api_key: str | None = None,
+    ) -> None:
+        self.base_url = (
+            base_url or os.environ["AGENT_MEMORY_EMBEDDING_BASE_URL"]
+        ).rstrip("/")
+        self.model = model or os.environ["AGENT_MEMORY_EMBEDDING_MODEL"]
+        self.api_key = api_key or os.getenv("AGENT_MEMORY_EMBEDDING_API_KEY", "EMPTY")
         self.query_instruction = os.getenv(
             "AGENT_MEMORY_QUERY_INSTRUCTION",
             "Given a question about past agent trajectories, retrieve relevant "

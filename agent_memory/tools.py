@@ -1,6 +1,6 @@
 from agent_memory.core import Memory
 
-TOOLS = [
+MEMORY_TOOLS = [
     {
         "type": "function",
         "function": {
@@ -18,12 +18,17 @@ TOOLS = [
                         "type": "string",
                         "description": "What to remember.",
                     },
+                    "payload": {
+                        "type": ["object", "null"],
+                        "description": "Optional metadata to filter on later.",
+                        "additionalProperties": True,
+                    },
                     "summary": {
                         "type": "boolean",
                         "description": "True to fold Recent behind this text.",
                     },
                 },
-                "required": ["text", "summary"],
+                "required": ["text", "payload", "summary"],
                 "additionalProperties": False,
             },
         },
@@ -49,6 +54,11 @@ TOOLS = [
                         "type": ["string", "null"],
                         "description": "Match a substring of the entry text.",
                     },
+                    "payload": {
+                        "type": ["object", "null"],
+                        "description": "Match saved metadata.",
+                        "additionalProperties": True,
+                    },
                     "query": {
                         "type": ["string", "null"],
                         "description": (
@@ -56,7 +66,7 @@ TOOLS = [
                         ),
                     },
                 },
-                "required": ["ids", "text", "query"],
+                "required": ["ids", "text", "payload", "query"],
                 "additionalProperties": False,
             },
         },
@@ -90,29 +100,31 @@ TOOLS = [
 ]
 
 
-def call_tool(memory: Memory, name: str, arguments: dict) -> tuple[Memory, str]:
+def call_tool(memory: Memory, name: str, arguments: dict) -> str:
+    """Run one memory tool call and return the text result for the model."""
     if name == "save":
         memory.save(
             arguments["text"],
+            arguments.get("payload"),
             summary=arguments.get("summary", False),
-            allow_empty=True,
         )
-        return memory, "Saved."
-
-    if name == "find":
+        result = "Saved."
+    elif name == "find":
         items = memory.find(
             arguments.get("query"),
             ids=arguments.get("ids"),
             text=arguments.get("text"),
+            payload=arguments.get("payload"),
             k=50,
         )
         covered = [c for item in items for c in item.payload.get("covers", [])]
         items += memory.find(ids=covered, k=50)
         lines = "\n".join(f"[{item.id[:8]}] {item.message}" for item in items)
-        return memory, lines or "Nothing found."
-
-    if name == "branch":
-        memory = memory.branch(arguments["id"], arguments["name"])
-        return memory, "You are back at that entry on a new branch. Save why."
-
-    return memory, f"Unknown tool {name}."
+        result = lines or "Nothing found."
+    elif name == "branch":
+        memory.branch(arguments["id"], arguments["name"])
+        result = "You are back at that entry on a new branch. Save why."
+    else:
+        result = f"Unknown tool {name}."
+    memory._last_tool_result = result
+    return result

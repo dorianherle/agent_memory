@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Iterator
 
 from agent_memory.catalog import Catalog
+from agent_memory.providers.base import EmbeddingProvider
 
 HIDDEN_DIR = ".agent_memory"
 ARCHIVE_PREFIX = ".agent_memory_archive_"
@@ -42,11 +43,17 @@ def split_state(items: list[MemoryItem]) -> tuple[list[MemoryItem], list[MemoryI
 
 
 class Memory:
-    def __init__(self, path: str | Path) -> None:
+    def __init__(
+        self,
+        path: str | Path,
+        provider: EmbeddingProvider | None = None,
+    ) -> None:
         self._path = Path(path).resolve()
         self._git_dir = self._path / HIDDEN_DIR
+        self._provider = provider
         self._search = None
         self._catalog = None
+        self._last_tool_result = "Nothing yet."
         self._init()
 
     def _run(self, *args: str, check: bool = True) -> str:
@@ -198,11 +205,11 @@ class Memory:
         if self._search is None:
             from agent_memory.search import Search
 
-            self._search = Search(self._catalog, self._git_dir)
+            self._search = Search(self._catalog, self._git_dir, self._provider)
         return self._search
 
     def _queue_embedding(self, item_id: str) -> None:
-        if not os.getenv("AGENT_MEMORY_PROVIDER"):
+        if self._provider is None and not os.getenv("AGENT_MEMORY_PROVIDER"):
             return
         row = self._catalog.get(item_id)
         if row["kind"] != "delete":
@@ -215,7 +222,7 @@ class Memory:
         self,
         message: str,
         payload: dict | None = None,
-        allow_empty: bool = False,
+        allow_empty: bool = True,
         summary: bool = False,
         _operation: dict | None = None,
     ) -> str:
@@ -327,6 +334,22 @@ class Memory:
         rows = self._catalog.state(self._branch_name())
         return [self._row_item(row) for row in rows]
 
+    def messages(self, prompt: str) -> list[dict[str, str]]:
+        """Build the system + user messages for one agent turn."""
+        from agent_memory.prompt import MEMORY_INSTRUCTIONS, render
+
+        content = "\n\n".join(
+            [
+                prompt.strip(),
+                f"MEMORY STATE\n{render(self.state())}",
+                f"LAST TOOL RESULT\n{self._last_tool_result}",
+            ]
+        )
+        return [
+            {"role": "system", "content": MEMORY_INSTRUCTIONS},
+            {"role": "user", "content": content},
+        ]
+
     def supersede(
         self,
         old_id: str,
@@ -372,8 +395,9 @@ class Memory:
             if self._run("status", "--porcelain", check=False):
                 raise RuntimeError("save current changes before branching")
             self._run("checkout", "-b", name, commit_id)
+            self._search = None
             self._sync_catalog()
-        return Memory(self._path)
+        return self
 
     def clear(self, archive: bool = True) -> None:
         self._search = None

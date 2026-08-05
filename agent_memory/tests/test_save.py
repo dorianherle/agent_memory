@@ -33,7 +33,7 @@ class TestSave(MemoryTestCase):
     def test_allow_empty_true(self):
         self.save("Initial")
 
-        item_id = self.memory.save("Thought about it", allow_empty=True)
+        item_id = self.memory.save("Thought about it")
 
         self.assertEqual(self.memory.find(ids=item_id)[0].message, "Thought about it")
 

@@ -1,8 +1,8 @@
 from agent_memory.core import MemoryItem, split_state
 
 # System message for OpenAI-style tool calling. Pair with
-# agent_memory.tools.TOOLS: the schemas define the arguments,
-# this prompt says when to call each tool.
+# agent_memory.tools.MEMORY_TOOLS: the schemas say what each tool does and
+# which arguments it takes, this prompt says when to reach for them.
 MEMORY_INSTRUCTIONS = """
 You work without chat history. Each turn you only see MEMORY STATE and
 the result of your last tool call. Anything you do not save is gone on
@@ -14,17 +14,15 @@ JSON reply format and do not write tool calls as plain text.
 MEMORY STATE
 - History: one-line summaries of finished work, oldest first.
 - Recent: your raw steps since the last summary.
-- Every entry starts with an id like [1a2b3c4d].
+- Every entry starts with an id like [1a2b3c4d]. Use only ids you can
+  see there and never invent one.
 
 WHEN TO CALL TOOLS
-- save(text): after every meaningful step, store what you learned.
-- save(text, summary=true): when a piece of work is finished, store one
-  sentence describing it. Everything now in Recent is folded behind it
-  and Recent becomes empty. The folded steps stay stored.
-- find(ids=[...]): read the exact steps folded behind a summary. Use the
-  ids shown in MEMORY STATE and never invent one.
-- branch(id, name): when a past conclusion proved wrong, go back to the
-  last good entry, then save why it was wrong.
+- save after every meaningful step, or its result is lost.
+- save with summary set to true as soon as a piece of work is finished,
+  so Recent stays short.
+- find when you need the exact detail behind a summary.
+- branch when a past conclusion proved wrong, then save why.
 
 WHEN TO STOP
 When the task is done, reply with a final answer in plain text and do
@@ -32,7 +30,6 @@ not call a tool.
 
 RULES
 - State only facts backed by MEMORY STATE or the latest tool result.
-- Summarize as soon as a piece of work is finished, so Recent stays short.
 """.strip()
 
 
