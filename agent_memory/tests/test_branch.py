@@ -22,7 +22,81 @@ class TestBranch(MemoryTestCase):
 
     def test_duplicate_name(self):
         first = self.save("first")
+        second = self.save("second")
+        self.save("third")
         self.memory.branch(base_id=first, name="duplicate")
 
         with self.assertRaises(RuntimeError):
-            self.memory.branch(base_id=first, name="duplicate")
+            self.memory.branch(base_id=second, name="duplicate")
+
+    def test_summary_caps_the_left_branch(self):
+        first = self.save("first")
+        second = self.save("second")
+
+        self.memory.branch(first, "retry", summary="second was a dead end")
+
+        cap = self.memory._refs()["main"]
+        item = self.memory.find(ids=cap)[0]
+        self.assertEqual(item.message, "second was a dead end")
+        self.assertIn(second, item.payload["covers"])
+        self.assertEqual([entry.id for entry in self.memory.state()], [first])
+
+    def test_branch_to_tip_resumes_that_branch(self):
+        first = self.save("first")
+        self.save("second")
+        self.memory.branch(first, "retry", summary="left main")
+
+        tip = self.memory._refs()["main"]
+        self.memory.branch(tip, "ignored", summary="back to main")
+
+        self.assertEqual(self.memory._branch_name(), "main")
+        self.assertEqual(self.file.read_text(), "second")
+
+    def test_inspect_and_done(self):
+        first = self.save("first")
+        self.save("second")
+
+        item = self.memory.inspect(first)
+
+        self.assertEqual(item.id, first)
+        self.assertEqual(self.file.read_text(), "first")
+        self.assertEqual(self.memory.inspecting()["branch"], "main")
+        with self.assertRaises(RuntimeError):
+            self.memory.save("not allowed")
+        with self.assertRaises(RuntimeError):
+            self.memory.branch(first, "not-allowed")
+
+        branch = self.memory.inspect_done()
+
+        self.assertEqual(branch, "main")
+        self.assertEqual(self.file.read_text(), "second")
+        self.assertIsNone(self.memory.inspecting())
+
+    def test_inspect_switches_snapshots(self):
+        first = self.save("first")
+        second = self.save("second")
+        self.save("third")
+
+        self.memory.inspect(first)
+        self.memory.inspect(second)
+
+        self.assertEqual(self.file.read_text(), "second")
+        self.assertEqual(self.memory.inspecting()["branch"], "main")
+        self.memory.inspect_done()
+        self.assertEqual(self.file.read_text(), "third")
+
+    def test_stale_inspect_marker_is_recovered(self):
+        first = self.save("first")
+        self.save("second")
+        self.memory.inspect(first)
+
+        memory = Memory(self.path)
+
+        self.assertIsNone(memory.inspecting())
+        self.assertEqual(self.file.read_text(), "second")
+
+    def test_inspect_done_without_inspect(self):
+        self.save("first")
+
+        with self.assertRaises(RuntimeError):
+            self.memory.inspect_done()

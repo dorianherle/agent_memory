@@ -88,11 +88,13 @@ class TestWrapper(MemoryTestCase):
         first = fake.requests[0]
         self.assertIn("MEMORY STATE", first["messages"][1]["content"])
         names = [tool["function"]["name"] for tool in first["tools"]]
-        self.assertEqual(names, ["save", "find", "branch"])
+        self.assertEqual(
+            names, ["save", "find", "branch", "inspect", "inspect_done"]
+        )
 
         second = fake.requests[1]
         self.assertEqual(second["messages"][-1]["role"], "tool")
-        self.assertEqual(second["messages"][-1]["content"], "Saved.")
+        self.assertTrue(second["messages"][-1]["content"].startswith("Saved ["))
 
     def test_user_tools_pass_through(self):
         weather = {
@@ -114,7 +116,10 @@ class TestWrapper(MemoryTestCase):
         self.assertEqual(call.function.name, "weather")
         self.assertEqual(len(fake.requests), 1)
         names = [tool["function"]["name"] for tool in fake.requests[0]["tools"]]
-        self.assertEqual(names, ["save", "find", "branch", "weather"])
+        self.assertEqual(
+            names,
+            ["save", "find", "branch", "inspect", "inspect_done", "weather"],
+        )
 
     def test_streaming_memory_tool_loop(self):
         fake = FakeClient([
@@ -145,7 +150,9 @@ class TestWrapper(MemoryTestCase):
         self.assertEqual(len(fake.requests), 2)
         self.assertEqual(self.memory.state()[-1].message, "Moved to Neuchatel")
         self.assertTrue(fake.requests[1]["stream"])
-        self.assertEqual(fake.requests[1]["messages"][-1]["content"], "Saved.")
+        self.assertTrue(
+            fake.requests[1]["messages"][-1]["content"].startswith("Saved [")
+        )
 
     def test_streaming_user_tools_pass_through(self):
         fake = FakeClient([
@@ -193,3 +200,71 @@ class TestWrapper(MemoryTestCase):
             self.assertEqual(agent.agent_id, "agent-123")
         self.assertTrue(fake.entered)
         self.assertTrue(fake.exited)
+
+    def test_openai_saves_user_message_once(self):
+        fake = FakeClient([reply(content="Done."), reply(content="Again.")])
+        client = wrap(fake, self.memory)
+
+        client.chat.completions.create(
+            model="gpt-5",
+            messages=[{"role": "user", "content": "Investigate."}],
+        )
+        client.chat.completions.create(
+            model="gpt-5",
+            messages=[{"role": "user", "content": "Investigate."}],
+        )
+
+        users = self.memory.find(payload={"user": True}, k=10)
+        self.assertEqual([item.message for item in users], ["Investigate."])
+
+    def test_cursor_send_saves_user_message(self):
+        fake = FakeAgent()
+        agent = wrap(fake, self.memory)
+
+        agent.send("Fix the bug")
+
+        users = self.memory.find(payload={"user": True}, k=10)
+        self.assertEqual(users[0].message, "Fix the bug")
+        self.assertIn("user: Fix the bug", fake.sent[0])
+
+    def test_call_tool_returns_errors(self):
+        from agent_memory import call_tool
+
+        result = call_tool(
+            self.memory,
+            "save",
+            {"text": "bad", "payload": {"_agent_memory": 1}, "summary": False},
+        )
+
+        self.assertTrue(result.startswith("Error:"))
+        self.assertEqual(self.memory._last_tool_result, result)
+
+    def test_call_tool_branch_result(self):
+        from agent_memory import call_tool
+
+        first = self.save("first")
+        self.save("second")
+
+        result = call_tool(
+            self.memory,
+            "branch",
+            {"id": first, "name": "retry", "summary": "second failed"},
+        )
+
+        self.assertIn("Summarized 'main'", result)
+        self.assertIn(f"You are now at [{first[:8]}] on branch 'retry'", result)
+        self.assertIn("Working files were restored", result)
+
+    def test_call_tool_inspect_round_trip(self):
+        from agent_memory import call_tool
+
+        first = self.save("first")
+        self.save("second")
+
+        result = call_tool(self.memory, "inspect", {"id": first})
+        self.assertIn(f"Files are now exactly as at [{first[:8]}]", result)
+        self.assertEqual(self.file.read_text(), "first")
+
+        result = call_tool(self.memory, "inspect_done", {})
+        self.assertIn("Back on 'main'", result)
+        self.assertEqual(self.file.read_text(), "second")

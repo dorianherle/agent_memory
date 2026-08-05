@@ -120,11 +120,21 @@ class MemoryEnhancedOpenAI:
         )
 
     def create(self, messages, tools=None, **kwargs):
+        for message in reversed(messages):
+            if isinstance(message, dict) and message.get("role") == "user":
+                if isinstance(message.get("content"), str):
+                    self.memory.save_user(message["content"])
+                break
+        state_text = render(
+            self.memory.state(),
+            self.memory.branches(),
+            self.memory.inspecting(),
+        )
         messages = [
             {"role": "system", "content": MEMORY_INSTRUCTIONS},
             {
                 "role": "system",
-                "content": f"MEMORY STATE\n{render(self.memory.state())}",
+                "content": f"MEMORY STATE\n{state_text}",
             },
             *messages,
         ]

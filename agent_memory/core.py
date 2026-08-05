@@ -18,6 +18,7 @@ HIDDEN_DIR = ".agent_memory"
 ARCHIVE_PREFIX = ".agent_memory_archive_"
 MARKER = "AGENT_MEMORY"
 LOCK_FILE = "AGENT_LOCK"
+INSPECT_FILE = "INSPECTING"
 PAYLOAD_PREFIX = "Agent-Memory-Payload: "
 OPERATION_KEY = "_agent_memory"
 FIELD_SEPARATOR = "\x00"
@@ -87,6 +88,9 @@ class Memory:
         exclude.write_text(
             f"{HIDDEN_DIR}/\n{ARCHIVE_PREFIX}*/\n.env\n__pycache__/\n.pytest_cache/\n"
         )
+        if self.inspecting() is not None:
+            # A previous session died while inspecting a snapshot.
+            self.inspect_done()
         self._catalog = Catalog(self._git_dir)
         self._sync_catalog()
 
@@ -101,6 +105,13 @@ class Memory:
 
     def _branch_name(self) -> str:
         return self._run("branch", "--show-current", check=False)
+
+    def _home_branch(self) -> str:
+        """The current branch, or the branch to return to while inspecting."""
+        marker = self.inspecting()
+        if marker is not None:
+            return marker["branch"]
+        return self._branch_name()
 
     def _refs(self) -> dict[str, str]:
         raw = self._run(
@@ -226,6 +237,10 @@ class Memory:
         summary: bool = False,
         _operation: dict | None = None,
     ) -> str:
+        if self.inspecting() is not None:
+            raise RuntimeError(
+                "cannot save while inspecting; call inspect_done first"
+            )
         payload = payload or {}
         if OPERATION_KEY in payload:
             raise ValueError(f"{OPERATION_KEY!r} is reserved")
@@ -269,7 +284,7 @@ class Memory:
         if k < 1:
             raise ValueError("k must be at least 1")
         self._sync_catalog()
-        branch_name = self._branch_name() if branch == "current" else branch
+        branch_name = self._home_branch() if branch == "current" else branch
         wanted = None
         if ids is not None:
             wanted = [ids] if isinstance(ids, str) else ids
@@ -281,6 +296,17 @@ class Memory:
                 ) or item
                 for item in wanted
             ]
+            # An explicit id that is not reachable from the current branch
+            # widens the search to every branch; nothing saved is ever out
+            # of reach. Ids reachable here keep the branch-local view.
+            if branch == "current" and branch_name and wanted:
+                reachable = self._catalog.select(
+                    branch=branch_name,
+                    ids=wanted,
+                    include_historical=True,
+                )
+                if len(reachable) < len(set(wanted)):
+                    branch_name = None
 
         if query is not None:
             ranked = self._searcher().find(
@@ -331,17 +357,52 @@ class Memory:
 
     def state(self) -> list[MemoryItem]:
         self._sync_catalog()
-        rows = self._catalog.state(self._branch_name())
+        rows = self._catalog.state(self._home_branch())
         return [self._row_item(row) for row in rows]
 
+    def branches(self) -> list[dict]:
+        """Every branch with its name, tip entry and whether it is current."""
+        self._sync_catalog()
+        current = self._home_branch()
+        result = []
+        for name, tip in sorted(self._refs().items()):
+            row = self._catalog.get(tip)
+            result.append(
+                {
+                    "name": name,
+                    "item": self._row_item(row),
+                    "current": name == current,
+                }
+            )
+        return result
+
+    def save_user(self, text: str) -> str | None:
+        """Record the user's own words as an entry.
+
+        Skipped while inspecting and when the newest user entry already
+        holds the same text (compact mode resends the same prompt).
+        """
+        if self.inspecting() is not None:
+            return None
+        latest = self.find(payload={"user": True}, k=1)
+        if latest and latest[0].message == text:
+            return None
+        return self.save(text, {"user": True})
+
     def messages(self, prompt: str) -> list[dict[str, str]]:
-        """Build the system + user messages for one agent turn."""
+        """Build the system + user messages for one agent turn.
+
+        The prompt is recorded as a user entry, so the user's words are
+        part of memory before any work starts.
+        """
         from agent_memory.prompt import MEMORY_INSTRUCTIONS, render
 
+        self.save_user(prompt)
+        state_text = render(self.state(), self.branches(), self.inspecting())
         content = "\n\n".join(
             [
                 prompt.strip(),
-                f"MEMORY STATE\n{render(self.state())}",
+                f"MEMORY STATE\n{state_text}",
                 f"LAST TOOL RESULT\n{self._last_tool_result}",
             ]
         )
@@ -389,15 +450,72 @@ class Memory:
             finally:
                 self._run("checkout", branch)
 
-    def branch(self, base_id: str, name: str) -> Memory:
+    def branch(self, base_id: str, name: str, summary: str | None = None) -> Memory:
+        """Move to an entry: back past a dead end or forward to another tip.
+
+        With a summary, the current branch is first capped with one
+        summary commit — the node that represents it from now on. If the
+        target is the tip of an existing branch, that branch is resumed
+        instead of creating a duplicate.
+        """
+        if self.inspecting() is not None:
+            raise RuntimeError(
+                "cannot branch while inspecting; call inspect_done first"
+            )
+        commit_id = self._resolve(base_id)
+        if summary is not None:
+            self.save(summary, summary=True)
         with self._lock():
-            commit_id = self._resolve(base_id)
             if self._run("status", "--porcelain", check=False):
                 raise RuntimeError("save current changes before branching")
-            self._run("checkout", "-b", name, commit_id)
+            current = self._branch_name()
+            for existing, tip in sorted(self._refs().items()):
+                # Jumping to another branch's tip resumes that branch;
+                # the own tip still starts a new named line.
+                if tip == commit_id and existing != current:
+                    self._run("checkout", existing)
+                    break
+            else:
+                self._run("checkout", "-b", name, commit_id)
             self._search = None
             self._sync_catalog()
         return self
+
+    def inspecting(self) -> dict | None:
+        """The inspect marker ({'branch': ..., 'id': ...}) or None."""
+        path = self._git_dir / INSPECT_FILE
+        if path.exists():
+            return json.loads(path.read_text())
+        return None
+
+    def inspect(self, item_id: str) -> MemoryItem:
+        """Set every working file to exactly how it was at an entry.
+
+        The repo stays there until inspect_done() checks the branch back
+        out. Inspecting again just switches snapshots.
+        """
+        with self._lock():
+            item = self._item(item_id)
+            marker = self.inspecting()
+            if marker is None:
+                if self._run("status", "--porcelain", check=False):
+                    raise RuntimeError("save current changes before inspecting")
+                marker = {"branch": self._branch_name(), "id": item.id}
+            else:
+                marker = {"branch": marker["branch"], "id": item.id}
+            self._run("checkout", "--force", "--detach", item.id)
+            (self._git_dir / INSPECT_FILE).write_text(json.dumps(marker))
+        return item
+
+    def inspect_done(self) -> str:
+        """Return from inspect: check the branch and its files back out."""
+        with self._lock():
+            marker = self.inspecting()
+            if marker is None:
+                raise RuntimeError("not inspecting; nothing to return from")
+            self._run("checkout", "--force", marker["branch"])
+            (self._git_dir / INSPECT_FILE).unlink()
+        return marker["branch"]
 
     def clear(self, archive: bool = True) -> None:
         self._search = None

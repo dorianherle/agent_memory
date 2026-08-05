@@ -68,3 +68,25 @@ class TestFind(MemoryTestCase):
             )
 
         self.assertEqual([item.id for item in found], [self.second])
+
+    def test_ids_reach_other_branches(self):
+        self.memory.branch(self.first, "side")
+
+        found = self.memory.find(ids=self.third)
+
+        self.assertEqual([item.id for item in found], [self.third])
+
+    def test_all_branches_tool_search(self):
+        from agent_memory import call_tool
+
+        self.memory.branch(self.first, "side")
+
+        scoped = call_tool(
+            self.memory, "find", {"text": "Fixed", "all_branches": False}
+        )
+        wide = call_tool(
+            self.memory, "find", {"text": "Fixed", "all_branches": True}
+        )
+
+        self.assertEqual(scoped, "Nothing found.")
+        self.assertIn("Fixed matrix", wide)

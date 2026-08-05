@@ -98,6 +98,56 @@ class StateTests(MemoryTestCase):
         text = render(self.memory.state(), nudge_after=5)
         self.assertNotIn("Recent has", text)
 
+    def test_render_branches_section(self) -> None:
+        a = self.save("step a")
+        self.save("step b")
+        self.memory.branch(a, "retry", summary="b went nowhere")
+
+        text = render(self.memory.state(), self.memory.branches())
+
+        self.assertIn("## Branches", text)
+        self.assertIn("* retry (you are here)", text)
+        cap = self.memory._refs()["main"]
+        self.assertIn(f"[{cap[:8]}] main: b went nowhere", text)
+
+    def test_render_single_branch_has_no_branches_section(self) -> None:
+        self.save("step a")
+
+        text = render(self.memory.state(), self.memory.branches())
+
+        self.assertNotIn("## Branches", text)
+
+    def test_render_user_lines(self) -> None:
+        item = self.memory.save_user("fix the bug")
+
+        text = render(self.memory.state())
+
+        self.assertIn(f"[{item[:8]}] user: fix the bug", text)
+
+    def test_save_user_skips_repeated_text(self) -> None:
+        first = self.memory.save_user("fix the bug")
+        second = self.memory.save_user("fix the bug")
+        third = self.memory.save_user("now test it")
+
+        self.assertIsNotNone(first)
+        self.assertIsNone(second)
+        self.assertIsNotNone(third)
+
+    def test_render_inspect_banner(self) -> None:
+        a = self.save("step a")
+        self.save("step b")
+        self.memory.inspect(a)
+
+        text = render(
+            self.memory.state(),
+            self.memory.branches(),
+            self.memory.inspecting(),
+        )
+
+        self.assertIn(f"INSPECTING [{a[:8]}]", text)
+        self.assertIn("return to 'main'", text)
+        self.memory.inspect_done()
+
 
 if __name__ == "__main__":
     unittest.main()
