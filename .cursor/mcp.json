@@ -4,11 +4,10 @@
       "command": "python",
       "args": [
         "-m",
-        "agent_memory.cursor.mcp"
-      ],
-      "env": {
-        "AGENT_MEMORY_ROOT": "${workspaceFolder}"
-      }
+        "agent_memory.cursor.mcp",
+        "--root",
+        "/Users/dorianherle/Documents/Personal/agent_memory"
+      ]
     }
   }
 }

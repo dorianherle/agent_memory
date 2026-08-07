@@ -10,6 +10,65 @@ from agent_memory.cursor.install import install_cursor
 from agent_memory.tests.helpers import MemoryTestCase
 
 
+class McpServerTests(MemoryTestCase):
+    def test_build_server_registers_tools(self) -> None:
+        from agent_memory.cursor.mcp import _build_server
+
+        server = _build_server()
+        names = set(server._tool_manager._tools)
+        self.assertIn("memory_state", names)
+        self.assertIn("memory_graph_data", names)
+        self.assertIn("memory_summarize", names)
+
+
+class MemoryRootTests(MemoryTestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        import agent_memory.cursor.common as common
+
+        common._resolved_root = None
+
+    def tearDown(self) -> None:
+        import agent_memory.cursor.common as common
+
+        common._resolved_root = None
+        super().tearDown()
+
+    def test_ignores_unexpanded_workspace_folder(self) -> None:
+        from agent_memory.cursor.common import resolve_root
+
+        with patch.dict(
+            os.environ,
+            {"AGENT_MEMORY_ROOT": "${workspaceFolder}"},
+            clear=False,
+        ):
+            with patch("agent_memory.cursor.common.Path.cwd") as cwd:
+                cwd.return_value = self.path
+                self.assertEqual(resolve_root([]), self.path.resolve())
+
+    def test_root_cli_arg_wins(self) -> None:
+        from agent_memory.cursor.common import resolve_root
+
+        other = self.path / "other"
+        other.mkdir()
+        self.assertEqual(
+            resolve_root(["--root", str(other)]),
+            other.resolve(),
+        )
+
+    def test_remember_root_survives_argv_strip(self) -> None:
+        import agent_memory.cursor.common as common
+        from agent_memory.cursor.mcp import _strip_root_argv
+
+        other = self.path / "cached"
+        other.mkdir()
+        with patch.object(sys, "argv", ["prog", "--root", str(other)]):
+            self.assertEqual(common.remember_root(), other.resolve())
+            _strip_root_argv()
+            self.assertEqual(sys.argv, ["prog"])
+            self.assertEqual(common.memory_root(), other.resolve())
+
+
 class GraphDataTests(MemoryTestCase):
     def test_graph_data_shape(self) -> None:
         first = self.save("first")
@@ -128,8 +187,14 @@ class InstallTests(MemoryTestCase):
         self.assertIn("agent-memory", mcp["mcpServers"])
         self.assertEqual(
             mcp["mcpServers"]["agent-memory"]["args"],
-            ["-m", "agent_memory.cursor.mcp"],
+            [
+                "-m",
+                "agent_memory.cursor.mcp",
+                "--root",
+                str(self.path.resolve()),
+            ],
         )
+        self.assertNotIn("env", mcp["mcpServers"]["agent-memory"])
 
         hooks = json.loads(written["hooks"].read_text())
         self.assertEqual(hooks["hooks"]["stop"], [{"command": "echo stop"}])

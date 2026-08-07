@@ -76,10 +76,18 @@ def install_cursor(
     mcp_path = cursor / "mcp.json"
     mcp = _read_json(mcp_path, {"mcpServers": {}})
     servers = mcp.setdefault("mcpServers", {})
+    # Pass the project root via --root in args (absolute). Prefer args over
+    # env: some Cursor builds leave ${workspaceFolder} unexpanded in env,
+    # which made memory look empty. Teammates should re-run
+    # `agent-memory cursor install` so the path matches their machine.
     servers[SERVER_NAME] = {
         "command": py,
-        "args": ["-m", "agent_memory.cursor.mcp"],
-        "env": {"AGENT_MEMORY_ROOT": "${workspaceFolder}"},
+        "args": [
+            "-m",
+            "agent_memory.cursor.mcp",
+            "--root",
+            str(root),
+        ],
     }
     _write_json(mcp_path, mcp)
     written["mcp"] = mcp_path

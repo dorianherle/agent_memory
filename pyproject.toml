@@ -10,9 +10,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-cursor = ["mcp>=1.2"]
+# FastMCP lives in mcp 1.x; mcp 2.0 removed it
+cursor = ["mcp>=1.2,<2"]
 gemini = ["google-genai"]
-test = ["pytest>=8", "mcp>=1.2"]
+test = ["pytest>=8", "mcp>=1.2,<2"]
 
 [project.scripts]
 agent-memory = "agent_memory.cli:main"

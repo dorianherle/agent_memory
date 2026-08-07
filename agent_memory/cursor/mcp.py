@@ -1,24 +1,40 @@
 """MCP server: judgment/navigation tools for Cursor Agent.
 
 Durability (auto.save) is handled by hooks — not exposed here.
+
+Works with mcp SDK v1 (`FastMCP`) and v2 (`MCPServer`).
 """
 
 from __future__ import annotations
+
+import json
 
 from agent_memory.cursor.common import get_memory
 from agent_memory.tools import call_tool
 
 
-def _build_server():
+def _mcp_server(name: str):
+    """Return a high-level MCP server instance for the installed SDK."""
+    try:
+        from mcp.server import MCPServer
+
+        return MCPServer(name)
+    except ImportError:
+        pass
     try:
         from mcp.server.fastmcp import FastMCP
+
+        return FastMCP(name)
     except ImportError as error:
         raise SystemExit(
-            "Cursor MCP needs the optional dependency. Install with:\n"
-            '  pip install "agent-memory[cursor]"'
+            "Cursor MCP needs the `mcp` package. Install with:\n"
+            '  pip install "agent-memory[cursor]"\n'
+            f"Import error: {error}"
         ) from error
 
-    mcp = FastMCP("agent-memory")
+
+def _build_server():
+    mcp = _mcp_server("agent-memory")
 
     @mcp.tool()
     def memory_state() -> str:
@@ -75,8 +91,6 @@ def _build_server():
         graph — use this when the agent should render a .canvas.tsx (or other
         view) instead of opening graph.html. Does not write any files.
         """
-        import json
-
         return json.dumps(get_memory().graph_data(), indent=2)
 
     @mcp.tool()
@@ -107,7 +121,32 @@ def _build_server():
     return mcp
 
 
+def _strip_root_argv() -> None:
+    """Remove our ``--root`` flag so the MCP SDK does not see unknown args."""
+    import sys
+
+    args = sys.argv[1:]
+    cleaned = []
+    skip = False
+    for arg in args:
+        if skip:
+            skip = False
+            continue
+        if arg == "--root":
+            skip = True
+            continue
+        if arg.startswith("--root="):
+            continue
+        cleaned.append(arg)
+    sys.argv = [sys.argv[0], *cleaned]
+
+
 def main() -> None:
+    # Pin root from argv first, then drop the flag before stdio serve.
+    from agent_memory.cursor.common import remember_root
+
+    remember_root()
+    _strip_root_argv()
     _build_server().run()
 
 
