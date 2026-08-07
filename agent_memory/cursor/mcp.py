@@ -90,8 +90,19 @@ def _build_server():
         Returns {nodes, edges, kinds, branches}. Same extraction as the HTML
         graph — use this when the agent should render a .canvas.tsx (or other
         view) instead of opening graph.html. Does not write any files.
+        Prefer memory_write_canvas for an instant canvas file.
         """
         return json.dumps(get_memory().graph_data(), indent=2)
+
+    @mcp.tool()
+    def memory_write_canvas(name: str = "agent-memory-graph") -> str:
+        """Write a Cursor canvas for the live memory graph (instant, no model rewrite).
+
+        Generates .canvas.tsx under the IDE canvases directory from the same
+        graph extraction as memory_graph_data / HTML. Returns the absolute path.
+        """
+        path = get_memory().write_canvas(name=name)
+        return f"Wrote canvas to {path}"
 
     @mcp.tool()
     def memory_branch(id: str, name: str, label: str | None = None) -> str:

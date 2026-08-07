@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+from pathlib import Path
 from unittest.mock import patch
 
 from agent_memory import Memory
@@ -18,6 +19,7 @@ class McpServerTests(MemoryTestCase):
         names = set(server._tool_manager._tools)
         self.assertIn("memory_state", names)
         self.assertIn("memory_graph_data", names)
+        self.assertIn("memory_write_canvas", names)
         self.assertIn("memory_summarize", names)
 
 
@@ -67,6 +69,34 @@ class MemoryRootTests(MemoryTestCase):
             _strip_root_argv()
             self.assertEqual(sys.argv, ["prog"])
             self.assertEqual(common.memory_root(), other.resolve())
+
+
+class WriteCanvasTests(MemoryTestCase):
+    def test_write_canvas_is_instant_tsx(self) -> None:
+        self.save("first step")
+        self.memory.summarize("done first")
+        out = self.path / "out"
+        path = self.memory.write_canvas(out / "graph.canvas.tsx")
+        text = path.read_text()
+        self.assertTrue(path.exists())
+        self.assertIn("computeDAGLayout", text)
+        self.assertIn("export default MemoryGraphCanvas", text)
+        self.assertIn("first step", text)
+        self.assertNotIn('"detail"', text)
+
+    def test_default_canvas_dir_slug(self) -> None:
+        from agent_memory.canvas import default_canvas_dir, project_slug
+
+        root = Path("/Users/me/proj")
+        self.assertEqual(project_slug(root), "Users-me-proj")
+        self.assertEqual(
+            default_canvas_dir(root),
+            Path.home()
+            / ".cursor"
+            / "projects"
+            / "Users-me-proj"
+            / "canvases",
+        )
 
 
 class GraphDataTests(MemoryTestCase):

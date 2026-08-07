@@ -378,6 +378,17 @@ class Memory:
 
         return graph_data(self)
 
+    def write_canvas(
+        self,
+        path: str | Path | None = None,
+        *,
+        name: str = "agent-memory-graph",
+    ) -> Path:
+        """Write a Cursor ``.canvas.tsx`` for the memory graph and return it."""
+        from agent_memory.canvas import write_canvas
+
+        return write_canvas(self, path, name=name)
+
     def graph(self) -> str:
         """An ASCII graph of every branch and entry, newest first."""
         from agent_memory.prompt import _line

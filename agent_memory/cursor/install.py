@@ -28,7 +28,8 @@ answers). You do **not** need to save every step.
 Use **agent-memory** MCP tools for judgment:
 - `memory_summarize` — fold finished work so Recent stays short
 - `memory_find` / `memory_history` / `memory_graph` — recall detail
-- `memory_graph_data` — structured `{nodes, edges, kinds, branches}` for a Cursor canvas
+- `memory_graph_data` — structured `{nodes, edges, kinds, branches}`
+- `memory_write_canvas` — write a live `.canvas.tsx` graph instantly
 - `memory_branch` — leave a dead end; restores files to a snapshot
 - `memory_inspect` / `memory_inspect_done` — look at an old snapshot
 - `memory_state` — refresh MEMORY STATE
