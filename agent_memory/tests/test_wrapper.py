@@ -259,6 +259,69 @@ class TestWrapper(MemoryTestCase):
         self.assertEqual(users[0].message, "Fix the bug")
         self.assertIn("user: Fix the bug", fake.sent[0])
 
+    def test_memory_tools_and_call(self):
+        """README path: tools=memory.tools, then memory.call(...)."""
+        tools = self.memory.tools
+        self.assertEqual(len(tools), 1)
+        self.assertEqual(tools[0]["function"]["name"], "memory")
+        self.assertIn(
+            "save",
+            tools[0]["function"]["parameters"]["properties"]["action"]["enum"],
+        )
+
+        args = {
+            "action": "save",
+            "text": "Read the file",
+            "payload": None,
+            "summary": False,
+            "ids": None,
+            "query": None,
+            "all_branches": None,
+            "html": None,
+            "id": None,
+            "name": None,
+            "label": None,
+        }
+        by_args = self.memory.call(args)
+        self.assertTrue(by_args.startswith("Saved ["))
+        self.assertEqual(self.memory.state()[-1].message, "Read the file")
+
+        by_name = self.memory.call("memory", {**args, "text": "Read docs"})
+        self.assertTrue(by_name.startswith("Saved ["))
+        self.assertEqual(self.memory.state()[-1].message, "Read docs")
+
+        fake = FakeClient([
+            reply(tool_calls=[tool_call("memory", {**args, "text": "From loop"})]),
+            reply(content="Done."),
+        ])
+        messages = self.memory.messages("Investigate.")
+        response = None
+        while True:
+            response = fake.create(
+                model="gpt-5",
+                messages=messages,
+                tools=self.memory.tools,
+            )
+            message = response.choices[0].message
+            if not message.tool_calls:
+                break
+            messages.append(message)
+            for call in message.tool_calls:
+                result = self.memory.call(
+                    call.function.name, json.loads(call.function.arguments)
+                )
+                messages.append(
+                    {"role": "tool", "tool_call_id": call.id, "content": result}
+                )
+
+        self.assertEqual(response.choices[0].message.content, "Done.")
+        self.assertEqual(self.memory.state()[-1].message, "From loop")
+        self.assertEqual(len(fake.requests), 2)
+        self.assertEqual(
+            [tool["function"]["name"] for tool in fake.requests[0]["tools"]],
+            ["memory"],
+        )
+
     def test_call_tool_returns_errors(self):
         from agent_memory import call_tool
 

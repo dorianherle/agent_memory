@@ -423,6 +423,25 @@ class Memory:
             return None
         return self.save(text, {"user": True})
 
+    @property
+    def tools(self) -> list[dict]:
+        """OpenAI-style tool schema: pass as `tools=` (plus your own)."""
+        from agent_memory.tools import MEMORY_TOOLS
+
+        return MEMORY_TOOLS
+
+    def call(self, name_or_args, arguments: dict | None = None) -> str:
+        """Run a memory tool call from the model.
+
+            memory.call(json.loads(call.function.arguments))
+            memory.call(call.function.name, json.loads(call.function.arguments))
+        """
+        from agent_memory.tools import call_tool
+
+        if arguments is None:
+            return call_tool(self, "memory", name_or_args)
+        return call_tool(self, name_or_args, arguments)
+
     def messages(self, prompt: str) -> list[dict[str, str]]:
         """Build the system + user messages for one agent turn.
 
