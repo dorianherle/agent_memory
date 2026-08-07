@@ -372,6 +372,12 @@ class Memory:
 
         return export_html(self, path)
 
+    def graph_data(self) -> dict:
+        """Structured graph ``{nodes, edges, kinds, branches}`` for any UI."""
+        from agent_memory.viz import graph_data
+
+        return graph_data(self)
+
     def graph(self) -> str:
         """An ASCII graph of every branch and entry, newest first."""
         from agent_memory.prompt import _line

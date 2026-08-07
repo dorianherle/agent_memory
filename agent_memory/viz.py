@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 TEMPLATE = """<!DOCTYPE html>
@@ -58,7 +58,12 @@ network.on("doubleClick", (params) => {
 </html>
 """
 
-COLORS = {"summary": "#f6c344", "user": "#6ea8fe", "step": "#f2f2f2", "delete": "#f4a6a6"}
+KINDS = {
+    "summary": {"color": "#f6c344", "label": "summary"},
+    "user": {"color": "#6ea8fe", "label": "user"},
+    "step": {"color": "#f2f2f2", "label": "step"},
+    "delete": {"color": "#f4a6a6", "label": "delete"},
+}
 
 
 def _kind(row, payload):
@@ -71,16 +76,23 @@ def _kind(row, payload):
     return "step"
 
 
-def export_html(memory, path=None) -> Path:
+def graph_data(memory) -> dict:
+    """Structured graph for any renderer: HTML, canvas, or custom UI.
+
+    Returns ``{nodes, edges, kinds, branches}``.
+    """
     memory._sync_catalog()
     current = memory._home_branch()
-    tips = {}
-    for name, tip in memory._refs().items():
-        label = name + (" (you are here)" if name == current else "")
-        tips.setdefault(tip, []).append(label)
+    tip_names: dict[str, list[str]] = {}
+    branch_rows = []
+    for name, tip in sorted(memory._refs().items()):
+        tip_names.setdefault(tip, []).append(name)
+        branch_rows.append(
+            {"name": name, "tip": tip, "current": name == current}
+        )
 
     raw = memory._run("log", "--all", "--format=%H %P", check=False)
-    parents = {}
+    parents: dict[str, list[str]] = {}
     rows = {}
     for line in raw.splitlines():
         sha, *sha_parents = line.split()
@@ -88,7 +100,8 @@ def export_html(memory, path=None) -> Path:
         row = memory._catalog.get(sha)
         if row is not None:
             rows[sha] = row
-    covers = {}
+
+    covers: dict[str, list[str]] = {}
     for sha, row in rows.items():
         payload = json.loads(row["payload"])
         wanted = [c for c in payload.get("covers", []) if c in parents]
@@ -112,19 +125,20 @@ def export_html(memory, path=None) -> Path:
             visible = nearest_visible(parent)
             if visible and (visible, sha) not in seen:
                 seen.add((visible, sha))
-                edges.append({"from": visible, "to": sha})
-    # Folded steps hang under their summary as a hidden, dashed chain.
+                edges.append({"from": visible, "to": sha, "kind": "parent"})
     for summary, steps in covers.items():
         chain = [summary] + steps
         for start, end in zip(chain, chain[1:]):
-            edges.append({
-                "id": f"fold-{summary}-{end}",
-                "from": start,
-                "to": end,
-                "dashes": True,
-                "hidden": True,
-                "fold": summary,
-            })
+            edges.append(
+                {
+                    "id": f"fold-{summary}-{end}",
+                    "from": start,
+                    "to": end,
+                    "kind": "fold",
+                    "fold": summary,
+                    "hidden": True,
+                }
+            )
 
     nodes = []
     for sha, row in rows.items():
@@ -135,28 +149,102 @@ def export_html(memory, path=None) -> Path:
         if sha in covers:
             head += f" [+{len(covers[sha])}]"
         label = f"{head}\n{first_line[:34]}"
-        if sha in tips:
-            label += f"\n[{', '.join(tips[sha])}]"
-        moment = datetime.fromtimestamp(row["committed_us"] / 1_000_000)
+        names = tip_names.get(sha, [])
+        if names:
+            label += f"\n[{', '.join(names)}]"
+        moment = datetime.fromtimestamp(
+            row["committed_us"] / 1_000_000, tz=timezone.utc
+        )
         detail = (
             f"[{sha[:8]}] {kind}\n"
-            f"{moment.strftime('%Y-%m-%d %H:%M:%S')}\n"
-            f"branches: {', '.join(tips.get(sha, [])) or '-'}\n\n"
+            f"{moment.strftime('%Y-%m-%d %H:%M:%S')} UTC\n"
+            f"branches: {', '.join(names) or '-'}\n\n"
             f"{row['message']}\n\n"
             f"payload: {json.dumps(payload, indent=2)}"
         )
-        node = {"id": sha, "label": label, "color": COLORS[kind], "detail": detail}
-        if sha in folded:
-            node["hidden"] = True
+        node = {
+            "id": sha,
+            "kind": kind,
+            "label": label,
+            "message": row["message"],
+            "detail": detail,
+            "branches": names,
+            "folded": sha in folded,
+            "tip": bool(names),
+            "current": any(name == current for name in names),
+            "committed_at": moment.isoformat(),
+        }
         if sha in covers:
             node["children"] = covers[sha]
-        if sha in tips:
-            node["borderWidth"] = 3
-            if any(name.startswith(current) for name in tips[sha]):
-                node["color"] = {"background": COLORS[kind], "border": "#e4572e"}
         nodes.append(node)
 
-    data = json.dumps({"nodes": nodes, "edges": edges}).replace("</", "<\\/")
+    return {
+        "nodes": nodes,
+        "edges": edges,
+        "kinds": KINDS,
+        "branches": branch_rows,
+    }
+
+
+def _vis_payload(data: dict, current_branch: str | None) -> dict:
+    """Map structured graph_data into the vis-network HTML shape."""
+    colors = {kind: meta["color"] for kind, meta in data["kinds"].items()}
+    nodes = []
+    for node in data["nodes"]:
+        kind = node["kind"]
+        color = colors[kind]
+        label = node["label"]
+        if node.get("branches") and current_branch:
+            tagged = [
+                name + (" (you are here)" if name == current_branch else "")
+                for name in node["branches"]
+            ]
+            lines = label.split("\n")
+            if len(lines) >= 3:
+                lines[-1] = f"[{', '.join(tagged)}]"
+                label = "\n".join(lines)
+        vis = {
+            "id": node["id"],
+            "label": label,
+            "color": color,
+            "detail": node["detail"],
+        }
+        if node.get("folded"):
+            vis["hidden"] = True
+        if node.get("children"):
+            vis["children"] = node["children"]
+        if node.get("tip"):
+            vis["borderWidth"] = 3
+            if node.get("current"):
+                vis["color"] = {"background": color, "border": "#e4572e"}
+        nodes.append(vis)
+
+    edges = []
+    for edge in data["edges"]:
+        if edge.get("kind") == "fold":
+            edges.append(
+                {
+                    "id": edge["id"],
+                    "from": edge["from"],
+                    "to": edge["to"],
+                    "dashes": True,
+                    "hidden": True,
+                    "fold": edge["fold"],
+                }
+            )
+        else:
+            edges.append({"from": edge["from"], "to": edge["to"]})
+    return {"nodes": nodes, "edges": edges}
+
+
+def export_html(memory, path=None) -> Path:
+    data = graph_data(memory)
+    current = next(
+        (branch["name"] for branch in data["branches"] if branch["current"]),
+        None,
+    )
+    payload = _vis_payload(data, current)
+    encoded = json.dumps(payload).replace("</", "<\\/")
     page = Path(path) if path else memory._git_dir / "graph.html"
-    page.write_text(TEMPLATE.replace("__DATA__", data))
+    page.write_text(TEMPLATE.replace("__DATA__", encoded))
     return page

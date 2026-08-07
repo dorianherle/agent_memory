@@ -68,6 +68,18 @@ def _build_server():
         )
 
     @mcp.tool()
+    def memory_graph_data() -> str:
+        """Structured memory graph JSON for building a Cursor canvas or custom UI.
+
+        Returns {nodes, edges, kinds, branches}. Same extraction as the HTML
+        graph — use this when the agent should render a .canvas.tsx (or other
+        view) instead of opening graph.html. Does not write any files.
+        """
+        import json
+
+        return json.dumps(get_memory().graph_data(), indent=2)
+
+    @mcp.tool()
     def memory_branch(id: str, name: str, label: str | None = None) -> str:
         """Move to an entry (dead end or another branch). Restores working files to that snapshot."""
         memory = get_memory()

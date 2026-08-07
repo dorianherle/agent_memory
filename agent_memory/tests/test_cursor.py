@@ -10,6 +10,37 @@ from agent_memory.cursor.install import install_cursor
 from agent_memory.tests.helpers import MemoryTestCase
 
 
+class GraphDataTests(MemoryTestCase):
+    def test_graph_data_shape(self) -> None:
+        first = self.save("first")
+        self.save("second")
+        summary = self.memory.summarize("did both")
+
+        data = self.memory.graph_data()
+        self.assertEqual(
+            set(data), {"nodes", "edges", "kinds", "branches"}
+        )
+        self.assertEqual(
+            set(data["kinds"]), {"summary", "user", "step", "delete"}
+        )
+        by_id = {node["id"]: node for node in data["nodes"]}
+        self.assertIn(first, by_id)
+        self.assertTrue(by_id[first]["folded"])
+        self.assertEqual(by_id[summary]["kind"], "summary")
+        self.assertIn(first, by_id[summary]["children"])
+        self.assertTrue(any(branch["current"] for branch in data["branches"]))
+        self.assertTrue(any(edge["kind"] == "fold" for edge in data["edges"]))
+        # Parent edges appear once there is a visible chain outside a fold.
+        later = self.save("after summary")
+        data = self.memory.graph_data()
+        self.assertTrue(
+            any(
+                edge["kind"] == "parent" and edge["to"] == later
+                for edge in data["edges"]
+            )
+        )
+
+
 class AutoSaveTests(MemoryTestCase):
     def test_auto_save_and_dedupe(self) -> None:
         first = self.memory.auto_save("done with checkout")

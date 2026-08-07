@@ -50,6 +50,7 @@ The agent never has to “remember to save.” Hooks handle that. Tools are for 
 | `memory_find` | Reopen detail by meaning, text, or id |
 | `memory_history` | Full timeline of the current branch |
 | `memory_graph` | Branch tree (`html=true` writes a page) |
+| `memory_graph_data` | Same graph as JSON `{nodes, edges, kinds, branches}` for a canvas |
 | `memory_branch` | Leave a dead end; restore that snapshot |
 | `memory_inspect` | Look at an old snapshot (then `memory_inspect_done`) |
 | `memory_state` | Refresh MEMORY STATE |
