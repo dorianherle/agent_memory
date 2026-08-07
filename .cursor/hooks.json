@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "python -m agent_memory.cursor.hook"
+      }
+    ],
+    "beforeSubmitPrompt": [
+      {
+        "command": "python -m agent_memory.cursor.hook"
+      }
+    ],
+    "afterAgentResponse": [
+      {
+        "command": "python -m agent_memory.cursor.hook"
+      }
+    ]
+  }
+}

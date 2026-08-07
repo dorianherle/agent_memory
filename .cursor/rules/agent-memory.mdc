@@ -1,0 +1,19 @@
+---
+description: Long-term agent memory (MCP + automatic durability)
+alwaysApply: true
+---
+
+# Agent Memory
+
+Durability is automatic (Cursor hooks save user prompts and finished
+answers). You do **not** need to save every step.
+
+Use **agent-memory** MCP tools for judgment:
+- `memory_summarize` — fold finished work so Recent stays short
+- `memory_find` / `memory_history` / `memory_graph` — recall detail
+- `memory_branch` — leave a dead end; restores files to a snapshot
+- `memory_inspect` / `memory_inspect_done` — look at an old snapshot
+- `memory_state` — refresh MEMORY STATE
+
+Read `@.cursor/MEMORY_STATE.md` for the compact current state.
+Only use entry ids you can see there or in tool results.

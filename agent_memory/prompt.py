@@ -117,6 +117,6 @@ def render(
         lines.append("")
         lines.append(
             f"Recent has {len(recent)} steps. "
-            "Save a summary of the finished work before continuing."
+            "Summarize the finished work before continuing."
         )
     return "\n".join(lines)

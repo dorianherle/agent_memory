@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "agent-memory": {
+      "command": "python",
+      "args": [
+        "-m",
+        "agent_memory.cursor.mcp"
+      ],
+      "env": {
+        "AGENT_MEMORY_ROOT": "${workspaceFolder}"
+      }
+    }
+  }
+}

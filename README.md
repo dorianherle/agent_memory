@@ -1,67 +1,70 @@
 # Agent Memory
 
-Your agent remembers without carrying its whole chat history.
+Long-running agents that remember — without dragging the whole chat around.
 
-It saves what it learns, folds finished work into one line, reopens
-detail when needed, and branches past dead ends. The prompt stays small.
-Nothing is deleted.
+The prompt stays small. Finished work folds into one line. Detail reopens on demand. Dead ends branch away. Nothing is deleted.
 
-## Install
+Memory owns durability. The agent owns judgment.
+
+## Cursor
 
 ```bash
-pip install "agent-memory @ git+https://github.com/dorianherle/agent_memory.git@main"
+pip install "agent-memory[cursor] @ git+https://github.com/dorianherle/agent_memory.git@main"
+cd your-project
+agent-memory cursor install
 ```
 
-## Quick start
+Reload MCP in **Settings → Tools & MCP**. Open Agent chat.
 
-Import `Memory`. Pass its tool to your agent. You own the loop.
+| When | What happens |
+|------|----------------|
+| Session starts | MEMORY STATE is injected |
+| You send a prompt | saved automatically |
+| Agent needs detail | `memory_find` / `memory_history` |
+| A chunk of work is done | `memory_summarize` |
+| Agent finishes an answer | saved automatically |
+
+`cursor install` merges into your project (safe if `.cursor/` already exists):
+
+- `.cursor/mcp.json` — judgment tools
+- `.cursor/hooks.json` — automatic saves
+- `.cursor/rules/agent-memory.mdc` — how the agent should use it
+- `.cursor/MEMORY_STATE.md` — live compact state
+
+Everything is stored in `.agent_memory/` beside the project — a separate Git store. Your repo is untouched.
+
+Working in this repo?
+
+```bash
+pip install -e ".[cursor]"
+agent-memory cursor install
+```
+
+## Tools
+
+The agent never has to “remember to save.” Hooks handle that. Tools are for judgment:
+
+| Tool | Use it to |
+|------|-----------|
+| `memory_summarize` | Fold finished work behind one line |
+| `memory_find` | Reopen detail by meaning, text, or id |
+| `memory_history` | Full timeline of the current branch |
+| `memory_graph` | Branch tree (`html=true` writes a page) |
+| `memory_branch` | Leave a dead end; restore that snapshot |
+| `memory_inspect` | Look at an old snapshot (then `memory_inspect_done`) |
+| `memory_state` | Refresh MEMORY STATE |
+
+## Python
 
 ```python
-import json
 from openai import OpenAI
-from agent_memory import Memory
+from agent_memory import Memory, wrap
 
-client = OpenAI()
-memory = Memory(".")
-
-messages = memory.messages("Why does checkout double-charge?")
-
-while True:
-    response = client.chat.completions.create(
-        model="gpt-5",
-        messages=messages,
-        tools=memory.tools,  # + your own tools
-    )
-    message = response.choices[0].message
-
-    if not message.tool_calls:
-        print(message.content)
-        break
-
-    messages.append(message)
-    for call in message.tool_calls:
-        result = memory.call(
-            call.function.name, json.loads(call.function.arguments)
-        )
-        messages.append({"role": "tool", "tool_call_id": call.id, "content": result})
+client = wrap(OpenAI(), Memory("."))
+response = client.chat.completions.create(
+    model="gpt-5",
+    messages=[{"role": "user", "content": "Why does checkout double-charge?"}],
+)
 ```
 
-`Memory(".")` stores everything in `.agent_memory/` next to your project
-(a separate Git store; your repo stays untouched). Open it again next
-session — it's still there.
-
-## Actions
-
-The model never sees a transcript. Every request carries MEMORY STATE.
-One tool, one `action`:
-
-```text
-do something            →  memory(action=save)
-finish a meaningful bit →  memory(action=save, summary=true)
-need a detail again     →  memory(action=find)
-look at an old snapshot →  memory(action=inspect)
-dead end, go back       →  memory(action=branch)
-```
-
-Also: `history` (full timeline), `graph` (branch tree; `html=true` writes
-an explorable page), `inspect_done` (leave inspect).
+Low-level: `memory.tools`, `memory.call(...)`, `memory.messages(...)`.

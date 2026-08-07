@@ -423,6 +423,45 @@ class Memory:
             return None
         return self.save(text, {"user": True})
 
+    def auto_save(self, text: str) -> str | None:
+        """Runtime durability save for a finished agent turn.
+
+        Called by hooks/wrappers — not by the model. Skips empty text,
+        inspect mode, and an identical consecutive auto entry.
+        """
+        text = (text or "").strip()
+        if not text or self.inspecting() is not None:
+            return None
+        state = self.state()
+        if state:
+            last = state[-1]
+            if last.message == text and last.payload.get("auto"):
+                return None
+        return self.save(text, {"auto": True})
+
+    def summarize(self, text: str) -> str:
+        """Fold Recent behind one line. Model-owned compaction."""
+        return self.save(text, summary=True)
+
+    def render_state(self) -> str:
+        """Current MEMORY STATE text for prompt injection."""
+        from agent_memory.prompt import render
+
+        return render(self.state(), self.branches(), self.inspecting())
+
+    def write_state_file(self, path: str | Path | None = None) -> Path:
+        """Write MEMORY STATE to a markdown file agents can @-mention."""
+        target = Path(path) if path else self._path / ".cursor" / "MEMORY_STATE.md"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        body = (
+            "# Active Memory State\n\n"
+            "Updated automatically. Prefer memory MCP tools for search "
+            "and compaction; do not invent ids.\n\n"
+            f"```\n{self.render_state()}\n```\n"
+        )
+        target.write_text(body)
+        return target
+
     @property
     def tools(self) -> list[dict]:
         """OpenAI-style tool schema: pass as `tools=` (plus your own)."""
