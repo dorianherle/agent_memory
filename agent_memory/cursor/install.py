@@ -28,8 +28,7 @@ answers). You do **not** need to save every step.
 Use **agent-memory** MCP tools for judgment:
 - `memory_summarize` — fold finished work so Recent stays short
 - `memory_find` / `memory_history` / `memory_graph` — recall detail
-- `memory_graph_data` — structured `{nodes, edges, kinds, branches}`
-- `memory_write_canvas` — write a live `.canvas.tsx` graph instantly
+- `memory_graph_data` — structured `{nodes, edges, kinds, branches}` for a Cursor canvas
 - `memory_branch` — leave a dead end; restores files to a snapshot
 - `memory_inspect` / `memory_inspect_done` — look at an old snapshot
 - `memory_state` — refresh MEMORY STATE
@@ -77,18 +76,11 @@ def install_cursor(
     mcp_path = cursor / "mcp.json"
     mcp = _read_json(mcp_path, {"mcpServers": {}})
     servers = mcp.setdefault("mcpServers", {})
-    # Pass the project root via --root in args (absolute). Prefer args over
-    # env: some Cursor builds leave ${workspaceFolder} unexpanded in env,
-    # which made memory look empty. Teammates should re-run
-    # `agent-memory cursor install` so the path matches their machine.
     servers[SERVER_NAME] = {
         "command": py,
-        "args": [
-            "-m",
-            "agent_memory.cursor.mcp",
-            "--root",
-            str(root),
-        ],
+        "args": ["-m", "agent_memory.cursor.mcp"],
+        # Absolute path: Cursor does not expand ${workspaceFolder} in MCP env.
+        "env": {"AGENT_MEMORY_ROOT": str(root)},
     }
     _write_json(mcp_path, mcp)
     written["mcp"] = mcp_path
