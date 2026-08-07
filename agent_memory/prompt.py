@@ -1,14 +1,14 @@
 from agent_memory.core import MemoryItem, split_state
 
 # System message for OpenAI-style tool calling. Pair with
-# agent_memory.tools.MEMORY_TOOLS: the schemas say what each tool does and
-# which arguments it takes, this prompt says when to reach for them.
+# agent_memory.tools.MEMORY_TOOL: the schema says what each action does
+# and which arguments it takes, this prompt says when to reach for them.
 MEMORY_INSTRUCTIONS = """
 You work without chat history. Each turn you only see MEMORY STATE and
 the result of your last tool call. Anything you do not save is gone on
 the next turn.
 
-Use the given tools through function calling. Do not invent your own
+Use the memory tool through function calling. Do not invent your own
 JSON reply format and do not write tool calls as plain text.
 
 MEMORY STATE
@@ -22,7 +22,8 @@ MEMORY STATE
 - Every entry starts with an id like [1a2b3c4d]. Use only ids you can
   see there and never invent one.
 
-WHEN TO CALL TOOLS
+WHEN TO CALL memory
+Pick action on the single memory tool:
 - save after every meaningful step, or its result is lost.
 - save with summary set to true as soon as a piece of work is finished,
   so Recent stays short.
@@ -34,8 +35,9 @@ WHEN TO CALL TOOLS
   one picture. Set html to true to also write an explorable HTML page
   for the user; give them its path.
 - branch to move to any entry: back past a dead end, or forward to a
-  branch shown under Branches. It folds the current branch behind your
-  summary and restores every working file to that entry's snapshot.
+  branch shown under Branches. Pass label to fold the current branch
+  behind that one-line summary and restore every working file to the
+  target entry's snapshot.
 - inspect to temporarily set every working file to how it was at an
   entry, to look around. inspect_done returns you to your branch.
   Always call inspect_done before answering; edits made while
@@ -89,8 +91,8 @@ def render(
     if inspecting:
         lines.append(
             f"INSPECTING [{inspecting['id'][:8]}]: files are at that "
-            f"snapshot. Call inspect_done to return to "
-            f"'{inspecting['branch']}'."
+            f"snapshot. Call memory with action=inspect_done to return "
+            f"to '{inspecting['branch']}'."
         )
         lines.append("")
     if branches and len(branches) > 1:

@@ -82,10 +82,14 @@ class TestFind(MemoryTestCase):
         self.memory.branch(self.first, "side")
 
         scoped = call_tool(
-            self.memory, "find", {"text": "Fixed", "all_branches": False}
+            self.memory,
+            "memory",
+            {"action": "find", "text": "Fixed", "all_branches": False},
         )
         wide = call_tool(
-            self.memory, "find", {"text": "Fixed", "all_branches": True}
+            self.memory,
+            "memory",
+            {"action": "find", "text": "Fixed", "all_branches": True},
         )
 
         self.assertEqual(scoped, "Nothing found.")

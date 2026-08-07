@@ -6,3 +6,9 @@ __pycache__/
 .venv/
 .codegraph/
 .pytest_cache/
+dist/
+*.egg-info/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/

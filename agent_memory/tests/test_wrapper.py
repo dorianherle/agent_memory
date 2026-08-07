@@ -68,8 +68,20 @@ class TestWrapper(MemoryTestCase):
         fake = FakeClient([
             reply(tool_calls=[
                 tool_call(
-                    "save",
-                    {"text": "Read the file", "payload": None, "summary": False},
+                    "memory",
+                    {
+                        "action": "save",
+                        "text": "Read the file",
+                        "payload": None,
+                        "summary": False,
+                        "ids": None,
+                        "query": None,
+                        "all_branches": None,
+                        "html": None,
+                        "id": None,
+                        "name": None,
+                        "label": None,
+                    },
                 )
             ]),
             reply(content="Done."),
@@ -88,8 +100,10 @@ class TestWrapper(MemoryTestCase):
         first = fake.requests[0]
         self.assertIn("MEMORY STATE", first["messages"][1]["content"])
         names = [tool["function"]["name"] for tool in first["tools"]]
+        self.assertEqual(names, ["memory"])
+        params = first["tools"][0]["function"]["parameters"]
         self.assertEqual(
-            names,
+            params["properties"]["action"]["enum"],
             [
                 "save",
                 "find",
@@ -125,29 +139,29 @@ class TestWrapper(MemoryTestCase):
         self.assertEqual(call.function.name, "weather")
         self.assertEqual(len(fake.requests), 1)
         names = [tool["function"]["name"] for tool in fake.requests[0]["tools"]]
-        self.assertEqual(
-            names,
-            [
-                "save",
-                "find",
-                "history",
-                "graph",
-                "branch",
-                "inspect",
-                "inspect_done",
-                "weather",
-            ],
-        )
+        self.assertEqual(names, ["memory", "weather"])
 
     def test_streaming_memory_tool_loop(self):
         fake = FakeClient([
             [
                 chunk(tool_calls=[
-                    call_delta(0, id="call_1", name="save",
-                               arguments='{"text": "Moved to Neuch'),
+                    call_delta(
+                        0,
+                        id="call_1",
+                        name="memory",
+                        arguments='{"action": "save", "text": "Moved to Neuch',
+                    ),
                 ]),
                 chunk(tool_calls=[
-                    call_delta(0, arguments='atel", "payload": null, "summary": false}'),
+                    call_delta(
+                        0,
+                        arguments=(
+                            'atel", "payload": null, "summary": false, '
+                            '"ids": null, "query": null, "all_branches": null, '
+                            '"html": null, "id": null, "name": null, '
+                            '"label": null}'
+                        ),
+                    ),
                 ]),
             ],
             [chunk(content="Got"), chunk(content=" it.")],
@@ -250,8 +264,13 @@ class TestWrapper(MemoryTestCase):
 
         result = call_tool(
             self.memory,
-            "save",
-            {"text": "bad", "payload": {"_agent_memory": 1}, "summary": False},
+            "memory",
+            {
+                "action": "save",
+                "text": "bad",
+                "payload": {"_agent_memory": 1},
+                "summary": False,
+            },
         )
 
         self.assertTrue(result.startswith("Error:"))
@@ -265,8 +284,13 @@ class TestWrapper(MemoryTestCase):
 
         result = call_tool(
             self.memory,
-            "branch",
-            {"id": first, "name": "retry", "summary": "second failed"},
+            "memory",
+            {
+                "action": "branch",
+                "id": first,
+                "name": "retry",
+                "label": "second failed",
+            },
         )
 
         self.assertIn("Summarized 'main'", result)
@@ -281,7 +305,7 @@ class TestWrapper(MemoryTestCase):
         summary = self.memory.save("did a and b", summary=True)
         c = self.save("step c")
 
-        result = call_tool(self.memory, "history", {})
+        result = call_tool(self.memory, "memory", {"action": "history"})
 
         lines = result.split("\n")
         self.assertEqual(lines[0], f"[{summary[:8]}] Summary: did a and b")
@@ -296,11 +320,18 @@ class TestWrapper(MemoryTestCase):
         self.save("second")
         call_tool(
             self.memory,
-            "branch",
-            {"id": first, "name": "retry", "summary": "dead end"},
+            "memory",
+            {
+                "action": "branch",
+                "id": first,
+                "name": "retry",
+                "label": "dead end",
+            },
         )
 
-        result = call_tool(self.memory, "graph", {"html": False})
+        result = call_tool(
+            self.memory, "memory", {"action": "graph", "html": False}
+        )
 
         self.assertIn("* ", result)
         self.assertIn("Summary: dead end", result)
@@ -309,7 +340,9 @@ class TestWrapper(MemoryTestCase):
         self.assertIn(f"[{first[:8]}] first", result)
         self.assertNotIn("graph.html", result)
 
-        result = call_tool(self.memory, "graph", {"html": True})
+        result = call_tool(
+            self.memory, "memory", {"action": "graph", "html": True}
+        )
         self.assertIn("Explorable version written to", result)
         self.assertIn("graph.html", result)
 
@@ -333,10 +366,15 @@ class TestWrapper(MemoryTestCase):
         first = self.save("first")
         self.save("second")
 
-        result = call_tool(self.memory, "inspect", {"id": first})
+        result = call_tool(
+            self.memory, "memory", {"action": "inspect", "id": first}
+        )
         self.assertIn(f"Files are now exactly as at [{first[:8]}]", result)
+        self.assertIn("action=inspect_done", result)
         self.assertEqual(self.file.read_text(), "first")
 
-        result = call_tool(self.memory, "inspect_done", {})
+        result = call_tool(
+            self.memory, "memory", {"action": "inspect_done"}
+        )
         self.assertIn("Back on 'main'", result)
         self.assertEqual(self.file.read_text(), "second")

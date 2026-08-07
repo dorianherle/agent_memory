@@ -3,9 +3,7 @@ from types import SimpleNamespace
 
 from agent_memory.core import Memory
 from agent_memory.prompt import MEMORY_INSTRUCTIONS, render
-from agent_memory.tools import MEMORY_TOOLS, call_tool
-
-MEMORY_TOOL_NAMES = {tool["function"]["name"] for tool in MEMORY_TOOLS}
+from agent_memory.tools import MEMORY_TOOL, MEMORY_TOOL_NAME, MEMORY_TOOLS, call_tool
 
 
 def wrap(target, memory: Memory, **options):
@@ -16,7 +14,7 @@ def wrap(target, memory: Memory, **options):
         client = wrap(OpenAI(), memory)
         client.chat.completions.create(...)
 
-    Cursor SDK, from the Agent class — registers the memory tools and
+    Cursor SDK, from the Agent class — registers the memory tool and
     prepends MEMORY STATE on every send::
 
         with wrap(Agent, memory, model="composer-2.5", cwd=".") as agent:
@@ -39,30 +37,26 @@ def wrap(target, memory: Memory, **options):
 
 
 def memory_custom_tools(memory: Memory) -> dict:
-    """The save / find / branch tools as Cursor CustomTool objects."""
+    """The memory tool as a Cursor CustomTool."""
     from cursor_sdk import CustomTool
 
-    def runner(name):
-        def execute(args, context=None):
-            return call_tool(memory, name, dict(args or {}))
+    def execute(args, context=None):
+        return call_tool(memory, MEMORY_TOOL_NAME, dict(args or {}))
 
-        return execute
-
-    tools = {}
-    for tool in MEMORY_TOOLS:
-        spec = tool["function"]
-        tools[spec["name"]] = CustomTool(
+    spec = MEMORY_TOOL["function"]
+    return {
+        MEMORY_TOOL_NAME: CustomTool(
             description=spec["description"],
             input_schema=spec["parameters"],
-            execute=runner(spec["name"]),
+            execute=execute,
         )
-    return tools
+    }
 
 
 def wrap_agent(agent_cls, memory: Memory, *, cwd=".", custom_tools=None, **options):
     """Create a Cursor agent with memory.
 
-    The memory tools are registered as custom tools at creation, and every
+    The memory tool is registered as a custom tool at creation, and every
     send() prepends the memory instructions and the current MEMORY STATE.
     All other options go through to Agent.create unchanged.
     """
@@ -107,9 +101,9 @@ class MemoryEnhancedOpenAI:
 
     It only acts at the two boundaries of a request. Before the request
     goes out it injects the memory instructions, MEMORY STATE and the
-    memory tools. When the model answers with a save / find / branch
-    call, the wrapper runs it against the store and fires the next
-    request. Text and your own tool calls are returned unchanged.
+    memory tool. When the model answers with a memory call, the wrapper
+    runs it against the store and fires the next request. Text and your
+    own tool calls are returned unchanged.
     """
 
     def __init__(self, client, memory: Memory) -> None:
@@ -151,7 +145,7 @@ class MemoryEnhancedOpenAI:
             message = response.choices[0].message
             calls = message.tool_calls or []
             if not calls or any(
-                call.function.name not in MEMORY_TOOL_NAMES for call in calls
+                call.function.name != MEMORY_TOOL_NAME for call in calls
             ):
                 return response
             messages.append(message)
@@ -191,7 +185,7 @@ class MemoryEnhancedOpenAI:
             # After state: the stream is done. Only a pure memory call
             # keeps the loop going; anything else was the final answer.
             if not calls or any(
-                call["name"] not in MEMORY_TOOL_NAMES for call in calls
+                call["name"] != MEMORY_TOOL_NAME for call in calls
             ):
                 return
             messages.append(

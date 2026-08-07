@@ -7,11 +7,11 @@ detail when it is needed again, and branches back past dead ends. The
 prompt stays small. Nothing is deleted.
 
 ```text
-do something            →  save
-finish a meaningful bit →  summarize
-need a detail again     →  find
-look at an old snapshot →  inspect
-dead end, go back       →  branch
+do something            →  memory(action=save)
+finish a meaningful bit →  memory(action=save, summary=true)
+need a detail again     →  memory(action=find)
+look at an old snapshot →  memory(action=inspect)
+dead end, go back       →  memory(action=branch)
 ```
 
 ## Install
@@ -42,13 +42,13 @@ print(response.choices[0].message.content)
 
 The wrapper only acts at the two boundaries of a request. Before it
 goes out: record your prompt as a `user:` entry, then inject the memory
-instructions, the current MEMORY STATE and the memory tools. When the
-model answers: a memory tool call is executed against the store and the
-next request fires silently; text or one of your own tool calls is
-returned to you untouched. One `create()` can therefore make several
+instructions, the current MEMORY STATE and the `memory` tool. When the
+model answers with `memory(...)`: the call is executed against the store
+and the next request fires silently; text or one of your own tool calls
+is returned to you untouched. One `create()` can therefore make several
 API requests — that is the agent working.
 
-Streaming passes through untouched. If the stream ends in a memory
+Streaming passes through untouched. If the stream ends in a `memory`
 call, the wrapper executes it and the next request streams through the
 same iterator:
 
@@ -65,7 +65,7 @@ for chunk in stream:
 ### Cursor SDK
 
 Cursor owns the tool loop, so the wrapper acts at the two places you
-talk to Cursor instead: `Agent.create` registers the memory tools, and
+talk to Cursor instead: `Agent.create` registers the `memory` tool, and
 every `agent.send` records your prompt as a `user:` entry and gets
 MEMORY STATE prepended before Cursor sees the prompt.
 
@@ -83,7 +83,7 @@ Everything else (`model=`, `cwd=`, `api_key=`, your own
 `custom_tools=`, ...) passes through to `Agent.create` unchanged.
 
 Already have an agent, for example from `Agent.resume`? Wrapping it
-adds the send-side injection; register the tools yourself with
+adds the send-side injection; register the tool yourself with
 `agent_memory.wrappers.memory_custom_tools(memory)`:
 
 ```python
@@ -102,11 +102,14 @@ agent.send("...")  # MEMORY STATE is prepended here
 ## How memory works
 
 The model never sees a transcript. Every request carries a compact
-MEMORY STATE, and the model manages it with seven tools. Your own words
-are part of it too: every prompt is recorded automatically as a
-`user:` entry, so intent is never lost.
+MEMORY STATE. The model manages it with one tool, `memory`, and an
+`action` that picks the operation. Tool calling validates the
+arguments. Your own words are part of it too: every prompt is recorded
+automatically as a `user:` entry, so intent is never lost.
 
-**save** — every meaningful step becomes an entry in Recent:
+### `memory(action=save)`
+
+Every meaningful step becomes an entry in Recent:
 
 ```text
 ## Recent
@@ -115,9 +118,11 @@ are part of it too: every prompt is recorded automatically as a
 [e5f6a7b8] Read payment retry docs
 ```
 
-**save with summary** — a finished piece of work folds into one line.
-History grows by one, Recent empties. Summaries are labeled, so the
-model always knows what can be unfolded:
+### `memory(action=save, summary=true)`
+
+A finished piece of work folds into one line. History grows by one,
+Recent empties. Summaries are labeled, so the model always knows what
+can be unfolded:
 
 ```text
 ## History
@@ -126,8 +131,10 @@ model always knows what can be unfolded:
 ## Recent
 ```
 
-**history** — the full timeline for the user: every entry oldest
-first, folded steps indented under the summary that folded them:
+### `memory(action=history)`
+
+The full timeline for the user: every entry oldest first, folded steps
+indented under the summary that folded them:
 
 ```text
 [9c8d7e6f] Summary: Checkout retries payments, so it needs an idempotency key.
@@ -136,7 +143,9 @@ first, folded steps indented under the summary that folded them:
     [e5f6a7b8] Read payment retry docs
 ```
 
-**graph** — the whole tree in one picture, every branch and entry:
+### `memory(action=graph)`
+
+The whole tree in one picture, every branch and entry:
 
 ```text
 * [55667788] Summary: retry without key works. (HEAD -> retry-without-key)
@@ -145,25 +154,31 @@ first, folded steps indented under the summary that folded them:
 * [a1b2c3d4] Read checkout/api.py
 ```
 
-With `html` set to true, graph also writes `.agent_memory/graph.html`
-— an explorable page: pan, zoom, click any node for its full entry.
+With `html=true`, also writes `.agent_memory/graph.html` — an
+explorable page: pan, zoom, click any node for its full entry.
 Summaries, user turns and branch tips are color coded. You can also
 create it yourself with `memory.export_html()`.
 
-**find** — the folded steps are not gone. Anything ever saved can be
-looked up again by id, text match, saved metadata, or meaning (with an
-embedding provider). An explicit id is found even if it lives on
-another branch, and `all_branches` widens any search to everything.
+### `memory(action=find)`
 
-**inspect** — look at the past without moving. Every working file is
-set to exactly how it was at an entry; `inspect_done` checks the
-branch and its files back out. The window survives crashes: a marker
-on disk records the way home, and the next `Memory(...)` restores it.
+Folded steps are not gone. Look up anything ever saved by id, text
+match, saved metadata, or meaning (with an embedding provider). An
+explicit id is found even if it lives on another branch, and
+`all_branches=true` widens any search to everything.
 
-**branch** — move to any entry, back past a dead end or forward to
-another branch. Leaving a branch first caps it with one summary
-commit, and that node is what the Branches section shows. Working
-files are restored to the target entry's snapshot:
+### `memory(action=inspect)` / `memory(action=inspect_done)`
+
+Look at the past without moving. Every working file is set to exactly
+how it was at an entry; `inspect_done` checks the branch and its files
+back out. The window survives crashes: a marker on disk records the
+way home, and the next `Memory(...)` restores it.
+
+### `memory(action=branch)`
+
+Move to any entry, back past a dead end or forward to another branch.
+Leaving a branch first caps it with one summary commit (`label`), and
+that node is what the Branches section shows. Working files are
+restored to the target entry's snapshot:
 
 ```text
 main
@@ -196,9 +211,9 @@ use the three pieces directly:
 
 | Piece | Role |
 |---|---|
-| `memory` | the store on disk |
-| `MEMORY_TOOLS` | OpenAI tool schemas for the five memory tools |
-| `call_tool(memory, name, args)` | runs one tool call, returns the result string (errors included, never raised) |
+| `Memory` | the store on disk |
+| `MEMORY_TOOLS` | `[MEMORY_TOOL]` — the single `memory` schema (`action` + args) |
+| `call_tool(memory, "memory", args)` | runs the call, returns the result string (errors included, never raised) |
 
 ```python
 import json
@@ -225,7 +240,9 @@ while True:
 
     messages.append(message)
     for call in message.tool_calls:
-        result = call_tool(memory, call.function.name, json.loads(call.function.arguments))
+        result = call_tool(
+            memory, call.function.name, json.loads(call.function.arguments)
+        )
         messages.append({"role": "tool", "tool_call_id": call.id, "content": result})
 ```
 
