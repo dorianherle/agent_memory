@@ -50,7 +50,10 @@ def _build_server():
         ids: list[str] | None = None,
         all_branches: bool = False,
     ) -> str:
-        """Search stored memory. Use query for meaning, text for substring, or ids from MEMORY STATE."""
+        """Search stored memory. Use query for meaning (falls back to substring
+        match when no embedding provider is configured), text for substring,
+        or ids from MEMORY STATE.
+        """
         return call_tool(
             get_memory(),
             "memory",
@@ -64,12 +67,21 @@ def _build_server():
         )
 
     @mcp.tool()
-    def memory_summarize(text: str) -> str:
-        """Fold finished work behind one line so Recent stays short. Still retrievable with memory_find."""
+    def memory_summarize(text: str, agent: str | None = None) -> str:
+        """Fold finished work behind one line so Recent stays short. Still retrievable with memory_find.
+
+        Pass agent to tag who did the work (defaults to AGENT_MEMORY_AGENT or main).
+        """
         memory = get_memory()
-        item_id = memory.summarize(text)
+        item_id = memory.summarize(text, agent=agent)
         memory.write_state_file()
-        return f"Summarized [{item_id[:8]}]."
+        try:
+            memory.write_canvas(name="agent-memory-live")
+        except Exception:
+            pass
+        who = memory.find(ids=item_id, k=1)
+        label = who[0].payload.get("agent", "main") if who else "main"
+        return f"Summarized [{item_id[:8]}] @{label}."
 
     @mcp.tool()
     def memory_history() -> str:
@@ -87,19 +99,21 @@ def _build_server():
     def memory_graph_data() -> str:
         """Structured memory graph JSON for building a Cursor canvas or custom UI.
 
-        Returns {nodes, edges, kinds, branches}. Same extraction as the HTML
+        Returns {nodes, edges, kinds, branches, agents}. Same extraction as the HTML
         graph — use this when the agent should render a .canvas.tsx (or other
         view) instead of opening graph.html. Does not write any files.
         Prefer memory_write_canvas for an instant canvas file.
+        Nodes include agent + color for who-said-what dashboards.
         """
         return json.dumps(get_memory().graph_data(), indent=2)
 
     @mcp.tool()
-    def memory_write_canvas(name: str = "agent-memory-graph") -> str:
+    def memory_write_canvas(name: str = "agent-memory-live") -> str:
         """Write a Cursor canvas for the live memory graph (instant, no model rewrite).
 
         Generates .canvas.tsx under the IDE canvases directory from the same
-        graph extraction as memory_graph_data / HTML. Returns the absolute path.
+        graph extraction as memory_graph_data / HTML. Entries are colored by
+        agent. Returns the absolute path.
         """
         path = get_memory().write_canvas(name=name)
         return f"Wrote canvas to {path}"

@@ -20,8 +20,8 @@ TEMPLATE = """<!DOCTYPE html>
 <div id="graph"></div>
 <div id="details">
   <p class="hint">Click a node for its full entry.</p>
-  <p class="hint">Double-click a gold summary to unfold the steps behind it.</p>
-  <p class="hint">gold = summary, blue = user, white = step, red = delete</p>
+  <p class="hint">gold border-hint = summary kind; node fill = agent</p>
+  <p class="hint">Double-click a summary to unfold the steps behind it.</p>
 </div>
 <script>
 const data = __DATA__;
@@ -76,11 +76,21 @@ def _kind(row, payload):
     return "step"
 
 
+def _agent_of(payload: dict, kind: str) -> str:
+    from agent_memory.identity import DEFAULT_AGENT, USER_AGENT
+
+    if kind == "user" or payload.get("user"):
+        return USER_AGENT
+    return payload.get("agent") or DEFAULT_AGENT
+
+
 def graph_data(memory) -> dict:
     """Structured graph for any renderer: HTML, canvas, or custom UI.
 
-    Returns ``{nodes, edges, kinds, branches}``.
+    Returns ``{nodes, edges, kinds, branches, agents}``.
     """
+    from agent_memory.identity import agent_color_hex, agent_color_key
+
     memory._sync_catalog()
     current = memory._home_branch()
     tip_names: dict[str, list[str]] = {}
@@ -140,15 +150,23 @@ def graph_data(memory) -> dict:
                 }
             )
 
+    agents: dict[str, dict] = {}
     nodes = []
     for sha, row in rows.items():
         payload = json.loads(row["payload"])
         kind = _kind(row, payload)
+        agent = _agent_of(payload, kind)
+        color_key = agent_color_key(agent)
+        agents[agent] = {
+            "name": agent,
+            "color": color_key,
+            "hex": agent_color_hex(agent),
+        }
         first_line = row["message"].split("\n")[0]
         head = sha[:8]
         if sha in covers:
             head += f" [+{len(covers[sha])}]"
-        label = f"{head}\n{first_line[:34]}"
+        label = f"{head} @{agent}\n{first_line[:34]}"
         names = tip_names.get(sha, [])
         if names:
             label += f"\n[{', '.join(names)}]"
@@ -156,7 +174,7 @@ def graph_data(memory) -> dict:
             row["committed_us"] / 1_000_000, tz=timezone.utc
         )
         detail = (
-            f"[{sha[:8]}] {kind}\n"
+            f"[{sha[:8]}] {kind} @{agent}\n"
             f"{moment.strftime('%Y-%m-%d %H:%M:%S')} UTC\n"
             f"branches: {', '.join(names) or '-'}\n\n"
             f"{row['message']}\n\n"
@@ -165,6 +183,8 @@ def graph_data(memory) -> dict:
         node = {
             "id": sha,
             "kind": kind,
+            "agent": agent,
+            "color": color_key,
             "label": label,
             "message": row["message"],
             "detail": detail,
@@ -183,16 +203,22 @@ def graph_data(memory) -> dict:
         "edges": edges,
         "kinds": KINDS,
         "branches": branch_rows,
+        "agents": sorted(agents.values(), key=lambda row: row["name"]),
     }
 
 
 def _vis_payload(data: dict, current_branch: str | None) -> dict:
     """Map structured graph_data into the vis-network HTML shape."""
-    colors = {kind: meta["color"] for kind, meta in data["kinds"].items()}
+    kind_colors = {kind: meta["color"] for kind, meta in data["kinds"].items()}
+    agent_hex = {
+        row["name"]: row.get("hex") or kind_colors.get("step", "#f2f2f2")
+        for row in data.get("agents") or []
+    }
     nodes = []
     for node in data["nodes"]:
         kind = node["kind"]
-        color = colors[kind]
+        # Color primarily by agent; kind still visible via border for tips.
+        color = agent_hex.get(node.get("agent"), kind_colors.get(kind, "#f2f2f2"))
         label = node["label"]
         if node.get("branches") and current_branch:
             tagged = [

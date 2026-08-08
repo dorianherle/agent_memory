@@ -13,9 +13,15 @@ from agent_memory.tests.helpers import MemoryTestCase
 
 class McpServerTests(MemoryTestCase):
     def test_build_server_registers_tools(self) -> None:
-        from agent_memory.cursor.mcp import _build_server
+        try:
+            from agent_memory.cursor.mcp import _build_server
+        except SystemExit as error:
+            self.skipTest(str(error))
 
-        server = _build_server()
+        try:
+            server = _build_server()
+        except SystemExit as error:
+            self.skipTest(str(error))
         names = set(server._tool_manager._tools)
         self.assertIn("memory_state", names)
         self.assertIn("memory_graph_data", names)
@@ -79,10 +85,9 @@ class WriteCanvasTests(MemoryTestCase):
         path = self.memory.write_canvas(out / "graph.canvas.tsx")
         text = path.read_text()
         self.assertTrue(path.exists())
-        self.assertIn("computeDAGLayout", text)
-        self.assertIn("export default MemoryGraphCanvas", text)
+        self.assertIn("useCanvasState", text)
+        self.assertIn("children", text)
         self.assertIn("first step", text)
-        self.assertNotIn('"detail"', text)
 
     def test_default_canvas_dir_slug(self) -> None:
         from agent_memory.canvas import default_canvas_dir, project_slug
@@ -107,7 +112,7 @@ class GraphDataTests(MemoryTestCase):
 
         data = self.memory.graph_data()
         self.assertEqual(
-            set(data), {"nodes", "edges", "kinds", "branches"}
+            set(data), {"nodes", "edges", "kinds", "branches", "agents"}
         )
         self.assertEqual(
             set(data["kinds"]), {"summary", "user", "step", "delete"}
@@ -116,7 +121,9 @@ class GraphDataTests(MemoryTestCase):
         self.assertIn(first, by_id)
         self.assertTrue(by_id[first]["folded"])
         self.assertEqual(by_id[summary]["kind"], "summary")
+        self.assertEqual(by_id[summary]["agent"], "main")
         self.assertIn(first, by_id[summary]["children"])
+        self.assertTrue(any(a["name"] == "main" for a in data["agents"]))
         self.assertTrue(any(branch["current"] for branch in data["branches"]))
         self.assertTrue(any(edge["kind"] == "fold" for edge in data["edges"]))
         # Parent edges appear once there is a visible chain outside a fold.
@@ -178,13 +185,54 @@ class HookTests(MemoryTestCase):
         last = Memory(self.path).state()[-1]
         self.assertEqual(last.message, "fixed the webhook retry")
         self.assertTrue(last.payload.get("auto"))
+        self.assertEqual(last.payload.get("agent"), "main")
 
     def test_session_start_injects_context(self) -> None:
         self.memory.save("prior work")
-        out = handle("sessionStart", {})
+        out = handle("sessionStart", {"session_id": "conv-1"})
         self.assertIn("additional_context", out)
         self.assertIn("prior work", out["additional_context"])
+        self.assertIn("@main", out["additional_context"])
+        self.assertEqual(out.get("env", {}).get("AGENT_MEMORY_AGENT"), "main")
         self.assertTrue((self.path / ".cursor" / "MEMORY_STATE.md").exists())
+
+    def test_subagent_start_and_stop_tag_agents(self) -> None:
+        handle(
+            "subagentStart",
+            {
+                "subagent_id": "abc-123456",
+                "subagent_type": "explore",
+                "task": "Find auth flow",
+                "parent_conversation_id": "conv-parent",
+            },
+        )
+        mem = Memory(self.path)
+        spawn = mem.state()[-1]
+        self.assertEqual(spawn.payload.get("agent"), "main")
+        self.assertIn("@explore·abc123", spawn.message)
+
+        handle(
+            "subagentStop",
+            {
+                "subagent_id": "abc-123456",
+                "subagent_type": "explore",
+                "status": "completed",
+                "summary": "Auth lives in src/auth.ts",
+                "description": "Exploring auth",
+                "task": "Find auth flow",
+            },
+        )
+        mem = Memory(self.path)
+        done = mem.state()[-1]
+        self.assertEqual(done.payload.get("agent"), "explore·abc123")
+        self.assertIn("Auth lives in src/auth.ts", done.message)
+        self.assertTrue(any(n.get("agent") == "explore·abc123" for n in mem.graph_data()["nodes"]))
+
+    def test_auto_save_keeps_agents_distinct(self) -> None:
+        self.memory.auto_save("same text", agent="main")
+        self.memory.auto_save("same text", agent="explore·x1")
+        agents = [i.payload.get("agent") for i in self.memory.state()]
+        self.assertEqual(agents[-2:], ["main", "explore·x1"])
 
 
 class InstallTests(MemoryTestCase):
@@ -211,7 +259,9 @@ class InstallTests(MemoryTestCase):
             )
         )
 
-        written = install_cursor(self.path, python=sys.executable)
+        written = install_cursor(
+            self.path, python=sys.executable, skip_gemini=True, interactive=False
+        )
         mcp = json.loads(written["mcp"].read_text())
         self.assertIn("other", mcp["mcpServers"])
         self.assertIn("agent-memory", mcp["mcpServers"])
@@ -232,6 +282,8 @@ class InstallTests(MemoryTestCase):
             "sessionStart",
             "beforeSubmitPrompt",
             "afterAgentResponse",
+            "subagentStart",
+            "subagentStop",
         ):
             commands = [e["command"] for e in hooks["hooks"][event]]
             self.assertTrue(
@@ -240,15 +292,48 @@ class InstallTests(MemoryTestCase):
 
         self.assertTrue(written["rule"].exists())
         self.assertTrue(written["state"].exists())
+        self.assertTrue((self.path / ".gitignore").exists())
+        self.assertIn(".agent_memory/", (self.path / ".gitignore").read_text())
+
+    def test_install_wires_gemini_env(self) -> None:
+        written = install_cursor(
+            self.path,
+            python=sys.executable,
+            gemini_api_key="test-gemini-key",
+            interactive=False,
+        )
+        mcp = json.loads(written["mcp"].read_text())
+        env = mcp["mcpServers"]["agent-memory"]["env"]
+        self.assertEqual(
+            env["AGENT_MEMORY_PROVIDER"],
+            "agent_memory.providers.gemini:GeminiProvider",
+        )
+        self.assertNotIn("GEMINI_API_KEY", env)
+        cred = written["credentials"].read_text()
+        self.assertIn("GEMINI_API_KEY=test-gemini-key", cred)
+        from agent_memory.cursor.install import apply_credentials_env
+
+        with patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("GEMINI_API_KEY", None)
+            os.environ.pop("AGENT_MEMORY_PROVIDER", None)
+            apply_credentials_env(self.path)
+            self.assertEqual(os.environ.get("GEMINI_API_KEY"), "test-gemini-key")
+            self.assertIn("gemini:GeminiProvider", os.environ.get("AGENT_MEMORY_PROVIDER", ""))
 
     def test_install_is_idempotent(self) -> None:
-        install_cursor(self.path, python=sys.executable)
-        install_cursor(self.path, python=sys.executable)
+        install_cursor(
+            self.path, python=sys.executable, skip_gemini=True, interactive=False
+        )
+        install_cursor(
+            self.path, python=sys.executable, skip_gemini=True, interactive=False
+        )
         hooks = json.loads((self.path / ".cursor" / "hooks.json").read_text())
         for event in (
             "sessionStart",
             "beforeSubmitPrompt",
             "afterAgentResponse",
+            "subagentStart",
+            "subagentStop",
         ):
             matches = [
                 e

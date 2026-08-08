@@ -114,6 +114,14 @@ MEMORY_TOOL = {
                         "label under Branches."
                     ),
                 },
+                "agent": {
+                    "type": ["string", "null"],
+                    "description": (
+                        "save only: who is writing this entry "
+                        "(main, explore·abc123, …). Defaults to "
+                        "AGENT_MEMORY_AGENT or main."
+                    ),
+                },
             },
             "required": [
                 "action",
@@ -127,6 +135,7 @@ MEMORY_TOOL = {
                 "id",
                 "name",
                 "label",
+                "agent",
             ],
             "additionalProperties": False,
         },
@@ -172,10 +181,13 @@ def _run_action(memory: Memory, arguments: dict) -> str:
         )
     if action == "save":
         _require(arguments, "text")
+        payload = dict(arguments.get("payload") or {})
+        agent = arguments.get("agent")
         item_id = memory.save(
             arguments["text"],
-            arguments.get("payload"),
+            payload,
             summary=bool(arguments.get("summary") or False),
+            agent=agent,
         )
         return f"Saved [{item_id[:8]}]."
     if action == "find":

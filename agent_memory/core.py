@@ -24,6 +24,20 @@ OPERATION_KEY = "_agent_memory"
 FIELD_SEPARATOR = "\x00"
 RECORD_SEPARATOR = "\x02"
 
+# Never snapshot VCS metadata into the memory store. The host project's
+# `.git/` and any nested clone would otherwise be picked up by `git add -A`
+# (agent-memory uses its own `--git-dir`, so those look like normal folders).
+EXCLUDE_ENTRIES = (
+    f"{HIDDEN_DIR}/",
+    f"{ARCHIVE_PREFIX}*/",
+    ".git/",
+    ".svn/",
+    ".hg/",
+    ".env",
+    "__pycache__/",
+    ".pytest_cache/",
+)
+
 
 @dataclass
 class MemoryItem:
@@ -85,14 +99,61 @@ class Memory:
 
         exclude = self._git_dir / "info" / "exclude"
         exclude.parent.mkdir(parents=True, exist_ok=True)
-        exclude.write_text(
-            f"{HIDDEN_DIR}/\n{ARCHIVE_PREFIX}*/\n.env\n__pycache__/\n.pytest_cache/\n"
-        )
+        self._ensure_exclude(exclude)
         if self.inspecting() is not None:
             # A previous session died while inspecting a snapshot.
             self.inspect_done()
         self._catalog = Catalog(self._git_dir)
         self._sync_catalog()
+
+    def _ensure_exclude(self, path: Path) -> None:
+        """Keep info/exclude up to date (merge, never wipe user lines)."""
+        existing: list[str] = []
+        if path.exists():
+            existing = [
+                line.rstrip("\n")
+                for line in path.read_text().splitlines()
+            ]
+        known = {line.strip() for line in existing if line.strip()}
+        lines = list(existing)
+        for entry in EXCLUDE_ENTRIES:
+            if entry not in known:
+                lines.append(entry)
+        for entry in self._nested_repo_excludes():
+            if entry not in known:
+                lines.append(entry)
+                known.add(entry)
+        path.write_text("\n".join(lines).rstrip() + "\n")
+
+    def _nested_repo_excludes(self) -> list[str]:
+        """Paths of nested git checkouts to keep out of ``git add -A``.
+
+        A directory containing ``.git`` is treated as a gitlink/submodule
+        candidate; excluding only ``.git/`` is not enough — the whole
+        nested project must be skipped or summarize/save fails.
+        """
+        found: list[str] = []
+        root = self._path
+        skip_roots = {self._git_dir.resolve()}
+        for meta in root.rglob(".git"):
+            try:
+                resolved = meta.resolve()
+            except OSError:
+                continue
+            if any(
+                resolved == skip or skip in resolved.parents
+                for skip in skip_roots
+            ):
+                continue
+            parent = meta.parent if meta.name == ".git" else meta
+            if parent.resolve() == root.resolve():
+                continue
+            try:
+                rel = parent.relative_to(root).as_posix().rstrip("/") + "/"
+            except ValueError:
+                continue
+            found.append(rel)
+        return sorted(set(found))
 
     @contextmanager
     def _lock(self) -> Iterator[None]:
@@ -236,15 +297,20 @@ class Memory:
         allow_empty: bool = True,
         summary: bool = False,
         _operation: dict | None = None,
+        agent: str | None = None,
     ) -> str:
         if self.inspecting() is not None:
             raise RuntimeError(
                 "cannot save while inspecting; call inspect_done first"
             )
+        from agent_memory.identity import DEFAULT_AGENT, ensure_agent_payload
+
         payload = payload or {}
         if OPERATION_KEY in payload:
             raise ValueError(f"{OPERATION_KEY!r} is reserved")
-        stored_payload = dict(payload)
+        stored_payload = ensure_agent_payload(
+            payload, agent=agent, default=DEFAULT_AGENT
+        )
         if summary:
             allow_empty = True
             recent = split_state(self.state())[1]
@@ -254,6 +320,8 @@ class Memory:
             stored_payload[OPERATION_KEY] = _operation
         body = f"{message}\n\n{PAYLOAD_PREFIX}{json.dumps(stored_payload)}"
         with self._lock():
+            # Refresh excludes each save: nested clones may appear mid-session.
+            self._ensure_exclude(self._git_dir / "info" / "exclude")
             self._run("add", "-A")
             arguments = ["commit"]
             if allow_empty:
@@ -308,23 +376,37 @@ class Memory:
                 if len(reachable) < len(set(wanted)):
                     branch_name = None
 
-        if query is not None:
-            ranked = self._searcher().find(
-                query=query,
-                branch=branch_name,
-                ids=wanted,
-                text=text,
-                payload=payload,
-                since=since,
-                until=until,
-                k=k,
-                hybrid=hybrid,
-                dedupe=dedupe,
-                recency_weight=recency_weight,
-                include_historical=include_historical,
-            )
-            items = [self._row_item(row, score) for row, score in ranked]
-        else:
+        use_semantic = query is not None and (
+            self._provider is not None
+            or bool(os.getenv("AGENT_MEMORY_PROVIDER"))
+        )
+        if use_semantic:
+            try:
+                ranked = self._searcher().find(
+                    query=query,
+                    branch=branch_name,
+                    ids=wanted,
+                    text=text,
+                    payload=payload,
+                    since=since,
+                    until=until,
+                    k=k,
+                    hybrid=hybrid,
+                    dedupe=dedupe,
+                    recency_weight=recency_weight,
+                    include_historical=include_historical,
+                )
+                items = [self._row_item(row, score) for row, score in ranked]
+            except ModuleNotFoundError:
+                # Embedding stack optional at runtime (hnswlib/numpy).
+                use_semantic = False
+        if not use_semantic:
+            if query is not None:
+                # No provider / no embedding deps: substring fallback.
+                if text:
+                    text = f"{text} {query}"
+                else:
+                    text = query
             rows = self._catalog.select(
                 branch=branch_name,
                 ids=wanted,
@@ -373,7 +455,7 @@ class Memory:
         return export_html(self, path)
 
     def graph_data(self) -> dict:
-        """Structured graph ``{nodes, edges, kinds, branches}`` for any UI."""
+        """Structured graph ``{nodes, edges, kinds, branches, agents}``."""
         from agent_memory.viz import graph_data
 
         return graph_data(self)
@@ -427,38 +509,56 @@ class Memory:
             )
         return result
 
-    def save_user(self, text: str) -> str | None:
+    def save_user(self, text: str, *, agent: str | None = None) -> str | None:
         """Record the user's own words as an entry.
 
         Skipped while inspecting and when the newest user entry already
         holds the same text (compact mode resends the same prompt).
         """
+        from agent_memory.identity import USER_AGENT
+
         if self.inspecting() is not None:
             return None
         latest = self.find(payload={"user": True}, k=1)
         if latest and latest[0].message == text:
             return None
-        return self.save(text, {"user": True})
+        return self.save(
+            text,
+            {"user": True},
+            agent=agent or USER_AGENT,
+        )
 
-    def auto_save(self, text: str) -> str | None:
+    def auto_save(
+        self,
+        text: str,
+        *,
+        agent: str | None = None,
+    ) -> str | None:
         """Runtime durability save for a finished agent turn.
 
         Called by hooks/wrappers — not by the model. Skips empty text,
         inspect mode, and an identical consecutive auto entry.
         """
+        from agent_memory.identity import DEFAULT_AGENT, resolve_agent
+
         text = (text or "").strip()
         if not text or self.inspecting() is not None:
             return None
+        who = resolve_agent(agent)
         state = self.state()
         if state:
             last = state[-1]
-            if last.message == text and last.payload.get("auto"):
+            if (
+                last.message == text
+                and last.payload.get("auto")
+                and last.payload.get("agent", DEFAULT_AGENT) == who
+            ):
                 return None
-        return self.save(text, {"auto": True})
+        return self.save(text, {"auto": True}, agent=who)
 
-    def summarize(self, text: str) -> str:
+    def summarize(self, text: str, *, agent: str | None = None) -> str:
         """Fold Recent behind one line. Model-owned compaction."""
-        return self.save(text, summary=True)
+        return self.save(text, summary=True, agent=agent)
 
     def render_state(self) -> str:
         """Current MEMORY STATE text for prompt injection."""

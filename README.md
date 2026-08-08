@@ -14,6 +14,22 @@ cd your-project
 agent-memory cursor install
 ```
 
+The installer asks for a **Gemini API key** (for semantic `memory_find`). It writes:
+
+- `.cursor/mcp.json` — MCP tools + non-secret `AGENT_MEMORY_PROVIDER`
+- `.cursor/hooks.json` — automatic saves
+- `.cursor/rules/agent-memory.mdc` — how the agent should use it
+- `.cursor/MEMORY_STATE.md` — live compact state
+- `.agent_memory/credentials.env` — `GEMINI_API_KEY` (gitignored; loaded at runtime)
+
+Non-interactive:
+
+```bash
+agent-memory cursor install --gemini-api-key "$GEMINI_API_KEY"
+# or skip embeddings:
+agent-memory cursor install --skip-gemini --no-interactive
+```
+
 Reload MCP in **Settings → Tools & MCP**. Open Agent chat.
 
 | When | What happens |
@@ -24,14 +40,7 @@ Reload MCP in **Settings → Tools & MCP**. Open Agent chat.
 | A chunk of work is done | `memory_summarize` |
 | Agent finishes an answer | saved automatically |
 
-`cursor install` merges into your project (safe if `.cursor/` already exists):
-
-- `.cursor/mcp.json` — judgment tools
-- `.cursor/hooks.json` — automatic saves
-- `.cursor/rules/agent-memory.mdc` — how the agent should use it
-- `.cursor/MEMORY_STATE.md` — live compact state
-
-Everything is stored in `.agent_memory/` beside the project — a separate Git store. Your repo is untouched.
+Everything else lives in `.agent_memory/` beside the project — a separate Git store. Your repo is untouched (`.agent_memory/` is added to `.gitignore`).
 
 Working in this repo?
 
@@ -47,14 +56,16 @@ The agent never has to “remember to save.” Hooks handle that. Tools are for 
 | Tool | Use it to |
 |------|-----------|
 | `memory_summarize` | Fold finished work behind one line |
-| `memory_find` | Reopen detail by meaning, text, or id |
+| `memory_find` | Reopen detail by meaning (Gemini), text, or id |
 | `memory_history` | Full timeline of the current branch |
 | `memory_graph` | Branch tree (`html=true` writes a page) |
-| `memory_graph_data` | Same graph as JSON `{nodes, edges, kinds, branches}` |
-| `memory_write_canvas` | Write a live `.canvas.tsx` graph instantly (no model rewrite) |
+| `memory_graph_data` | Same graph as JSON `{nodes, edges, kinds, branches, agents}` |
+| `memory_write_canvas` | Write a live `.canvas.tsx` graph (colored by agent) |
 | `memory_branch` | Leave a dead end; restore that snapshot |
 | `memory_inspect` | Look at an old snapshot (then `memory_inspect_done`) |
 | `memory_state` | Refresh MEMORY STATE |
+
+Entries are tagged with an **agent** name (`user`, `main`, `explore·…`) so parent and subagents share one store while the dashboard shows who said what.
 
 ## Python
 
@@ -70,3 +81,19 @@ response = client.chat.completions.create(
 ```
 
 Low-level: `memory.tools`, `memory.call(...)`, `memory.messages(...)`.
+
+## Semantic search (Gemini)
+
+Configured by `cursor install`. Under the hood:
+
+```text
+AGENT_MEMORY_PROVIDER=agent_memory.providers.gemini:GeminiProvider
+GEMINI_API_KEY=…
+```
+
+Without a provider, `memory_find(query=...)` falls back to substring search.
+
+## Nested git repos
+
+Host and nested `.git/` directories are excluded automatically so `memory_summarize` /
+saves are not broken by another repo inside the tree.

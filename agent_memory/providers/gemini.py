@@ -1,11 +1,28 @@
+from __future__ import annotations
+
+import os
+
 from google import genai
 
 
 class GeminiProvider:
-    def __init__(self, model: str = "gemini-embedding-001", dimensions: int = 1536) -> None:
+    """Gemini embeddings for ``memory_find(query=...)``.
+
+    Reads ``GEMINI_API_KEY`` from the environment (set by
+    ``agent-memory cursor install`` into MCP env +
+    ``.agent_memory/credentials.env``).
+    """
+
+    def __init__(
+        self,
+        model: str = "gemini-embedding-001",
+        dimensions: int = 1536,
+        api_key: str | None = None,
+    ) -> None:
         self.model = model
         self.dimensions = dimensions
-        self.client = genai.Client()
+        key = (api_key or os.getenv("GEMINI_API_KEY") or "").strip() or None
+        self.client = genai.Client(api_key=key) if key else genai.Client()
 
     @property
     def fingerprint(self) -> str:
@@ -26,7 +43,7 @@ class GeminiProvider:
         vectors = []
         for start in range(0, len(texts), 100):
             vectors.extend(
-                self._embed(texts[start:start + 100], "RETRIEVAL_DOCUMENT")
+                self._embed(texts[start : start + 100], "RETRIEVAL_DOCUMENT")
             )
         return vectors
 

@@ -1,9 +1,17 @@
+import os
 import sqlite3
+import unittest
 from datetime import timedelta
 from unittest.mock import patch
 
 from agent_memory import Memory
 from agent_memory.tests.helpers import FakeProvider, MemoryTestCase
+
+try:
+    import hnswlib  # noqa: F401
+    HAS_HNSWLIB = True
+except ImportError:
+    HAS_HNSWLIB = False
 
 
 class TestExtendedMemory(MemoryTestCase):
@@ -106,7 +114,7 @@ class TestExtendedMemory(MemoryTestCase):
         new_id = self.memory.supersede(old_id, "new", {"kind": "fact"})
         self.assertEqual(
             self.memory.find(ids=new_id)[0].payload,
-            {"kind": "fact"},
+            {"kind": "fact", "agent": "main"},
         )
 
     def test_negative_k_is_rejected(self):
@@ -114,15 +122,15 @@ class TestExtendedMemory(MemoryTestCase):
         with self.assertRaises(ValueError):
             self.memory.find(k=-1)
 
+    @unittest.skipUnless(HAS_HNSWLIB, "needs hnswlib")
     def test_semantic_query_is_bounded(self):
         self.save("matrix one")
         self.save("matrix two")
-        with patch(
-            "agent_memory.search.load_provider",
-            return_value=FakeProvider(),
-        ):
-            self.assertEqual(len(self.memory.find("matrix", k=1)), 1)
+        self.memory._provider = FakeProvider()
+        self.memory._search = None
+        self.assertEqual(len(self.memory.find("matrix", k=1)), 1)
 
+    @unittest.skipUnless(HAS_HNSWLIB, "needs hnswlib")
     def test_semantic_payload_and_time_filters(self):
         first = self.save("matrix", {"kind": "keep"})
         self.memory.save("matrix", {"kind": "drop"}, allow_empty=True)
@@ -130,25 +138,22 @@ class TestExtendedMemory(MemoryTestCase):
             ids=first,
             include_historical=True,
         )[0].datetime
-        with patch(
-            "agent_memory.search.load_provider",
-            return_value=FakeProvider(),
-        ):
-            items = self.memory.find(
-                "matrix",
-                payload={"kind": "keep"},
-                since=timestamp,
-            )
+        self.memory._provider = FakeProvider()
+        self.memory._search = None
+        items = self.memory.find(
+            "matrix",
+            payload={"kind": "keep"},
+            since=timestamp,
+        )
         self.assertEqual([item.id for item in items], [first])
 
+    @unittest.skipUnless(HAS_HNSWLIB, "needs hnswlib")
     def test_semantic_id_filter_does_not_depend_on_ann_pool(self):
         ids = [
             self.memory.save(f"entry {index}", allow_empty=True)
             for index in range(60)
         ]
-        with patch(
-            "agent_memory.search.load_provider",
-            return_value=FakeProvider(),
-        ):
-            items = self.memory.find("matrix", ids=ids[0], k=1)
+        self.memory._provider = FakeProvider()
+        self.memory._search = None
+        items = self.memory.find("matrix", ids=ids[0], k=1)
         self.assertEqual(items[0].id, ids[0])

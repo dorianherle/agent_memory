@@ -1,13 +1,15 @@
 {
   "mcpServers": {
     "agent-memory": {
-      "command": "python",
+      "command": "/Users/dorianherle/Documents/Personal/agent_memory/.venv/bin/python",
       "args": [
         "-m",
-        "agent_memory.cursor.mcp"
+        "agent_memory.cursor.mcp",
+        "--root",
+        "/Users/dorianherle/Documents/Personal/agent_memory"
       ],
       "env": {
-        "AGENT_MEMORY_ROOT": "/Users/dorianherle/Documents/Personal/agent_memory"
+        "AGENT_MEMORY_PROVIDER": "agent_memory.providers.gemini:GeminiProvider"
       }
     }
   }

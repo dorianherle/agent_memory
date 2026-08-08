@@ -55,12 +55,17 @@ RULES
 
 
 def _line(item: MemoryItem) -> str:
+    from agent_memory.identity import DEFAULT_AGENT, USER_AGENT
+
+    agent = item.payload.get("agent") or DEFAULT_AGENT
     prefix = ""
     if item.payload.get("covers"):
         prefix = "Summary: "
     elif item.payload.get("user"):
         prefix = "user: "
-    return f"[{item.id[:8]}] {prefix}{item.message}"
+        agent = USER_AGENT
+    who = "" if agent in (USER_AGENT, "") else f"@{agent} "
+    return f"[{item.id[:8]}] {who}{prefix}{item.message}"
 
 
 def render_timeline(items: list[MemoryItem]) -> str:

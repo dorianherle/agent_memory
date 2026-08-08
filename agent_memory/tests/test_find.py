@@ -1,6 +1,13 @@
+import unittest
 from unittest.mock import patch
 
 from agent_memory.tests.helpers import FakeProvider, MemoryTestCase
+
+try:
+    import hnswlib  # noqa: F401
+    HAS_HNSWLIB = True
+except ImportError:
+    HAS_HNSWLIB = False
 
 
 class TestFind(MemoryTestCase):
@@ -54,19 +61,25 @@ class TestFind(MemoryTestCase):
 
         self.assertEqual([item.id for item in found], [self.first])
 
+    @unittest.skipUnless(HAS_HNSWLIB, "needs hnswlib")
     def test_semantic(self):
-        with patch("agent_memory.search.load_provider", return_value=FakeProvider()):
-            found = self.memory.find("matrix")
-
+        self.memory._provider = FakeProvider()
+        self.memory._search = None
+        found = self.memory.find("matrix")
         self.assertEqual({item.id for item in found[:2]}, {self.first, self.third})
 
+    @unittest.skipUnless(HAS_HNSWLIB, "needs hnswlib")
     def test_semantic_combines_with_payload(self):
-        with patch("agent_memory.search.load_provider", return_value=FakeProvider()):
-            found = self.memory.find(
-                "matrix",
-                payload={"type": "observation"},
-            )
+        self.memory._provider = FakeProvider()
+        self.memory._search = None
+        found = self.memory.find(
+            "matrix",
+            payload={"type": "observation"},
+        )
+        self.assertEqual([item.id for item in found], [self.second])
 
+    def test_query_falls_back_to_text_without_provider(self):
+        found = self.memory.find(query="UPDATED")
         self.assertEqual([item.id for item in found], [self.second])
 
     def test_ids_reach_other_branches(self):

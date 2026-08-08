@@ -65,4 +65,9 @@ def memory_root(argv: list[str] | None = None) -> Path:
 
 
 def get_memory() -> Memory:
-    return Memory(memory_root())
+    root = memory_root()
+    # Gemini key + AGENT_MEMORY_PROVIDER from cursor install.
+    from agent_memory.cursor.install import apply_credentials_env
+
+    apply_credentials_env(root)
+    return Memory(root)
