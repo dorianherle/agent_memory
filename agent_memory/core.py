@@ -471,6 +471,17 @@ class Memory:
 
         return write_canvas(self, path, name=name)
 
+    def write_live_html(
+        self,
+        path: str | Path | None = None,
+        *,
+        force_shell: bool = False,
+    ) -> Path:
+        """Write / refresh the self-updating browser HTML live monitor."""
+        from agent_memory.live_html import write_live_html
+
+        return write_live_html(self, path, force_shell=force_shell)
+
     def graph(self) -> str:
         """An ASCII graph of every branch and entry, newest first."""
         from agent_memory.prompt import _line

@@ -22,7 +22,7 @@ def main(argv: list[str] | None = None) -> None:
 
     install = cursor_sub.add_parser(
         "install",
-        help="Wire MCP + hooks + rule + Gemini embeddings into .cursor/",
+        help="Wire MCP + hooks + rule + SDK guide + Gemini into .cursor/",
     )
     install.add_argument(
         "project",
@@ -87,9 +87,10 @@ def main(argv: list[str] | None = None) -> None:
             print("Gemini embeddings: OFF (substring memory_find only)")
             print("  You chose --skip-gemini (or cleared credentials).")
         print()
-        print("Next:")
-        print("  Reload MCP in Cursor Settings → Tools & MCP")
-        print("  Start an Agent chat — hooks auto-save; use memory_* tools")
+        from agent_memory.cursor.install import sdk_next_steps_lines
+
+        for line in sdk_next_steps_lines():
+            print(line)
         return
 
     parser.error("unknown command")

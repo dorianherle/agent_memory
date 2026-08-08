@@ -10,6 +10,7 @@ from pathlib import Path
 
 SERVER_NAME = "agent-memory"
 RULE_NAME = "agent-memory.mdc"
+SDK_GUIDE_NAME = "agent-memory-sdk.md"
 CREDENTIALS_NAME = "credentials.env"
 
 PROVIDER_GEMINI = "agent_memory.providers.gemini:GeminiProvider"
@@ -39,7 +40,8 @@ can color who said what.
 Use **agent-memory** MCP tools for judgment:
 - `memory_summarize` — fold finished work so Recent stays short (pass `agent`)
 - `memory_find` — recall detail (`query=` uses Gemini when configured)
-- `memory_write_canvas` — **only** way to show memory to the user (live dashboard)
+- `memory_write_canvas` — Cursor canvas live dashboard
+- Browser monitor: `.agent_memory/live/index.html` (auto-created; self-refreshing)
 - `memory_branch` — leave a dead end; restores files to a snapshot
 - `memory_inspect` / `memory_inspect_done` — look at an old snapshot
 - `memory_state` — agent context only (do not dump graphs/history in chat to “show” memory)
@@ -48,9 +50,82 @@ Read `@.cursor/MEMORY_STATE.md` for the compact current state.
 Only use entry ids you can see there or in tool results.
 """
 
+SDK_GUIDE_BODY = """# Agent Memory + Cursor SDK
+
+`agent-memory cursor install` already wrote the project files this needs:
+
+- `.cursor/mcp.json` — `agent-memory` MCP server
+- `.cursor/hooks.json` — automatic saves (loaded from this project `cwd`)
+
+## Local SDK (required opt-in for MCP)
+
+Local Cursor SDK agents **do not** load `.cursor/mcp.json` by default.
+Pass project settings so `memory_*` tools appear:
+
+### Python
+
+```python
+from dotenv import load_dotenv
+from cursor_sdk import Agent, LocalAgentOptions
+
+load_dotenv()  # CURSOR_API_KEY
+
+with Agent.create(
+    model="composer-2.5",
+    local=LocalAgentOptions(
+        cwd=".",  # this project (has .cursor/mcp.json)
+        setting_sources=["project"],  # ← loads agent-memory MCP
+    ),
+) as agent:
+    result = agent.send("What do we already know?").wait()
+    print(result.result)
+```
+
+### TypeScript
+
+```ts
+import { Agent } from "@cursor/sdk";
+
+const agent = Agent.create({
+  model: { id: "composer-2.5" },
+  local: {
+    cwd: process.cwd(),
+    settingSources: ["project"], // ← loads agent-memory MCP
+  },
+});
+```
+
+## What you get
+
+| Piece | How it activates |
+|-------|------------------|
+| MCP `memory_*` tools | `setting_sources=["project"]` / `settingSources: ["project"]` |
+| Hooks auto-save | automatic when `cwd` is this project (no settingSources needed) |
+
+Inline `mcp_servers` / `mcpServers` also works if you prefer not to use ambient project settings.
+
+Cloud SDK agents load project MCP/hooks from the repo differently — see Cursor SDK docs.
+"""
+
 
 class GeminiSetupError(ValueError):
     """Raised when Gemini was neither configured nor explicitly skipped."""
+
+
+def sdk_next_steps_lines() -> list[str]:
+    """Lines printed after install so SDK users do not miss setting_sources."""
+    return [
+        "Next (Cursor IDE):",
+        "  Reload MCP in Cursor Settings → Tools & MCP",
+        "  Start an Agent chat — hooks auto-save; use memory_* tools",
+        "",
+        "Next (Cursor SDK — local, no wrap):",
+        "  Local agents ignore .cursor/mcp.json unless you opt in:",
+        '    Python: LocalAgentOptions(cwd=".", setting_sources=["project"])',
+        '    TypeScript: local: { cwd: ".", settingSources: ["project"] }',
+        f"  Full recipe: .cursor/{SDK_GUIDE_NAME}",
+        "  Hooks still load automatically from this project's .cursor/hooks.json",
+    ]
 
 
 def _read_json(path: Path, default):
@@ -256,7 +331,8 @@ def install_cursor(
     """Merge agent-memory into the project's `.cursor/` config.
 
     Safe to re-run: merges MCP servers and hook lists without wiping
-    unrelated entries.
+    unrelated entries. Also writes ``.cursor/agent-memory-sdk.md`` so
+    Cursor SDK users know to pass ``setting_sources=["project"]``.
 
     Gemini is not skipped silently: a TTY always prompts (configure vs
     skip); non-interactive installs need ``--gemini-api-key`` /
@@ -327,6 +403,10 @@ def install_cursor(
     rule_path = rules_dir / RULE_NAME
     rule_path.write_text(RULE_BODY)
     written["rule"] = rule_path
+
+    sdk_guide_path = cursor / SDK_GUIDE_NAME
+    sdk_guide_path.write_text(SDK_GUIDE_BODY)
+    written["sdk_guide"] = sdk_guide_path
 
     from agent_memory.core import Memory
 

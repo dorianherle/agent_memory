@@ -95,6 +95,29 @@ class WriteCanvasTests(MemoryTestCase):
         self.assertIn("first step", text)
         self.assertIn("Live", text)
 
+    def test_write_live_html_creates_shell_and_data(self) -> None:
+        self.save("first step")
+        self.memory.summarize("done first")
+        index = self.memory.write_live_html()
+        data = index.parent / "data.js"
+        self.assertTrue(index.exists())
+        self.assertTrue(data.exists())
+        shell = index.read_text()
+        payload = data.read_text()
+        self.assertIn("agent-memory-live-shell", shell)
+        self.assertIn("window.__AGENT_MEMORY_LIVE__", payload)
+        self.assertIn("first step", payload)
+        # Second call refreshes data without requiring a rewrite of an
+        # up-to-date shell; force_shell still rewrites.
+        mtime = index.stat().st_mtime_ns
+        self.save("second step")
+        again = self.memory.write_live_html()
+        self.assertEqual(again, index)
+        self.assertIn("second step", data.read_text())
+        forced = self.memory.write_live_html(force_shell=True)
+        self.assertEqual(forced, index)
+        self.assertGreaterEqual(index.stat().st_mtime_ns, mtime)
+
     def test_default_canvas_dir_slug(self) -> None:
         from agent_memory.canvas import default_canvas_dir, project_slug
 
@@ -108,6 +131,31 @@ class WriteCanvasTests(MemoryTestCase):
             / "Users-me-proj"
             / "canvases",
         )
+
+    def test_default_canvas_dir_prefers_live_ide_project(self) -> None:
+        """When `_` vs `-` folders both exist, prefer the live IDE project."""
+        import tempfile
+        from unittest import mock
+
+        from agent_memory.canvas import default_canvas_dir
+
+        root = Path("/Users/me/agent_memory")
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            projects = home / ".cursor" / "projects"
+            underscored = projects / "Users-me-agent_memory"
+            hyphenated = projects / "Users-me-agent-memory"
+            (underscored / "canvases").mkdir(parents=True)
+            (hyphenated / "canvases").mkdir(parents=True)
+            (hyphenated / "terminals").mkdir()
+            with mock.patch(
+                "agent_memory.canvas.Path.home",
+                return_value=home,
+            ):
+                self.assertEqual(
+                    default_canvas_dir(root),
+                    hyphenated / "canvases",
+                )
 
 
 class GraphDataTests(MemoryTestCase):
@@ -297,6 +345,10 @@ class InstallTests(MemoryTestCase):
             )
 
         self.assertTrue(written["rule"].exists())
+        self.assertTrue(written["sdk_guide"].exists())
+        guide = written["sdk_guide"].read_text()
+        self.assertIn('setting_sources=["project"]', guide)
+        self.assertIn("settingSources", guide)
         self.assertTrue(written["state"].exists())
         self.assertTrue((self.path / ".gitignore").exists())
         self.assertIn(".agent_memory/", (self.path / ".gitignore").read_text())

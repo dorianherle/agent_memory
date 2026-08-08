@@ -76,6 +76,7 @@ def _build_server():
         memory.write_state_file()
         try:
             memory.write_canvas(name="agent-memory-live")
+            memory.write_live_html()
         except Exception:
             pass
         who = memory.find(ids=item_id, k=1)
@@ -110,6 +111,7 @@ def _build_server():
         memory.write_state_file()
         try:
             memory.write_canvas(name="agent-memory-live")
+            memory.write_live_html()
         except Exception:
             pass
         return result

@@ -15,7 +15,8 @@ can color who said what.
 Use **agent-memory** MCP tools for judgment:
 - `memory_summarize` — fold finished work so Recent stays short (pass `agent`)
 - `memory_find` — recall detail (`query=` uses Gemini when configured)
-- `memory_write_canvas` — **only** way to show memory to the user (live dashboard)
+- `memory_write_canvas` — Cursor canvas live dashboard
+- Browser monitor: `.agent_memory/live/index.html` (auto-created; self-refreshing)
 - `memory_branch` — leave a dead end; restores files to a snapshot
 - `memory_inspect` / `memory_inspect_done` — look at an old snapshot
 - `memory_state` — agent context only (do not dump graphs/history in chat to “show” memory)

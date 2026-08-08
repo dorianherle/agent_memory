@@ -24,8 +24,11 @@ It writes:
 - `.cursor/mcp.json` — MCP tools + non-secret `AGENT_MEMORY_PROVIDER`
 - `.cursor/hooks.json` — automatic saves
 - `.cursor/rules/agent-memory.mdc` — how the agent should use it
+- `.cursor/agent-memory-sdk.md` — Cursor SDK recipe (`setting_sources`)
 - `.cursor/MEMORY_STATE.md` — live compact state
 - `.agent_memory/credentials.env` — `GEMINI_API_KEY` (gitignored; loaded at runtime)
+
+Install also prints IDE + SDK next steps. Re-run anytime; merges safely.
 
 Non-interactive:
 
@@ -34,6 +37,8 @@ agent-memory cursor install --gemini-api-key "$GEMINI_API_KEY"
 # or skip embeddings:
 agent-memory cursor install --skip-gemini --no-interactive
 ```
+
+### Cursor IDE
 
 Reload MCP in **Settings → Tools & MCP**. Open Agent chat.
 
@@ -54,6 +59,52 @@ pip install -e ".[cursor]"
 agent-memory cursor install
 ```
 
+### Cursor SDK (no wrap)
+
+Install already created `.cursor/mcp.json` and `.cursor/hooks.json`. Local SDK agents **still ignore project MCP** unless you opt in with `setting_sources` / `settingSources`.
+
+```bash
+pip install cursor-sdk python-dotenv
+# CURSOR_API_KEY in .env or the environment
+```
+
+```python
+from dotenv import load_dotenv
+from cursor_sdk import Agent, LocalAgentOptions
+
+load_dotenv()
+
+with Agent.create(
+    model="composer-2.5",
+    local=LocalAgentOptions(
+        cwd=".",  # project where you ran `agent-memory cursor install`
+        setting_sources=["project"],  # required: load agent-memory from mcp.json
+    ),
+) as agent:
+    print(agent.send("What do we already know?").wait().result)
+```
+
+TypeScript:
+
+```ts
+import { Agent } from "@cursor/sdk";
+
+await using agent = await Agent.create({
+  model: { id: "composer-2.5" },
+  local: {
+    cwd: process.cwd(),
+    settingSources: ["project"], // required: load agent-memory from mcp.json
+  },
+});
+```
+
+| Piece | Local SDK |
+|-------|-----------|
+| MCP `memory_*` | needs `setting_sources=["project"]` (or inline `mcp_servers`) |
+| Hooks auto-save | automatic when `cwd` is the installed project |
+
+Same store as the IDE: point `cwd` at that project. Full copy lives at `.cursor/agent-memory-sdk.md` after install.
+
 ## Tools
 
 The agent never has to “remember to save.” Hooks handle that. Tools are for judgment:
@@ -62,7 +113,7 @@ The agent never has to “remember to save.” Hooks handle that. Tools are for 
 |------|-----------|
 | `memory_summarize` | Fold finished work behind one line |
 | `memory_find` | Reopen detail by meaning (Gemini), text, or id |
-| `memory_write_canvas` | **Show** memory — live dashboard (only UI) |
+| `memory_write_canvas` | **Show** memory — Cursor canvas dashboard |
 | `memory_branch` | Leave a dead end; restore that snapshot |
 | `memory_inspect` | Look at an old snapshot (then `memory_inspect_done`) |
 | `memory_state` | Agent context only (not for displaying to you) |
@@ -70,7 +121,12 @@ The agent never has to “remember to save.” Hooks handle that. Tools are for 
 The live canvas (`agent-memory-live.canvas.tsx`) is refreshed by hooks on save.
 Click a summary to open **only** its subgraph; breadcrumbs return to Live.
 
-## Python
+A self-updating **HTML** monitor is also kept at `.agent_memory/live/index.html`.
+Session start creates it if missing; hooks refresh the data on every save. Open
+that file in a browser and leave the tab open — it polls for updates, so you can
+watch memory without asking the agent for a canvas.
+
+## Python (OpenAI-compatible)
 
 ```python
 from openai import OpenAI

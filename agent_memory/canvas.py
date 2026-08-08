@@ -422,6 +422,9 @@ function MemoryGraphCanvas() {
                 const accent = kindColor(meta.kind);
                 const barW = meta.kind === "summary" ? 4 : ACCENT_W;
                 const emphasized = meta.current || meta.tip;
+                // Current tip uses the accent border only — a left kind bar
+                // next to that border reads as a double line.
+                const showKindBar = !meta.current;
                 return (
                   <g
                     key={node.id}
@@ -441,20 +444,24 @@ function MemoryGraphCanvas() {
                       }
                       strokeWidth={emphasized ? 1.5 : 1}
                     />
-                    <rect
-                      x={0}
-                      y={0}
-                      width={barW}
-                      height={NODE_H}
-                      fill={accent}
-                    />
-                    <rect
-                      x={barW}
-                      y={0}
-                      width={1}
-                      height={NODE_H}
-                      fill={nodeFill}
-                    />
+                    {showKindBar ? (
+                      <>
+                        <rect
+                          x={0}
+                          y={0}
+                          width={barW}
+                          height={NODE_H}
+                          fill={accent}
+                        />
+                        <rect
+                          x={barW}
+                          y={0}
+                          width={1}
+                          height={NODE_H}
+                          fill={nodeFill}
+                        />
+                      </>
+                    ) : null}
                     <text
                       x={14}
                       y={22}
@@ -561,18 +568,43 @@ def project_slug(root: Path) -> str:
     return text.replace("/", "-")
 
 
+def _cursor_project_candidates(root: Path) -> list[str]:
+    """Possible ~/.cursor/projects/<slug> names for this workspace.
+
+    Cursor sometimes normalizes `_` to `-` in project folder names, so a
+    path like `.../agent_memory` may live under `...-agent-memory`.
+    """
+    slug = project_slug(root)
+    names = [slug]
+    alt = slug.replace("_", "-")
+    if alt != slug:
+        names.append(alt)
+    return names
+
+
 def default_canvas_dir(root: Path) -> Path:
     """IDE-managed canvases directory for this workspace."""
     override = os.environ.get("CURSOR_CANVAS_DIR")
     if override:
         return Path(override).expanduser().resolve()
-    return (
-        Path.home()
-        / ".cursor"
-        / "projects"
-        / project_slug(root)
-        / "canvases"
-    )
+    projects = Path.home() / ".cursor" / "projects"
+    best: Path | None = None
+    best_score = -1
+    for name in _cursor_project_candidates(root):
+        base = projects / name
+        score = 0
+        if (base / "terminals").is_dir():
+            score += 10
+        if (base / "agent-transcripts").is_dir():
+            score += 5
+        if (base / "canvases").is_dir():
+            score += 2
+        if score > best_score:
+            best_score = score
+            best = base / "canvases"
+    if best is not None and best_score > 0:
+        return best
+    return projects / project_slug(root) / "canvases"
 
 
 def render_canvas_tsx(data: dict) -> str:

@@ -39,6 +39,8 @@ Prefer facts from MEMORY STATE or tool results; do not invent entry ids.
 Every memory entry is tagged with an agent name (@main, @explore·…, @user).
 When calling memory tools, pass agent=<your name> if the tool asks; your
 session agent name is also in AGENT_MEMORY_AGENT.
+A self-updating HTML live view is also kept at `.agent_memory/live/index.html`
+(open in a browser; it polls for updates — no need to ask for a canvas).
 """.strip()
 
 
@@ -75,10 +77,11 @@ def _agent_for_event(memory, data: dict) -> str:
 
 
 def _refresh_dashboard(memory) -> None:
-    """Best-effort live canvas rewrite after durable events."""
+    """Best-effort live canvas + HTML rewrite after durable events."""
     try:
         memory.write_state_file()
         memory.write_canvas(name="agent-memory-live")
+        memory.write_live_html()
     except Exception:
         # Never block the agent loop on dashboard failures.
         try:
@@ -101,18 +104,27 @@ def handle(event: str, data: dict) -> dict:
                 agent_type=agent,
             )
         state_path = memory.write_state_file()
+        canvas_note = ""
+        html_note = ""
         try:
             canvas_path = memory.write_canvas(name="agent-memory-live")
             canvas_note = f"\nLive dashboard: {canvas_path}"
         except Exception:
-            canvas_note = ""
+            pass
+        try:
+            html_path = memory.write_live_html()
+            html_note = (
+                f"\nLive HTML (auto-refreshes in browser): {html_path}"
+            )
+        except Exception:
+            pass
         context = (
             f"{CURSOR_INSTRUCTIONS}\n\n"
             f"Your memory agent name: @{agent}\n"
             f"Pass agent={agent!r} on memory_summarize when possible.\n\n"
             f"MEMORY STATE\n{memory.render_state()}\n\n"
             f"Also available at @{state_path.relative_to(memory._path)}"
-            f"{canvas_note}"
+            f"{canvas_note}{html_note}"
         )
         return {
             "additional_context": context,
