@@ -1,6 +1,7 @@
-"""MCP server: judgment/navigation tools for Cursor Agent.
+"""MCP server: judgment + checkpoint tools for Cursor Agent.
 
-Durability (auto.save) is handled by hooks — not exposed here.
+Hooks auto-save at turn boundaries (user prompt / finished answer).
+`memory_save` lets the agent checkpoint mid-turn during long work.
 
 Works with mcp SDK v1 (`FastMCP`) and v2 (`MCPServer`).
 """
@@ -63,6 +64,28 @@ def _build_server():
                 "all_branches": all_branches,
             },
         )
+
+    @mcp.tool()
+    def memory_save(text: str, agent: str | None = None) -> str:
+        """Checkpoint a meaningful mid-turn step before the turn ends.
+
+        Hooks only save at turn boundaries (user prompt / finished answer).
+        During long work, call this so progress is durable if the session dies.
+        Do not save every trivial step — only checkpoints worth keeping.
+        Pass agent to tag who wrote it (defaults to AGENT_MEMORY_AGENT or main).
+        Refreshes the live canvas automatically.
+        """
+        memory = get_memory()
+        item_id = memory.save(text, agent=agent)
+        memory.write_state_file()
+        try:
+            memory.write_canvas(name="agent-memory-live")
+            memory.write_live_html()
+        except Exception:
+            pass
+        who = memory.find(ids=item_id, k=1)
+        label = who[0].payload.get("agent", "main") if who else "main"
+        return f"Saved [{item_id[:8]}] @{label}."
 
     @mcp.tool()
     def memory_summarize(text: str, agent: str | None = None) -> str:

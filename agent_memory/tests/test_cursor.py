@@ -25,9 +25,30 @@ class McpServerTests(MemoryTestCase):
         names = set(server._tool_manager._tools)
         self.assertIn("memory_state", names)
         self.assertIn("memory_write_canvas", names)
+        self.assertIn("memory_save", names)
         self.assertIn("memory_summarize", names)
         self.assertNotIn("memory_graph_data", names)
         self.assertNotIn("memory_graph", names)
+
+    def test_memory_save_tool_checkpoints(self) -> None:
+        try:
+            from agent_memory.cursor.mcp import _build_server
+        except SystemExit as error:
+            self.skipTest(str(error))
+
+        with patch.dict(os.environ, {"AGENT_MEMORY_ROOT": str(self.path)}):
+            try:
+                server = _build_server()
+            except SystemExit as error:
+                self.skipTest(str(error))
+            tool = server._tool_manager._tools["memory_save"]
+            result = tool.fn(text="mid-turn finding: auth in src/auth.ts", agent="main")
+        self.assertIn("Saved [", result)
+        self.assertIn("@main", result)
+        last = Memory(self.path).state()[-1]
+        self.assertIn("auth in src/auth.ts", last.message)
+        self.assertFalse(last.payload.get("auto"))
+        self.assertEqual(last.payload.get("agent"), "main")
 
 
 class MemoryRootTests(MemoryTestCase):
@@ -252,6 +273,7 @@ class HookTests(MemoryTestCase):
         self.assertIn("additional_context", out)
         self.assertIn("prior work", out["additional_context"])
         self.assertIn("@main", out["additional_context"])
+        self.assertIn("memory_save", out["additional_context"])
         self.assertEqual(out.get("env", {}).get("AGENT_MEMORY_AGENT"), "main")
         self.assertTrue((self.path / ".cursor" / "MEMORY_STATE.md").exists())
 

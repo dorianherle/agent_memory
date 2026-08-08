@@ -4,7 +4,8 @@ Long-running agents that remember — without dragging the whole chat around.
 
 The prompt stays small. Finished work folds into one line. Detail reopens on demand. Dead ends branch away. Nothing is deleted.
 
-Memory owns durability. The agent owns judgment.
+Memory owns durability. The agent owns judgment — including mid-turn
+`memory_save` checkpoints when a run outlasts the next hook.
 
 ## Cursor
 
@@ -46,6 +47,7 @@ Reload MCP in **Settings → Tools & MCP**. Open Agent chat.
 |------|----------------|
 | Session starts | MEMORY STATE is injected |
 | You send a prompt | saved automatically |
+| Long mid-turn work | agent calls `memory_save` to checkpoint |
 | Agent needs detail | `memory_find` / `memory_history` |
 | A chunk of work is done | `memory_summarize` |
 | Agent finishes an answer | saved automatically |
@@ -107,10 +109,14 @@ Same store as the IDE: point `cwd` at that project. Full copy lives at `.cursor/
 
 ## Tools
 
-The agent never has to “remember to save.” Hooks handle that. Tools are for judgment:
+Hooks auto-save at **turn boundaries** (your prompt, the finished answer).
+That is not enough for a long mid-turn run — the agent should call
+`memory_save` for durable checkpoints (milestones, findings, decisions).
+Do not save every trivial step. Other tools are for judgment:
 
 | Tool | Use it to |
 |------|-----------|
+| `memory_save` | Mid-turn checkpoint before the turn ends |
 | `memory_summarize` | Fold finished work behind one line |
 | `memory_find` | Reopen detail by meaning (Gemini), text, or id |
 | `memory_write_canvas` | **Show** memory — Cursor canvas dashboard |
@@ -118,7 +124,8 @@ The agent never has to “remember to save.” Hooks handle that. Tools are for 
 | `memory_inspect` | Look at an old snapshot (then `memory_inspect_done`) |
 | `memory_state` | Agent context only (not for displaying to you) |
 
-The live canvas (`agent-memory-live.canvas.tsx`) is refreshed by hooks on save.
+The live canvas (`agent-memory-live.canvas.tsx`) is refreshed by hooks on save
+and when the agent calls `memory_save` / `memory_summarize`.
 Click a summary to open **only** its subgraph; breadcrumbs return to Live.
 
 A self-updating **HTML** monitor is also kept at `.agent_memory/live/index.html`.

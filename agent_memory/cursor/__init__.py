@@ -1,7 +1,7 @@
 """Cursor IDE integration: MCP tools + hooks.
 
-Memory owns durability (hooks auto-save). The agent owns judgment tools
-via MCP (find, summarize, branch, inspect, …).
+Hooks auto-save at turn boundaries. MCP adds mid-turn checkpoints
+(`memory_save`) plus judgment tools (find, summarize, branch, inspect, …).
 """
 
 from agent_memory.cursor.install import install_cursor

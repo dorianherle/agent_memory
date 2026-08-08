@@ -28,8 +28,11 @@ from agent_memory.identity import (
 
 CURSOR_INSTRUCTIONS = """
 You have long-term project memory via the agent-memory MCP tools.
-Durability is automatic — do not try to "save" every step.
-Use tools for judgment only:
+Hooks auto-save user prompts and finished answers at turn boundaries.
+That is not enough for long mid-turn work — use memory_save for durable
+checkpoints (milestones, findings, decisions). Do not save every trivial step.
+Use tools for judgment and checkpoints:
+- memory_save — mid-turn checkpoint so progress survives before the turn ends
 - memory_summarize when a chunk of work is finished (keeps Recent short)
 - memory_find to recall detail (query= uses Gemini when configured)
 - memory_write_canvas to show the user the live dashboard (only UI — do not dump graphs in chat)
@@ -121,7 +124,7 @@ def handle(event: str, data: dict) -> dict:
         context = (
             f"{CURSOR_INSTRUCTIONS}\n\n"
             f"Your memory agent name: @{agent}\n"
-            f"Pass agent={agent!r} on memory_summarize when possible.\n\n"
+            f"Pass agent={agent!r} on memory_save / memory_summarize when possible.\n\n"
             f"MEMORY STATE\n{memory.render_state()}\n\n"
             f"Also available at @{state_path.relative_to(memory._path)}"
             f"{canvas_note}{html_note}"

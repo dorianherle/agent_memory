@@ -47,8 +47,8 @@ const agent = Agent.create({
 
 | Piece | How it activates |
 |-------|------------------|
-| MCP `memory_*` tools | `setting_sources=["project"]` / `settingSources: ["project"]` |
-| Hooks auto-save | automatic when `cwd` is this project (no settingSources needed) |
+| MCP `memory_*` tools (including mid-turn `memory_save`) | `setting_sources=["project"]` / `settingSources: ["project"]` |
+| Hooks auto-save (turn boundaries only) | automatic when `cwd` is this project (no settingSources needed) |
 
 Inline `mcp_servers` / `mcpServers` also works if you prefer not to use ambient project settings.
 

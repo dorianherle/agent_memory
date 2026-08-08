@@ -30,14 +30,16 @@ alwaysApply: true
 
 # Agent Memory
 
-Durability is automatic (Cursor hooks save user prompts and finished
-answers). You do **not** need to save every step.
+Hooks auto-save user prompts and finished answers at turn boundaries.
+During long mid-turn work, call `memory_save` for durable checkpoints
+(milestones, findings, decisions). Do **not** save every trivial step.
 
 Subagents share the same memory store. Every entry is tagged with an
 `agent` name (`user`, `main`, `explore·abc123`, …) so the live canvas
 can color who said what.
 
-Use **agent-memory** MCP tools for judgment:
+Use **agent-memory** MCP tools for judgment and checkpoints:
+- `memory_save` — mid-turn checkpoint before the turn ends (pass `agent`)
 - `memory_summarize` — fold finished work so Recent stays short (pass `agent`)
 - `memory_find` — recall detail (`query=` uses Gemini when configured)
 - `memory_write_canvas` — Cursor canvas live dashboard
@@ -99,8 +101,8 @@ const agent = Agent.create({
 
 | Piece | How it activates |
 |-------|------------------|
-| MCP `memory_*` tools | `setting_sources=["project"]` / `settingSources: ["project"]` |
-| Hooks auto-save | automatic when `cwd` is this project (no settingSources needed) |
+| MCP `memory_*` tools (including mid-turn `memory_save`) | `setting_sources=["project"]` / `settingSources: ["project"]` |
+| Hooks auto-save (turn boundaries only) | automatic when `cwd` is this project (no settingSources needed) |
 
 Inline `mcp_servers` / `mcpServers` also works if you prefer not to use ambient project settings.
 
