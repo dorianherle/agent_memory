@@ -10,8 +10,14 @@ from pathlib import Path
 
 SERVER_NAME = "agent-memory"
 RULE_NAME = "agent-memory.mdc"
+STATE_RULE_NAME = "agent-memory-state.mdc"
 SDK_GUIDE_NAME = "agent-memory-sdk.md"
 CREDENTIALS_NAME = "credentials.env"
+GITIGNORE_LINES = (
+    ".agent_memory/",
+    ".cursor/MEMORY_STATE.md",
+    f".cursor/rules/{STATE_RULE_NAME}",
+)
 
 PROVIDER_GEMINI = "agent_memory.providers.gemini:GeminiProvider"
 
@@ -42,13 +48,14 @@ Use **agent-memory** MCP tools for judgment and checkpoints:
 - `memory_save` — mid-turn checkpoint before the turn ends (pass `agent`)
 - `memory_summarize` — fold finished work so Recent stays short (pass `agent`)
 - `memory_find` — recall detail (`query=` uses Gemini when configured)
-- `memory_write_canvas` — Cursor canvas live dashboard
-- Browser monitor: `.agent_memory/live/index.html` (auto-created; self-refreshing)
+- Browser monitor: `.agent_memory/live/index.html` (auto-created; self-refreshing; click an entry for the full prompt packet)
 - `memory_branch` — leave a dead end; restores files to a snapshot
 - `memory_inspect` / `memory_inspect_done` — look at an old snapshot
 - `memory_state` — agent context only (do not dump graphs/history in chat to “show” memory)
+- `memory_history` — full timeline text (folded steps under summaries)
 
-Read `@.cursor/MEMORY_STATE.md` for the compact current state.
+MEMORY STATE is injected every turn via the alwaysApply rule
+`.cursor/rules/agent-memory-state.mdc` (auto-rewritten on each prompt).
 Only use entry ids you can see there or in tool results.
 """
 
@@ -301,24 +308,23 @@ def resolve_gemini(
 
 
 def ensure_gitignore(root: Path) -> Path | None:
-    """Make sure ``.agent_memory/`` is ignored by the project git repo."""
+    """Ignore the memory store + live state surfaces (not committed)."""
     gitignore = Path(root) / ".gitignore"
-    line = ".agent_memory/"
-    if gitignore.exists():
-        text = gitignore.read_text()
-        if any(
-            entry.strip() in {line, ".agent_memory", "**/.agent_memory/"}
-            for entry in text.splitlines()
-        ):
-            return None
-        suffix = "" if text.endswith("\n") or not text else "\n"
-        gitignore.write_text(
-            f"{text}{suffix}\n# agent-memory store + Gemini credentials\n{line}\n"
-        )
-    else:
-        gitignore.write_text(
-            f"# agent-memory store + Gemini credentials\n{line}\n"
-        )
+    text = gitignore.read_text() if gitignore.exists() else ""
+    existing = {entry.strip() for entry in text.splitlines() if entry.strip()}
+    if ".agent_memory" in existing or "**/.agent_memory/" in existing:
+        existing.add(".agent_memory/")
+    missing = [line for line in GITIGNORE_LINES if line not in existing]
+    if not missing:
+        return None
+    parts = []
+    if text and not text.endswith("\n"):
+        parts.append(text + "\n")
+    elif text:
+        parts.append(text)
+    parts.append("# agent-memory store + live prompt state (auto-generated)\n")
+    parts.append("\n".join(missing) + "\n")
+    gitignore.write_text("".join(parts))
     return gitignore
 
 

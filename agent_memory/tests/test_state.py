@@ -132,6 +132,39 @@ class StateTests(MemoryTestCase):
 
         self.assertIn(f"[{item[:8]}] user: fix the bug", text)
 
+    def test_render_compact_uses_commit_subjects_only(self) -> None:
+        long_body = (
+            "fixed the webhook retry\n\n"
+            "Details:\n- checked logs\n- patched handler\n"
+            + ("x" * 200)
+        )
+        item = self.memory.save(long_body)
+
+        before_summary = render(self.memory.state())
+        before_compact = render(self.memory.state(), compact=True)
+        self.assertIn("Details:", before_summary)
+        self.assertNotIn("Details:", before_compact)
+        self.assertNotIn("xxx", before_compact)
+        self.assertIn(
+            f"[{item[:8]}] @main fixed the webhook retry", before_compact
+        )
+        self.assertIn("Commit subjects only", before_compact)
+
+        self.memory.save("step two with\nmultiple lines")
+        summary = self.memory.save("finished pairing steps", summary=True)
+        compact = self.memory.render_state()
+
+        self.assertIn(
+            f"[{summary[:8]}] @main Summary: finished pairing steps",
+            compact,
+        )
+        # Folded step is not a top-level Recent line.
+        recent_section = compact.split("## Recent", 1)[1]
+        self.assertNotIn(item[:8], recent_section)
+        # Full body still retrievable.
+        found = self.memory.find(ids=item)
+        self.assertIn("Details:", found[0].message)
+
     def test_save_user_skips_repeated_text(self) -> None:
         first = self.memory.save_user("fix the bug")
         second = self.memory.save_user("fix the bug")

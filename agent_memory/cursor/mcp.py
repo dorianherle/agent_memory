@@ -37,7 +37,7 @@ def _build_server():
 
     @mcp.tool()
     def memory_state() -> str:
-        """Compact MEMORY STATE for the agent (not for showing the user). Prefer memory_write_canvas to display memory."""
+        """Compact MEMORY STATE for the agent (not for showing the user). Live HTML is at .agent_memory/live/index.html."""
         memory = get_memory()
         memory.write_state_file()
         return memory.render_state()
@@ -73,13 +73,12 @@ def _build_server():
         During long work, call this so progress is durable if the session dies.
         Do not save every trivial step — only checkpoints worth keeping.
         Pass agent to tag who wrote it (defaults to AGENT_MEMORY_AGENT or main).
-        Refreshes the live canvas automatically.
+        Refreshes the live HTML monitor automatically.
         """
         memory = get_memory()
         item_id = memory.save(text, agent=agent)
         memory.write_state_file()
         try:
-            memory.write_canvas(name="agent-memory-live")
             memory.write_live_html()
         except Exception:
             pass
@@ -92,13 +91,12 @@ def _build_server():
         """Fold finished work behind one line so Recent stays short. Still retrievable with memory_find.
 
         Pass agent to tag who did the work (defaults to AGENT_MEMORY_AGENT or main).
-        Refreshes the live canvas automatically.
+        Refreshes the live HTML monitor automatically.
         """
         memory = get_memory()
         item_id = memory.summarize(text, agent=agent)
         memory.write_state_file()
         try:
-            memory.write_canvas(name="agent-memory-live")
             memory.write_live_html()
         except Exception:
             pass
@@ -108,19 +106,8 @@ def _build_server():
 
     @mcp.tool()
     def memory_history() -> str:
-        """Full timeline text for the agent. To show memory to the user, call memory_write_canvas instead."""
+        """Full timeline text for the agent (summaries with folded steps). Live UI: .agent_memory/live/index.html."""
         return call_tool(get_memory(), "memory", {"action": "history"})
-
-    @mcp.tool()
-    def memory_write_canvas(name: str = "agent-memory-live") -> str:
-        """Write/refresh the live memory dashboard (only UI to show the user).
-
-        Opens as agent-memory-live.canvas.tsx beside chat. Click a summary to
-        drill into its subgraph; breadcrumbs go back. Hooks also refresh this
-        file on save. Returns the absolute path — tell the user to open it.
-        """
-        path = get_memory().write_canvas(name=name or "agent-memory-live")
-        return f"Live memory dashboard: {path}"
 
     @mcp.tool()
     def memory_branch(id: str, name: str, label: str | None = None) -> str:
@@ -133,7 +120,6 @@ def _build_server():
         )
         memory.write_state_file()
         try:
-            memory.write_canvas(name="agent-memory-live")
             memory.write_live_html()
         except Exception:
             pass

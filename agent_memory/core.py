@@ -572,22 +572,59 @@ class Memory:
         return self.save(text, summary=True, agent=agent)
 
     def render_state(self) -> str:
-        """Current MEMORY STATE text for prompt injection."""
+        """Compact MEMORY STATE for prompt injection.
+
+        Top hierarchy only: branch tips, History summaries, and Recent as
+        one-line commit subjects. Full bodies / folded steps stay in the
+        store — use memory_find / memory_history.
+        """
         from agent_memory.prompt import render
 
-        return render(self.state(), self.branches(), self.inspecting())
+        return render(
+            self.state(),
+            self.branches(),
+            self.inspecting(),
+            compact=True,
+        )
+
+    def write_state_rule(self, path: str | Path | None = None) -> Path:
+        """Write MEMORY STATE into an alwaysApply Cursor rule.
+
+        Cursor reloads always-apply rules each turn. Embedding live state
+        here is the reliable IDE injection path (beforeSubmitPrompt cannot
+        inject context). File is meant to be gitignored.
+        """
+        target = (
+            Path(path)
+            if path
+            else self._path / ".cursor" / "rules" / "agent-memory-state.mdc"
+        )
+        target.parent.mkdir(parents=True, exist_ok=True)
+        body = (
+            "---\n"
+            "description: Live MEMORY STATE (auto-updated; do not edit)\n"
+            "alwaysApply: true\n"
+            "---\n\n"
+            "# MEMORY STATE\n\n"
+            "Top-level commit subjects only (not full bodies). "
+            "Use memory_find / memory_history for detail.\n\n"
+            f"```\n{self.render_state()}\n```\n"
+        )
+        target.write_text(body)
+        return target
 
     def write_state_file(self, path: str | Path | None = None) -> Path:
-        """Write MEMORY STATE to a markdown file agents can @-mention."""
+        """Write MEMORY STATE markdown + alwaysApply rule for prompt injection."""
         target = Path(path) if path else self._path / ".cursor" / "MEMORY_STATE.md"
         target.parent.mkdir(parents=True, exist_ok=True)
         body = (
             "# Active Memory State\n\n"
-            "Updated automatically. Prefer memory MCP tools for search "
-            "and compaction; do not invent ids.\n\n"
+            "Top-level commit subjects only. Prefer memory_find / "
+            "memory_history for full detail; do not invent ids.\n\n"
             f"```\n{self.render_state()}\n```\n"
         )
         target.write_text(body)
+        self.write_state_rule()
         return target
 
     @property
@@ -615,10 +652,10 @@ class Memory:
         The prompt is recorded as a user entry, so the user's words are
         part of memory before any work starts.
         """
-        from agent_memory.prompt import MEMORY_INSTRUCTIONS, render
+        from agent_memory.prompt import MEMORY_INSTRUCTIONS
 
         self.save_user(prompt)
-        state_text = render(self.state(), self.branches(), self.inspecting())
+        state_text = self.render_state()
         content = "\n\n".join(
             [
                 prompt.strip(),

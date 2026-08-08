@@ -17,11 +17,12 @@ Use **agent-memory** MCP tools for judgment and checkpoints:
 - `memory_save` — mid-turn checkpoint before the turn ends (pass `agent`)
 - `memory_summarize` — fold finished work so Recent stays short (pass `agent`)
 - `memory_find` — recall detail (`query=` uses Gemini when configured)
-- `memory_write_canvas` — Cursor canvas live dashboard
-- Browser monitor: `.agent_memory/live/index.html` (auto-created; self-refreshing)
+- Browser monitor: `.agent_memory/live/index.html` (auto-created; self-refreshing; click an entry for the full prompt packet)
 - `memory_branch` — leave a dead end; restores files to a snapshot
 - `memory_inspect` / `memory_inspect_done` — look at an old snapshot
 - `memory_state` — agent context only (do not dump graphs/history in chat to “show” memory)
+- `memory_history` — full timeline text (folded steps under summaries)
 
-Read `@.cursor/MEMORY_STATE.md` for the compact current state.
+MEMORY STATE is injected every turn via the alwaysApply rule
+`.cursor/rules/agent-memory-state.mdc` (auto-rewritten on each prompt).
 Only use entry ids you can see there or in tool results.

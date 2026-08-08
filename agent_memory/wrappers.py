@@ -2,7 +2,7 @@ import json
 from types import SimpleNamespace
 
 from agent_memory.core import Memory
-from agent_memory.prompt import MEMORY_INSTRUCTIONS, render
+from agent_memory.prompt import MEMORY_INSTRUCTIONS
 from agent_memory.tools import MEMORY_TOOL, MEMORY_TOOL_NAME, MEMORY_TOOLS, call_tool
 
 
@@ -119,11 +119,7 @@ class MemoryEnhancedOpenAI:
                 if isinstance(message.get("content"), str):
                     self.memory.save_user(message["content"])
                 break
-        state_text = render(
-            self.memory.state(),
-            self.memory.branches(),
-            self.memory.inspecting(),
-        )
+        state_text = self.memory.render_state()
         messages = [
             {"role": "system", "content": MEMORY_INSTRUCTIONS},
             {

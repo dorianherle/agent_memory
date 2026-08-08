@@ -17,8 +17,9 @@ MEMORY STATE
 - History: one-line summaries of finished work, oldest first. A
   summary starts with "Summary:"; find its id to unfold the steps
   behind it.
-- Recent: your raw steps since the last summary. Lines starting with
-  "user:" are the user's own words, recorded automatically.
+- Recent: one-line commit subjects since the last summary (not full
+  bodies). Lines starting with "user:" are the user's own words.
+- Injected state is headlines only — call find/history for detail.
 - Every entry starts with an id like [1a2b3c4d]. Use only ids you can
   see there and never invent one.
 
@@ -54,7 +55,27 @@ RULES
 """.strip()
 
 
+def _subject(item: MemoryItem, max_len: int = 100) -> str:
+    """One-line commit subject for prompt injection (not the full body)."""
+    from agent_memory.identity import DEFAULT_AGENT, USER_AGENT
+
+    agent = item.payload.get("agent") or DEFAULT_AGENT
+    prefix = ""
+    if item.payload.get("covers"):
+        prefix = "Summary: "
+    elif item.payload.get("user"):
+        prefix = "user: "
+        agent = USER_AGENT
+    who = "" if agent in (USER_AGENT, "") else f"@{agent} "
+    # First line only — treat multi-paragraph agent dumps as commit bodies.
+    head = (item.message or "").strip().split("\n", 1)[0].strip()
+    if len(head) > max_len:
+        head = head[: max_len - 1].rstrip() + "…"
+    return f"[{item.id[:8]}] {who}{prefix}{head}"
+
+
 def _line(item: MemoryItem) -> str:
+    """Full message line (for timelines / expanded views)."""
     from agent_memory.identity import DEFAULT_AGENT, USER_AGENT
 
     agent = item.payload.get("agent") or DEFAULT_AGENT
@@ -90,8 +111,17 @@ def render(
     branches: list[dict] | None = None,
     inspecting: dict | None = None,
     nudge_after: int = 30,
+    *,
+    compact: bool = False,
 ) -> str:
+    """Render MEMORY STATE.
+
+    compact=True (prompt injection): top hierarchy only — branch tips,
+    History summaries, and Recent as one-line commit subjects. Full
+    bodies stay in the store; use memory_find / memory_history.
+    """
     history, recent = split_state(items)
+    line_for = _subject if compact else _line
     lines = []
     if inspecting:
         lines.append(
@@ -113,15 +143,21 @@ def render(
     if history:
         lines.append("## History")
         for item in history:
-            lines.append(_line(item))
+            lines.append(line_for(item))
         lines.append("")
     lines.append("## Recent")
     for item in recent:
-        lines.append(_line(item))
+        lines.append(line_for(item))
     if len(recent) > nudge_after:
         lines.append("")
         lines.append(
             f"Recent has {len(recent)} steps. "
             "Summarize the finished work before continuing."
+        )
+    if compact:
+        lines.append("")
+        lines.append(
+            "Commit subjects only. Use memory_find / memory_history "
+            "for full bodies or folded steps."
         )
     return "\n".join(lines)

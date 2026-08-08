@@ -3,11 +3,16 @@
 Reads JSON from stdin (Cursor hook protocol). Event comes from
 `hook_event_name` in the payload.
 
-- sessionStart        → inject MEMORY STATE, set AGENT_MEMORY_AGENT, canvas
-- beforeSubmitPrompt  → save_user(prompt) as @user
+- sessionStart        → instructions + agent id; refresh state rule/canvas
+- beforeSubmitPrompt  → save_user(prompt); refresh alwaysApply MEMORY STATE
 - afterAgentResponse  → auto_save(text) tagged with current agent
 - subagentStart       → register subagent session name
 - subagentStop        → save subagent summary under that agent name
+
+MEMORY STATE lands in the model prompt via the gitignored alwaysApply rule
+``.cursor/rules/agent-memory-state.mdc`` (rewritten every durable write).
+Per-turn, beforeSubmitPrompt also mirrors compact MEMORY STATE as
+additional_context (capped for Cursor's inline limit). Live UI is HTML only.
 """
 
 from __future__ import annotations
@@ -35,15 +40,15 @@ Use tools for judgment and checkpoints:
 - memory_save — mid-turn checkpoint so progress survives before the turn ends
 - memory_summarize when a chunk of work is finished (keeps Recent short)
 - memory_find to recall detail (query= uses Gemini when configured)
-- memory_write_canvas to show the user the live dashboard (only UI — do not dump graphs in chat)
 - memory_branch to leave a dead end; memory_inspect to look at an old snapshot
 Always call memory_inspect_done before answering if you inspected.
-Prefer facts from MEMORY STATE or tool results; do not invent entry ids.
+Prefer facts from MEMORY STATE (always-applied rule) or tool results; do not
+invent entry ids.
 Every memory entry is tagged with an agent name (@main, @explore·…, @user).
 When calling memory tools, pass agent=<your name> if the tool asks; your
 session agent name is also in AGENT_MEMORY_AGENT.
 A self-updating HTML live view is also kept at `.agent_memory/live/index.html`
-(open in a browser; it polls for updates — no need to ask for a canvas).
+(open in a browser; it polls for updates).
 """.strip()
 
 
@@ -80,13 +85,11 @@ def _agent_for_event(memory, data: dict) -> str:
 
 
 def _refresh_dashboard(memory) -> None:
-    """Best-effort live canvas + HTML rewrite after durable events."""
+    """Best-effort live HTML rewrite after durable events."""
     try:
         memory.write_state_file()
-        memory.write_canvas(name="agent-memory-live")
         memory.write_live_html()
     except Exception:
-        # Never block the agent loop on dashboard failures.
         try:
             memory.write_state_file()
         except Exception:
@@ -107,13 +110,8 @@ def handle(event: str, data: dict) -> dict:
                 agent_type=agent,
             )
         state_path = memory.write_state_file()
-        canvas_note = ""
+        rule_path = memory._path / ".cursor" / "rules" / "agent-memory-state.mdc"
         html_note = ""
-        try:
-            canvas_path = memory.write_canvas(name="agent-memory-live")
-            canvas_note = f"\nLive dashboard: {canvas_path}"
-        except Exception:
-            pass
         try:
             html_path = memory.write_live_html()
             html_note = (
@@ -125,9 +123,10 @@ def handle(event: str, data: dict) -> dict:
             f"{CURSOR_INSTRUCTIONS}\n\n"
             f"Your memory agent name: @{agent}\n"
             f"Pass agent={agent!r} on memory_save / memory_summarize when possible.\n\n"
-            f"MEMORY STATE\n{memory.render_state()}\n\n"
-            f"Also available at @{state_path.relative_to(memory._path)}"
-            f"{canvas_note}{html_note}"
+            f"MEMORY STATE is injected every turn via the alwaysApply rule "
+            f"`{rule_path.relative_to(memory._path)}` "
+            f"(also @{state_path.relative_to(memory._path)})."
+            f"{html_note}"
         )
         return {
             "additional_context": context,
@@ -136,10 +135,42 @@ def handle(event: str, data: dict) -> dict:
 
     if event == "beforeSubmitPrompt":
         prompt = data.get("prompt") or ""
+        entry_id = None
         if isinstance(prompt, str) and prompt.strip():
-            memory.save_user(prompt.strip(), agent=USER_AGENT)
+            entry_id = memory.save_user(prompt.strip(), agent=USER_AGENT)
             _refresh_dashboard(memory)
-        return {}
+        else:
+            memory.write_state_file()
+        # Cursor inlines additional_context up to 10k chars; over that it
+        # spills to a side file. Full state always lives in the alwaysApply
+        # rule — only mirror it here when it fits.
+        state = memory.render_state()
+        payload = f"MEMORY STATE\n{state}"
+        rule_rel = ".cursor/rules/agent-memory-state.mdc"
+        if len(payload) > 9000:
+            payload = (
+                "MEMORY STATE (truncated for hook inline cap)\n"
+                f"Full state is in the alwaysApply rule `{rule_rel}`.\n\n"
+                f"{state[:8500]}\n…\n"
+            )
+        if entry_id and isinstance(prompt, str) and prompt.strip():
+            try:
+                from agent_memory.live_html import default_live_dir
+                from agent_memory.turn_prompts import record_turn_prompt
+
+                record_turn_prompt(
+                    default_live_dir(memory),
+                    entry_id,
+                    goal=prompt.strip(),
+                    injected=payload,
+                )
+                memory.write_live_html()
+            except Exception:
+                pass
+        return {
+            "continue": True,
+            "additional_context": payload,
+        }
 
     if event == "afterAgentResponse":
         text = data.get("text") or ""

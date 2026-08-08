@@ -13,3 +13,4 @@ dist/
 .coverage
 htmlcov/
 .cursor/MEMORY_STATE.md
+.cursor/rules/agent-memory-state.mdc

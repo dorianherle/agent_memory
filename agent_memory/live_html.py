@@ -16,7 +16,7 @@ import re
 from pathlib import Path
 
 # Bump when SHELL_TEMPLATE changes so existing installs pick up the new shell.
-SHELL_VERSION = "4"
+SHELL_VERSION = "5"
 
 SHELL_TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
@@ -225,11 +225,49 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     cursor: pointer;
   }
   #detail .subgraph:hover { border-color: var(--accent); }
+  #detail .section {
+    margin-top: 16px;
+  }
+  #detail .section:first-of-type { margin-top: 8px; }
+  #detail .section-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  #detail .section-head h3 {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  #detail .copy {
+    margin-left: auto;
+    background: var(--elevated);
+    border: 1px solid var(--stroke-strong);
+    color: var(--muted);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font: 10px/1.4 ui-sans-serif, system-ui, sans-serif;
+    cursor: pointer;
+  }
+  #detail .copy:hover { color: var(--text); border-color: var(--accent); }
   #detail .body {
     white-space: pre-wrap;
     word-break: break-word;
     font: 12.5px/1.55 ui-sans-serif, system-ui, -apple-system, sans-serif;
     color: var(--text);
+  }
+  #detail .body.mono {
+    font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: var(--elevated);
+    border: 1px solid var(--stroke);
+    border-radius: 8px;
+    padding: 10px 12px;
+    max-height: min(55vh, 520px);
+    overflow: auto;
   }
   #detail .body a.path,
   #detail .paths a {
@@ -510,17 +548,46 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
       nav.appendChild(btn);
     });
   }
+  function addSection(aside, title, text, { mono = false, copyLabel = "Copy" } = {}) {
+    if (!text) return;
+    const section = document.createElement("div");
+    section.className = "section";
+    const head = document.createElement("div");
+    head.className = "section-head";
+    const h3 = document.createElement("h3");
+    h3.textContent = title;
+    head.appendChild(h3);
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "copy";
+    btn.textContent = copyLabel;
+    btn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.textContent = "Copied";
+        setTimeout(() => { btn.textContent = copyLabel; }, 1200);
+      } catch (_) {
+        btn.textContent = "Failed";
+        setTimeout(() => { btn.textContent = copyLabel; }, 1200);
+      }
+    });
+    head.appendChild(btn);
+    section.appendChild(head);
+    const body = linkifyBody(text);
+    if (mono) body.classList.add("mono");
+    section.appendChild(body);
+    aside.appendChild(section);
+  }
   function renderDetail(all) {
     const aside = document.getElementById("detail");
     const entry = state.selected ? all[state.selected] : null;
     if (!entry) {
-      aside.innerHTML = '<p class="empty">Select an entry.</p>';
+      aside.innerHTML = '<p class="empty">Select an entry — full prompt / reply opens here.</p>';
       return;
     }
     const when = formatWhen(entry.committed_at);
     const kids = (entry.children || []).length;
-    let html = "<h2></h2>";
-    aside.innerHTML = html;
+    aside.innerHTML = "<h2></h2>";
     aside.querySelector("h2").textContent = entry.title || entry.kind || "entry";
     const meta = document.createElement("div");
     meta.className = "meta-line";
@@ -553,7 +620,23 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
       });
       aside.appendChild(row);
     }
-    aside.appendChild(linkifyBody(entry.body || ""));
+    if (entry.kind === "user") {
+      const goal = entry.goal || entry.body || "";
+      addSection(aside, "Full prompt (goal)", goal, { mono: true });
+      if (entry.injected) {
+        addSection(aside, "Injected MEMORY STATE", entry.injected, { mono: true });
+      }
+      if (entry.packet) {
+        addSection(aside, "Full packet sent", entry.packet, {
+          mono: true,
+          copyLabel: "Copy packet",
+        });
+      }
+    } else {
+      const label =
+        entry.kind === "summary" ? "Full summary" : "Full reply / entry";
+      addSection(aside, label, entry.body || "", { mono: true });
+    }
   }
   function renderList(all) {
     const list = document.getElementById("list");
@@ -674,12 +757,14 @@ def write_live_html(
     """
     from agent_memory.canvas import compact_graph
     from agent_memory.live_reveal import ensure_reveal_server
+    from agent_memory.turn_prompts import attach_turn_prompts
     from agent_memory.viz import graph_data
 
     out_dir = Path(path) if path is not None else default_live_dir(memory)
     out_dir.mkdir(parents=True, exist_ok=True)
 
     payload = compact_graph(graph_data(memory))
+    attach_turn_prompts(payload["nodes"], out_dir)
     payload["root"] = str(Path(memory._path).resolve())
     try:
         payload["reveal"] = ensure_reveal_server(out_dir)
