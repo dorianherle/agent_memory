@@ -124,7 +124,9 @@ Click a summary to open **only** its subgraph; breadcrumbs return to Live.
 A self-updating **HTML** monitor is also kept at `.agent_memory/live/index.html`.
 Session start creates it if missing; hooks refresh the data on every save. Open
 that file in a browser and leave the tab open — it polls for updates, so you can
-watch memory without asking the agent for a canvas.
+watch memory without asking the agent for a canvas. Timestamps include seconds.
+Paths to plots/files mentioned in an entry are clickable and **Reveal in Finder**
+(a tiny local helper starts automatically when the live page is written).
 
 ## Python (OpenAI-compatible)
 

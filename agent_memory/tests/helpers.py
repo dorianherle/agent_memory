@@ -1,3 +1,4 @@
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -7,6 +8,8 @@ from agent_memory import Memory
 
 class MemoryTestCase(unittest.TestCase):
     def setUp(self) -> None:
+        # Live HTML auto-starts a Finder reveal helper; keep unit tests offline.
+        os.environ.setdefault("AGENT_MEMORY_NO_REVEAL", "1")
         self.temporary = tempfile.TemporaryDirectory()
         self.path = Path(self.temporary.name)
         self.memory = Memory(self.path)

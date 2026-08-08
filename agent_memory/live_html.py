@@ -16,7 +16,7 @@ import re
 from pathlib import Path
 
 # Bump when SHELL_TEMPLATE changes so existing installs pick up the new shell.
-SHELL_VERSION = "3"
+SHELL_VERSION = "4"
 
 SHELL_TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
@@ -231,6 +231,40 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     font: 12.5px/1.55 ui-sans-serif, system-ui, -apple-system, sans-serif;
     color: var(--text);
   }
+  #detail .body a.path,
+  #detail .paths a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+    word-break: break-all;
+  }
+  #detail .body a.path:hover,
+  #detail .paths a:hover { color: var(--text); }
+  #detail .paths {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 14px;
+  }
+  #detail .paths a {
+    display: inline-block;
+    max-width: 100%;
+    padding: 5px 9px;
+    border-radius: 8px;
+    border: 1px solid var(--stroke-strong);
+    background: var(--elevated);
+    text-decoration: none;
+    font: 11px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: var(--accent);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #detail .paths a:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
 </style>
 </head>
 <body>
@@ -282,12 +316,133 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
   function formatWhen(iso) {
     if (!iso) return "";
     const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return String(iso).slice(0, 16).replace("T", " ");
+    if (Number.isNaN(d.getTime())) return String(iso).slice(0, 19).replace("T", " ");
     const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
     const dd = String(d.getUTCDate()).padStart(2, "0");
     const hh = String(d.getUTCHours()).padStart(2, "0");
     const mm = String(d.getUTCMinutes()).padStart(2, "0");
-    return months[d.getUTCMonth()] + " " + dd + ", " + hh + ":" + mm + " UTC";
+    const ss = String(d.getUTCSeconds()).padStart(2, "0");
+    return months[d.getUTCMonth()] + " " + dd + ", " + hh + ":" + mm + ":" + ss + " UTC";
+  }
+  function projectRoot() {
+    return String((graph && graph.root) || "").replace(/\/+$/, "");
+  }
+  function toFileUrl(absPath) {
+    const parts = String(absPath).split("/");
+    const encoded = parts.map((p, i) => (i === 0 && p === "" ? "" : encodeURIComponent(p))).join("/");
+    return "file://" + encoded;
+  }
+  function resolvePath(raw) {
+    let p = String(raw || "").trim().replace(/^['"`]+|['"`]+$/g, "");
+    if (!p) return null;
+    if (p.startsWith("file://")) {
+      try { p = decodeURI(p.replace(/^file:\/\//, "")); } catch (_) {}
+    }
+    if (p.startsWith("~/")) {
+      // Browser cannot expand ~; leave absolute-looking only.
+      return null;
+    }
+    if (p.startsWith("/")) return p;
+    const root = projectRoot();
+    if (!root) return null;
+    if (p.startsWith("./")) p = p.slice(2);
+    while (p.startsWith("../")) {
+      // Do not climb above project root from relative mentions.
+      p = p.slice(3);
+    }
+    return root + "/" + p.replace(/^\/+/, "");
+  }
+  function extractPaths(text) {
+    const src = String(text || "");
+    const found = [];
+    const seen = new Set();
+    const push = (raw) => {
+      const abs = resolvePath(raw);
+      if (!abs || seen.has(abs)) return;
+      // Skip obvious non-files (lone roots, tiny noise).
+      if (abs === "/" || abs.length < 4) return;
+      seen.add(abs);
+      found.push({ raw: String(raw).trim(), abs });
+    };
+    const absRe = /(?:^|[\s`'"(=\[]|file:\/\/)(\/(?:Users|home|tmp|var|private|Volumes|opt|Library|mnt|Applications)\/[^\s`'":\]\)]+)/g;
+    const relRe = /(?:^|[\s`'"(=\[]|file:\/\/)((?:\.\.?\/)?(?:[\w.-]+\/)+[\w.-]+\.(?:png|jpe?g|gif|webp|svg|pdf|md|py|txt|csv|html?|json|ya?ml|toml|npy|npz|pt|pth|ckpt|onnx|mp4|mov|wav|ipynb))\b/gi;
+    let m;
+    while ((m = absRe.exec(src))) push(m[1].replace(/[.,;:]+$/, ""));
+    while ((m = relRe.exec(src))) push(m[1].replace(/[.,;:]+$/, ""));
+    return found;
+  }
+  function shortPath(abs) {
+    const root = projectRoot();
+    if (root && abs.startsWith(root + "/")) return abs.slice(root.length + 1);
+    const parts = abs.split("/");
+    return parts.length > 2 ? "…/" + parts.slice(-2).join("/") : abs;
+  }
+  function openInFinder(absPath, event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    const reveal = graph && graph.reveal;
+    if (reveal) {
+      fetch(reveal + "?path=" + encodeURIComponent(absPath))
+        .then((r) => {
+          if (!r.ok) throw new Error("reveal failed");
+        })
+        .catch(() => openFolderFallback(absPath));
+      return;
+    }
+    openFolderFallback(absPath);
+  }
+  function openFolderFallback(absPath) {
+    // Without the reveal helper, open the parent folder via file:// (Finder on macOS).
+    const trimmed = absPath.replace(/\/+$/, "");
+    const parent = trimmed.includes("/") ? trimmed.replace(/\/[^/]+$/, "") || "/" : trimmed;
+    window.open(toFileUrl(parent + "/"), "_blank");
+  }
+  function linkifyBody(text) {
+    const wrap = document.createElement("div");
+    wrap.className = "body";
+    const paths = extractPaths(text);
+    if (!paths.length) {
+      wrap.textContent = text || "";
+      return wrap;
+    }
+    // Replace longest abs paths first so overlaps stay stable.
+    const ordered = paths.slice().sort((a, b) => b.raw.length - a.raw.length);
+    let remaining = String(text || "");
+    const chunks = [];
+    while (remaining.length) {
+      let best = null;
+      let bestAt = -1;
+      ordered.forEach((p) => {
+        const at = remaining.indexOf(p.raw);
+        if (at >= 0 && (bestAt < 0 || at < bestAt)) {
+          best = p;
+          bestAt = at;
+        }
+      });
+      if (!best || bestAt < 0) {
+        chunks.push({ type: "text", value: remaining });
+        break;
+      }
+      if (bestAt > 0) chunks.push({ type: "text", value: remaining.slice(0, bestAt) });
+      chunks.push({ type: "path", value: best.raw, abs: best.abs });
+      remaining = remaining.slice(bestAt + best.raw.length);
+    }
+    chunks.forEach((chunk) => {
+      if (chunk.type === "text") {
+        wrap.appendChild(document.createTextNode(chunk.value));
+        return;
+      }
+      const a = document.createElement("a");
+      a.className = "path";
+      a.href = toFileUrl(chunk.abs);
+      a.textContent = chunk.value;
+      a.title = "Show in Finder: " + chunk.abs;
+      a.addEventListener("click", (e) => openInFinder(chunk.abs, e));
+      wrap.appendChild(a);
+    });
+    return wrap;
   }
   function truncate(text, max) {
     text = String(text || "");
@@ -384,10 +539,21 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
       });
       aside.appendChild(btn);
     }
-    const body = document.createElement("div");
-    body.className = "body";
-    body.textContent = entry.body || "";
-    aside.appendChild(body);
+    const paths = extractPaths(entry.body || "");
+    if (paths.length) {
+      const row = document.createElement("div");
+      row.className = "paths";
+      paths.forEach((p) => {
+        const a = document.createElement("a");
+        a.href = toFileUrl(p.abs);
+        a.textContent = shortPath(p.abs);
+        a.title = "Show in Finder: " + p.abs;
+        a.addEventListener("click", (e) => openInFinder(p.abs, e));
+        row.appendChild(a);
+      });
+      aside.appendChild(row);
+    }
+    aside.appendChild(linkifyBody(entry.body || ""));
   }
   function renderList(all) {
     const list = document.getElementById("list");
@@ -507,12 +673,18 @@ def write_live_html(
     or when ``SHELL_VERSION`` changed (unless ``force_shell`` forces a rewrite).
     """
     from agent_memory.canvas import compact_graph
+    from agent_memory.live_reveal import ensure_reveal_server
     from agent_memory.viz import graph_data
 
     out_dir = Path(path) if path is not None else default_live_dir(memory)
     out_dir.mkdir(parents=True, exist_ok=True)
 
     payload = compact_graph(graph_data(memory))
+    payload["root"] = str(Path(memory._path).resolve())
+    try:
+        payload["reveal"] = ensure_reveal_server(out_dir)
+    except Exception:
+        payload["reveal"] = None
     encoded = json.dumps(payload, indent=2).replace("</", "<\\/")
     (out_dir / "data.js").write_text(
         f"window.__AGENT_MEMORY_LIVE__ = {encoded};\n",

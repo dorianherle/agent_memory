@@ -105,8 +105,13 @@ class WriteCanvasTests(MemoryTestCase):
         shell = index.read_text()
         payload = data.read_text()
         self.assertIn("agent-memory-live-shell", shell)
+        self.assertIn('content="4"', shell)
+        self.assertIn("getUTCSeconds", shell)
+        self.assertIn("openInFinder", shell)
         self.assertIn("window.__AGENT_MEMORY_LIVE__", payload)
         self.assertIn("first step", payload)
+        self.assertIn('"root"', payload)
+        self.assertIn(str(self.path.resolve()), payload)
         # Second call refreshes data without requiring a rewrite of an
         # up-to-date shell; force_shell still rewrites.
         mtime = index.stat().st_mtime_ns

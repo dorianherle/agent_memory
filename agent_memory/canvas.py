@@ -94,7 +94,8 @@ function formatWhen(iso: string): string {
   const dd = String(d.getUTCDate()).padStart(2, "0");
   const hh = String(d.getUTCHours()).padStart(2, "0");
   const mm = String(d.getUTCMinutes()).padStart(2, "0");
-  return `${months[d.getUTCMonth()]} ${dd}, ${hh}:${mm} UTC`;
+  const ss = String(d.getUTCSeconds()).padStart(2, "0");
+  return `${months[d.getUTCMonth()]} ${dd}, ${hh}:${mm}:${ss} UTC`;
 }
 
 function truncate(text: string, max: number): string {
