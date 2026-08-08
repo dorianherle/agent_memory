@@ -24,9 +24,10 @@ class McpServerTests(MemoryTestCase):
             self.skipTest(str(error))
         names = set(server._tool_manager._tools)
         self.assertIn("memory_state", names)
-        self.assertIn("memory_graph_data", names)
         self.assertIn("memory_write_canvas", names)
         self.assertIn("memory_summarize", names)
+        self.assertNotIn("memory_graph_data", names)
+        self.assertNotIn("memory_graph", names)
 
 
 class MemoryRootTests(MemoryTestCase):
@@ -86,8 +87,13 @@ class WriteCanvasTests(MemoryTestCase):
         text = path.read_text()
         self.assertTrue(path.exists())
         self.assertIn("useCanvasState", text)
+        self.assertIn("drill-trail", text)
+        self.assertIn("selected-entry", text)
+        self.assertIn("Subgraph (", text)
+        self.assertIn('"body"', text)
         self.assertIn("children", text)
         self.assertIn("first step", text)
+        self.assertIn("Live", text)
 
     def test_default_canvas_dir_slug(self) -> None:
         from agent_memory.canvas import default_canvas_dir, project_slug
@@ -319,6 +325,31 @@ class InstallTests(MemoryTestCase):
             apply_credentials_env(self.path)
             self.assertEqual(os.environ.get("GEMINI_API_KEY"), "test-gemini-key")
             self.assertIn("gemini:GeminiProvider", os.environ.get("AGENT_MEMORY_PROVIDER", ""))
+
+    def test_install_refuses_silent_gemini_skip(self) -> None:
+        from agent_memory.cursor.install import GeminiSetupError
+
+        with patch.dict(os.environ, {"GEMINI_API_KEY": ""}, clear=False):
+            os.environ.pop("GEMINI_API_KEY", None)
+            with self.assertRaises(GeminiSetupError):
+                install_cursor(
+                    self.path,
+                    python=sys.executable,
+                    interactive=False,
+                    skip_gemini=False,
+                )
+
+    def test_install_uses_project_dotenv(self) -> None:
+        (self.path / ".env").write_text("GEMINI_API_KEY=from-dotenv-key\n")
+        with patch.dict(os.environ, {"GEMINI_API_KEY": ""}, clear=False):
+            os.environ.pop("GEMINI_API_KEY", None)
+            written = install_cursor(
+                self.path,
+                python=sys.executable,
+                interactive=False,
+            )
+        cred = written["credentials"].read_text()
+        self.assertIn("GEMINI_API_KEY=from-dotenv-key", cred)
 
     def test_install_is_idempotent(self) -> None:
         install_cursor(

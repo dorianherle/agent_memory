@@ -38,17 +38,19 @@ can color who said what.
 
 Use **agent-memory** MCP tools for judgment:
 - `memory_summarize` — fold finished work so Recent stays short (pass `agent`)
-- `memory_find` / `memory_history` / `memory_graph` — recall detail
-  (`query=` uses Gemini embeddings when configured at install)
-- `memory_graph_data` — structured `{nodes, edges, kinds, branches, agents}`
-- `memory_write_canvas` — refresh the live who-said-what dashboard
+- `memory_find` — recall detail (`query=` uses Gemini when configured)
+- `memory_write_canvas` — **only** way to show memory to the user (live dashboard)
 - `memory_branch` — leave a dead end; restores files to a snapshot
 - `memory_inspect` / `memory_inspect_done` — look at an old snapshot
-- `memory_state` — refresh MEMORY STATE
+- `memory_state` — agent context only (do not dump graphs/history in chat to “show” memory)
 
 Read `@.cursor/MEMORY_STATE.md` for the compact current state.
 Only use entry ids you can see there or in tool results.
 """
+
+
+class GeminiSetupError(ValueError):
+    """Raised when Gemini was neither configured nor explicitly skipped."""
 
 
 def _read_json(path: Path, default):
@@ -110,6 +112,22 @@ def apply_credentials_env(root: Path) -> dict[str, str]:
     return loaded
 
 
+def load_dotenv_key(root: Path, name: str = "GEMINI_API_KEY") -> str | None:
+    """Read a single key from project ``.env`` if present (no overwrite of os.environ)."""
+    path = Path(root).resolve() / ".env"
+    if not path.exists():
+        return None
+    for line in path.read_text().splitlines():
+        text = line.strip()
+        if not text or text.startswith("#") or "=" not in text:
+            continue
+        key, value = text.split("=", 1)
+        if key.strip() == name:
+            value = value.strip().strip("'").strip('"')
+            return value or None
+    return None
+
+
 def gemini_env(api_key: str) -> dict[str, str]:
     return {
         "AGENT_MEMORY_PROVIDER": PROVIDER_GEMINI,
@@ -117,46 +135,92 @@ def gemini_env(api_key: str) -> dict[str, str]:
     }
 
 
-def _prompt_gemini_key() -> str | None:
-    """Interactive Gemini setup. Returns API key or None to skip."""
-    print()
-    print("Semantic memory_find uses Gemini embeddings.")
-    print("  1) Configure Gemini now (GEMINI_API_KEY)")
-    print("  2) Skip — substring search only")
-    print()
-    default = "1" if os.getenv("GEMINI_API_KEY") else "1"
-    choice = input(f"Choose [1/2] (default {default}): ").strip() or default
-    if choice not in {"1", "gemini", "y", "yes"}:
-        return None
+def _find_gemini_key(
+    root: Path,
+    *,
+    api_key: str | None = None,
+) -> tuple[str | None, str | None]:
+    """Return ``(key, source)`` from flag, env, credentials, or project ``.env``."""
+    if api_key and api_key.strip():
+        return api_key.strip(), "flag"
+    env = (os.getenv("GEMINI_API_KEY") or "").strip()
+    if env:
+        return env, "environment"
+    cred = (load_credentials(root).get("GEMINI_API_KEY") or "").strip()
+    if cred:
+        return cred, "credentials.env"
+    dotenv = load_dotenv_key(root)
+    if dotenv:
+        return dotenv, ".env"
+    return None, None
 
-    existing = (os.getenv("GEMINI_API_KEY") or "").strip()
+
+def _prompt_gemini_choice(root: Path, existing: str | None, source: str | None) -> dict[str, str]:
+    """Always ask: configure Gemini or explicitly skip. Never silent."""
+    print()
+    print("=== Gemini embeddings (required choice) ===")
+    print("Semantic memory_find(query=...) needs a Gemini API key.")
+    print("  1) Configure Gemini")
+    print("  2) Skip embeddings (substring search only) — type 2 to confirm")
+    print()
+    if existing and source:
+        print(f"Found GEMINI_API_KEY via {source}.")
+    choice = ""
+    while choice not in {"1", "2"}:
+        choice = input("Choose 1 or 2: ").strip()
+        if choice not in {"1", "2"}:
+            print("Please enter 1 (configure) or 2 (skip).")
+
+    if choice == "2":
+        print("Skipping Gemini — memory_find will use substring match only.")
+        return {}
+
     if existing:
-        use = input(
-            "GEMINI_API_KEY is already set in this shell. Use it? [Y/n]: "
-        ).strip().lower()
+        use = input(f"Use the key from {source}? [Y/n]: ").strip().lower()
         if use in {"", "y", "yes"}:
-            return existing
+            return gemini_env(existing)
     key = getpass.getpass("Paste Gemini API key (input hidden): ").strip()
-    return key or None
+    if not key:
+        raise GeminiSetupError(
+            "No Gemini API key entered. Re-run and choose 1 with a key, "
+            "or choose 2 to skip embeddings."
+        )
+    return gemini_env(key)
 
 
 def resolve_gemini(
+    root: Path,
     *,
     api_key: str | None = None,
     skip_gemini: bool = False,
     interactive: bool = False,
 ) -> dict[str, str]:
-    """Return env map for Gemini, or ``{}`` when skipped / missing key."""
+    """Resolve Gemini env — never silently omit the decision.
+
+    - ``skip_gemini``: explicit off
+    - interactive TTY: always prompt (configure vs skip)
+    - non-interactive: need flag/env/.env/credentials, else raise
+    """
     if skip_gemini:
         return {}
-    key = (api_key or os.getenv("GEMINI_API_KEY") or "").strip()
-    if key:
-        return gemini_env(key)
+
+    existing, source = _find_gemini_key(root, api_key=api_key)
+
     if interactive and sys.stdin.isatty():
-        prompted = _prompt_gemini_key()
-        if prompted:
-            return gemini_env(prompted)
-    return {}
+        return _prompt_gemini_choice(root, existing, source)
+
+    if existing:
+        if source and source != "flag":
+            print(f"Using GEMINI_API_KEY from {source}.")
+        return gemini_env(existing)
+
+    raise GeminiSetupError(
+        "Gemini setup is required (no silent skip).\n"
+        "  agent-memory cursor install --gemini-api-key \"$GEMINI_API_KEY\"\n"
+        "  # or put GEMINI_API_KEY in the project .env\n"
+        "  # or explicitly opt out:\n"
+        "  agent-memory cursor install --skip-gemini"
+    )
 
 
 def ensure_gitignore(root: Path) -> Path | None:
@@ -171,9 +235,13 @@ def ensure_gitignore(root: Path) -> Path | None:
         ):
             return None
         suffix = "" if text.endswith("\n") or not text else "\n"
-        gitignore.write_text(f"{text}{suffix}\n# agent-memory store + Gemini credentials\n{line}\n")
+        gitignore.write_text(
+            f"{text}{suffix}\n# agent-memory store + Gemini credentials\n{line}\n"
+        )
     else:
-        gitignore.write_text(f"# agent-memory store + Gemini credentials\n{line}\n")
+        gitignore.write_text(
+            f"# agent-memory store + Gemini credentials\n{line}\n"
+        )
     return gitignore
 
 
@@ -190,9 +258,10 @@ def install_cursor(
     Safe to re-run: merges MCP servers and hook lists without wiping
     unrelated entries.
 
-    Gemini setup (default on a TTY unless ``skip_gemini`` / key flags):
-    prompts for ``GEMINI_API_KEY``, writes ``.agent_memory/credentials.env``,
-    and injects the same env into ``.cursor/mcp.json`` so MCP can embed.
+    Gemini is not skipped silently: a TTY always prompts (configure vs
+    skip); non-interactive installs need ``--gemini-api-key`` /
+    ``GEMINI_API_KEY`` / project ``.env`` / existing credentials, or
+    explicit ``--skip-gemini``.
     """
     root = Path(project).resolve()
     cursor = root / ".cursor"
@@ -202,12 +271,11 @@ def install_cursor(
     written: dict[str, Path] = {}
 
     if interactive is None:
-        interactive = (
-            not skip_gemini
-            and gemini_api_key is None
-            and sys.stdin.isatty()
-        )
+        # Always prefer asking when we can — never default to silent skip.
+        interactive = not skip_gemini and sys.stdin.isatty()
+
     provider_env = resolve_gemini(
+        root,
         api_key=gemini_api_key,
         skip_gemini=skip_gemini,
         interactive=interactive,
@@ -231,6 +299,9 @@ def install_cursor(
         server["env"] = {
             "AGENT_MEMORY_PROVIDER": provider_env["AGENT_MEMORY_PROVIDER"],
         }
+    else:
+        # Explicit skip / no provider: drop stale provider env from mcp.json.
+        server.pop("env", None)
     servers[SERVER_NAME] = server
     _write_json(mcp_path, mcp)
     written["mcp"] = mcp_path
@@ -266,8 +337,7 @@ def install_cursor(
     if provider_env:
         write_credentials(cred_path, provider_env)
         written["credentials"] = cred_path
-    elif skip_gemini and cred_path.exists():
-        # Explicit skip: clear so hooks/MCP don't keep a stale key.
+    elif skip_gemini:
         write_credentials(cred_path, {})
         written["credentials"] = cred_path
 

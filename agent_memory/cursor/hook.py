@@ -31,9 +31,9 @@ You have long-term project memory via the agent-memory MCP tools.
 Durability is automatic — do not try to "save" every step.
 Use tools for judgment only:
 - memory_summarize when a chunk of work is finished (keeps Recent short)
-- memory_find / memory_history / memory_graph to recall detail
+- memory_find to recall detail (query= uses Gemini when configured)
+- memory_write_canvas to show the user the live dashboard (only UI — do not dump graphs in chat)
 - memory_branch to leave a dead end; memory_inspect to look at an old snapshot
-- memory_write_canvas to refresh the live dashboard
 Always call memory_inspect_done before answering if you inspected.
 Prefer facts from MEMORY STATE or tool results; do not invent entry ids.
 Every memory entry is tagged with an agent name (@main, @explore·…, @user).

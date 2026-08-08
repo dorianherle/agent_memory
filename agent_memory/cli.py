@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
 
@@ -37,43 +38,54 @@ def main(argv: list[str] | None = None) -> None:
     install.add_argument(
         "--gemini-api-key",
         default=None,
-        help="Gemini API key for semantic memory_find (or set GEMINI_API_KEY)",
+        help="Gemini API key for semantic memory_find (or set GEMINI_API_KEY / .env)",
     )
     install.add_argument(
         "--skip-gemini",
         action="store_true",
-        help="Skip embeddings; memory_find(query=) falls back to substring",
+        help="Explicitly skip embeddings (substring memory_find only)",
     )
     install.add_argument(
         "--no-interactive",
         action="store_true",
-        help="Never prompt (use flags/env only)",
+        help="Never prompt; require --gemini-api-key / env / .env or --skip-gemini",
     )
 
     args = parser.parse_args(argv)
 
     if args.command == "cursor" and args.cursor_command == "install":
-        from agent_memory.cursor.install import install_cursor
+        from agent_memory.cursor.install import GeminiSetupError, install_cursor
 
-        written = install_cursor(
-            args.project,
-            python=args.python,
-            gemini_api_key=args.gemini_api_key,
-            skip_gemini=args.skip_gemini,
-            interactive=False if args.no_interactive else None,
-        )
+        try:
+            written = install_cursor(
+                args.project,
+                python=args.python,
+                gemini_api_key=args.gemini_api_key,
+                skip_gemini=args.skip_gemini,
+                interactive=False if args.no_interactive else None,
+            )
+        except GeminiSetupError as error:
+            print(f"error: {error}", file=sys.stderr)
+            sys.exit(2)
+
         root = Path(args.project).resolve()
         print(f"Installed agent-memory into {root / '.cursor'}")
         for label, path in written.items():
             print(f"  {label}: {path}")
         print()
-        has_gemini = "credentials" in written and written["credentials"].exists()
-        if has_gemini and written["credentials"].read_text().strip():
-            print("Gemini embeddings: on (semantic memory_find)")
-            print('  Also install: pip install "agent-memory[cursor,gemini]"')
+        cred = written.get("credentials")
+        has_gemini = bool(
+            cred
+            and cred.exists()
+            and "GEMINI_API_KEY=" in cred.read_text()
+            and cred.read_text().split("GEMINI_API_KEY=", 1)[-1].strip()
+        )
+        if has_gemini:
+            print("Gemini embeddings: ON (semantic memory_find)")
+            print('  pip install "agent-memory[cursor]"  # includes google-genai')
         else:
-            print("Gemini embeddings: off (substring memory_find only)")
-            print("  Re-run with: agent-memory cursor install --gemini-api-key …")
+            print("Gemini embeddings: OFF (substring memory_find only)")
+            print("  You chose --skip-gemini (or cleared credentials).")
         print()
         print("Next:")
         print("  Reload MCP in Cursor Settings → Tools & MCP")

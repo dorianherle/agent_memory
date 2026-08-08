@@ -14,13 +14,11 @@ can color who said what.
 
 Use **agent-memory** MCP tools for judgment:
 - `memory_summarize` — fold finished work so Recent stays short (pass `agent`)
-- `memory_find` / `memory_history` / `memory_graph` — recall detail
-  (`query=` uses Gemini embeddings when configured at install)
-- `memory_graph_data` — structured `{nodes, edges, kinds, branches, agents}`
-- `memory_write_canvas` — refresh the live who-said-what dashboard
+- `memory_find` — recall detail (`query=` uses Gemini when configured)
+- `memory_write_canvas` — **only** way to show memory to the user (live dashboard)
 - `memory_branch` — leave a dead end; restores files to a snapshot
 - `memory_inspect` / `memory_inspect_done` — look at an old snapshot
-- `memory_state` — refresh MEMORY STATE
+- `memory_state` — agent context only (do not dump graphs/history in chat to “show” memory)
 
 Read `@.cursor/MEMORY_STATE.md` for the compact current state.
 Only use entry ids you can see there or in tool results.

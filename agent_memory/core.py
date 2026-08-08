@@ -464,9 +464,9 @@ class Memory:
         self,
         path: str | Path | None = None,
         *,
-        name: str = "agent-memory-graph",
+        name: str = "agent-memory-live",
     ) -> Path:
-        """Write a Cursor ``.canvas.tsx`` for the memory graph and return it."""
+        """Write a Cursor ``.canvas.tsx`` live dashboard and return it."""
         from agent_memory.canvas import write_canvas
 
         return write_canvas(self, path, name=name)

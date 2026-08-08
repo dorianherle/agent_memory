@@ -14,7 +14,12 @@ cd your-project
 agent-memory cursor install
 ```
 
-The installer asks for a **Gemini API key** (for semantic `memory_find`). It writes:
+The installer **always requires a Gemini choice**:
+- interactive: prompts `1` configure / `2` skip
+- non-interactive: needs `--gemini-api-key`, `GEMINI_API_KEY`, project `.env`,
+  existing credentials, or explicit `--skip-gemini` (no silent skip)
+
+It writes:
 
 - `.cursor/mcp.json` — MCP tools + non-secret `AGENT_MEMORY_PROVIDER`
 - `.cursor/hooks.json` — automatic saves
@@ -57,15 +62,13 @@ The agent never has to “remember to save.” Hooks handle that. Tools are for 
 |------|-----------|
 | `memory_summarize` | Fold finished work behind one line |
 | `memory_find` | Reopen detail by meaning (Gemini), text, or id |
-| `memory_history` | Full timeline of the current branch |
-| `memory_graph` | Branch tree (`html=true` writes a page) |
-| `memory_graph_data` | Same graph as JSON `{nodes, edges, kinds, branches, agents}` |
-| `memory_write_canvas` | Write a live `.canvas.tsx` graph (colored by agent) |
+| `memory_write_canvas` | **Show** memory — live dashboard (only UI) |
 | `memory_branch` | Leave a dead end; restore that snapshot |
 | `memory_inspect` | Look at an old snapshot (then `memory_inspect_done`) |
-| `memory_state` | Refresh MEMORY STATE |
+| `memory_state` | Agent context only (not for displaying to you) |
 
-Entries are tagged with an **agent** name (`user`, `main`, `explore·…`) so parent and subagents share one store while the dashboard shows who said what.
+The live canvas (`agent-memory-live.canvas.tsx`) is refreshed by hooks on save.
+Click a summary to open **only** its subgraph; breadcrumbs return to Live.
 
 ## Python
 
