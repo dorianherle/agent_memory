@@ -50,8 +50,9 @@ def _build_server():
         all_branches: bool = False,
     ) -> str:
         """Search stored memory. Use query for meaning (falls back to substring
-        match when no embedding provider is configured), text for substring,
-        or ids from MEMORY STATE.
+        match when no embedding provider is configured, or when embeddings
+        fail — e.g. missing GEMINI_API_KEY), text for substring, or ids from
+        MEMORY STATE.
         """
         return call_tool(
             get_memory(),
@@ -67,12 +68,13 @@ def _build_server():
 
     @mcp.tool()
     def memory_save(text: str, agent: str | None = None) -> str:
-        """Checkpoint a meaningful mid-turn step before the turn ends.
+        """Checkpoint meaningful mid-turn progress before the turn ends.
 
         Hooks only save at turn boundaries (user prompt / finished answer).
-        During long work, call this so progress is durable if the session dies.
-        Do not save every trivial step — only checkpoints worth keeping.
-        Pass agent to tag who wrote it (defaults to AGENT_MEMORY_AGENT or main).
+        During long work, call this at milestones — findings, decisions,
+        working checkpoints — so progress survives if the session dies.
+        Prefer a few solid saves over silence; skip pure noise.
+        Pass agent to tag who wrote it (defaults to AGENT_MEMORY_AGENT or agent).
         Refreshes the live HTML monitor automatically.
         """
         memory = get_memory()
@@ -83,14 +85,16 @@ def _build_server():
         except Exception:
             pass
         who = memory.find(ids=item_id, k=1)
-        label = who[0].payload.get("agent", "main") if who else "main"
+        from agent_memory.identity import DEFAULT_AGENT
+
+        label = who[0].payload.get("agent", DEFAULT_AGENT) if who else DEFAULT_AGENT
         return f"Saved [{item_id[:8]}] @{label}."
 
     @mcp.tool()
     def memory_summarize(text: str, agent: str | None = None) -> str:
         """Fold finished work behind one line so Recent stays short. Still retrievable with memory_find.
 
-        Pass agent to tag who did the work (defaults to AGENT_MEMORY_AGENT or main).
+        Pass agent to tag who did the work (defaults to AGENT_MEMORY_AGENT or agent).
         Refreshes the live HTML monitor automatically.
         """
         memory = get_memory()
@@ -101,7 +105,9 @@ def _build_server():
         except Exception:
             pass
         who = memory.find(ids=item_id, k=1)
-        label = who[0].payload.get("agent", "main") if who else "main"
+        from agent_memory.identity import DEFAULT_AGENT
+
+        label = who[0].payload.get("agent", DEFAULT_AGENT) if who else DEFAULT_AGENT
         return f"Summarized [{item_id[:8]}] @{label}."
 
     @mcp.tool()

@@ -69,6 +69,9 @@ def ensure_reveal_server(live_dir: Path) -> str | None:
         url = reveal_url(live_dir)
         if url:
             return url
+        if proc.poll() is not None:
+            # Child exited before becoming healthy (crash / import error).
+            return None
     return None
 
 
@@ -176,7 +179,11 @@ def _pick_port() -> int:
             except OSError:
                 continue
             return port
-    raise RuntimeError("no free port for live reveal helper")
+    # Preferred ports taken (other projects / stale helpers) — use ephemeral.
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.bind((DEFAULT_HOST, 0))
+        return int(sock.getsockname()[1])
 
 
 def main(argv: list[str] | None = None) -> int:

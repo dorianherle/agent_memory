@@ -154,8 +154,9 @@ class TestSemanticSearch(MemoryTestCase):
 
     @unittest.skipUnless(HAS_HNSWLIB, "needs hnswlib")
     def test_bad_provider_result(self):
-        with self.assertRaisesRegex(ValueError, "wrong number"):
-            self.find("matrix", BrokenProvider())
+        # Provider bugs must not break find for the agent — substring fallback.
+        hits = self.find("matrix", BrokenProvider())
+        self.assertEqual([item.id for item in hits], [self.matrix])
 
 
 @unittest.skipUnless(os.getenv("GEMINI_API_KEY"), "needs GEMINI_API_KEY")

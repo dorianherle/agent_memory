@@ -371,10 +371,10 @@ class TestWrapper(MemoryTestCase):
         result = call_tool(self.memory, "memory", {"action": "history"})
 
         lines = result.split("\n")
-        self.assertEqual(lines[0], f"[{summary[:8]}] @main Summary: did a and b")
-        self.assertEqual(lines[1], f"    [{a[:8]}] @main step a")
-        self.assertEqual(lines[2], f"    [{b[:8]}] @main step b")
-        self.assertEqual(lines[3], f"[{c[:8]}] @main step c")
+        self.assertEqual(lines[0], f"[{summary[:8]}] @agent Summary: did a and b")
+        self.assertEqual(lines[1], f"    [{a[:8]}] @agent step a")
+        self.assertEqual(lines[2], f"    [{b[:8]}] @agent step b")
+        self.assertEqual(lines[3], f"[{c[:8]}] @agent step c")
 
     def test_call_tool_graph_shows_every_branch(self):
         from agent_memory import call_tool
@@ -400,7 +400,7 @@ class TestWrapper(MemoryTestCase):
         self.assertIn("Summary: dead end", result)
         self.assertIn("main", result)
         self.assertIn("HEAD -> retry", result)
-        self.assertIn(f"[{first[:8]}] @main first", result)
+        self.assertIn(f"[{first[:8]}] @agent first", result)
         self.assertNotIn("graph.html", result)
 
         result = call_tool(

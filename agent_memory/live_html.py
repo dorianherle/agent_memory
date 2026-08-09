@@ -16,7 +16,7 @@ import re
 from pathlib import Path
 
 # Bump when SHELL_TEMPLATE changes so existing installs pick up the new shell.
-SHELL_VERSION = "5"
+SHELL_VERSION = "7"
 
 SHELL_TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
@@ -622,12 +622,28 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     }
     if (entry.kind === "user") {
       const goal = entry.goal || entry.body || "";
-      addSection(aside, "Full prompt (goal)", goal, { mono: true });
-      if (entry.injected) {
-        addSection(aside, "Injected MEMORY STATE", entry.injected, { mono: true });
+      if (entry.instructions) {
+        addSection(aside, "1. Memory instructions (prompt text)", entry.instructions, {
+          mono: true,
+        });
       }
+      if (entry.rule) {
+        addSection(aside, "2. Always-apply rule → system/rules prompt", entry.rule, {
+          mono: true,
+        });
+      }
+      if (entry.mcp_tools) {
+        addSection(aside, "3. MCP tool catalog (also sent as tool schemas)", entry.mcp_tools, {
+          mono: true,
+        });
+      }
+      const stateText = entry.memory_state || entry.injected || "";
+      if (stateText) {
+        addSection(aside, "4. Injected MEMORY STATE", stateText, { mono: true });
+      }
+      addSection(aside, "5. User goal", goal, { mono: true });
       if (entry.packet) {
-        addSection(aside, "Full packet sent", entry.packet, {
+        addSection(aside, "Full memory packet (copy)", entry.packet, {
           mono: true,
           copyLabel: "Copy packet",
         });

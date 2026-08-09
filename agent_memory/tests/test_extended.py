@@ -114,7 +114,7 @@ class TestExtendedMemory(MemoryTestCase):
         new_id = self.memory.supersede(old_id, "new", {"kind": "fact"})
         self.assertEqual(
             self.memory.find(ids=new_id)[0].payload,
-            {"kind": "fact", "agent": "main"},
+            {"kind": "fact", "agent": "agent"},
         )
 
     def test_negative_k_is_rejected(self):

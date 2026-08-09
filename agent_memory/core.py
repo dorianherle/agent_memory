@@ -397,8 +397,9 @@ class Memory:
                     include_historical=include_historical,
                 )
                 items = [self._row_item(row, score) for row, score in ranked]
-            except ModuleNotFoundError:
-                # Embedding stack optional at runtime (hnswlib/numpy).
+            except Exception:
+                # Embedding stack optional; missing API key / provider errors
+                # fall back to substring (matches memory_find docstring).
                 use_semantic = False
         if not use_semantic:
             if query is not None:

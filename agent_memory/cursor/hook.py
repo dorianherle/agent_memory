@@ -34,17 +34,23 @@ from agent_memory.identity import (
 CURSOR_INSTRUCTIONS = """
 You have long-term project memory via the agent-memory MCP tools.
 Hooks auto-save user prompts and finished answers at turn boundaries.
-That is not enough for long mid-turn work — use memory_save for durable
-checkpoints (milestones, findings, decisions). Do not save every trivial step.
+
+For any stretch of work that might outlast this turn — investigations,
+multi-step edits, experiments — call memory_save at real milestones
+(findings, decisions, working checkpoints). Prefer a few solid saves
+over silence; if the session dies, only checkpoints survive.
+Skip pure noise (e.g. "opened file X") but do not wait until the final
+answer if useful progress already exists.
+
 Use tools for judgment and checkpoints:
-- memory_save — mid-turn checkpoint so progress survives before the turn ends
+- memory_save — durable mid-turn checkpoint (pass agent)
 - memory_summarize when a chunk of work is finished (keeps Recent short)
 - memory_find to recall detail (query= uses Gemini when configured)
 - memory_branch to leave a dead end; memory_inspect to look at an old snapshot
 Always call memory_inspect_done before answering if you inspected.
 Prefer facts from MEMORY STATE (always-applied rule) or tool results; do not
 invent entry ids.
-Every memory entry is tagged with an agent name (@main, @explore·…, @user).
+Every memory entry is tagged with an agent name (@agent, @explore·…, @user).
 When calling memory tools, pass agent=<your name> if the tool asks; your
 session agent name is also in AGENT_MEMORY_AGENT.
 A self-updating HTML live view is also kept at `.agent_memory/live/index.html`
@@ -94,6 +100,15 @@ def _refresh_dashboard(memory) -> None:
             memory.write_state_file()
         except Exception:
             pass
+
+
+def _memory_rule_text(memory) -> str:
+    """Static alwaysApply tool-guide rule (not the live state rule)."""
+    path = memory._path / ".cursor" / "rules" / "agent-memory.mdc"
+    try:
+        return path.read_text(encoding="utf-8")
+    except OSError:
+        return ""
 
 
 def handle(event: str, data: dict) -> dict:
@@ -156,13 +171,26 @@ def handle(event: str, data: dict) -> dict:
         if entry_id and isinstance(prompt, str) and prompt.strip():
             try:
                 from agent_memory.live_html import default_live_dir
-                from agent_memory.turn_prompts import record_turn_prompt
+                from agent_memory.turn_prompts import (
+                    mcp_tools_catalog,
+                    record_turn_prompt,
+                )
 
+                agent = _agent_for_event(memory, data)
+                instructions = (
+                    f"{CURSOR_INSTRUCTIONS}\n\n"
+                    f"Your memory agent name: @{agent}\n"
+                    f"Pass agent={agent!r} on memory_save / "
+                    f"memory_summarize when possible."
+                )
                 record_turn_prompt(
                     default_live_dir(memory),
                     entry_id,
                     goal=prompt.strip(),
-                    injected=payload,
+                    memory_state=payload,
+                    instructions=instructions,
+                    rule=_memory_rule_text(memory),
+                    mcp_tools=mcp_tools_catalog(),
                 )
                 memory.write_live_html()
             except Exception:

@@ -22,7 +22,12 @@ class GeminiProvider:
         self.model = model
         self.dimensions = dimensions
         key = (api_key or os.getenv("GEMINI_API_KEY") or "").strip() or None
-        self.client = genai.Client(api_key=key) if key else genai.Client()
+        if not key:
+            raise ValueError(
+                "GEMINI_API_KEY is not set "
+                "(expected in .agent_memory/credentials.env or project .env)"
+            )
+        self.client = genai.Client(api_key=key)
 
     @property
     def fingerprint(self) -> str:

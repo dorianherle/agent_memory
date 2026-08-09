@@ -37,15 +37,20 @@ alwaysApply: true
 # Agent Memory
 
 Hooks auto-save user prompts and finished answers at turn boundaries.
-During long mid-turn work, call `memory_save` for durable checkpoints
-(milestones, findings, decisions). Do **not** save every trivial step.
+
+For any stretch of work that might outlast this turn — investigations,
+multi-step edits, experiments — call `memory_save` at real milestones
+(findings, decisions, working checkpoints). Prefer a few solid saves
+over silence; if the session dies, only checkpoints survive.
+Skip pure noise (e.g. “opened file X”) but do not wait for the final
+answer if useful progress already exists.
 
 Subagents share the same memory store. Every entry is tagged with an
-`agent` name (`user`, `main`, `explore·abc123`, …) so the live canvas
+`agent` name (`agent`, `explore·abc123`, `user`, …) so the live HTML
 can color who said what.
 
 Use **agent-memory** MCP tools for judgment and checkpoints:
-- `memory_save` — mid-turn checkpoint before the turn ends (pass `agent`)
+- `memory_save` — durable mid-turn checkpoint (pass `agent`)
 - `memory_summarize` — fold finished work so Recent stays short (pass `agent`)
 - `memory_find` — recall detail (`query=` uses Gemini when configured)
 - Browser monitor: `.agent_memory/live/index.html` (auto-created; self-refreshing; click an entry for the full prompt packet)
@@ -188,11 +193,20 @@ def load_credentials(root: Path) -> dict[str, str]:
 
 
 def apply_credentials_env(root: Path) -> dict[str, str]:
-    """Load credentials into ``os.environ`` for keys that are not already set."""
-    loaded = load_credentials(root)
+    """Load credentials into ``os.environ`` for keys that are not already set.
+
+    Prefers ``.agent_memory/credentials.env``. If ``GEMINI_API_KEY`` is still
+    unset, falls back to the project ``.env`` (same sources as install).
+    """
+    loaded = dict(load_credentials(root))
     for key, value in loaded.items():
         if value and not os.environ.get(key):
             os.environ[key] = value
+    if not (os.environ.get("GEMINI_API_KEY") or "").strip():
+        dotenv_key = load_dotenv_key(root)
+        if dotenv_key:
+            os.environ["GEMINI_API_KEY"] = dotenv_key
+            loaded["GEMINI_API_KEY"] = dotenv_key
     return loaded
 
 

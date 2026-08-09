@@ -14,7 +14,7 @@ from pathlib import Path
 ENV_AGENT = "AGENT_MEMORY_AGENT"
 SESSIONS_FILE = "agent_sessions.json"
 
-DEFAULT_AGENT = "main"
+DEFAULT_AGENT = "agent"
 USER_AGENT = "user"
 
 # Stable category keys for Cursor canvas ``theme.category`` / HTML fallback.
@@ -56,7 +56,7 @@ def resolve_agent(
     explicit: str | None = None,
     payload: dict | None = None,
 ) -> str:
-    """Pick agent name: explicit → payload → env → main."""
+    """Pick agent name: explicit → payload → env → agent."""
     if explicit and str(explicit).strip():
         return normalize_agent(str(explicit))
     if payload:
@@ -77,7 +77,7 @@ def agent_color_key(name: str) -> str:
     if normalized == DEFAULT_AGENT:
         return "green"
     digest = sum(ord(ch) for ch in normalized)
-    # Skip reserved blue/green so other agents don't collide with user/main.
+    # Skip reserved blue/green so other agents don't collide with user/agent.
     pool = AGENT_COLORS[2:]
     return pool[digest % len(pool)]
 

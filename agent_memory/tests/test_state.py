@@ -74,9 +74,9 @@ class StateTests(MemoryTestCase):
 
         text = render(self.memory.state())
         self.assertIn("## History", text)
-        self.assertIn(f"[{summary[:8]}] @main Summary: did a", text)
+        self.assertIn(f"[{summary[:8]}] @agent Summary: did a", text)
         self.assertIn("## Recent", text)
-        self.assertIn(f"[{b[:8]}] @main step b", text)
+        self.assertIn(f"[{b[:8]}] @agent step b", text)
         self.assertNotIn(a[:8], text)
 
     def test_render_without_summaries(self) -> None:
@@ -85,7 +85,7 @@ class StateTests(MemoryTestCase):
         text = render(self.memory.state())
         self.assertNotIn("## History", text)
         self.assertIn("## Recent", text)
-        self.assertIn(f"[{a[:8]}] @main step a", text)
+        self.assertIn(f"[{a[:8]}] @agent step a", text)
 
     def test_render_nudges_when_recent_is_long(self) -> None:
         self.save("step a")
@@ -123,7 +123,7 @@ class StateTests(MemoryTestCase):
 
         text = render(self.memory.state())
 
-        self.assertIn(f"[{summary[:8]}] @main Summary: did a", text)
+        self.assertIn(f"[{summary[:8]}] @agent Summary: did a", text)
 
     def test_render_user_lines(self) -> None:
         item = self.memory.save_user("fix the bug")
@@ -146,7 +146,7 @@ class StateTests(MemoryTestCase):
         self.assertNotIn("Details:", before_compact)
         self.assertNotIn("xxx", before_compact)
         self.assertIn(
-            f"[{item[:8]}] @main fixed the webhook retry", before_compact
+            f"[{item[:8]}] @agent fixed the webhook retry", before_compact
         )
         self.assertIn("Commit subjects only", before_compact)
 
@@ -155,7 +155,7 @@ class StateTests(MemoryTestCase):
         compact = self.memory.render_state()
 
         self.assertIn(
-            f"[{summary[:8]}] @main Summary: finished pairing steps",
+            f"[{summary[:8]}] @agent Summary: finished pairing steps",
             compact,
         )
         # Folded step is not a top-level Recent line.

@@ -1,3 +1,4 @@
+import os
 import unittest
 from unittest.mock import patch
 
@@ -80,6 +81,26 @@ class TestFind(MemoryTestCase):
 
     def test_query_falls_back_to_text_without_provider(self):
         found = self.memory.find(query="UPDATED")
+        self.assertEqual([item.id for item in found], [self.second])
+
+    def test_query_falls_back_when_provider_errors(self):
+        class BoomProvider:
+            fingerprint = "boom:1"
+
+            def embed_documents(self, texts):
+                raise RuntimeError("no api key")
+
+            def embed_query(self, text):
+                raise RuntimeError("no api key")
+
+        with patch.dict(
+            os.environ,
+            {"AGENT_MEMORY_PROVIDER": "agent_memory.providers.gemini:GeminiProvider"},
+            clear=False,
+        ):
+            self.memory._provider = BoomProvider()
+            self.memory._search = None
+            found = self.memory.find(query="UPDATED")
         self.assertEqual([item.id for item in found], [self.second])
 
     def test_ids_reach_other_branches(self):

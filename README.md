@@ -18,8 +18,16 @@ is deleted.
 | **Hooks** | Auto-save prompts/answers; refresh state + HTML | Invisible durability |
 | **Live HTML** | Browser monitor with full prompt packets | You |
 
-**MCP does not inject anything into the prompt.** It only registers tools.
-State reaches the model via Cursor **hooks** + an **alwaysApply** rule.
+**MCP does not paste a separate “system prompt” file.** The model learns
+tools exist in **two** ways:
+
+1. **Prompt text (we control)** — alwaysApply `.cursor/rules/agent-memory.mdc`
+   + sessionStart hook instructions. This *is* in the system/rules prompt.
+2. **Tool schemas (Cursor controls)** — Cursor reads `.cursor/mcp.json`,
+   starts the MCP server, `list_tools`, and attaches each tool’s
+   name/description/args as callables on the request.
+
+Live HTML shows both layers when you click a user entry.
 
 ### What the model sees each turn (roughly)
 
@@ -42,7 +50,7 @@ Injected state looks like:
 ```text
 MEMORY STATE
 ## History
-[39d43eec] @main Summary: clear + inject smoke test
+[39d43eec] @agent Summary: clear + inject smoke test
 
 ## Recent
 [597bea7a] user: Show me compact injection only
@@ -108,7 +116,7 @@ agent-memory cursor install
 |------|----------------|
 | Session starts | Instructions + agent id; state rule + live HTML refreshed |
 | You send a prompt | Saved as `@user`; compact MEMORY STATE rewritten into the prompt; HTML records the **full prompt packet** |
-| Long mid-turn work | Agent calls `memory_save` (hooks only fire at turn boundaries) |
+| Long mid-turn work | Agent should `memory_save` at milestones (hooks only fire at turn boundaries) |
 | Need detail | `memory_find` / `memory_history` |
 | Chunk finished | `memory_summarize` (folds Recent behind one line) |
 | Agent finishes | Answer auto-saved |
@@ -118,7 +126,7 @@ agent-memory cursor install
 ## MCP tools (8)
 
 Hooks cover **turn boundaries**. For long mid-turn runs, the agent should call
-`memory_save` for durable checkpoints. Do not save every trivial step.
+`memory_save` at milestones so progress survives if the session dies. Prefer a few solid checkpoints over silence; skip pure noise.
 
 | Tool | Purpose |
 |------|---------|
@@ -143,9 +151,13 @@ Path: `.agent_memory/live/index.html`
 - Polls for updates — leave the tab open
 - Timeline shows **short titles** (no clutter)
 - Click a **user** entry → aside shows:
-  - **Full prompt (goal)**
-  - **Injected MEMORY STATE** (exact compact state sent that turn)
-  - **Full packet sent** (goal + injected) with Copy
+  - **Memory instructions** (sessionStart / hook system text)
+  - **Always-apply rule** (`agent-memory.mdc`)
+  - **Injected MEMORY STATE** (compact subjects)
+  - **User goal**
+  - **Full memory packet** (all of the above, Copy)
+  - Note: Cursor's base system prompt + MCP tool JSON schemas are *not*
+    plain text here — tools are registered as tool defs, not pasted prompt
 - Click other entries → full reply / summary body
 - File paths in bodies are clickable (**Reveal in Finder**)
 

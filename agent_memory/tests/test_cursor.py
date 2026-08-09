@@ -43,13 +43,13 @@ class McpServerTests(MemoryTestCase):
             except SystemExit as error:
                 self.skipTest(str(error))
             tool = server._tool_manager._tools["memory_save"]
-            result = tool.fn(text="mid-turn finding: auth in src/auth.ts", agent="main")
+            result = tool.fn(text="mid-turn finding: auth in src/auth.ts", agent="agent")
         self.assertIn("Saved [", result)
-        self.assertIn("@main", result)
+        self.assertIn("@agent", result)
         last = Memory(self.path).state()[-1]
         self.assertIn("auth in src/auth.ts", last.message)
         self.assertFalse(last.payload.get("auto"))
-        self.assertEqual(last.payload.get("agent"), "main")
+        self.assertEqual(last.payload.get("agent"), "agent")
 
 
 class MemoryRootTests(MemoryTestCase):
@@ -127,10 +127,10 @@ class WriteCanvasTests(MemoryTestCase):
         shell = index.read_text()
         payload = data.read_text()
         self.assertIn("agent-memory-live-shell", shell)
-        self.assertIn('content="5"', shell)
+        self.assertIn('content="7"', shell)
         self.assertIn("getUTCSeconds", shell)
         self.assertIn("openInFinder", shell)
-        self.assertIn("Full prompt", shell)
+        self.assertIn("MCP tool catalog", shell)
         self.assertIn("window.__AGENT_MEMORY_LIVE__", payload)
         self.assertIn("first step", payload)
         self.assertIn('"root"', payload)
@@ -203,9 +203,9 @@ class GraphDataTests(MemoryTestCase):
         self.assertIn(first, by_id)
         self.assertTrue(by_id[first]["folded"])
         self.assertEqual(by_id[summary]["kind"], "summary")
-        self.assertEqual(by_id[summary]["agent"], "main")
+        self.assertEqual(by_id[summary]["agent"], "agent")
         self.assertIn(first, by_id[summary]["children"])
-        self.assertTrue(any(a["name"] == "main" for a in data["agents"]))
+        self.assertTrue(any(a["name"] == "agent" for a in data["agents"]))
         self.assertTrue(any(branch["current"] for branch in data["branches"]))
         self.assertTrue(any(edge["kind"] == "fold" for edge in data["edges"]))
         # Parent edges appear once there is a visible chain outside a fold.
@@ -278,6 +278,12 @@ class HookTests(MemoryTestCase):
         self.assertTrue(out.get("continue"))
 
     def test_before_submit_records_full_prompt_packet(self) -> None:
+        # Install the static rule the hook reads into the packet.
+        rules = self.path / ".cursor" / "rules"
+        rules.mkdir(parents=True, exist_ok=True)
+        (rules / "agent-memory.mdc").write_text(
+            "---\nalwaysApply: true\n---\n# Agent Memory\nuse memory_save\n"
+        )
         out = handle(
             "beforeSubmitPrompt",
             {"prompt": "exact goal for live html"},
@@ -287,8 +293,14 @@ class HookTests(MemoryTestCase):
         turns = (live / "turn_prompts.json").read_text()
         self.assertIn("exact goal for live html", turns)
         self.assertIn("MEMORY STATE", turns)
+        self.assertIn("memory_save", turns)
+        self.assertIn("MEMORY INSTRUCTIONS", turns)
+        self.assertIn("ALWAYS-APPLY RULE", turns)
+        self.assertIn("MCP TOOL CATALOG", turns)
         self.assertIn("exact goal for live html", data_js)
-        self.assertIn('"injected"', data_js)
+        self.assertIn('"instructions"', data_js)
+        self.assertIn('"rule"', data_js)
+        self.assertIn('"mcp_tools"', data_js)
         self.assertIn('"packet"', data_js)
         self.assertIn("exact goal for live html", out["additional_context"])
         self.assertIn("MEMORY STATE", out["additional_context"])
@@ -298,16 +310,16 @@ class HookTests(MemoryTestCase):
         last = Memory(self.path).state()[-1]
         self.assertEqual(last.message, "fixed the webhook retry")
         self.assertTrue(last.payload.get("auto"))
-        self.assertEqual(last.payload.get("agent"), "main")
+        self.assertEqual(last.payload.get("agent"), "agent")
 
     def test_session_start_injects_context(self) -> None:
         self.memory.save("prior work")
         out = handle("sessionStart", {"session_id": "conv-1"})
         self.assertIn("additional_context", out)
-        self.assertIn("@main", out["additional_context"])
+        self.assertIn("@agent", out["additional_context"])
         self.assertIn("memory_save", out["additional_context"])
         self.assertIn("agent-memory-state.mdc", out["additional_context"])
-        self.assertEqual(out.get("env", {}).get("AGENT_MEMORY_AGENT"), "main")
+        self.assertEqual(out.get("env", {}).get("AGENT_MEMORY_AGENT"), "agent")
         self.assertTrue((self.path / ".cursor" / "MEMORY_STATE.md").exists())
         rule = self.path / ".cursor" / "rules" / "agent-memory-state.mdc"
         self.assertTrue(rule.exists())
@@ -325,7 +337,7 @@ class HookTests(MemoryTestCase):
         )
         mem = Memory(self.path)
         spawn = mem.state()[-1]
-        self.assertEqual(spawn.payload.get("agent"), "main")
+        self.assertEqual(spawn.payload.get("agent"), "agent")
         self.assertIn("@explore·abc123", spawn.message)
 
         handle(
@@ -346,10 +358,10 @@ class HookTests(MemoryTestCase):
         self.assertTrue(any(n.get("agent") == "explore·abc123" for n in mem.graph_data()["nodes"]))
 
     def test_auto_save_keeps_agents_distinct(self) -> None:
-        self.memory.auto_save("same text", agent="main")
+        self.memory.auto_save("same text", agent="agent")
         self.memory.auto_save("same text", agent="explore·x1")
         agents = [i.payload.get("agent") for i in self.memory.state()]
-        self.assertEqual(agents[-2:], ["main", "explore·x1"])
+        self.assertEqual(agents[-2:], ["agent", "explore·x1"])
 
 
 class InstallTests(MemoryTestCase):
@@ -465,6 +477,16 @@ class InstallTests(MemoryTestCase):
             )
         cred = written["credentials"].read_text()
         self.assertIn("GEMINI_API_KEY=from-dotenv-key", cred)
+
+    def test_apply_credentials_falls_back_to_dotenv(self) -> None:
+        from agent_memory.cursor.install import apply_credentials_env
+
+        (self.path / ".env").write_text("GEMINI_API_KEY=dotenv-runtime-key\n")
+        with patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("GEMINI_API_KEY", None)
+            loaded = apply_credentials_env(self.path)
+            self.assertEqual(os.environ.get("GEMINI_API_KEY"), "dotenv-runtime-key")
+            self.assertEqual(loaded.get("GEMINI_API_KEY"), "dotenv-runtime-key")
 
     def test_install_is_idempotent(self) -> None:
         install_cursor(

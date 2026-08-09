@@ -522,7 +522,7 @@ def compact_graph(data: dict) -> dict:
             {
                 "id": node["id"],
                 "kind": node.get("kind", "step"),
-                "agent": node.get("agent") or "main",
+                "agent": node.get("agent") or "agent",
                 "color": node.get("color") or "gray",
                 "title": title,
                 "body": body,
@@ -548,7 +548,7 @@ def compact_graph(data: dict) -> dict:
     for row in data.get("agents") or []:
         agents.append(
             {
-                "name": row.get("name") or "main",
+                "name": row.get("name") or "agent",
                 "color": row.get("color") or "gray",
             }
         )

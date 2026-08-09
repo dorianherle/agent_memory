@@ -13,7 +13,7 @@ class TestSave(MemoryTestCase):
         item = self.memory.find(ids=item_id)[0]
         self.assertIsInstance(item, MemoryItem)
         self.assertEqual(item.message, "Created file")
-        self.assertEqual(item.payload, {"agent": "main"})
+        self.assertEqual(item.payload, {"agent": "agent"})
         self.assertIsInstance(item.datetime, datetime)
         self.assertIsNotNone(item.datetime.tzinfo)
 
@@ -24,7 +24,7 @@ class TestSave(MemoryTestCase):
 
         self.assertEqual(
             self.memory.find(ids=item_id)[0].payload,
-            {**payload, "agent": "main"},
+            {**payload, "agent": "agent"},
         )
 
     def test_allow_empty_false(self):
