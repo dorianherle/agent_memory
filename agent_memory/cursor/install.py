@@ -12,6 +12,8 @@ SERVER_NAME = "agent-memory"
 RULE_NAME = "agent-memory.mdc"
 STATE_RULE_NAME = "agent-memory-state.mdc"
 SDK_GUIDE_NAME = "agent-memory-sdk.md"
+SKILL_NAME = "agent-memory"
+SKILL_SOURCE = Path(__file__).resolve().parent / "skill"
 CREDENTIALS_NAME = "credentials.env"
 GITIGNORE_LINES = (
     ".agent_memory/",
@@ -35,6 +37,10 @@ alwaysApply: true
 ---
 
 # Agent Memory
+
+Expert guidance — when to retrieve, how to write entries that stay useful,
+snapshot safety — is the **agent-memory skill** at
+`.cursor/skills/agent-memory/SKILL.md`. Read it before multi-step work.
 
 Hooks auto-save user prompts and finished answers at turn boundaries.
 
@@ -132,6 +138,7 @@ def sdk_next_steps_lines() -> list[str]:
         "Next (Cursor IDE):",
         "  Reload MCP in Cursor Settings → Tools & MCP",
         "  Start an Agent chat — hooks auto-save; use memory_* tools",
+        f"  Skill installed: .cursor/skills/{SKILL_NAME}/SKILL.md",
         "",
         "Next (Cursor SDK — local, no wrap):",
         "  Local agents ignore .cursor/mcp.json unless you opt in:",
@@ -140,6 +147,21 @@ def sdk_next_steps_lines() -> list[str]:
         f"  Full recipe: .cursor/{SDK_GUIDE_NAME}",
         "  Hooks still load automatically from this project's .cursor/hooks.json",
     ]
+
+
+def write_skill(root: str | Path) -> Path:
+    """Copy the packaged agent-memory skill into the project's skills dir.
+
+    The skill teaches retrieval judgment and snapshot safety, which the
+    alwaysApply rule is too small to carry. Returns its ``SKILL.md``.
+    """
+    target = Path(root).resolve() / ".cursor" / "skills" / SKILL_NAME
+    target.mkdir(parents=True, exist_ok=True)
+    for source in sorted(SKILL_SOURCE.glob("*.md")):
+        (target / source.name).write_text(
+            source.read_text(encoding="utf-8"), encoding="utf-8"
+        )
+    return target / "SKILL.md"
 
 
 def _read_json(path: Path, default):
@@ -353,8 +375,9 @@ def install_cursor(
     """Merge agent-memory into the project's `.cursor/` config.
 
     Safe to re-run: merges MCP servers and hook lists without wiping
-    unrelated entries. Also writes ``.cursor/agent-memory-sdk.md`` so
-    Cursor SDK users know to pass ``setting_sources=["project"]``.
+    unrelated entries. Also writes the ``agent-memory`` skill (how to use
+    the tools well) and ``.cursor/agent-memory-sdk.md`` so Cursor SDK
+    users know to pass ``setting_sources=["project"]``.
 
     Gemini is not skipped silently: a TTY always prompts (configure vs
     skip); non-interactive installs need ``--gemini-api-key`` /
@@ -425,6 +448,8 @@ def install_cursor(
     rule_path = rules_dir / RULE_NAME
     rule_path.write_text(RULE_BODY)
     written["rule"] = rule_path
+
+    written["skill"] = write_skill(root)
 
     sdk_guide_path = cursor / SDK_GUIDE_NAME
     sdk_guide_path.write_text(SDK_GUIDE_BODY)

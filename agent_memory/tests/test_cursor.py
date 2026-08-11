@@ -420,6 +420,7 @@ class InstallTests(MemoryTestCase):
             )
 
         self.assertTrue(written["rule"].exists())
+        self.assertIn(".cursor/skills/agent-memory", written["rule"].read_text())
         self.assertTrue(written["sdk_guide"].exists())
         guide = written["sdk_guide"].read_text()
         self.assertIn('setting_sources=["project"]', guide)
@@ -509,3 +510,46 @@ class InstallTests(MemoryTestCase):
                 if "agent_memory.cursor.hook" in e["command"]
             ]
             self.assertEqual(len(matches), 1)
+
+
+class SkillTests(MemoryTestCase):
+    """The shipped skill is the agent's manual; keep it discoverable."""
+
+    TOOLS = (
+        "memory_save",
+        "memory_summarize",
+        "memory_find",
+        "memory_history",
+        "memory_state",
+        "memory_branch",
+        "memory_inspect",
+        "memory_inspect_done",
+    )
+
+    def test_install_writes_skill_with_references(self) -> None:
+        written = install_cursor(
+            self.path, python=sys.executable, skip_gemini=True, interactive=False
+        )
+        skill = written["skill"]
+        self.assertEqual(
+            skill,
+            (self.path / ".cursor" / "skills" / "agent-memory" / "SKILL.md").resolve(),
+        )
+        body = skill.read_text()
+        for name in self.TOOLS:
+            self.assertIn(name, body)
+        for reference in ("playbooks.md", "internals.md"):
+            self.assertIn(reference, body)
+            self.assertTrue((skill.parent / reference).exists())
+
+    def test_skill_frontmatter_is_auto_invocable(self) -> None:
+        from agent_memory.cursor.install import SKILL_SOURCE
+
+        body = (SKILL_SOURCE / "SKILL.md").read_text()
+        header = body.split("---")[1]
+        self.assertIn("name: agent-memory", header)
+        self.assertIn("description:", header)
+        # Auto-invocation is the point: the agent should not have to be told.
+        self.assertNotIn("disable-model-invocation", body)
+        # Cursor reads the whole file every time it fires.
+        self.assertLess(len(body.splitlines()), 500)

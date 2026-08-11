@@ -33,6 +33,9 @@ from agent_memory.identity import (
 
 CURSOR_INSTRUCTIONS = """
 You have long-term project memory via the agent-memory MCP tools.
+Read the skill `.cursor/skills/agent-memory/SKILL.md` before multi-step
+work: it covers when to retrieve, how to write entries that stay useful,
+and snapshot safety for branch/inspect.
 Hooks auto-save user prompts and finished answers at turn boundaries.
 
 For any stretch of work that might outlast this turn — investigations,

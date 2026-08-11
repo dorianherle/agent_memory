@@ -5,6 +5,10 @@ alwaysApply: true
 
 # Agent Memory
 
+Expert guidance — when to retrieve, how to write entries that stay useful,
+snapshot safety — is the **agent-memory skill** at
+`.cursor/skills/agent-memory/SKILL.md`. Read it before multi-step work.
+
 Hooks auto-save user prompts and finished answers at turn boundaries.
 
 For any stretch of work that might outlast this turn — investigations,

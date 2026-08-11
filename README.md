@@ -15,6 +15,7 @@ is deleted.
 |-------|------------|-------------|
 | **Injected MEMORY STATE** | Compact outline — commit subjects only | Model, every turn |
 | **MCP tools** (8) | Judgment + mid-turn checkpoints | Model, on demand |
+| **Skill** | How to use those tools well | Model, when it matters |
 | **Hooks** | Auto-save prompts/answers; refresh state + HTML | Invisible durability |
 | **Live HTML** | Browser monitor with full prompt packets | You |
 
@@ -70,6 +71,49 @@ cd your-project
 agent-memory cursor install
 ```
 
+### Or paste this to your agent
+
+Copy the whole block into a Cursor Agent chat in the project you want memory in.
+
+```text
+Install the agent-memory package in this project so I get persistent memory
+in Cursor: MCP tools, auto-save hooks, and the agent-memory skill.
+
+1. Choose the Python that will still exist tomorrow — the project's .venv if
+   there is one, otherwise create one and use it. Its path gets baked into
+   .cursor/mcp.json and .cursor/hooks.json, so it has to be stable. Call it
+   PY below, and prefer the unversioned path (.venv/bin/python, not
+   .venv/bin/python3.13).
+
+2. Install the package:
+   PY -m pip install "agent-memory[cursor] @ git+https://github.com/dorianherle/agent_memory.git@main"
+
+3. Ask me for a Gemini API key before you install — it turns on semantic
+   memory_find. Do not skip it silently and do not decide for me.
+   With a key (or if GEMINI_API_KEY is already in my env or project .env):
+     PY -m agent_memory.cli cursor install --python PY --no-interactive
+   Add --gemini-api-key "KEY" if you got the key from me directly.
+   If I decline, use --skip-gemini instead.
+
+4. Verify, and show me what you checked:
+   - these exist: .cursor/mcp.json, .cursor/hooks.json,
+     .cursor/rules/agent-memory.mdc, .cursor/skills/agent-memory/SKILL.md,
+     .agent_memory/
+   - the interpreter recorded in .cursor/mcp.json is PY, and it imports:
+     PY -c "import agent_memory, mcp; print('ok')"
+   - the hook answers instead of erroring:
+     echo '{"hook_event_name":"sessionStart"}' | PY -m agent_memory.cursor.hook
+   - .gitignore contains .agent_memory/
+
+5. Never commit .agent_memory/ or anything holding the API key.
+
+6. Then tell me the two steps only I can do: reload MCP in Cursor Settings →
+   Tools & MCP, and start a fresh Agent chat so the hooks attach.
+
+Finally, read .cursor/skills/agent-memory/SKILL.md and tell me in three lines
+how you will use memory from now on.
+```
+
 Gemini choice is always required:
 
 - interactive → `1` configure / `2` skip
@@ -88,6 +132,7 @@ agent-memory cursor install --skip-gemini --no-interactive
 | `.cursor/mcp.json` | MCP server + non-secret `AGENT_MEMORY_PROVIDER` |
 | `.cursor/hooks.json` | Auto-save + state injection |
 | `.cursor/rules/agent-memory.mdc` | Tool guide (alwaysApply) |
+| `.cursor/skills/agent-memory/` | Skill: how to use the tools well |
 | `.cursor/rules/agent-memory-state.mdc` | Live MEMORY STATE (alwaysApply, **gitignored**) |
 | `.cursor/MEMORY_STATE.md` | Markdown mirror of compact state (**gitignored**) |
 | `.cursor/agent-memory-sdk.md` | SDK recipe (`setting_sources`) |
@@ -140,6 +185,25 @@ Hooks cover **turn boundaries**. For long mid-turn runs, the agent should call
 | `memory_inspect_done` | Leave inspect mode |
 
 There is **no** `memory_write_canvas`. The live UI is HTML only.
+
+---
+
+## Skill
+
+Tool schemas say *what* each tool takes; the rule is too small to say *when*.
+`cursor install` writes a skill at `.cursor/skills/agent-memory/` so the agent
+does not have to be an expert — and the user does not have to instruct it.
+
+| File | Contents |
+|------|----------|
+| `SKILL.md` | Operating contract, entry-writing, retrieval budget, snapshot safety |
+| `playbooks.md` | Resume a dead session, archaeology, safe refactor, dead end, subagents |
+| `internals.md` | Storage model, search pipeline, hook events, error strings |
+
+It is auto-invoked: the description triggers on multi-step work, "continue" /
+"why did we", risky edits, folding, subagents, and recovery. The alwaysApply
+rule and the sessionStart hook both point at it, so it still bootstraps where
+skills are unsupported.
 
 ---
 
