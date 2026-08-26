@@ -77,6 +77,7 @@ class TestExtendedMemory(MemoryTestCase):
         item_id = self.save("wrong")
         self.memory.delete(item_id)
         self.assertEqual(self.memory.find(ids=item_id), [])
+        self.assertNotIn(item_id, [item.id for item in self.memory.state()])
         historical = self.memory.find(ids=item_id, include_historical=True)
         self.assertEqual(historical[0].id, item_id)
 
@@ -88,7 +89,7 @@ class TestExtendedMemory(MemoryTestCase):
 
     def test_delete_is_branch_scoped(self):
         old_id = self.save("shared")
-        self.memory.branch(old_id, "keep")
+        self.memory.branch(old_id, "keep", summary="isolate delete")
         self.memory._run("checkout", "main")
         self.memory.delete(old_id)
         self.assertEqual(self.memory.find(ids=old_id), [])
@@ -103,7 +104,7 @@ class TestExtendedMemory(MemoryTestCase):
 
     def test_deleted_branch_is_not_globally_searchable(self):
         base = self.save("base")
-        self.memory.branch(base, "temporary")
+        self.memory.branch(base, "temporary", summary="temp line")
         side_id = self.memory.save("side only", allow_empty=True)
         self.memory._run("checkout", "main")
         self.memory._run("branch", "-D", "temporary")

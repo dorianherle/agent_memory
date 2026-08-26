@@ -26,6 +26,9 @@ class McpServerTests(MemoryTestCase):
         self.assertIn("memory_state", names)
         self.assertIn("memory_save", names)
         self.assertIn("memory_summarize", names)
+        self.assertIn("memory_delete", names)
+        self.assertIn("memory_open_questions", names)
+        self.assertNotIn("memory_pin", names)
         self.assertIn("memory_history", names)
         self.assertNotIn("memory_write_canvas", names)
         self.assertNotIn("memory_graph_data", names)
@@ -50,6 +53,26 @@ class McpServerTests(MemoryTestCase):
         self.assertIn("auth in src/auth.ts", last.message)
         self.assertFalse(last.payload.get("auto"))
         self.assertEqual(last.payload.get("agent"), "agent")
+
+    def test_memory_delete_tool_hides_from_state(self) -> None:
+        try:
+            from agent_memory.cursor.mcp import _build_server
+        except SystemExit as error:
+            self.skipTest(str(error))
+
+        noise = self.save("opened file X")
+        with patch.dict(os.environ, {"AGENT_MEMORY_ROOT": str(self.path)}):
+            try:
+                server = _build_server()
+            except SystemExit as error:
+                self.skipTest(str(error))
+            tool = server._tool_manager._tools["memory_delete"]
+            result = tool.fn(ids=[noise[:8]])
+        self.assertIn("Deleted [", result)
+        self.assertIn(noise[:8], result)
+        mem = Memory(self.path)
+        self.assertNotIn(noise, [item.id for item in mem.state()])
+        self.assertEqual(mem.find(ids=noise), [])
 
 
 class MemoryRootTests(MemoryTestCase):
@@ -127,10 +150,14 @@ class WriteCanvasTests(MemoryTestCase):
         shell = index.read_text()
         payload = data.read_text()
         self.assertIn("agent-memory-live-shell", shell)
-        self.assertIn('content="7"', shell)
+        self.assertIn('content="13"', shell)
+        self.assertIn("focusBranch", shell)
+        self.assertIn("toggleExpand", shell)
         self.assertIn("getUTCSeconds", shell)
         self.assertIn("openInFinder", shell)
         self.assertIn("MCP tool catalog", shell)
+        self.assertIn("now-files", shell)
+        self.assertIn("assignLanes", shell)
         self.assertIn("window.__AGENT_MEMORY_LIVE__", payload)
         self.assertIn("first step", payload)
         self.assertIn('"root"', payload)
@@ -145,6 +172,28 @@ class WriteCanvasTests(MemoryTestCase):
         forced = self.memory.write_live_html(force_shell=True)
         self.assertEqual(forced, index)
         self.assertGreaterEqual(index.stat().st_mtime_ns, mtime)
+
+    def test_write_live_demo_is_self_contained(self) -> None:
+        from agent_memory.live_html import write_live_demo
+
+        path = write_live_demo(self.path / "demo.html")
+        text = path.read_text()
+        self.assertIn("Memory · demo", text)
+        self.assertIn('"demo": true', text)
+        self.assertIn("retry", text)
+        self.assertIn("pytest", text)
+        self.assertIn("live_html.py", text)
+        self.assertNotIn('src="data.js"', text)
+
+    def test_live_html_hides_deleted(self) -> None:
+        noise = self.save("opened file X")
+        self.save("real finding")
+        self.memory.delete(noise)
+        index = self.memory.write_live_html()
+        payload = (index.parent / "data.js").read_text()
+        self.assertNotIn(noise, payload)
+        self.assertNotIn("opened file X", payload)
+        self.assertIn("real finding", payload)
 
     def test_default_canvas_dir_slug(self) -> None:
         from agent_memory.canvas import default_canvas_dir, project_slug
@@ -197,7 +246,8 @@ class GraphDataTests(MemoryTestCase):
             set(data), {"nodes", "edges", "kinds", "branches", "agents"}
         )
         self.assertEqual(
-            set(data["kinds"]), {"summary", "user", "step", "delete"}
+            set(data["kinds"]),
+            {"summary", "user", "step", "delete", "open_question"},
         )
         by_id = {node["id"]: node for node in data["nodes"]}
         self.assertIn(first, by_id)
@@ -217,6 +267,16 @@ class GraphDataTests(MemoryTestCase):
                 for edge in data["edges"]
             )
         )
+
+    def test_graph_data_hides_deleted(self) -> None:
+        noise = self.save("opened file X")
+        keeper = self.save("real finding")
+        self.memory.delete(noise)
+        data = self.memory.graph_data()
+        ids = {node["id"] for node in data["nodes"]}
+        self.assertNotIn(noise, ids)
+        self.assertIn(keeper, ids)
+        self.assertFalse(any(node["kind"] == "delete" for node in data["nodes"]))
 
 
 class AutoSaveTests(MemoryTestCase):
@@ -518,6 +578,8 @@ class SkillTests(MemoryTestCase):
     TOOLS = (
         "memory_save",
         "memory_summarize",
+        "memory_open_questions",
+        "memory_delete",
         "memory_find",
         "memory_history",
         "memory_state",

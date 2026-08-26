@@ -1,65 +1,114 @@
 # Agent Memory
 
-Long-running agents that remember — without dragging the whole chat around.
+A notebook for agents that run a long time on **one job**.
 
-The **prompt stays small**: only top-level commit subjects (History summaries +
-Recent headlines). Full bodies stay in the store and reopen on demand.
-Finished work folds behind one summary line. Dead ends branch away. Nothing
-is deleted.
+Think Ralph loops: you give a goal, the agent keeps going for hours,
+and you only jump in when something is off. The chat will forget.
+This notebook does not.
+
+Every note is also a snapshot of the project files at that moment.
+The agent can search what was decided, and it can go back.
 
 ---
 
-## Mental model
+## What the agent sees every turn
 
-| Layer | What it is | Who sees it |
-|-------|------------|-------------|
-| **Injected MEMORY STATE** | Compact outline — commit subjects only | Model, every turn |
-| **MCP tools** (8) | Judgment + mid-turn checkpoints | Model, on demand |
-| **Skill** | How to use those tools well | Model, when it matters |
-| **Hooks** | Auto-save prompts/answers; refresh state + HTML | Invisible durability |
-| **Live HTML** | Browser monitor with full prompt packets | You |
-
-**MCP does not paste a separate “system prompt” file.** The model learns
-tools exist in **two** ways:
-
-1. **Prompt text (we control)** — alwaysApply `.cursor/rules/agent-memory.mdc`
-   + sessionStart hook instructions. This *is* in the system/rules prompt.
-2. **Tool schemas (Cursor controls)** — Cursor reads `.cursor/mcp.json`,
-   starts the MCP server, `list_tools`, and attaches each tool’s
-   name/description/args as callables on the request.
-
-Live HTML shows both layers when you click a user entry.
-
-### What the model sees each turn (roughly)
-
-```
-1. alwaysApply rules
-   • agent-memory.mdc          → how to use tools
-   • agent-memory-state.mdc    → live MEMORY STATE (commit subjects)
-
-2. Hook context
-   • sessionStart (once)       → instructions + @agent name
-   • beforeSubmitPrompt        → MEMORY STATE again (compact)
-
-3. Your goal                  → <user_query>
-
-4. MCP tool schemas           → available to call (not pasted as text)
-```
-
-Injected state looks like:
+A short header. That is the whole memory prompt.
 
 ```text
-MEMORY STATE
-## History
-[39d43eec] @agent Summary: clear + inject smoke test
+## Goal
+[a1b2c3d4] Why is login so slow?
+
+## Steering
+[e5f6g7h8] wait, also look at the cookie path
+
+## Open questions
+[11111111] Why is it still slow after caching? [6ca98198]
+[22222222] Do we still need the extra database index?
 
 ## Recent
-[597bea7a] user: Show me compact injection only
-
-Commit subjects only. Use memory_find / memory_history for full bodies…
+[6ca98198] @agent Login loads the whole users table every time
 ```
 
-Detail → `memory_find` / `memory_history`. Do **not** dump graphs into chat.
+Every `[8 characters]` is a note id. Same shape everywhere.
+
+The extra id after a question (`[6ca98198]` above) is not a second
+question. It points at an older note the question stands on — here,
+the finding in Recent. The agent opens that note with `memory_find`.
+
+**Goal** is the original job — the thing you started the loop for.
+It does not change when you type mid-run.
+
+**Steering** is your latest course-correct (“wait, also check X”).
+Optional. It does **not** replace open questions. Goal is the
+mission; steering is the latest nudge; open questions are what
+the agent still has to resolve.
+
+**Open questions** are the unsolved things right now. You can have
+several. Clear one or all with `memory_open_questions`.
+
+**Recent** is the last 10 headlines — the trail of this stretch.
+Finished work leaves this view. The agent opens it with
+`memory_find` or `memory_history`.
+
+After a failed test the agent must rewind — see
+[When a test fails](#when-a-test-fails). Those autopsies show up as
+**Avoid**. A new notebook has none.
+
+Watch it live: `.agent_memory/live/index.html`.
+
+---
+
+## The tools
+
+Hooks already save your first prompt and each finished answer.
+The agent writes the rest.
+
+| Tool | In one line |
+|------|-------------|
+| `memory_save` | Write a finding, a decision, or a checkpoint |
+| `memory_open_questions` | Add or close unsolved questions |
+| `memory_summarize` | Hide a finished chunk behind one line |
+| `memory_delete` | Hide a bad or tiny note |
+| `memory_find` | Open a note (by id, words, or meaning) |
+| `memory_history` | The whole timeline of this line of work |
+| `memory_state` | The same compact view already in the prompt |
+| `memory_branch` | Leave a dead end — **requires what went wrong**, rewinds files |
+| `memory_inspect` | Peek at an old snapshot — **rewinds the files** |
+| `memory_inspect_done` | Put the files back |
+
+`memory_branch` and `memory_inspect` change the working files.
+Everything else only writes to the notebook.
+
+---
+
+## When a test fails
+
+Do not keep going. Rewind.
+
+1. A test fails, or a check does not pass.
+2. The agent must call `memory_branch` back to the last green
+   checkpoint. `label` is required — one sentence of **exactly what
+   went wrong**.
+3. Files restore to that checkpoint. The sentence is stored as a
+   dead-end autopsy.
+4. Every later turn injects those autopsies:
+
+```text
+## Avoid / Previous failed paths
+[44444444] Redis cache made p95 worse. Do not retry under this schema.
+```
+
+That is the whole method. No counts, no embeddings, no reconstructed
+capsules. The agent wrote the lesson; the next agent reads it.
+
+`memory_branch` without a `label` is an error.
+
+```bash
+python -m agent_memory.demo_v1
+```
+
+Runs the Redis miss, branches with an autopsy, prints the header.
 
 ---
 
@@ -72,8 +121,6 @@ agent-memory cursor install
 ```
 
 ### Or paste this to your agent
-
-Copy the whole block into a Cursor Agent chat in the project you want memory in.
 
 ```text
 Install the agent-memory package in this project so I get persistent memory
@@ -88,8 +135,9 @@ in Cursor: MCP tools, auto-save hooks, and the agent-memory skill.
 2. Install the package:
    PY -m pip install "agent-memory[cursor] @ git+https://github.com/dorianherle/agent_memory.git@main"
 
-3. Ask me for a Gemini API key before you install — it turns on semantic
-   memory_find. Do not skip it silently and do not decide for me.
+3. Ask me for a Gemini API key before you install — it turns on
+   meaning-based memory_find. Avoid autopsies work without it.
+   Do not skip it silently and do not decide for me.
    With a key (or if GEMINI_API_KEY is already in my env or project .env):
      PY -m agent_memory.cli cursor install --python PY --no-interactive
    Add --gemini-api-key "KEY" if you got the key from me directly.
@@ -114,33 +162,13 @@ Finally, read .cursor/skills/agent-memory/SKILL.md and tell me in three lines
 how you will use memory from now on.
 ```
 
-Gemini choice is always required:
-
-- interactive → `1` configure / `2` skip
-- non-interactive → `--gemini-api-key`, `GEMINI_API_KEY`, project `.env`,
-  existing credentials, or explicit `--skip-gemini`
+Gemini is always a choice: interactive `1` / `2`, or
+`--gemini-api-key`, `GEMINI_API_KEY`, project `.env`, or `--skip-gemini`.
 
 ```bash
 agent-memory cursor install --gemini-api-key "$GEMINI_API_KEY"
 agent-memory cursor install --skip-gemini --no-interactive
 ```
-
-### Files written
-
-| Path | Role |
-|------|------|
-| `.cursor/mcp.json` | MCP server + non-secret `AGENT_MEMORY_PROVIDER` |
-| `.cursor/hooks.json` | Auto-save + state injection |
-| `.cursor/rules/agent-memory.mdc` | Tool guide (alwaysApply) |
-| `.cursor/skills/agent-memory/` | Skill: how to use the tools well |
-| `.cursor/rules/agent-memory-state.mdc` | Live MEMORY STATE (alwaysApply, **gitignored**) |
-| `.cursor/MEMORY_STATE.md` | Markdown mirror of compact state (**gitignored**) |
-| `.cursor/agent-memory-sdk.md` | SDK recipe (`setting_sources`) |
-| `.agent_memory/` | Separate Git memory store (**gitignored**) |
-| `.agent_memory/live/index.html` | Browser live monitor |
-| `.agent_memory/credentials.env` | `GEMINI_API_KEY` (**gitignored**) |
-
-Re-run install anytime; it merges safely.
 
 This repo:
 
@@ -149,87 +177,50 @@ pip install -e ".[cursor]"
 agent-memory cursor install
 ```
 
+Then: **Settings → Tools & MCP → reload**, start a new Agent chat.
+Optional: open `.agent_memory/live/index.html` (it refreshes itself).
+
+Re-run install anytime; it merges safely.
+
+### What install writes
+
+| Path | What it is |
+|------|------------|
+| `.cursor/mcp.json` | The memory tools |
+| `.cursor/hooks.json` | Auto-save + refresh |
+| `.cursor/rules/agent-memory.mdc` | Short always-on guide |
+| `.cursor/skills/agent-memory/` | How the agent should use memory |
+| `.cursor/rules/agent-memory-state.mdc` | Live notebook view (**gitignored**) |
+| `.agent_memory/` | The notebook itself (**gitignored**) |
+| `.agent_memory/live/index.html` | Browser view |
+| `.agent_memory/credentials.env` | Gemini key, if you set one (**gitignored**) |
+
 ---
 
-## Cursor IDE
+## Live view
 
-1. Reload MCP in **Settings → Tools & MCP**
-2. Open Agent chat
-3. Optional: open `.agent_memory/live/index.html` in a browser (auto-refreshes)
+`.agent_memory/live/index.html` — created on session start, updated on
+every save. Leave the tab open.
 
-| When | What happens |
-|------|----------------|
-| Session starts | Instructions + agent id; state rule + live HTML refreshed |
-| You send a prompt | Saved as `@user`; compact MEMORY STATE rewritten into the prompt; HTML records the **full prompt packet** |
-| Long mid-turn work | Agent should `memory_save` at milestones (hooks only fire at turn boundaries) |
-| Need detail | `memory_find` / `memory_history` |
-| Chunk finished | `memory_summarize` (folds Recent behind one line) |
-| Agent finishes | Answer auto-saved |
-
----
-
-## MCP tools (8)
-
-Hooks cover **turn boundaries**. For long mid-turn runs, the agent should call
-`memory_save` at milestones so progress survives if the session dies. Prefer a few solid checkpoints over silence; skip pure noise.
-
-| Tool | Purpose |
-|------|---------|
-| `memory_save` | Mid-turn checkpoint |
-| `memory_summarize` | Fold Recent behind one summary line |
-| `memory_find` | Reopen detail (Gemini `query=`, substring `text=`, or `ids=`) |
-| `memory_history` | Full timeline text (folded steps under summaries) |
-| `memory_state` | Compact state for the agent (same as injection) |
-| `memory_branch` | Leave a dead end; restore files to that snapshot |
-| `memory_inspect` | Temporarily view an old snapshot |
-| `memory_inspect_done` | Leave inspect mode |
-
-There is **no** `memory_write_canvas`. The live UI is HTML only.
+Click a user prompt to see what the model was given. Click any other
+note for the full text. File paths open in Finder.
 
 ---
 
 ## Skill
 
-Tool schemas say *what* each tool takes; the rule is too small to say *when*.
-`cursor install` writes a skill at `.cursor/skills/agent-memory/` so the agent
-does not have to be an expert — and the user does not have to instruct it.
+Install writes `.cursor/skills/agent-memory/`. That is the agent's
+manual: when to save, how to write a headline, when to set open questions, when not to rewind files.
 
-| File | Contents |
-|------|----------|
-| `SKILL.md` | Operating contract, entry-writing, retrieval budget, snapshot safety |
-| `playbooks.md` | Resume a dead session, archaeology, safe refactor, dead end, subagents |
-| `internals.md` | Storage model, search pipeline, hook events, error strings |
-
-It is auto-invoked: the description triggers on multi-step work, "continue" /
-"why did we", risky edits, folding, subagents, and recovery. The alwaysApply
-rule and the sessionStart hook both point at it, so it still bootstraps where
-skills are unsupported.
-
----
-
-## Live HTML monitor
-
-Path: `.agent_memory/live/index.html`
-
-- Created on session start; refreshed on every save
-- Polls for updates — leave the tab open
-- Timeline shows **short titles** (no clutter)
-- Click a **user** entry → aside shows:
-  - **Memory instructions** (sessionStart / hook system text)
-  - **Always-apply rule** (`agent-memory.mdc`)
-  - **Injected MEMORY STATE** (compact subjects)
-  - **User goal**
-  - **Full memory packet** (all of the above, Copy)
-  - Note: Cursor's base system prompt + MCP tool JSON schemas are *not*
-    plain text here — tools are registered as tool defs, not pasted prompt
-- Click other entries → full reply / summary body
-- File paths in bodies are clickable (**Reveal in Finder**)
+- [SKILL.md](.cursor/skills/agent-memory/SKILL.md) — the manual
+- [playbooks.md](.cursor/skills/agent-memory/playbooks.md) — worked examples
+- [internals.md](.cursor/skills/agent-memory/internals.md) — mechanics
 
 ---
 
 ## Cursor SDK
 
-Local SDK agents **ignore** project MCP unless you opt in:
+Local SDK agents ignore project MCP unless you opt in:
 
 ```python
 from dotenv import load_dotenv
@@ -259,12 +250,8 @@ await using agent = await Agent.create({
 });
 ```
 
-| Piece | Local SDK |
-|-------|-----------|
-| MCP `memory_*` | needs `setting_sources=["project"]` |
-| Hooks auto-save | automatic when `cwd` is the installed project |
-
-Same store as the IDE. Full recipe: `.cursor/agent-memory-sdk.md` after install.
+Same notebook as the IDE. Full recipe: `.cursor/agent-memory-sdk.md`
+after install.
 
 ---
 
@@ -281,25 +268,22 @@ response = client.chat.completions.create(
 )
 ```
 
-`wrap` / `Memory.messages()` inject **GOAL then compact MEMORY STATE** each turn.
-Low-level: `memory.tools`, `memory.call(...)`, `memory.messages(...)`.
+`wrap` injects the compact notebook view each turn.
 
 ---
 
 ## Semantic search (Gemini)
 
-Configured by `cursor install`:
+One optional key, one job: `memory_find(query=…)` finds notes by
+meaning instead of exact words. Avoid autopsies need nothing from
+it.
 
-```text
-AGENT_MEMORY_PROVIDER=agent_memory.providers.gemini:GeminiProvider
-GEMINI_API_KEY=…
-```
-
-Without a provider, `memory_find(query=...)` falls back to substring search.
+Without a key, `memory_find` falls back to literal substring search
+(and says so). Everything else works unchanged.
 
 ---
 
 ## Nested git repos
 
-Host and nested `.git/` directories are excluded automatically so saves /
-`memory_summarize` are not broken by another repo inside the tree.
+Host and nested `.git/` folders are skipped so a repo-inside-a-repo
+does not break saves.

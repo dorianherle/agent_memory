@@ -33,30 +33,44 @@ derived state and rebuild themselves from the git history.
 
 | Tool | Signature | Effect |
 |---|---|---|
-| `memory_save` | `(text, agent=None)` | Commit + snapshot. Returns `Saved [id8] @agent`. Raises while inspecting. |
-| `memory_summarize` | `(text, agent=None)` | Same, plus `covers` = every entry since the last summary. Returns `Summarized [id8] @agent`. |
-| `memory_find` | `(query=None, text=None, ids=None, all_branches=False)` | Read. Up to 50 full entries, newest first, plus steps covered by any matched summary. |
+| `memory_save` | `(text, agent=None)` | Commit + snapshot. Returns `Saved [id8] @agent`. Warns if line 1 is over 100 chars or reads like narration. Raises while inspecting. |
+| `memory_summarize` | `(text, agent=None)` | Same, plus `covers` = every entry since the last summary. Returns `Summarized [id8] @agent`. Same headline warning as save. |
+| `memory_open_questions` | `(text="", depends_on=None, ids=None)` | Add a question (`text` + notes it stands on). Empty `text` closes all, or only `ids`. Several can be live. |
+| `memory_delete` | `(ids)` | Tombstone. Hides those ids from state / find / history / live HTML. Returns `Deleted [id8], …`. Raises on unknown id. The delete commit is `kind=delete` and does not appear in Recent. |
+| `memory_find` | `(query=None, text=None, ids=None, all_branches=False)` | Read. Up to 50 full entries, newest first, plus steps covered by any matched summary. `query=` without embeddings appends a substring-fallback notice. |
 | `memory_history` | `()` | Whole current branch, oldest first, folded steps indented under their summary. |
 | `memory_state` | `()` | The same compact state that is already injected each turn. |
-| `memory_branch` | `(id, name, label=None)` | Caps the current branch with `label`, moves to `id`, **restores files**. |
+| `memory_branch` | `(id, name, label)` | `label` required: what went wrong. Caps the dead line, moves to `id`, **restores files**. That sentence is Avoid. |
 | `memory_inspect` | `(id)` | **Restores files** to that entry, detached, and blocks saving until closed. |
 | `memory_inspect_done` | `()` | Restores the branch and its files. |
 
-There is no delete or edit tool. Memory only ever grows.
+There is no edit tool. `memory_delete` appends a tombstone; git history is
+never rewritten. Default find / state / history / live HTML skip deleted
+targets. `Memory.find(..., include_historical=True)` can still retrieve them.
 
 ## How state is rendered
 
 `render(compact=True)` produces what you see injected:
 
-- **Branches** block appears only when more than one branch exists; the current
-  one is marked `(you are here)`.
-- **History** is every summary, oldest first. **Recent** is everything after the
-  last summary.
+- **Goal** is the original job (`goal=True` on the first user save, or
+  the oldest user entry if none is marked). It is not folded.
+- **Steering** is the latest user note that is not the goal. It is not folded.
+- **Open questions** are all `open_question=True` entries. Each line is
+  `[id] text [dep] [dep]`. They are not folded.
+- **Current branch** is a single `* name (you are here)` line when more than
+  one branch exists. Other branch listings stay in `memory_history`.
+- **Recent** is the newest 10 subjects since the last summary. Older Recent
+  lines stay findable; a `(+N earlier)` marker says they exist.
+- `[stale]` on a subject means that entry's own files changed between its
+  commit and HEAD. Note-only (empty) commits are never stale.
+- `last @agent checkpoint N steps ago` appears when 8+ Recent items have
+  passed since the last non-auto, non-user save.
 - Each line is `[8-char id] @agent <prefix><first line of the message>`, where
   prefix is `Summary: ` for folds and `user: ` for the user's own prompts.
 - **Only the first line is shown, truncated to 100 characters** with a trailing
   `…`. Multi-paragraph entries are treated as commit bodies.
-- Over 30 entries in Recent adds a nudge to summarize.
+- Over 30 entries in Recent (full count, not the visible 10) adds a nudge
+  to summarize.
 - While inspecting, an `INSPECTING [id]` banner is prepended.
 
 The same text is written to `.cursor/rules/agent-memory-state.mdc` (an
@@ -76,8 +90,9 @@ always-applied rule, rewritten on every durable write) and mirrored to
 3. **Ranking.** With an embedding provider (`AGENT_MEMORY_PROVIDER` +
    `GEMINI_API_KEY`), `query=` runs a hybrid semantic search with a small
    recency weight (0.05) and de-duplication. Without a provider — or if
-   embedding raises for any reason, including a missing key — it silently falls
-   back to treating `query` as a substring.
+   embedding raises for any reason, including a missing key — `query` is
+   treated as a substring and the result ends with
+   `(substring fallback — set GEMINI_API_KEY for semantic)`.
 4. **Substring.** `text=` is a case-insensitive `instr` match on the message.
    Under fallback, `query` is appended to `text`.
 5. **Unfolding.** Any matched summary pulls in the entries listed in its
@@ -95,6 +110,13 @@ State then hides those ids and shows the summary line instead. The fold is
 all-or-nothing over that window; there is no way to fold a subset. Folded
 entries remain in `memory_find` results and appear indented under their summary
 in `memory_history`.
+
+## Delete
+
+`memory_delete` writes a new commit with `kind=delete` and `target_id` set to
+the hidden entry. `catalog.state()` and default `select()` exclude both the
+tombstone and its target. `graph_data` skips those nodes, so the live HTML
+timeline hides them too. Each id is one tombstone; unknown ids raise.
 
 ## Snapshot movement
 
@@ -122,12 +144,12 @@ detects the stale marker and returns to the branch automatically.
 
 `memory_branch(id, name, label)`:
 
-- with `label`, first commits a summary capping the current branch — that line
-  becomes the branch's label in the Branches block
+- `label` is required (what went wrong). Empty raises.
+- first commits that sentence as a dead-end autopsy on the current line
 - if `id` is the tip of an existing branch, that branch is resumed and `name` is
   ignored; otherwise a new branch `name` is created at `id`
 - working files are restored to the target snapshot
-- the result string reports where you landed and asks you to save why
+- the autopsy is injected under Avoid on later turns
 
 ## Hook events
 

@@ -107,11 +107,13 @@ class TestWrapper(MemoryTestCase):
             [
                 "save",
                 "find",
+                "delete",
                 "history",
                 "graph",
                 "branch",
                 "inspect",
                 "inspect_done",
+                "open_questions",
             ],
         )
 
@@ -257,7 +259,8 @@ class TestWrapper(MemoryTestCase):
 
         users = self.memory.find(payload={"user": True}, k=10)
         self.assertEqual(users[0].message, "Fix the bug")
-        self.assertIn("user: Fix the bug", fake.sent[0])
+        self.assertIn("## Goal", fake.sent[0])
+        self.assertIn(f"[{users[0].id[:8]}] Fix the bug", fake.sent[0])
 
     def test_memory_tools_and_call(self):
         """README path: tools=memory.tools, then memory.call(...)."""
@@ -441,3 +444,16 @@ class TestWrapper(MemoryTestCase):
         )
         self.assertIn("Back on 'main'", result)
         self.assertEqual(self.file.read_text(), "second")
+
+    def test_call_tool_delete_hides_target(self):
+        from agent_memory import call_tool
+
+        noise = self.save("opened file X")
+        keeper = self.save("real finding")
+        result = call_tool(
+            self.memory, "memory", {"action": "delete", "ids": [noise[:8]]}
+        )
+        self.assertIn(f"Deleted [{noise[:8]}]", result)
+        self.assertNotIn(noise, [item.id for item in self.memory.state()])
+        self.assertEqual(self.memory.find(ids=noise), [])
+        self.assertEqual(self.memory.find(ids=keeper)[0].id, keeper)

@@ -11,7 +11,7 @@ from pathlib import Path
 import numpy
 
 CATALOG_FILE = "catalog.sqlite3"
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 4
 
 
 def locked(method):
@@ -365,9 +365,17 @@ class Catalog:
                   JOIN json_each(fields.value) covered
                   WHERE fields.key = 'covers'
               )
+              AND NOT EXISTS (
+                  SELECT 1 FROM memories effects
+                  JOIN ref_memories effects_scope
+                    ON effects_scope.memory_id = effects.id
+                   AND effects_scope.ref_name = ?
+                  WHERE effects.target_id = memories.id
+                    AND effects.kind IN ('delete', 'supersede')
+              )
             ORDER BY memories.committed_us ASC, memories.sequence ASC
             """,
-            (branch, branch),
+            (branch, branch, branch),
         ).fetchall()
 
     @locked

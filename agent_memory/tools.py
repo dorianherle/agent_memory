@@ -1,14 +1,16 @@
 from agent_memory.core import Memory
-from agent_memory.prompt import _line, render_timeline
+from agent_memory.prompt import SUBSTRING_FALLBACK, _line, render_timeline, save_hygiene
 
 ACTIONS = (
     "save",
     "find",
+    "delete",
     "history",
     "graph",
     "branch",
     "inspect",
     "inspect_done",
+    "open_questions",
 )
 
 MEMORY_TOOL = {
@@ -21,18 +23,23 @@ MEMORY_TOOL = {
             "- save: store a step. Set summary=true when a piece of work "
             "is finished so Recent is folded behind this text (still "
             "retrievable with find).\n"
+            "- open_questions: add an unsolved question (and the notes "
+            "it stands on). Empty text closes all, or the ids you pass.\n"
             "- find: read stored entries, including steps folded behind "
             "a summary. An explicit id is found even on another branch.\n"
+            "- delete: hide specific entries from Recent, find, and the "
+            "live timeline. Use for noise that should not have been "
+            "saved. Snapshots stay in git; the delete commit itself "
+            "does not appear in Recent.\n"
             "- history: full timeline of the current branch, oldest "
             "first, with folded steps under their summary. Use it to "
             "show the user everything.\n"
             "- graph: visual tree of every branch and entry (like "
             "git log --graph). Set html=true to also write an "
             "explorable HTML page.\n"
-            "- branch: move to any entry — back past a dead end, or "
-            "forward to a branch under Branches. Caps the current "
-            "branch with label and restores working files to the "
-            "target snapshot. Nothing is deleted.\n"
+            "- branch: required after a failing test. Rewind to the "
+            "last green checkpoint. label must say exactly what "
+            "failed; that sentence is injected as Avoid.\n"
             "- inspect: set every working file to how it was at an "
             "entry, to look around. Read-only; call inspect_done to "
             "return.\n"
@@ -72,7 +79,9 @@ MEMORY_TOOL = {
                     "type": ["array", "null"],
                     "items": {"type": "string"},
                     "description": (
-                        "find only: entry ids as shown in MEMORY STATE."
+                        "find / delete / open_questions: entry ids as "
+                        "shown in MEMORY STATE. open_questions: notes "
+                        "the question stands on, or questions to close."
                     ),
                 },
                 "query": {
@@ -109,9 +118,8 @@ MEMORY_TOOL = {
                 "label": {
                     "type": ["string", "null"],
                     "description": (
-                        "branch only: one line summing up the current "
-                        "branch before leaving it. Becomes the branch's "
-                        "label under Branches."
+                        "branch only, required: one line of what went "
+                        "wrong. The next agent sees it under Avoid."
                     ),
                 },
                 "agent": {
@@ -189,9 +197,12 @@ def _run_action(memory: Memory, arguments: dict) -> str:
             summary=bool(arguments.get("summary") or False),
             agent=agent,
         )
-        return f"Saved [{item_id[:8]}]."
+        result = f"Saved [{item_id[:8]}]."
+        warn = save_hygiene(arguments["text"])
+        return f"{result}\n{warn}" if warn else result
     if action == "find":
         branch = None if arguments.get("all_branches") else "current"
+        queried = bool(arguments.get("query"))
         items = memory.find(
             arguments.get("query"),
             ids=arguments.get("ids"),
@@ -200,12 +211,43 @@ def _run_action(memory: Memory, arguments: dict) -> str:
             k=50,
             branch=branch,
         )
+        used_substring = memory._find_used_substring
         covered = [c for item in items for c in item.payload.get("covers", [])]
         items += memory.find(ids=covered, k=50, branch=branch)
         lines = "\n".join(_line(item) for item in items)
-        return lines or "Nothing found."
+        result = lines or "Nothing found."
+        if queried and used_substring:
+            result = f"{result}\n\n{SUBSTRING_FALLBACK}"
+        return result
+    if action == "delete":
+        raw = arguments.get("ids") or arguments.get("id")
+        if not raw:
+            raise ValueError(
+                "missing required argument(s) for this action: ids"
+            )
+        targets = [raw] if isinstance(raw, str) else list(raw)
+        hidden = []
+        for item_id in targets:
+            target = memory._resolve(item_id)
+            memory.delete(target)
+            hidden.append(target[:8])
+        return "Deleted [" + "], [".join(hidden) + "]."
     if action == "history":
         return render_timeline(memory.history())
+    if action == "open_questions":
+        if not (arguments.get("text") or "").strip():
+            closed = memory.close_questions(arguments.get("ids"))
+            if not closed:
+                return "No open questions."
+            shown = " ".join(f"[{item_id[:8]}]" for item_id in closed)
+            return f"Closed {shown}."
+        item_id = memory.open_question(
+            arguments["text"],
+            depends_on=arguments.get("ids"),
+            agent=arguments.get("agent"),
+        )
+        deps = "".join(f" [{d[:8]}]" for d in (arguments.get("ids") or []))
+        return f"Open question [{item_id[:8]}] added.{deps}"
     if action == "graph":
         result = memory.graph()
         if arguments.get("html"):
@@ -213,9 +255,9 @@ def _run_action(memory: Memory, arguments: dict) -> str:
             result += f"\n\nExplorable version written to {page}"
         return result
     if action == "branch":
-        _require(arguments, "id", "name")
+        _require(arguments, "id", "name", "label")
         before = memory._branch_name()
-        memory.branch(arguments["id"], arguments["name"], arguments.get("label"))
+        memory.branch(arguments["id"], arguments["name"], arguments["label"])
         after = memory._branch_name()
         landed = memory.state()[-1]
         result = (

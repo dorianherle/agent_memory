@@ -9,6 +9,7 @@ Works with mcp SDK v1 (`FastMCP`) and v2 (`MCPServer`).
 from __future__ import annotations
 
 from agent_memory.cursor.common import get_memory
+from agent_memory.prompt import save_hygiene
 from agent_memory.tools import call_tool
 
 
@@ -51,8 +52,8 @@ def _build_server():
     ) -> str:
         """Search stored memory. Use query for meaning (falls back to substring
         match when no embedding provider is configured, or when embeddings
-        fail — e.g. missing GEMINI_API_KEY), text for substring, or ids from
-        MEMORY STATE.
+        fail — e.g. missing GEMINI_API_KEY — and says so), text for substring,
+        or ids from MEMORY STATE.
         """
         return call_tool(
             get_memory(),
@@ -88,7 +89,9 @@ def _build_server():
         from agent_memory.identity import DEFAULT_AGENT
 
         label = who[0].payload.get("agent", DEFAULT_AGENT) if who else DEFAULT_AGENT
-        return f"Saved [{item_id[:8]}] @{label}."
+        result = f"Saved [{item_id[:8]}] @{label}."
+        warn = save_hygiene(text)
+        return f"{result}\n{warn}" if warn else result
 
     @mcp.tool()
     def memory_summarize(text: str, agent: str | None = None) -> str:
@@ -108,7 +111,59 @@ def _build_server():
         from agent_memory.identity import DEFAULT_AGENT
 
         label = who[0].payload.get("agent", DEFAULT_AGENT) if who else DEFAULT_AGENT
-        return f"Summarized [{item_id[:8]}] @{label}."
+        result = f"Summarized [{item_id[:8]}] @{label}."
+        warn = save_hygiene(text)
+        return f"{result}\n{warn}" if warn else result
+
+    @mcp.tool()
+    def memory_delete(ids: list[str]) -> str:
+        """Hide specific entries from Recent, find, and the live timeline.
+
+        Use for noise that should not have been saved — not for finished
+        work (summarize that). Snapshots stay in git; the delete commit
+        itself does not appear in Recent. Pass ids from MEMORY STATE.
+        Refreshes the live HTML monitor automatically.
+        """
+        memory = get_memory()
+        result = call_tool(
+            memory,
+            "memory",
+            {"action": "delete", "ids": ids},
+        )
+        memory.write_state_file()
+        try:
+            memory.write_live_html()
+        except Exception:
+            pass
+        return result
+
+    @mcp.tool()
+    def memory_open_questions(
+        text: str = "",
+        depends_on: list[str] | None = None,
+        ids: list[str] | None = None,
+    ) -> str:
+        """Add or close open questions.
+
+        With text: add a question (depends_on = notes it stands on).
+        You can have several. Empty text closes all, or only ``ids``.
+        """
+        memory = get_memory()
+        result = call_tool(
+            memory,
+            "memory",
+            {
+                "action": "open_questions",
+                "text": text,
+                "ids": depends_on or ids,
+            },
+        )
+        memory.write_state_file()
+        try:
+            memory.write_live_html()
+        except Exception:
+            pass
+        return result
 
     @mcp.tool()
     def memory_history() -> str:
@@ -116,8 +171,8 @@ def _build_server():
         return call_tool(get_memory(), "memory", {"action": "history"})
 
     @mcp.tool()
-    def memory_branch(id: str, name: str, label: str | None = None) -> str:
-        """Move to an entry (dead end or another branch). Restores working files to that snapshot."""
+    def memory_branch(id: str, name: str, label: str) -> str:
+        """Leave a dead end. label is required: what went wrong. Restores working files to id."""
         memory = get_memory()
         result = call_tool(
             memory,

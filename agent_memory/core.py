@@ -57,6 +57,25 @@ def split_state(items: list[MemoryItem]) -> tuple[list[MemoryItem], list[MemoryI
     return items[: last_summary + 1], items[last_summary + 1 :]
 
 
+OPEN_QUESTION_KEY = "open_question"
+GOAL_KEY = "goal"
+DEAD_END_KEY = "dead_end"
+
+
+def split_open_questions(items: list[MemoryItem]) -> list[MemoryItem]:
+    """Open questions: payload open_question=True, not deleted."""
+    return [item for item in items if item.payload.get(OPEN_QUESTION_KEY) is True]
+
+
+def split_goals(items: list[MemoryItem]) -> list[MemoryItem]:
+    """The original job. Marked goal=True, else the oldest user entry."""
+    marked = [item for item in items if item.payload.get(GOAL_KEY) is True]
+    if marked:
+        return marked[:1]
+    users = [item for item in items if item.payload.get("user")]
+    return users[:1] if users else []
+
+
 class Memory:
     def __init__(
         self,
@@ -69,6 +88,7 @@ class Memory:
         self._search = None
         self._catalog = None
         self._last_tool_result = "Nothing yet."
+        self._find_used_substring = False
         self._init()
 
     def _run(self, *args: str, check: bool = True) -> str:
@@ -313,7 +333,24 @@ class Memory:
         )
         if summary:
             allow_empty = True
-            recent = split_state(self.state())[1]
+            # Goal, latest steering, and open questions are not finished work.
+            state = self.state()
+            recent = split_state(state)[1]
+            goal = split_goals(state)
+            goal_id = goal[0].id if goal else None
+            users = [
+                item
+                for item in recent
+                if item.payload.get("user") and item.id != goal_id
+            ]
+            steer_id = users[-1].id if users else None
+            recent = [
+                item
+                for item in recent
+                if item.payload.get(OPEN_QUESTION_KEY) is not True
+                and item.id != goal_id
+                and item.id != steer_id
+            ]
             if recent:
                 stored_payload["covers"] = [item.id for item in recent]
         if _operation is not None:
@@ -376,6 +413,7 @@ class Memory:
                 if len(reachable) < len(set(wanted)):
                     branch_name = None
 
+        self._find_used_substring = False
         use_semantic = query is not None and (
             self._provider is not None
             or bool(os.getenv("AGENT_MEMORY_PROVIDER"))
@@ -401,9 +439,11 @@ class Memory:
                 # Embedding stack optional; missing API key / provider errors
                 # fall back to substring (matches memory_find docstring).
                 use_semantic = False
+                self._find_used_substring = True
         if not use_semantic:
             if query is not None:
                 # No provider / no embedding deps: substring fallback.
+                self._find_used_substring = True
                 if text:
                     text = f"{text} {query}"
                 else:
@@ -534,9 +574,12 @@ class Memory:
         latest = self.find(payload={"user": True}, k=1)
         if latest and latest[0].message == text:
             return None
+        payload = {"user": True}
+        if not split_goals(self.state()):
+            payload[GOAL_KEY] = True
         return self.save(
             text,
-            {"user": True},
+            payload,
             agent=agent or USER_AGENT,
         )
 
@@ -572,20 +615,127 @@ class Memory:
         """Fold Recent behind one line. Model-owned compaction."""
         return self.save(text, summary=True, agent=agent)
 
+    def open_question(
+        self,
+        text: str,
+        depends_on: list[str] | None = None,
+        *,
+        agent: str | None = None,
+    ) -> str:
+        """Add an open question (and the notes it stands on)."""
+        if self.inspecting() is not None:
+            raise RuntimeError(
+                "cannot save while inspecting; call inspect_done first"
+            )
+        if not text.strip():
+            raise ValueError("text required; use close_questions to clear")
+        payload: dict = {OPEN_QUESTION_KEY: True}
+        resolved = [self._resolve(item_id) for item_id in depends_on or []]
+        if resolved:
+            payload["depends_on"] = resolved
+        return self.save(text.strip(), payload, allow_empty=True, agent=agent)
+
+    def open_questions(self) -> list[MemoryItem]:
+        """Live open questions on this branch."""
+        return split_open_questions(self.state())
+
+    def close_questions(self, ids: list[str] | None = None) -> list[str]:
+        """Close listed open questions, or all of them. Returns closed ids."""
+        current = {item.id: item for item in self.open_questions()}
+        if ids:
+            targets = [self._resolve(item_id) for item_id in ids]
+            bad = next((target for target in targets if target not in current), None)
+            if bad:
+                raise ValueError(f"not an open question: {bad[:8]}")
+        else:
+            targets = list(current)
+        closed = []
+        for target in targets:
+            self.save(
+                "Closed open question",
+                {},
+                allow_empty=True,
+                _operation={"operation": "delete", "target": target},
+            )
+            closed.append(target)
+        return closed
+
+    def _stale_ids(self, items: list[MemoryItem]) -> set[str]:
+        """Ids whose own files have changed between that commit and HEAD.
+
+        Empty commits (note-only saves) are never stale. Inspect mode
+        skips this — HEAD is the detached snapshot, not the live tree.
+        """
+        stale: set[str] = set()
+        if not items or self.inspecting() is not None:
+            return stale
+        head = self._run("rev-parse", "HEAD", check=False)
+        if not head:
+            return stale
+        for item in items:
+            if item.id == head:
+                continue
+            names = self._run(
+                "show", "--pretty=format:", "--name-only", item.id, check=False
+            )
+            files = {name for name in names.splitlines() if name.strip()}
+            if not files:
+                continue
+            later = {
+                name
+                for name in self._run(
+                    "diff", "--name-only", item.id, "HEAD", check=False
+                ).splitlines()
+                if name.strip()
+            }
+            if files & later:
+                stale.add(item.id)
+        return stale
+
+    def prompt_sections(self, k: int = 5) -> dict[str, list[MemoryItem]]:
+        """Avoid = autopsies written at memory_branch. Nothing else."""
+        self._sync_catalog()
+        rows = self._catalog.select(
+            branch=None,
+            payload={DEAD_END_KEY: True},
+            include_historical=False,
+            limit=k,
+        )
+        avoid = [self._row_item(row) for row in rows]
+        return {"avoid": avoid} if avoid else {}
+
     def render_state(self) -> str:
         """Compact MEMORY STATE for prompt injection.
 
-        Top hierarchy only: branch tips, History summaries, and Recent as
-        one-line commit subjects. Full bodies / folded steps stay in the
-        store — use memory_find / memory_history.
+        Goal, steering, open questions, newest Recent subjects.
         """
-        from agent_memory.prompt import render
+        from agent_memory.prompt import RECENT_CAP, _goal, _steering, render
 
+        items = self.state()
+        _, recent = split_state(items)
+        hide = {item.id for item in split_open_questions(items)}
+        recent = [item for item in recent if item.id not in hide]
+        sample = list(recent[-RECENT_CAP:])
+        goal = _goal(items)
+        if goal:
+            sample.append(goal)
+        steer = _steering(items, goal)
+        if steer:
+            sample.append(steer)
+        sample.extend(split_open_questions(items))
+        sections = {}
+        if not self.inspecting():
+            try:
+                sections = self.prompt_sections()
+            except Exception:
+                sections = {}
         return render(
-            self.state(),
+            items,
             self.branches(),
             self.inspecting(),
             compact=True,
+            stale_ids=self._stale_ids(sample),
+            sections=sections,
         )
 
     def write_state_rule(self, path: str | Path | None = None) -> Path:
@@ -708,21 +858,26 @@ class Memory:
             finally:
                 self._run("checkout", branch)
 
-    def branch(self, base_id: str, name: str, summary: str | None = None) -> Memory:
-        """Move to an entry: back past a dead end or forward to another tip.
+    def branch(self, base_id: str, name: str, summary: str) -> Memory:
+        """Rewind to an entry. ``summary`` is the autopsy: what went wrong.
 
-        With a summary, the current branch is first capped with one
-        summary commit — the node that represents it from now on. If the
-        target is the tip of an existing branch, that branch is resumed
-        instead of creating a duplicate.
+        That sentence is capped onto the abandoned line and later injected
+        as Avoid so the next agent does not repeat it. Then files restore
+        to the target snapshot. If the target is another branch's tip,
+        that branch is resumed instead of creating a duplicate.
         """
         if self.inspecting() is not None:
             raise RuntimeError(
                 "cannot branch while inspecting; call inspect_done first"
             )
+        text = (summary or "").strip()
+        if not text:
+            raise ValueError(
+                "branch requires a summary of what went wrong "
+                "(the next agent will see it under Avoid)"
+            )
         commit_id = self._resolve(base_id)
-        if summary is not None:
-            self.save(summary, summary=True)
+        self.save(text, {DEAD_END_KEY: True}, summary=True)
         with self._lock():
             if self._run("status", "--porcelain", check=False):
                 raise RuntimeError("save current changes before branching")

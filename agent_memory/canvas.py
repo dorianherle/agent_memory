@@ -24,7 +24,7 @@ CANVAS_TEMPLATE = r'''import {
   useHostTheme,
 } from "cursor/canvas";
 
-type Kind = "summary" | "user" | "step" | "delete";
+type Kind = "summary" | "user" | "step" | "delete" | "open_question";
 type ColorKey =
   | "blue"
   | "green"
@@ -145,6 +145,7 @@ function MemoryGraphCanvas() {
     if (kind === "summary") return cat?.orange ?? theme.accent.primary;
     if (kind === "user") return cat?.cyan ?? theme.fill.primary;
     if (kind === "delete") return cat?.pink ?? theme.fill.tertiary;
+    if (kind === "open_question") return cat?.orange ?? theme.accent.primary;
     return cat?.blue ?? theme.fill.secondary; // normal commits / steps
   };
   const nodeFill = theme.bg?.elevated ?? theme.fill.secondary;
@@ -532,6 +533,7 @@ def compact_graph(data: dict) -> dict:
                 "branches": list(node.get("branches") or []),
                 "committed_at": node.get("committed_at") or "",
                 "children": list(node.get("children") or []),
+                "depends_on": list(node.get("depends_on") or []),
             }
         )
     edges = []

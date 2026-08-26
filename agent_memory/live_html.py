@@ -6,17 +6,20 @@ Writes into ``.agent_memory/live/``:
 - ``data.js`` — latest graph payload (rewritten on every durable memory event)
 
 Open ``index.html`` in a browser. The page polls ``data.js`` and re-renders when
-memory changes — no need to ask the agent for a canvas.
+memory changes. A ``Now`` strip polls the reveal helper's ``/working`` endpoint
+for dirty files, live Cursor terminals, and inspect state. The timeline is a
+git-style lane graph so branches are visible.
 """
 
 from __future__ import annotations
 
 import json
 import re
+import time
 from pathlib import Path
 
 # Bump when SHELL_TEMPLATE changes so existing installs pick up the new shell.
-SHELL_VERSION = "7"
+SHELL_VERSION = "13"
 
 SHELL_TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
@@ -40,7 +43,8 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     --step: #6ea8fe;
     --user: #5bc0be;
     --delete: #e88a9a;
-    --rail: #2e2e2e;
+    --rail: #3a3a3a;
+    --warn: #e8a54b;
   }
   * { box-sizing: border-box; }
   html, body {
@@ -69,8 +73,25 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     letter-spacing: -0.02em;
   }
   header .branch {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px;
     color: var(--muted);
     font-size: 12px;
+  }
+  header .branch button {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: var(--muted);
+    cursor: pointer;
+    font: inherit;
+  }
+  header .branch button:hover { color: var(--text); }
+  header .branch button.focus { color: var(--text); font-weight: 650; }
+  header .branch button.here {
+    box-shadow: inset 0 -2px 0 var(--accent);
   }
   header .status {
     margin-left: auto;
@@ -95,6 +116,7 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
   }
   .dot.summary { background: var(--summary); }
   .dot.user { background: var(--user); }
+  .dot.open_question { background: var(--warn); }
   .crumbs {
     display: flex;
     flex-wrap: wrap;
@@ -124,73 +146,11 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
   @media (max-width: 860px) {
     main { grid-template-columns: 1fr; }
     #detail { border-left: 0; border-top: 1px solid var(--stroke); max-height: 42vh; }
+    .now-grid { grid-template-columns: 1fr; }
   }
   #list {
     overflow: auto;
     padding: 16px 20px 28px;
-  }
-  .timeline {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-width: 520px;
-  }
-  .timeline::before {
-    content: "";
-    position: absolute;
-    left: 18px;
-    top: 8px;
-    bottom: 8px;
-    width: 1px;
-    background: var(--rail);
-    pointer-events: none;
-  }
-  .card {
-    position: relative;
-    margin-left: 36px;
-    background: var(--elevated);
-    border: 1px solid var(--stroke);
-    border-radius: 10px;
-    padding: 12px 14px 12px 16px;
-    cursor: pointer;
-    overflow: hidden;
-  }
-  .card:hover { border-color: var(--stroke-strong); }
-  .card.selected {
-    border-color: var(--accent);
-  }
-  .card.current {
-    border-color: var(--accent);
-  }
-  .card .bar {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--step);
-  }
-  .card.kind-summary .bar { width: 4px; background: var(--summary); }
-  .card.kind-user .bar { background: var(--user); }
-  .card.kind-delete .bar { background: var(--delete); }
-  .card.current .bar { display: none; }
-  .card .title {
-    font-weight: 600;
-    font-size: 13px;
-    margin: 0 0 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .card .meta {
-    color: var(--muted);
-    font-size: 11px;
-  }
-  .card .when {
-    margin-top: 6px;
-    color: var(--faint);
-    font: 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
   }
   #detail {
     border-left: 1px solid var(--stroke);
@@ -303,6 +263,284 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     border-color: var(--accent);
     color: var(--text);
   }
+  #now {
+    padding: 12px 20px 10px;
+    border-bottom: 1px solid var(--stroke);
+    background: var(--panel);
+  }
+  .now-grid {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) minmax(260px, 1.25fr);
+    gap: 14px 28px;
+  }
+  .now-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .now-head h2 {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .now-head .meta {
+    color: var(--faint);
+    font-size: 11px;
+  }
+  #now-run, #now-files {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 28vh;
+    overflow: auto;
+  }
+  #now-run li, #now-files li {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+  }
+  #now-run .pulse {
+    flex: 0 0 7px;
+    width: 7px;
+    height: 7px;
+    margin-top: 5px;
+    border-radius: 99px;
+    background: var(--user);
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  #now-run .pulse.warn { background: var(--warn); }
+  #now-run .pulse.idle {
+    background: var(--faint);
+    animation: none;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+  #now-run .cmd {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
+  }#now-run .cmd .who { color: var(--muted); font-family: inherit; }
+  #now-files .dir {
+    color: var(--faint);
+    font: 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+    margin-top: 4px;
+  }
+  #now-files .dir:first-child { margin-top: 0; }
+  #now-files .code {
+    flex: 0 0 2.2em;
+    color: var(--summary);
+    font: 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-weight: 650;
+  }
+  #questions {
+    display: none;
+    border: 1px solid var(--warn);
+    background: color-mix(in srgb, var(--warn) 12%, transparent);
+    border-radius: 8px;
+    margin: 0 20px 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+  #questions .q-head {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-weight: 650;
+    color: var(--warn);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 10px;
+  }
+  #questions .q-text { margin-top: 3px; }
+  #questions .q-item { margin-top: 6px; }
+  #questions .q-deps button {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: var(--muted);
+    cursor: pointer;
+    font: inherit;
+    text-decoration: underline dotted;
+  }
+  #now-files .code.st-A,
+  #now-files .code.st-qq { color: var(--user); }
+  #now-files .code.st-D { color: var(--delete); }
+  #now-files a {
+    color: var(--accent);
+    text-decoration: none;
+    font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+  #now-files a:hover { color: var(--text); }
+  .age {
+    margin-left: auto;
+    color: var(--faint);
+    font: 11px/1.3 ui-sans-serif, system-ui, sans-serif;
+    font-variant-numeric: tabular-nums;
+    flex: 0 0 auto;
+  }
+  .graph {
+    position: relative;
+    max-width: 640px;
+  }
+  .graph svg.rails {
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+  }
+  .row {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .gutter { position: relative; flex: 0 0 auto; }
+  .gutter .commit {
+    position: absolute;
+    top: 18px;
+    width: 9px;
+    height: 9px;
+    border-radius: 99px;
+    background: var(--step);
+    transform: translateX(-50%);
+    z-index: 1;
+    box-shadow: 0 0 0 3px var(--bg);
+  }
+  .gutter .commit.kind-summary { background: var(--summary); }
+  .gutter .commit.kind-user { background: var(--user); }
+  .gutter .commit.current {
+    box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--accent);
+  }
+  .card {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    background: var(--elevated);
+    border: 1px solid var(--stroke);
+    border-radius: 10px;
+    padding: 12px 14px 12px 16px;
+    cursor: pointer;
+  }
+  .card:hover { border-color: var(--stroke-strong); }
+  .card.selected, .card.current { border-color: var(--accent); }
+  .card .bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--step);
+  }
+  .card.kind-summary .bar { width: 4px; background: var(--summary); }
+  .card.kind-user .bar { background: var(--user); }
+  .card.kind-delete .bar { background: var(--delete); }
+  .card.current .bar { display: none; }
+  .card .title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-weight: 600;
+    font-size: 13px;
+    margin: 0 0 4px;
+    min-width: 0;
+  }
+  .card .title span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .kind-icon {
+    flex: 0 0 14px;
+    width: 14px;
+    height: 14px;
+    color: var(--step);
+  }
+  .kind-icon.kind-summary { color: var(--summary); }
+  .kind-icon.kind-user { color: var(--user); }
+  .forks {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 8px;
+    padding: 1px 7px 1px 5px;
+    border-radius: 999px;
+    border: 1px solid var(--stroke-strong);
+    background: var(--elevated);
+    color: var(--text);
+    font: 10px/1.3 ui-sans-serif, system-ui, sans-serif;
+    cursor: pointer;
+  }
+  .forks:hover, .forks.open { border-color: var(--accent); }
+  .forks svg { width: 11px; height: 11px; }
+  .fork-menu {
+    position: absolute;
+    left: 0;
+    top: calc(100% + 6px);
+    z-index: 8;
+    min-width: 140px;
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid var(--stroke-strong);
+    background: var(--panel);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+  .fork-menu button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: 0;
+    border-radius: 6px;
+    padding: 6px 8px;
+    color: var(--text);
+    font: 12px/1.3 ui-sans-serif, system-ui, sans-serif;
+    cursor: pointer;
+  }
+  .fork-menu button:hover { background: var(--elevated); }
+  .fork-menu .here { color: var(--accent); }
+  .card .meta {
+    color: var(--muted);
+    font-size: 11px;
+  }
+  .card .tips {
+    display: inline-flex;
+    gap: 6px;
+    margin-left: 6px;
+  }
+  .card .tips button {
+    font: 10px/1.3 ui-sans-serif, system-ui, sans-serif;
+    padding: 0 5px;
+    border-radius: 999px;
+    border: 1px solid var(--stroke-strong);
+    background: none;
+    color: var(--text);
+    cursor: pointer;
+  }
+  .card .tips button:hover { border-color: var(--accent); }
+  .card .when {
+    margin-top: 6px;
+    color: var(--faint);
+    font: 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
 </style>
 </head>
 <body>
@@ -315,8 +553,31 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
   <span><i class="dot summary"></i>summary</span>
   <span><i class="dot"></i>commit</span>
   <span><i class="dot user"></i>user</span>
+  <span><i class="dot open_question"></i>open</span>
 </div>
 <nav class="crumbs" id="crumbs"></nav>
+<section id="questions">
+  <div class="q-head"><span>Open questions</span></div>
+  <div id="questions-list"></div>
+</section>
+<section id="now">
+  <div class="now-grid">
+    <div>
+      <div class="now-head">
+        <h2>Running</h2>
+        <span class="meta" id="now-run-meta"></span>
+      </div>
+      <ul id="now-run"></ul>
+    </div>
+    <div>
+      <div class="now-head">
+        <h2>Files</h2>
+        <span class="meta" id="now-files-meta">checking files…</span>
+      </div>
+      <ul id="now-files"></ul>
+    </div>
+  </div>
+</section>
 <main>
   <section id="list"></section>
   <aside id="detail"><p class="empty">Select an entry.</p></aside>
@@ -326,9 +587,11 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
 (function () {
   const POLL_MS = 1500;
   const STORE_KEY = "agent-memory-live-ui-v1";
+  const LANE = 16;
   const state = loadState();
   let lastHash = "";
   let graph = window.__AGENT_MEMORY_LIVE__ || { nodes: [], edges: [], branches: [] };
+  let lastNow = null;
 
   function loadState() {
     try {
@@ -343,6 +606,8 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
       JSON.stringify({
         trail: state.trail || [],
         selected: state.selected || null,
+        branch: state.branch || null,
+        expanded: state.expanded || [],
       })
     );
   }
@@ -377,7 +642,6 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
       try { p = decodeURI(p.replace(/^file:\/\//, "")); } catch (_) {}
     }
     if (p.startsWith("~/")) {
-      // Browser cannot expand ~; leave absolute-looking only.
       return null;
     }
     if (p.startsWith("/")) return p;
@@ -385,7 +649,6 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     if (!root) return null;
     if (p.startsWith("./")) p = p.slice(2);
     while (p.startsWith("../")) {
-      // Do not climb above project root from relative mentions.
       p = p.slice(3);
     }
     return root + "/" + p.replace(/^\/+/, "");
@@ -397,7 +660,6 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     const push = (raw) => {
       const abs = resolvePath(raw);
       if (!abs || seen.has(abs)) return;
-      // Skip obvious non-files (lone roots, tiny noise).
       if (abs === "/" || abs.length < 4) return;
       seen.add(abs);
       found.push({ raw: String(raw).trim(), abs });
@@ -432,7 +694,6 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     openFolderFallback(absPath);
   }
   function openFolderFallback(absPath) {
-    // Without the reveal helper, open the parent folder via file:// (Finder on macOS).
     const trimmed = absPath.replace(/\/+$/, "");
     const parent = trimmed.includes("/") ? trimmed.replace(/\/[^/]+$/, "") || "/" : trimmed;
     window.open(toFileUrl(parent + "/"), "_blank");
@@ -445,7 +706,6 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
       wrap.textContent = text || "";
       return wrap;
     }
-    // Replace longest abs paths first so overlaps stay stable.
     const ordered = paths.slice().sort((a, b) => b.raw.length - a.raw.length);
     let remaining = String(text || "");
     const chunks = [];
@@ -494,7 +754,7 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
       return focus.children.filter((id) => all[id]).slice().reverse().map((id) => all[id]);
     }
     return (graph.nodes || [])
-      .filter((n) => !n.folded)
+      .filter((n) => !n.folded && n.kind !== "delete")
       .slice()
       .sort((a, b) => String(b.committed_at || "").localeCompare(String(a.committed_at || "")));
   }
@@ -502,6 +762,170 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     const el = document.getElementById("status");
     el.textContent = text;
     el.classList.toggle("live", !!live);
+  }
+  function workingEndpoint() {
+    if (graph && graph.working) return graph.working;
+    const reveal = graph && graph.reveal;
+    if (!reveal) return null;
+    return String(reveal).replace(/\/reveal\/?$/, "/working");
+  }
+  function formatAge(mtime) {
+    if (!mtime) return "";
+    const sec = Math.max(0, (Date.now() / 1000) - Number(mtime));
+    if (sec < 60) return Math.floor(sec) + "s ago";
+    if (sec < 3600) return Math.floor(sec / 60) + "m ago";
+    if (sec < 86400) return Math.floor(sec / 3600) + "h ago";
+    return Math.floor(sec / 86400) + "d ago";
+  }
+  function formatDuration(ms) {
+    const sec = Math.max(0, Math.floor(Number(ms || 0) / 1000));
+    if (sec < 60) return sec + "s";
+    if (sec < 3600) return Math.floor(sec / 60) + "m " + (sec % 60) + "s";
+    return Math.floor(sec / 3600) + "h " + Math.floor((sec % 3600) / 60) + "m";
+  }
+  function latestVisible() {
+    const nodes = (graph.nodes || []).filter((n) => !n.folded && n.kind !== "delete");
+    nodes.sort((a, b) => String(b.committed_at || "").localeCompare(String(a.committed_at || "")));
+    return nodes[0] || null;
+  }
+  function addNowRow(list, { pulse, text, title, age, warn }) {
+    const li = document.createElement("li");
+    const dot = document.createElement("i");
+    dot.className = "pulse" + (warn ? " warn" : pulse ? "" : " idle");
+    const cmd = document.createElement("span");
+    cmd.className = "cmd";
+    cmd.textContent = text;
+    if (title) cmd.title = title;
+    li.appendChild(dot);
+    li.appendChild(cmd);
+    if (age) {
+      const stamp = document.createElement("span");
+      stamp.className = "age";
+      stamp.textContent = age;
+      li.appendChild(stamp);
+    }
+    list.appendChild(li);
+  }
+  function renderNow(data) {
+    lastNow = data || lastNow || {};
+    const run = document.getElementById("now-run");
+    const runMeta = document.getElementById("now-run-meta");
+    const filesEl = document.getElementById("now-files");
+    const filesMeta = document.getElementById("now-files-meta");
+    const processes = (lastNow && lastNow.processes) || [];
+    const inspecting = lastNow && lastNow.inspecting;
+    const files = (lastNow && lastNow.files) || [];
+    const total = (lastNow && lastNow.total) || files.length;
+    const latest = latestVisible();
+
+    run.innerHTML = "";
+    if (inspecting && inspecting.id) {
+      addNowRow(run, {
+        pulse: true,
+        warn: true,
+        text: "inspecting " + String(inspecting.id).slice(0, 8) +
+          (inspecting.branch ? " · return to " + inspecting.branch : ""),
+        title: "Working files are at that snapshot",
+      });
+    }
+    processes.forEach((proc) => {
+      addNowRow(run, {
+        pulse: true,
+        text: proc.command,
+        title: (proc.cwd ? proc.cwd + " · " : "") + "pid " + proc.pid,
+        age: formatDuration(proc.running_for_ms),
+      });
+    });
+    if (latest) {
+      const working = latest.kind === "user";
+      addNowRow(run, {
+        pulse: working && !processes.length && !inspecting,
+        text: (working ? "turn: " : "last: ") + truncate(latest.title || latest.kind, 56),
+        title: latest.title,
+      });
+    }
+    if (!run.children.length) {
+      addNowRow(run, { pulse: false, text: "idle" });
+    }
+    runMeta.textContent = processes.length
+      ? processes.length + " live"
+      : inspecting
+        ? "inspecting"
+        : "idle";
+
+    filesEl.innerHTML = "";
+    if (!files.length) {
+      filesMeta.textContent = "clean vs last memory save";
+      return;
+    }
+    filesMeta.textContent = total + " changed · vs last memory save";
+    const groups = new Map();
+    files.forEach((f) => {
+      const path = String(f.path || "");
+      const i = path.lastIndexOf("/");
+      const dir = i < 0 ? "" : path.slice(0, i);
+      const name = i < 0 ? path : path.slice(i + 1);
+      if (!groups.has(dir)) groups.set(dir, []);
+      groups.get(dir).push({ file: f, name: name });
+    });
+    groups.forEach((rows, dir) => {
+      if (dir) {
+        const head = document.createElement("li");
+        head.className = "dir";
+        head.textContent = dir + "/";
+        filesEl.appendChild(head);
+      }
+      rows.forEach((row) => {
+        const f = row.file;
+        const li = document.createElement("li");
+        const code = document.createElement("span");
+        const stamp = String(f.status || "?").replace(/\s/g, "");
+        code.className = "code st-" + stamp.replace(/\?/g, "q");
+        code.textContent = f.status || "?";
+        const a = document.createElement("a");
+        const abs = String(f.path || "").startsWith("/")
+          ? f.path
+          : projectRoot() + "/" + f.path;
+        a.href = toFileUrl(abs);
+        a.textContent = row.name;
+        a.title = "Show in Finder: " + abs;
+        a.addEventListener("click", (e) => openInFinder(abs, e));
+        const age = document.createElement("span");
+        age.className = "age";
+        age.textContent = formatAge(f.mtime);
+        li.appendChild(code);
+        li.appendChild(a);
+        li.appendChild(age);
+        filesEl.appendChild(li);
+      });
+    });
+  }
+  function isDemo() {
+    return !!(graph && graph.demo);
+  }
+  function pollWorking() {
+    if (isDemo()) {
+      renderNow(graph.now || { files: [], processes: [], inspecting: null });
+      return;
+    }
+    const url = workingEndpoint();
+    const meta = document.getElementById("now-files-meta");
+    if (!url) {
+      meta.textContent = "no file watcher";
+      renderNow({ files: [], processes: [], inspecting: null });
+      return;
+    }
+    fetch(url)
+      .then((r) => {
+        if (!r.ok) throw new Error("working");
+        return r.json();
+      })
+      .then(renderNow)
+      .catch(() => {
+        if (!document.getElementById("now-files").children.length) {
+          meta.textContent = "waiting for file watcher…";
+        }
+      });
   }
   function renderCrumbs(all) {
     const nav = document.getElementById("crumbs");
@@ -599,8 +1023,7 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
       btn.className = "subgraph";
       btn.textContent = "Subgraph (" + kids + ")";
       btn.addEventListener("click", () => {
-        state.trail = (state.trail || []).concat([entry.id]);
-        state.selected = null;
+        if (!isExpanded(entry.id)) toggleExpand(entry.id);
         saveState();
         render();
       });
@@ -654,12 +1077,273 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
       addSection(aside, label, entry.body || "", { mono: true });
     }
   }
+  function currentBranchName() {
+    const row = (graph.branches || []).find((b) => b.current);
+    return (row && row.name) || ((graph.branches || [])[0] || {}).name || "main";
+  }
+  function focusedName() {
+    const names = new Set((graph.branches || []).map((b) => b.name));
+    if (state.branch && names.has(state.branch)) return state.branch;
+    return currentBranchName();
+  }
+  function lineageOf(tipId, parentsOf) {
+    const seen = new Set();
+    const stack = tipId ? [tipId] : [];
+    while (stack.length) {
+      const id = stack.pop();
+      if (!id || seen.has(id)) continue;
+      seen.add(id);
+      (parentsOf[id] || []).forEach((p) => stack.push(p));
+    }
+    return seen;
+  }
+  function svgIcon(kind) {
+    const ns = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("viewBox", "0 0 16 16");
+    svg.setAttribute("fill", "none");
+    svg.setAttribute("stroke", "currentColor");
+    svg.setAttribute("stroke-width", "1.6");
+    svg.setAttribute("stroke-linecap", "round");
+    svg.setAttribute("stroke-linejoin", "round");
+    const path = document.createElementNS(ns, "path");
+    if (kind === "user") {
+      path.setAttribute("d", "M8 8a2.4 2.4 0 1 0 0-4.8A2.4 2.4 0 0 0 8 8Zm-4.5 6c.4-2.2 2.2-3.4 4.5-3.4s4.1 1.2 4.5 3.4");
+    } else if (kind === "summary") {
+      path.setAttribute("d", "M3 4.5h10M3 8h10M3 11.5h7");
+    } else if (kind === "fork") {
+      path.setAttribute("d", "M5 3.5v6.5m0-6.5a1.5 1.5 0 1 0 0-0.01M11 3.5a1.5 1.5 0 1 0 0-0.01M5 10l6-4.5M11 12.5a1.5 1.5 0 1 0 0-0.01");
+    } else {
+      path.setAttribute("d", "M8 3.2v9.6M5.2 6.2 8 3.2l2.8 3");
+    }
+    svg.appendChild(path);
+    return svg;
+  }
+  function attachPoint(tipId, onFocus, parentsOf) {
+    let id = tipId;
+    const seen = new Set();
+    while (id && !seen.has(id)) {
+      if (onFocus.has(id)) return id;
+      seen.add(id);
+      id = (parentsOf[id] || [])[0] || null;
+    }
+    return null;
+  }
+  function forksByAttach(onFocus, parentsOf) {
+    const focus = focusedName();
+    const by = {};
+    (graph.branches || []).forEach((b) => {
+      if ((b.name || "main") === focus) return;
+      if (onFocus.has(b.tip)) return;
+      const at = attachPoint(b.tip, onFocus, parentsOf);
+      if (!at) return;
+      (by[at] = by[at] || []).push(b);
+    });
+    return by;
+  }
+  function isExpanded(id) {
+    return (state.expanded || []).indexOf(id) >= 0;
+  }
+  function toggleExpand(id) {
+    const cur = (state.expanded || []).slice();
+    const at = cur.indexOf(id);
+    if (at >= 0) cur.splice(at, 1);
+    else cur.push(id);
+    state.expanded = cur;
+  }
+  function expandIds(ids, force) {
+    const cur = new Set(state.expanded || []);
+    const allOn = ids.every((id) => cur.has(id));
+    const next = force === true || (force !== false && !allOn);
+    ids.forEach((id) => {
+      if (next) cur.add(id);
+      else cur.delete(id);
+    });
+    state.expanded = Array.from(cur);
+  }
+  function forkButton(branches, ids) {
+    const idList = Array.isArray(ids) ? ids : [ids];
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "forks";
+    if (idList.length && idList.every(isExpanded)) btn.classList.add("open");
+    const icon = svgIcon("fork");
+    btn.appendChild(icon);
+    btn.appendChild(document.createTextNode(String(branches.length)));
+    btn.title =
+      (btn.classList.contains("open") ? "Collapse" : "Expand") +
+      " " +
+      branches.length +
+      " other branch" +
+      (branches.length === 1 ? "" : "es");
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      expandIds(idList);
+      saveState();
+      render();
+    });
+    return btn;
+  }
+  function focusContext() {
+    const parentsAll = parentMap();
+    const focus = focusedName();
+    const tip = ((graph.branches || []).find((b) => b.name === focus) || {}).tip;
+    const onFocus = lineageOf(tip, parentsAll);
+    return {
+      focus: focus,
+      tip: tip,
+      onFocus: onFocus,
+      parentsAll: parentsAll,
+      forksBy: forksByAttach(onFocus, parentsAll),
+    };
+  }
+  function focusBranch(name, selectId) {
+    state.branch = name;
+    if (selectId) {
+      state.selected = selectId;
+    } else {
+      const row = (graph.branches || []).find((b) => b.name === name);
+      if (row && row.tip) state.selected = row.tip;
+    }
+    saveState();
+    render();
+  }
+  function parentMap(nodes, folds) {
+    const ids = nodes ? new Set(nodes.map((n) => n.id)) : null;
+    const map = {};
+    (graph.edges || []).forEach((e) => {
+      const kind = e.kind || "parent";
+      if (kind !== "parent" && !(folds && kind === "fold")) return;
+      if (ids && (!ids.has(e.from) || !ids.has(e.to))) return;
+      (map[e.to] = map[e.to] || []).push(e.from);
+    });
+    if (folds && nodes) {
+      const have = new Set(nodes.map((n) => n.id));
+      const all = byId();
+      (state.expanded || []).forEach((id) => {
+        const kids = (all[id] && all[id].children) || [];
+        kids.forEach((cid, i) => {
+          const parent = i === 0 ? id : kids[i - 1];
+          if (!have.has(cid) || !have.has(parent)) return;
+          const row = map[cid] || [];
+          if (row.indexOf(parent) < 0) row.push(parent);
+          map[cid] = row;
+        });
+      });
+    }
+    return map;
+  }
+  function graphNodes(all) {
+    const ctx = focusContext();
+    if (!ctx.onFocus.size) {
+      return visibleNodes(all);
+    }
+    const show = new Set(ctx.onFocus);
+    (state.expanded || []).forEach((id) => {
+      (ctx.forksBy[id] || []).forEach((b) => {
+        lineageOf(b.tip, ctx.parentsAll).forEach((x) => show.add(x));
+      });
+      ((all[id] && all[id].children) || []).forEach((cid) => show.add(cid));
+    });
+    return (graph.nodes || [])
+      .filter((n) => show.has(n.id) && n.kind !== "delete")
+      .slice()
+      .sort((a, b) =>
+        String(b.committed_at || "").localeCompare(String(a.committed_at || ""))
+      );
+  }
+  function assignLanes(nodes, parentsOf) {
+    const lanes = [];
+    const laneOf = {};
+    const alloc = (id) => {
+      const empty = lanes.findIndex((x) => x == null);
+      if (empty >= 0) {
+        lanes[empty] = id;
+        return empty;
+      }
+      lanes.push(id);
+      return lanes.length - 1;
+    };
+    nodes.forEach((node) => {
+      let lane = lanes.indexOf(node.id);
+      if (lane < 0) lane = alloc(node.id);
+      laneOf[node.id] = lane;
+      const parents = parentsOf[node.id] || [];
+      lanes[lane] = parents[0] || null;
+      parents.slice(1).forEach((p) => {
+        if (!lanes.includes(p)) alloc(p);
+      });
+    });
+    const used = Object.values(laneOf);
+    return { laneOf, laneCount: used.length ? Math.max.apply(null, used) + 1 : 1 };
+  }
+  function renderRails(wrap, svg, nodes, parentsOf) {
+    const box = wrap.getBoundingClientRect();
+    const dots = {};
+    wrap.querySelectorAll(".row").forEach((row) => {
+      const dot = row.querySelector(".commit");
+      if (!dot) return;
+      const r = dot.getBoundingClientRect();
+      dots[row.dataset.id] = {
+        x: r.left + r.width / 2 - box.left,
+        y: r.top + r.height / 2 - box.top,
+      };
+    });
+    const w = parseInt(wrap.dataset.gutter || "40", 10);
+    svg.setAttribute("width", String(w));
+    svg.setAttribute("height", String(wrap.scrollHeight));
+    svg.innerHTML = "";
+    const ns = "http://www.w3.org/2000/svg";
+    nodes.forEach((n) => {
+      (parentsOf[n.id] || []).forEach((pid) => {
+        const a = dots[n.id];
+        const b = dots[pid];
+        if (!a || !b) return;
+        const path = document.createElementNS(ns, "path");
+        const mid = (a.y + b.y) / 2;
+        path.setAttribute(
+          "d",
+          a.x === b.x
+            ? "M " + a.x + " " + a.y + " L " + b.x + " " + b.y
+            : "M " + a.x + " " + a.y + " C " + a.x + " " + mid + ", " + b.x + " " + mid + ", " + b.x + " " + b.y
+        );
+        path.setAttribute("fill", "none");
+        path.setAttribute("stroke", "var(--rail)");
+        path.setAttribute("stroke-width", "1.5");
+        svg.appendChild(path);
+      });
+    });
+  }
   function renderList(all) {
     const list = document.getElementById("list");
-    const nodes = visibleNodes(all);
+    const atRoot = !(state.trail || []).length;
+    const ctx = focusContext();
+    const nodes = atRoot ? graphNodes(all) : visibleNodes(all);
+    const parentsOf = parentMap(nodes, true);
+    const { laneOf, laneCount } = assignLanes(nodes, parentsOf);
+    const forksBy = atRoot ? ctx.forksBy : {};
+    const gutter = 22 + Math.max(0, laneCount - 1) * LANE;
     const wrap = document.createElement("div");
-    wrap.className = "timeline";
+    wrap.className = "graph";
+    wrap.dataset.gutter = String(gutter);
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", "rails");
+    wrap.appendChild(svg);
     nodes.forEach((meta) => {
+      const row = document.createElement("div");
+      row.className = "row";
+      row.dataset.id = meta.id;
+      const rail = document.createElement("div");
+      rail.className = "gutter";
+      rail.style.width = gutter + "px";
+      const commit = document.createElement("i");
+      commit.className = "commit kind-" + (meta.kind || "step");
+      if (meta.current) commit.classList.add("current");
+      commit.style.left = 11 + (laneOf[meta.id] || 0) * LANE + "px";
+      const forks = forksBy[meta.id] || [];
+      const expandable = forks.length > 0 || (meta.children && meta.children.length);
+      if (expandable) commit.style.cursor = "pointer";
+      rail.appendChild(commit);
       const card = document.createElement("div");
       card.className = "card kind-" + (meta.kind || "step");
       if (meta.current) card.classList.add("current");
@@ -669,13 +1353,35 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
       card.appendChild(bar);
       const title = document.createElement("div");
       title.className = "title";
-      title.textContent = truncate(meta.title || meta.kind || "entry", 48);
+      const icon = svgIcon(meta.kind || "step");
+      icon.setAttribute("class", "kind-icon kind-" + (meta.kind || "step"));
+      title.appendChild(icon);
+      const label = document.createElement("span");
+      label.textContent = truncate(meta.title || meta.kind || "entry", 48);
+      title.appendChild(label);
       card.appendChild(title);
       const line = document.createElement("div");
       line.className = "meta";
       const bits = [meta.agent];
       if (meta.children && meta.children.length) bits.push(String(meta.children.length));
-      line.textContent = bits.filter(Boolean).join(" · ");
+      line.appendChild(document.createTextNode(bits.filter(Boolean).join(" · ")));
+      if (meta.branches && meta.branches.length) {
+        const tips = document.createElement("span");
+        tips.className = "tips";
+        meta.branches.forEach((name) => {
+          const pill = document.createElement("button");
+          pill.type = "button";
+          pill.textContent = name;
+          pill.title = "View branch " + name;
+          pill.addEventListener("click", (e) => {
+            e.stopPropagation();
+            focusBranch(name, meta.id);
+          });
+          tips.appendChild(pill);
+        });
+        line.appendChild(tips);
+      }
+      if (forks.length) line.appendChild(forkButton(forks, meta.id));
       card.appendChild(line);
       const when = document.createElement("div");
       when.className = "when";
@@ -684,28 +1390,102 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
         ? stamp + " · " + meta.id.slice(0, 8)
         : meta.id.slice(0, 8);
       card.appendChild(when);
-      card.addEventListener("click", () => {
+      const openNode = (toggle) => {
         state.selected = meta.id;
+        if (expandable && (toggle || !isExpanded(meta.id))) toggleExpand(meta.id);
         saveState();
         render();
+      };
+      commit.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openNode(true);
       });
-      wrap.appendChild(card);
+      card.addEventListener("click", () => openNode(false));
+      row.appendChild(rail);
+      row.appendChild(card);
+      wrap.appendChild(row);
     });
     list.innerHTML = "";
     list.appendChild(wrap);
+    renderRails(wrap, svg, nodes, parentsOf);
+  }
+  function depButton(id) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "[" + String(id).slice(0, 8) + "]";
+    const target = byId()[String(id)] || null;
+    btn.title = target ? "Show entry " + target.id.slice(0, 8)
+      : "Entry not on this view";
+    btn.addEventListener("click", () => {
+      if (!target) return;
+      state.selected = target.id;
+      saveState();
+      render();
+      document.getElementById("detail").scrollIntoView({behavior: "smooth"});
+    });
+    return btn;
+  }
+  function renderQuestions() {
+    const el = document.getElementById("questions");
+    const list = document.getElementById("questions-list");
+    const qs = (graph.nodes || []).filter((n) => n.kind === "open_question");
+    if (!qs.length) {
+      el.style.display = "none";
+      return;
+    }
+    el.style.display = "block";
+    list.innerHTML = "";
+    qs.forEach((q) => {
+      const item = document.createElement("div");
+      item.className = "q-item";
+      const text = document.createElement("div");
+      text.className = "q-text";
+      text.textContent = "[" + String(q.id).slice(0, 8) + "] "
+        + (q.title || "").trim();
+      item.appendChild(text);
+      const deps = document.createElement("div");
+      deps.className = "q-deps";
+      (q.depends_on || []).forEach((id) => deps.appendChild(depButton(id)));
+      if (deps.childNodes.length) item.appendChild(deps);
+      list.appendChild(item);
+    });
+  }
+  function renderBranches() {
+    const el = document.getElementById("branch");
+    el.innerHTML = "";
+    const ctx = focusContext();
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "focus";
+    btn.textContent = ctx.focus;
+    const here = (graph.branches || []).some(
+      (b) => b.current && b.name === ctx.focus
+    );
+    if (here) btn.classList.add("here");
+    btn.title = here ? "You are here" : "Viewing " + ctx.focus;
+    el.appendChild(btn);
+    const others = Object.values(ctx.forksBy).reduce((n, rows) => n + rows.length, 0);
+    if (others) {
+      const all = [];
+      Object.keys(ctx.forksBy).forEach((id) => {
+        ctx.forksBy[id].forEach((b) => all.push(b));
+      });
+      el.appendChild(forkButton(all, Object.keys(ctx.forksBy)));
+    }
   }
   function render() {
     const all = byId();
-    const branch =
-      ((graph.branches || []).find((b) => b.current) || {}).name || "main";
-    document.getElementById("branch").textContent = branch;
-    // Drop stale trail / selection after data changes.
+    renderBranches();
+    renderQuestions();
     state.trail = (state.trail || []).filter((id) => all[id] && (all[id].children || []).length);
     if (state.selected && !all[state.selected]) state.selected = null;
+    const names = new Set((graph.branches || []).map((b) => b.name));
+    if (state.branch && !names.has(state.branch)) state.branch = null;
     saveState();
     renderCrumbs(all);
     renderList(all);
     renderDetail(all);
+    if (lastNow) renderNow(lastNow);
   }
   function applyData(next) {
     const encoded = JSON.stringify(next || {});
@@ -717,11 +1497,13 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     return true;
   }
   function poll() {
+    if (isDemo()) return;
     const s = document.createElement("script");
     s.src = "data.js?t=" + Date.now();
     s.onload = () => {
       applyData(window.__AGENT_MEMORY_LIVE__);
       setStatus("live · " + new Date().toLocaleTimeString(), true);
+      pollWorking();
       schedule();
     };
     s.onerror = () => {
@@ -729,15 +1511,15 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
       schedule();
     };
     document.head.appendChild(s);
-    // Keep DOM tidy.
     setTimeout(() => s.remove(), 5000);
   }
   function schedule() {
     setTimeout(poll, POLL_MS);
   }
   applyData(graph);
-  setStatus("live", true);
-  schedule();
+  setStatus(isDemo() ? "demo" : "live", true);
+  pollWorking();
+  if (!isDemo()) schedule();
 })();
 </script>
 </body>
@@ -783,9 +1565,13 @@ def write_live_html(
     attach_turn_prompts(payload["nodes"], out_dir)
     payload["root"] = str(Path(memory._path).resolve())
     try:
-        payload["reveal"] = ensure_reveal_server(out_dir)
+        payload["reveal"] = ensure_reveal_server(
+            out_dir, root=Path(memory._path).resolve()
+        )
     except Exception:
         payload["reveal"] = None
+    if payload.get("reveal"):
+        payload["working"] = str(payload["reveal"]).rsplit("/", 1)[0] + "/working"
     encoded = json.dumps(payload, indent=2).replace("</", "<\\/")
     (out_dir / "data.js").write_text(
         f"window.__AGENT_MEMORY_LIVE__ = {encoded};\n",
@@ -804,3 +1590,207 @@ def write_live_html(
             encoding="utf-8",
         )
     return index
+
+
+def demo_payload() -> dict:
+    """Sample graph + Now strip so the live shell can be opened without a store."""
+    def node(
+        nid: str,
+        kind: str,
+        agent: str,
+        title: str,
+        body: str,
+        at: str,
+        *,
+        tip: bool = False,
+        current: bool = False,
+        folded: bool = False,
+        branches: list[str] | None = None,
+        children: list[str] | None = None,
+        color: str = "green",
+    ) -> dict:
+        return {
+            "id": nid,
+            "kind": kind,
+            "agent": agent,
+            "color": color,
+            "title": title,
+            "body": body,
+            "tip": tip,
+            "current": current,
+            "folded": folded,
+            "branches": list(branches or []),
+            "committed_at": at,
+            "children": list(children or []),
+        }
+
+    # main: a1–a5 (polling abandoned). retry forks at a3: b1–b2 (current).
+    a1, a2, a3, a4, a5 = "a1b2c3d4", "b2c3d4e5", "c3d4e5f6", "d4e5f6a7", "e5f6a7b8"
+    b1, b2 = "f6a7b8c9", "a7b8c9d0"
+    c1, c2 = "c9d0e1f2", "d0e1f2a3"
+    f1, f2 = "aabbcc11", "bbccdd22"
+    now = time.time()
+    return {
+        "demo": True,
+        "root": "/Users/demo/project",
+        "nodes": [
+            node(
+                a1, "user", "user",
+                "auth is slow on every login",
+                "auth is slow on every login\n\nWhy is /login taking ~2s?",
+                "2026-08-17T09:00:00+00:00",
+                color="blue",
+            ),
+            node(
+                a2, "step", "agent",
+                "session lookup does a full scan",
+                "Root cause: src/auth/session.py:88 walks every row.\n"
+                "Evidence: EXPLAIN on sessions showed Seq Scan.",
+                "2026-08-17T09:08:00+00:00",
+            ),
+            node(
+                a3, "summary", "agent",
+                "Auth moved to short-lived tokens; login p95 1.9s → 240ms",
+                "Changed: src/auth/session.py, src/auth/tokens.py.\n"
+                "Decided: refresh in a cookie, not localStorage (XSS).",
+                "2026-08-17T09:40:00+00:00",
+                children=[f1, f2],
+                color="orange",
+            ),
+            node(
+                f1, "step", "agent",
+                "added token table + cookie refresh",
+                "src/auth/tokens.py: new Token table, 15m access / 7d refresh.",
+                "2026-08-17T09:22:00+00:00",
+                folded=True,
+            ),
+            node(
+                f2, "step", "agent",
+                "login p95 1.9s → 240ms",
+                "Benchmark: locust 50 users, p95 240ms after the index.",
+                "2026-08-17T09:35:00+00:00",
+                folded=True,
+            ),
+            node(
+                a4, "user", "user",
+                "try the polling retry loop",
+                "Can we just poll until the session row shows up?",
+                "2026-08-17T10:00:00+00:00",
+                color="blue",
+            ),
+            node(
+                a5, "step", "agent",
+                "polling breaks under concurrent writes",
+                "Two logins race; the waiter never sees the commit.\n"
+                "Abandoned — branched away to retry.",
+                "2026-08-17T10:20:00+00:00",
+                tip=True,
+                branches=["main"],
+            ),
+            node(
+                b1, "user", "user",
+                "what do we want most of the time",
+                "what do we want most of the time",
+                "2026-08-17T11:00:00+00:00",
+                color="blue",
+            ),
+            node(
+                b2, "step", "agent",
+                "Most of the time: retrieve, don’t converse.",
+                "Default is memory_find, not a chat with the store.\n"
+                "Now strip + git-style lanes on the live page.",
+                "2026-08-17T11:12:00+00:00",
+                tip=True,
+                current=True,
+                branches=["retry"],
+            ),
+            node(
+                "eef1f2f3", "open_question", "agent",
+                "OPEN: is the retry gate sound?",
+                "Measure memory_find calls per thinker turn before/after.\n"
+                "Rests on the retrieval findings below.",
+                "2026-08-17T11:20:00+00:00",
+                color="green",
+            ),
+            node(
+                c1, "user", "user",
+                "try a vector index instead",
+                "What if we embed sessions and skip the table?",
+                "2026-08-17T10:30:00+00:00",
+                color="blue",
+            ),
+            node(
+                c2, "step", "explore·a1b2c3",
+                "embeddings help find, not the login path",
+                "Login still needs an exact key. Dead end.",
+                "2026-08-17T10:45:00+00:00",
+                tip=True,
+                branches=["explore"],
+                color="purple",
+            ),
+        ],
+        "edges": [
+            {"from": a1, "to": a2, "kind": "parent"},
+            {"from": a2, "to": a3, "kind": "parent"},
+            {"from": a3, "to": a4, "kind": "parent"},
+            {"from": a4, "to": a5, "kind": "parent"},
+            {"from": a3, "to": b1, "kind": "parent"},
+            {"from": b1, "to": b2, "kind": "parent"},
+            {"from": b2, "to": "eef1f2f3", "kind": "parent"},
+            {"from": a3, "to": c1, "kind": "parent"},
+            {"from": c1, "to": c2, "kind": "parent"},
+            {"from": f1, "to": f2, "kind": "parent"},
+            {"from": a3, "to": f1, "kind": "fold"},
+            {"from": f1, "to": f2, "kind": "fold"},
+        ],
+        "branches": [
+            {"name": "main", "tip": a5, "current": False},
+            {"name": "retry", "tip": "eef1f2f3", "current": True},
+            {"name": "explore", "tip": c2, "current": False},
+        ],
+        "agents": [
+            {"name": "agent", "color": "green"},
+            {"name": "user", "color": "blue"},
+            {"name": "explore·a1b2c3", "color": "purple"},
+        ],
+        "now": {
+            "ok": True,
+            "files": [
+                {"path": "agent_memory/live_html.py", "status": "M", "mtime": now - 12},
+                {"path": "agent_memory/live_reveal.py", "status": "M", "mtime": now - 40},
+                {
+                    "path": "agent_memory/tests/test_live_reveal.py",
+                    "status": "A",
+                    "mtime": now - 8,
+                },
+                {"path": "README.md", "status": "M", "mtime": now - 180},
+            ],
+            "total": 4,
+            "vs": "last memory snapshot",
+            "processes": [
+                {
+                    "pid": 66442,
+                    "command": ".venv/bin/python -m pytest agent_memory/tests -q",
+                    "cwd": "/Users/demo/project",
+                    "running_for_ms": 42000,
+                    "started_at": "2026-08-17T11:14:00+00:00",
+                }
+            ],
+            "inspecting": None,
+        },
+    }
+
+
+def write_live_demo(path: str | Path) -> Path:
+    """Write a self-contained demo page (no memory store, no polling)."""
+    encoded = json.dumps(demo_payload(), indent=2).replace("</", "<\\/")
+    html = SHELL_TEMPLATE.replace("__SHELL_VERSION__", SHELL_VERSION)
+    html = html.replace("<title>Memory · live</title>", "<title>Memory · demo</title>")
+    html = html.replace(
+        '<script src="data.js"></script>',
+        f"<script>window.__AGENT_MEMORY_LIVE__ = {encoded};</script>",
+    )
+    target = Path(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(html, encoding="utf-8")
+    return target

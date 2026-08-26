@@ -7,27 +7,42 @@ class TestBranch(MemoryTestCase):
         first = self.save("first")
         self.save("second")
 
-        branch = self.memory.branch(base_id=first, name="different-idea")
+        branch = self.memory.branch(
+            base_id=first, name="different-idea", summary="second was wrong"
+        )
 
         self.assertIsInstance(branch, Memory)
         self.assertEqual(branch._branch_name(), "different-idea")
         self.assertEqual(self.file.read_text(), "first")
         self.assertEqual(branch.find(ids=first)[0].message, "first")
 
+    def test_summary_is_required(self):
+        first = self.save("first")
+        with self.assertRaises(ValueError):
+            self.memory.branch(first, "retry", summary="")
+        with self.assertRaises(TypeError):
+            self.memory.branch(first, "retry")  # type: ignore[misc]
+
     def test_unknown_base_id(self):
         self.save("first")
 
         with self.assertRaises(ValueError):
-            self.memory.branch(base_id="missing", name="bad")
+            self.memory.branch(
+                base_id="missing", name="bad", summary="no such id"
+            )
 
     def test_duplicate_name(self):
         first = self.save("first")
         second = self.save("second")
         self.save("third")
-        self.memory.branch(base_id=first, name="duplicate")
+        self.memory.branch(
+            base_id=first, name="duplicate", summary="left for a retry"
+        )
 
         with self.assertRaises(RuntimeError):
-            self.memory.branch(base_id=second, name="duplicate")
+            self.memory.branch(
+                base_id=second, name="duplicate", summary="name clash"
+            )
 
     def test_summary_caps_the_left_branch(self):
         first = self.save("first")
@@ -64,7 +79,7 @@ class TestBranch(MemoryTestCase):
         with self.assertRaises(RuntimeError):
             self.memory.save("not allowed")
         with self.assertRaises(RuntimeError):
-            self.memory.branch(first, "not-allowed")
+            self.memory.branch(first, "not-allowed", summary="blocked")
 
         branch = self.memory.inspect_done()
 

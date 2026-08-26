@@ -63,6 +63,7 @@ KINDS = {
     "user": {"color": "#6ea8fe", "label": "user"},
     "step": {"color": "#f2f2f2", "label": "step"},
     "delete": {"color": "#f4a6a6", "label": "delete"},
+    "open_question": {"color": "#ff9f43", "label": "open"},
 }
 
 
@@ -118,9 +119,16 @@ def graph_data(memory) -> dict:
         if wanted:
             covers[sha] = wanted
     folded = {step for steps in covers.values() for step in steps}
+    hidden_ids = {
+        row["target_id"]
+        for row in rows.values()
+        if row["kind"] in ("delete", "supersede") and row["target_id"]
+    }
 
     def nearest_visible(sha):
-        while sha in folded:
+        while sha in folded or sha in hidden_ids or (
+            sha in rows and rows[sha]["kind"] == "delete"
+        ):
             if not parents.get(sha):
                 return None
             sha = parents[sha][0]
@@ -129,7 +137,9 @@ def graph_data(memory) -> dict:
     edges = []
     seen = set()
     for sha in rows:
-        if sha in folded:
+        if sha in folded or sha in hidden_ids:
+            continue
+        if rows[sha]["kind"] == "delete":
             continue
         for parent in parents[sha]:
             visible = nearest_visible(parent)
@@ -153,6 +163,8 @@ def graph_data(memory) -> dict:
     agents: dict[str, dict] = {}
     nodes = []
     for sha, row in rows.items():
+        if sha in hidden_ids or row["kind"] == "delete":
+            continue
         payload = json.loads(row["payload"])
         kind = _kind(row, payload)
         agent = _agent_of(payload, kind)
@@ -196,6 +208,9 @@ def graph_data(memory) -> dict:
         }
         if sha in covers:
             node["children"] = covers[sha]
+        if payload.get("open_question") is True:
+            node["kind"] = "open_question"
+            node["depends_on"] = payload.get("depends_on", [])
         nodes.append(node)
 
     return {

@@ -48,8 +48,9 @@ answer if useful progress already exists.
 Use tools for judgment and checkpoints:
 - memory_save — durable mid-turn checkpoint (pass agent)
 - memory_summarize when a chunk of work is finished (keeps Recent short)
+- memory_delete — hide specific noise entries from Recent (pass ids)
 - memory_find to recall detail (query= uses Gemini when configured)
-- memory_branch to leave a dead end; memory_inspect to look at an old snapshot
+- memory_branch after a failing test (label = what went wrong); memory_inspect to look at an old snapshot
 Always call memory_inspect_done before answering if you inspected.
 Prefer facts from MEMORY STATE (always-applied rule) or tool results; do not
 invent entry ids.

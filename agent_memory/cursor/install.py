@@ -57,10 +57,12 @@ can color who said what.
 
 Use **agent-memory** MCP tools for judgment and checkpoints:
 - `memory_save` — durable mid-turn checkpoint (pass `agent`)
-- `memory_summarize` — fold finished work so Recent stays short (pass `agent`)
+- `memory_summarize` — hide finished work so Recent stays short (pass `agent`)
+- `memory_open_questions` — add or close unsolved questions
+- `memory_delete` — hide specific noise entries from Recent (pass `ids`)
 - `memory_find` — recall detail (`query=` uses Gemini when configured)
 - Browser monitor: `.agent_memory/live/index.html` (auto-created; self-refreshing; click an entry for the full prompt packet)
-- `memory_branch` — leave a dead end; restores files to a snapshot
+- `memory_branch` — test failed: rewind to last green; `label` = what went wrong (becomes Avoid)
 - `memory_inspect` / `memory_inspect_done` — look at an old snapshot
 - `memory_state` — agent context only (do not dump graphs/history in chat to “show” memory)
 - `memory_history` — full timeline text (folded steps under summaries)

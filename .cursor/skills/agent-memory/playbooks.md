@@ -188,3 +188,18 @@ memory_summarize(text="<what is now true> — <the headline outcome>\n\n"
 
 If anything is unfinished, put it in `Open:`. That line is the single highest
 value thing you can leave behind for whoever comes next.
+
+## 9. Cleaning pollution
+
+**Trigger:** Recent has noise the user does not want — mistaken saves, tiny
+experiments, entries about a change that was reverted in conversation.
+
+Delete only the ids that are the pollution. Leave the current request and
+unrelated work.
+
+```
+memory_delete(ids=["a1b2c3d4", "e5f6g7h8"])
+```
+
+Tell the user the noise is gone from Recent. Do not summarize those entries
+first — a summary of junk is still junk.
