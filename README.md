@@ -74,6 +74,7 @@ The agent writes the rest.
 | `memory_find` | Open a note (by id, words, or meaning) |
 | `memory_history` | The whole timeline of this line of work |
 | `memory_state` | The same compact view already in the prompt |
+| `memory_check` | Run a test/check; fail latches red until `memory_branch` |
 | `memory_branch` | Leave a dead end — **requires what went wrong**, rewinds files |
 | `memory_inspect` | Peek at an old snapshot — **rewinds the files** |
 | `memory_inspect_done` | Put the files back |
@@ -87,11 +88,13 @@ Everything else only writes to the notebook.
 
 Do not keep going. Rewind.
 
-1. A test fails, or a check does not pass.
-2. The agent must call `memory_branch` back to the last green
-   checkpoint. `label` is required — one sentence of **exactly what
-   went wrong**.
-3. Files restore to that checkpoint. The sentence is stored as a
+1. Route the check through `memory_check`. A nonzero exit
+   persists a red latch.
+2. While red, save / summarize / delete / inspect are rejected.
+   The only escape is `memory_branch`. `label` is required —
+   one sentence of **exactly what went wrong**.
+3. Files restore to the last green checkpoint (the id you pass
+   is ignored while red). The sentence is stored as a
    dead-end autopsy.
 4. Every later turn injects those autopsies:
 
@@ -104,6 +107,11 @@ That is the whole method. No counts, no embeddings, no reconstructed
 capsules. The agent wrote the lesson; the next agent reads it.
 
 `memory_branch` without a `label` is an error.
+
+Agent-memory cannot stop arbitrary Shell or file-edit tools. The
+honest contract is: checks that go through `memory_check` cannot
+quietly continue in memory. Harnesses that mediate edits should
+call `Memory.require_green` before writing.
 
 ```bash
 python -m agent_memory.demo_v1

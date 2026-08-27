@@ -110,6 +110,7 @@ class TestWrapper(MemoryTestCase):
                 "delete",
                 "history",
                 "graph",
+                "check",
                 "branch",
                 "inspect",
                 "inspect_done",
@@ -391,7 +392,7 @@ class TestWrapper(MemoryTestCase):
                 "action": "branch",
                 "id": first,
                 "name": "retry",
-                "label": "dead end",
+                "label": "second was a dead end",
             },
         )
 
@@ -400,7 +401,7 @@ class TestWrapper(MemoryTestCase):
         )
 
         self.assertIn("* ", result)
-        self.assertIn("Summary: dead end", result)
+        self.assertIn("Summary: second was a dead end", result)
         self.assertIn("main", result)
         self.assertIn("HEAD -> retry", result)
         self.assertIn(f"[{first[:8]}] @agent first", result)

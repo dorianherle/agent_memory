@@ -28,6 +28,7 @@ class McpServerTests(MemoryTestCase):
         self.assertIn("memory_summarize", names)
         self.assertIn("memory_delete", names)
         self.assertIn("memory_open_questions", names)
+        self.assertIn("memory_check", names)
         self.assertNotIn("memory_pin", names)
         self.assertIn("memory_history", names)
         self.assertNotIn("memory_write_canvas", names)
@@ -150,14 +151,29 @@ class WriteCanvasTests(MemoryTestCase):
         shell = index.read_text()
         payload = data.read_text()
         self.assertIn("agent-memory-live-shell", shell)
-        self.assertIn('content="13"', shell)
-        self.assertIn("focusBranch", shell)
+        self.assertIn('content="22"', shell)
+        self.assertIn("toggleBranch", shell)
+        self.assertIn("openBranches", shell)
+        self.assertIn("BRANCH", shell)
+        self.assertIn('id="rail"', shell)
+        self.assertIn("branch-tab", shell)
+        self.assertIn("lanePlan", shell)
+        self.assertIn("stub:", shell)
+        self.assertIn('id="prompt"', shell)
+        self.assertIn("Findings so far", shell)
+        self.assertIn('"prompt"', payload)
         self.assertIn("toggleExpand", shell)
         self.assertIn("getUTCSeconds", shell)
         self.assertIn("openInFinder", shell)
         self.assertIn("MCP tool catalog", shell)
         self.assertIn("now-files", shell)
-        self.assertIn("assignLanes", shell)
+        self.assertIn("trow", shell)
+        self.assertIn("depthOf", shell)
+        self.assertIn("stickRight", shell)
+        self.assertIn("stickBottom", shell)
+        self.assertIn("--lane-w", shell)
+        self.assertIn("commit ", shell)
+        self.assertIn("Message", shell)
         self.assertIn("window.__AGENT_MEMORY_LIVE__", payload)
         self.assertIn("first step", payload)
         self.assertIn('"root"', payload)
@@ -183,6 +199,12 @@ class WriteCanvasTests(MemoryTestCase):
         self.assertIn("retry", text)
         self.assertIn("pytest", text)
         self.assertIn("live_html.py", text)
+        self.assertIn("Findings so far", text)
+        self.assertIn("id=\"prompt\"", text)
+        self.assertIn("id=\"rail\"", text)
+        self.assertIn("branch-tab", text)
+        self.assertIn("retry", text)
+        self.assertIn("explore", text)
         self.assertNotIn('src="data.js"', text)
 
     def test_live_html_hides_deleted(self) -> None:
@@ -334,7 +356,8 @@ class HookTests(MemoryTestCase):
         self.assertTrue(rule.exists())
         self.assertIn("why double charge?", rule.read_text())
         self.assertIn("additional_context", out)
-        self.assertIn("why double charge?", out["additional_context"])
+        self.assertIn("alwaysApply rule", out["additional_context"])
+        self.assertNotIn("why double charge?", out["additional_context"])
         self.assertTrue(out.get("continue"))
 
     def test_before_submit_records_full_prompt_packet(self) -> None:
@@ -362,8 +385,9 @@ class HookTests(MemoryTestCase):
         self.assertIn('"rule"', data_js)
         self.assertIn('"mcp_tools"', data_js)
         self.assertIn('"packet"', data_js)
-        self.assertIn("exact goal for live html", out["additional_context"])
-        self.assertIn("MEMORY STATE", out["additional_context"])
+        self.assertIn("alwaysApply rule", out["additional_context"])
+        self.assertNotIn("exact goal for live html", out["additional_context"])
+        self.assertNotIn("## Goal", out["additional_context"])
 
     def test_after_response_auto_saves(self) -> None:
         handle("afterAgentResponse", {"text": "fixed the webhook retry"})
@@ -583,6 +607,7 @@ class SkillTests(MemoryTestCase):
         "memory_find",
         "memory_history",
         "memory_state",
+        "memory_check",
         "memory_branch",
         "memory_inspect",
         "memory_inspect_done",

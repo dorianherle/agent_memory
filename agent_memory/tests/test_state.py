@@ -313,6 +313,26 @@ class StateTests(MemoryTestCase):
         self.assertIsNone(second)
         self.assertIsNotNone(third)
 
+    def test_prompt_payload_keeps_full_bodies(self) -> None:
+        goal = self.memory.save_user(
+            "make login fast\n\nWhy is /login taking ~2s?"
+        )
+        self.memory.save_user("wait also check the cookie path")
+        finding = self.save(
+            "session lookup does a full scan\n\n"
+            "Evidence: src/auth/session.py:88"
+        )
+        self.memory.auto_save("finished the turn")
+        payload = self.memory.prompt_payload()
+        self.assertEqual(payload["goal"]["id"], goal)
+        self.assertIn("Why is /login taking ~2s?", payload["goal"]["text"])
+        self.assertIn("cookie path", payload["steering"]["text"])
+        self.assertEqual([row["id"] for row in payload["findings"]], [finding])
+        self.assertIn("src/auth/session.py:88", payload["findings"][0]["text"])
+        self.assertIn("## Goal", payload["injected"])
+        self.assertNotIn("Why is /login taking ~2s?", payload["injected"])
+        self.assertNotIn("finished the turn", payload["injected"])
+
     def test_render_inspect_banner(self) -> None:
         a = self.save("step a")
         self.save("step b")

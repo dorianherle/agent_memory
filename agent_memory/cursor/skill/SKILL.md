@@ -1,6 +1,6 @@
 ---
 name: agent-memory
-description: Expert operation of the agent-memory MCP tools (memory_save, memory_find, memory_summarize, memory_open_questions, memory_delete, memory_history, memory_state, memory_branch, memory_inspect, memory_inspect_done). Use whenever MEMORY STATE appears in context, at the start of any multi-step or long-running task, when the user refers to earlier work ("continue", "why did we", "like last time", "the thing we decided"), before risky or irreversible edits, when recalling past decisions or dead ends, when folding finished work, when deleting noise from Recent, when coordinating subagents, or when recovering a lost session.
+description: Expert operation of the agent-memory MCP tools (memory_save, memory_find, memory_summarize, memory_open_questions, memory_delete, memory_history, memory_state, memory_check, memory_branch, memory_inspect, memory_inspect_done). Use whenever MEMORY STATE appears in context, at the start of any multi-step or long-running task, when the user refers to earlier work ("continue", "why did we", "like last time", "the thing we decided"), before risky or irreversible edits, when recalling past decisions or dead ends, when folding finished work, when deleting noise from Recent, when coordinating subagents, or when recovering a lost session.
 ---
 
 # Agent Memory
@@ -49,7 +49,11 @@ Already in your context. Do not call `memory_state` to fetch it.
 - Finished work is not in this view. Open it with `memory_history`
   or `memory_find`. A `Summary:` line is one finished chunk.
 - **Avoid** is each `memory_branch` autopsy: what went wrong.
-  A failing test **must** branch back with that sentence.
+  A failing `memory_check` latches red until you branch
+  back with that sentence.
+- `RED` at the top means a check failed. Only `memory_branch`
+  is allowed. Agent-memory cannot stop Shell/Write; route
+  checks through `memory_check`.
 - `INSPECTING [id]` means the working files are **not** current.
   Call `memory_inspect_done` before you do anything else.
 
@@ -68,10 +72,10 @@ Already in your context. Do not call `memory_state` to fetch it.
    current user request.
 8. Keep open questions current. Close them when answered or dropped.
    Do not add one that is already listed.
-9. A failing test or check **must** `memory_branch` to the last
-   green checkpoint. `label` is the whole lesson the next agent
-   gets under Avoid — write it like a good note (below). Do not
-   keep editing on a red run.
+9. Route tests through `memory_check`. A fail latches red: the
+   only write left is `memory_branch` to last green. `label` is
+   the whole lesson the next agent gets under Avoid — write it
+   like a good note (below). Do not keep editing on a red run.
 
 ## The loop
 
@@ -85,7 +89,7 @@ Already in your context. Do not call `memory_state` to fetch it.
 | Open | Still unsolved? | `memory_open_questions` |
 | Summarize | Is a chunk finished? | `memory_summarize` |
 | Clean | Is a headline just noise? | `memory_delete` |
-| Fail | Did a test or check fail? | `memory_branch` to last green + what went wrong |
+| Fail | Did `memory_check` fail? | `memory_branch` to last green + what went wrong |
 
 ## Writing a note
 

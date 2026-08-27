@@ -11,8 +11,8 @@ Reads JSON from stdin (Cursor hook protocol). Event comes from
 
 MEMORY STATE lands in the model prompt via the gitignored alwaysApply rule
 ``.cursor/rules/agent-memory-state.mdc`` (rewritten every durable write).
-Per-turn, beforeSubmitPrompt also mirrors compact MEMORY STATE as
-additional_context (capped for Cursor's inline limit). Live UI is HTML only.
+beforeSubmitPrompt only points at that rule — it does not paste the
+packet again. Live UI is HTML only.
 """
 
 from __future__ import annotations
@@ -50,7 +50,8 @@ Use tools for judgment and checkpoints:
 - memory_summarize when a chunk of work is finished (keeps Recent short)
 - memory_delete — hide specific noise entries from Recent (pass ids)
 - memory_find to recall detail (query= uses Gemini when configured)
-- memory_branch after a failing test (label = what went wrong); memory_inspect to look at an old snapshot
+- memory_check — run pytest / a compile through memory; a fail latches red
+- memory_branch after a red check (label = what went wrong); memory_inspect to look at an old snapshot
 Always call memory_inspect_done before answering if you inspected.
 Prefer facts from MEMORY STATE (always-applied rule) or tool results; do not
 invent entry ids.
@@ -160,17 +161,17 @@ def handle(event: str, data: dict) -> dict:
             _refresh_dashboard(memory)
         else:
             memory.write_state_file()
-        # Cursor inlines additional_context up to 10k chars; over that it
-        # spills to a side file. Full state always lives in the alwaysApply
-        # rule — only mirror it here when it fits.
-        state = memory.render_state()
-        payload = f"MEMORY STATE\n{state}"
+        # One delivery channel: the alwaysApply rule. The hook only
+        # points at it so Avoid / RED never land twice in the prompt.
         rule_rel = ".cursor/rules/agent-memory-state.mdc"
-        if len(payload) > 9000:
-            payload = (
-                "MEMORY STATE (truncated for hook inline cap)\n"
-                f"Full state is in the alwaysApply rule `{rule_rel}`.\n\n"
-                f"{state[:8500]}\n…\n"
+        state = memory.render_state()
+        pointer = (
+            f"MEMORY STATE is in the alwaysApply rule `{rule_rel}`."
+        )
+        latch = memory.latch()
+        if latch and latch.get("status") == "red":
+            pointer = (
+                f"{pointer} A check is red. Only memory_branch is allowed."
             )
         if entry_id and isinstance(prompt, str) and prompt.strip():
             try:
@@ -191,7 +192,7 @@ def handle(event: str, data: dict) -> dict:
                     default_live_dir(memory),
                     entry_id,
                     goal=prompt.strip(),
-                    memory_state=payload,
+                    memory_state=state,
                     instructions=instructions,
                     rule=_memory_rule_text(memory),
                     mcp_tools=mcp_tools_catalog(),
@@ -201,7 +202,7 @@ def handle(event: str, data: dict) -> dict:
                 pass
         return {
             "continue": True,
-            "additional_context": payload,
+            "additional_context": pointer,
         }
 
     if event == "afterAgentResponse":
