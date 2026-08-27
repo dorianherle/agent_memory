@@ -266,6 +266,37 @@ class StateTests(MemoryTestCase):
         self.assertIn(f"[{old[:8]}] [stale]", text)
         self.assertNotIn(f"[{fresh[:8]}] [stale]", text)
 
+    def test_compact_goal_steering_questions_are_never_stale(self) -> None:
+        self.file.write_text("start")
+        goal = self.memory.save_user("the original job")
+        self.file.write_text("nudge")
+        steer = self.memory.save_user("wait also check the cookie")
+        self.file.write_text("ask")
+        question = self.memory.open_question("Why is it still slow?")
+        old = self.save("finding: full table scan")
+        self.save("later finding")
+        text = self.memory.render_state()
+        pinned = text.split("## Recent", 1)[0]
+        self.assertNotIn("[stale]", pinned)
+        self.assertIn(f"[{goal[:8]}] the original job", pinned)
+        self.assertIn(f"[{steer[:8]}] wait also check the cookie", pinned)
+        self.assertIn(f"[{question[:8]}] Why is it still slow?", pinned)
+        self.assertIn(f"[{old[:8]}] [stale]", text.split("## Recent", 1)[1])
+
+    def test_compact_recent_hides_user_and_auto(self) -> None:
+        self.memory.save_user("the original job")
+        mid = self.memory.save_user("a mid-run prompt")
+        self.memory.save_user("wait also the cookie")
+        finding = self.save("finding: full table scan")
+        auto = self.memory.auto_save("finished the turn")
+        text = self.memory.render_state()
+        recent = text.split("## Recent", 1)[1]
+        self.assertIn(f"[{finding[:8]}]", recent)
+        self.assertNotIn(f"[{mid[:8]}]", recent)
+        self.assertNotIn("user:", recent)
+        self.assertNotIn(f"[{auto[:8]}]", recent)
+        self.assertNotIn("finished the turn", recent)
+
     def test_note_only_save_is_not_stale(self) -> None:
         note = self.memory.save("decision: use pytest")
         self.file.write_text("unrelated change")

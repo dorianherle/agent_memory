@@ -45,11 +45,12 @@ mission; steering is the latest nudge; open questions are what
 the agent still has to resolve.
 
 **Open questions** are the unsolved things right now. You can have
-several. Clear one or all with `memory_open_questions`.
+several. Adding the same question twice does nothing. Clear one
+or all with `memory_open_questions`.
 
-**Recent** is the last 10 headlines — the trail of this stretch.
-Finished work leaves this view. The agent opens it with
-`memory_find` or `memory_history`.
+**Recent** is the last 10 work headlines — findings, not every
+user prompt or auto-saved answer. Finished work leaves this view.
+The agent opens it with `memory_find` or `memory_history`.
 
 After a failed test the agent must rewind — see
 [When a test fails](#when-a-test-fails). Those autopsies show up as

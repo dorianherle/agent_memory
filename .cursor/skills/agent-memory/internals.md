@@ -56,13 +56,18 @@ targets. `Memory.find(..., include_historical=True)` can still retrieve them.
   the oldest user entry if none is marked). It is not folded.
 - **Steering** is the latest user note that is not the goal. It is not folded.
 - **Open questions** are all `open_question=True` entries. Each line is
-  `[id] text [dep] [dep]`. They are not folded.
+  `[id] text [dep] [dep]`. They are not folded. The packet keeps the
+  first of any same-text pair (case and spacing ignored). Adding that
+  text again returns the existing id. Closing one closes its twins.
 - **Current branch** is a single `* name (you are here)` line when more than
   one branch exists. Other branch listings stay in `memory_history`.
-- **Recent** is the newest 10 subjects since the last summary. Older Recent
-  lines stay findable; a `(+N earlier)` marker says they exist.
-- `[stale]` on a subject means that entry's own files changed between its
-  commit and HEAD. Note-only (empty) commits are never stale.
+- **Recent** is the newest 10 work subjects since the last summary
+  (user prompts and auto-saved answers are omitted; Goal and Steering
+  already hold the ones that matter). Older Recent lines stay findable;
+  a `(+N earlier)` marker says they exist.
+- `[stale]` on a Recent subject means that entry's own files changed
+  between its commit and HEAD. Goal, Steering, and open questions are
+  never marked stale. Note-only (empty) commits are never stale.
 - `last @agent checkpoint N steps ago` appears when 8+ Recent items have
   passed since the last non-auto, non-user save.
 - Each line is `[8-char id] @agent <prefix><first line of the message>`, where

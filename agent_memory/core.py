@@ -62,9 +62,27 @@ GOAL_KEY = "goal"
 DEAD_END_KEY = "dead_end"
 
 
-def split_open_questions(items: list[MemoryItem]) -> list[MemoryItem]:
-    """Open questions: payload open_question=True, not deleted."""
+def all_open_questions(items: list[MemoryItem]) -> list[MemoryItem]:
+    """Every live open-question entry, including same-text twins."""
     return [item for item in items if item.payload.get(OPEN_QUESTION_KEY) is True]
+
+
+def question_key(text: str) -> str:
+    """Deterministic identity for an open question (case and spacing)."""
+    return " ".join((text or "").split()).casefold()
+
+
+def split_open_questions(items: list[MemoryItem]) -> list[MemoryItem]:
+    """Open questions for the packet: first-wins on the same question_key."""
+    seen: set[str] = set()
+    unique: list[MemoryItem] = []
+    for item in all_open_questions(items):
+        key = question_key(item.message)
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(item)
+    return unique
 
 
 def split_goals(items: list[MemoryItem]) -> list[MemoryItem]:
@@ -627,13 +645,18 @@ class Memory:
             raise RuntimeError(
                 "cannot save while inspecting; call inspect_done first"
             )
-        if not text.strip():
+        text = text.strip()
+        if not text:
             raise ValueError("text required; use close_questions to clear")
+        key = question_key(text)
+        for existing in self.open_questions():
+            if question_key(existing.message) == key:
+                return existing.id
         payload: dict = {OPEN_QUESTION_KEY: True}
         resolved = [self._resolve(item_id) for item_id in depends_on or []]
         if resolved:
             payload["depends_on"] = resolved
-        return self.save(text.strip(), payload, allow_empty=True, agent=agent)
+        return self.save(text, payload, allow_empty=True, agent=agent)
 
     def open_questions(self) -> list[MemoryItem]:
         """Live open questions on this branch."""
@@ -641,12 +664,17 @@ class Memory:
 
     def close_questions(self, ids: list[str] | None = None) -> list[str]:
         """Close listed open questions, or all of them. Returns closed ids."""
-        current = {item.id: item for item in self.open_questions()}
+        raw = all_open_questions(self.state())
+        current = {item.id: item for item in raw}
         if ids:
-            targets = [self._resolve(item_id) for item_id in ids]
-            bad = next((target for target in targets if target not in current), None)
+            chosen = [self._resolve(item_id) for item_id in ids]
+            bad = next((target for target in chosen if target not in current), None)
             if bad:
                 raise ValueError(f"not an open question: {bad[:8]}")
+            keys = {question_key(current[target].message) for target in chosen}
+            targets = [
+                item.id for item in raw if question_key(item.message) in keys
+            ]
         else:
             targets = list(current)
         closed = []
@@ -713,7 +741,7 @@ class Memory:
 
         items = self.state()
         _, recent = split_state(items)
-        hide = {item.id for item in split_open_questions(items)}
+        hide = {item.id for item in all_open_questions(items)}
         recent = [item for item in recent if item.id not in hide]
         sample = list(recent[-RECENT_CAP:])
         goal = _goal(items)

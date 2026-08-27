@@ -1,4 +1,4 @@
-from agent_memory.core import split_open_questions
+from agent_memory.core import OPEN_QUESTION_KEY, all_open_questions, split_open_questions
 from agent_memory.prompt import render
 from agent_memory.tests.helpers import MemoryTestCase
 from agent_memory.tools import call_tool
@@ -27,6 +27,57 @@ class OpenQuestionTests(MemoryTestCase):
         self.assertNotIn(
             "## Open questions", render(self.memory.state(), compact=True)
         )
+
+    def test_same_text_is_noop(self) -> None:
+        first = self.memory.open_question("Why is login still slow?")
+        second = self.memory.open_question("Why is login still slow?")
+        self.assertEqual(first, second)
+        self.assertEqual(
+            [item.id for item in split_open_questions(self.memory.state())],
+            [first],
+        )
+
+    def test_same_text_ignores_case_and_spacing(self) -> None:
+        first = self.memory.open_question("Why is login still slow?")
+        second = self.memory.open_question("  why is   LOGIN still slow? ")
+        self.assertEqual(first, second)
+
+    def test_packet_filters_duplicate_questions(self) -> None:
+        first = self.memory.save(
+            "Why is login still slow?",
+            {OPEN_QUESTION_KEY: True},
+            allow_empty=True,
+        )
+        twin = self.memory.save(
+            "why is login still slow?",
+            {OPEN_QUESTION_KEY: True},
+            allow_empty=True,
+        )
+        state = self.memory.state()
+        self.assertEqual(
+            [item.id for item in split_open_questions(state)], [first]
+        )
+        self.assertEqual(
+            [item.id for item in all_open_questions(state)], [first, twin]
+        )
+        text = render(state, compact=True)
+        questions = text.split("## Open questions", 1)[1].split("## Recent", 1)[0]
+        self.assertIn(first[:8], questions)
+        self.assertNotIn(twin[:8], questions)
+        self.assertNotIn(twin[:8], text.split("## Recent", 1)[1])
+
+    def test_close_one_closes_same_text_twins(self) -> None:
+        first = self.memory.save(
+            "Why slow?", {OPEN_QUESTION_KEY: True}, allow_empty=True
+        )
+        self.memory.save(
+            "why slow?", {OPEN_QUESTION_KEY: True}, allow_empty=True
+        )
+        other = self.memory.open_question("Different question")
+        self.memory.close_questions([first])
+        left = split_open_questions(self.memory.state())
+        self.assertEqual([item.id for item in left], [other])
+        self.assertEqual(all_open_questions(self.memory.state()), left)
 
     def test_can_have_several(self) -> None:
         first = self.memory.open_question("Is the retry gate sound?")
@@ -91,7 +142,14 @@ class OpenQuestionTests(MemoryTestCase):
             },
         )
         self.assertIn("Open question [", result)
+        self.assertIn("added", result)
         self.assertIn(f"[{evidence[:8]}]", result)
+        again = call_tool(
+            self.memory,
+            "memory",
+            {"action": "open_questions", "text": "Why slow?"},
+        )
+        self.assertIn("already open", again)
         self.assertIn(
             "## Open questions", render(self.memory.state(), compact=True)
         )

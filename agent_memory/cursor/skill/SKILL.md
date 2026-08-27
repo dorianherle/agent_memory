@@ -39,9 +39,11 @@ Already in your context. Do not call `memory_state` to fetch it.
 - **Open questions** are unsolved things. A trailing `[id]` is an
   older note the question stands on (here, the finding in Recent).
   Find those ids before you cite or extend them. Close when answered.
+  Do not add a question that is already listed.
 - `[8-char id]` is real. Use only ids you can see. Never invent one.
-- `[stale]` means that note's files have changed since it was saved.
-  Check the files before you treat it as current.
+- `[stale]` on a Recent line means that note's files have changed
+  since it was saved. Check the files before you treat it as current.
+  Goal, Steering, and open questions are never marked stale.
 - Only the first line of a note appears here, cut at 100 characters.
   Write line 1 like a commit subject. `…` means there is more.
 - Finished work is not in this view. Open it with `memory_history`
@@ -65,6 +67,7 @@ Already in your context. Do not call `memory_state` to fetch it.
 7. Hide noise with `memory_delete`. Do not delete findings or the
    current user request.
 8. Keep open questions current. Close them when answered or dropped.
+   Do not add one that is already listed.
 9. A failing test or check **must** `memory_branch` to the last
    green checkpoint. `label` is the whole lesson the next agent
    gets under Avoid — write it like a good note (below). Do not

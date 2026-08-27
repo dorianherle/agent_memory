@@ -24,7 +24,8 @@ MEMORY_TOOL = {
             "is finished so Recent is folded behind this text (still "
             "retrievable with find).\n"
             "- open_questions: add an unsolved question (and the notes "
-            "it stands on). Empty text closes all, or the ids you pass.\n"
+            "it stands on). Same text already open is a no-op. Empty "
+            "text closes all, or the ids you pass.\n"
             "- find: read stored entries, including steps folded behind "
             "a summary. An explicit id is found even on another branch.\n"
             "- delete: hide specific entries from Recent, find, and the "
@@ -241,11 +242,14 @@ def _run_action(memory: Memory, arguments: dict) -> str:
                 return "No open questions."
             shown = " ".join(f"[{item_id[:8]}]" for item_id in closed)
             return f"Closed {shown}."
+        before = {item.id for item in memory.open_questions()}
         item_id = memory.open_question(
             arguments["text"],
             depends_on=arguments.get("ids"),
             agent=arguments.get("agent"),
         )
+        if item_id in before:
+            return f"Open question [{item_id[:8]}] already open."
         deps = "".join(f" [{d[:8]}]" for d in (arguments.get("ids") or []))
         return f"Open question [{item_id[:8]}] added.{deps}"
     if action == "graph":

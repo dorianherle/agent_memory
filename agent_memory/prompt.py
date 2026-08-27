@@ -3,6 +3,7 @@ import re
 from agent_memory.core import (
     MemoryItem,
     split_goals,
+    all_open_questions,
     split_open_questions,
     split_state,
 )
@@ -37,10 +38,13 @@ MEMORY STATE
 - Goal: the original job (not later user notes).
 - Steering: the latest user course-correct, if any.
 - Open questions: unsolved things, each `[id] text [dep] [dep]`.
+  Same text already open is a no-op.
 - Avoid: autopsies from memory_branch. A test failure must
   branch back with a one-line what-went-wrong; that line lands here.
-- Recent: the newest 10 headlines since the last summary. A
-  [stale] tag means that entry's files have changed since it was saved.
+- Recent: the newest 10 work headlines since the last summary
+  (not user prompts or auto-saved answers). A [stale] tag on a
+  Recent line means that entry's files have changed since it was
+  saved. Goal, Steering, and open questions are never [stale].
   Finished work lives in history — call find/history for it.
 - Injected state is headlines only — call find/history for detail.
 - Every entry starts with an id like [1a2b3c4d]. Use only ids you can
@@ -50,7 +54,8 @@ WHEN TO CALL memory
 Pick action on the single memory tool:
 - save after every meaningful step, or its result is lost.
 - open_questions to add an unsolved question (plus the notes it
-  stands on). Empty text closes all, or the ids you pass.
+  stands on). Same text already listed is a no-op. Empty text
+  closes all, or the ids you pass.
 - save with summary set to true as soon as a piece of work is finished,
   so Recent stays short.
 - delete to hide specific noise entries from Recent. Pass ids from
@@ -237,21 +242,27 @@ def render(
     lines = []
     if compact:
         questions = split_open_questions(items)
-        hide = {item.id for item in questions}
+        hide = {item.id for item in all_open_questions(items)}
         goal = _goal(items)
         steer = _steering(items, goal)
         recent = [item for item in recent if item.id not in hide]
         steps = recent
+        pinned = {item.id for item in (goal, steer) if item}
+        recent = [
+            item
+            for item in recent
+            if item.id not in pinned
+            and not item.payload.get("user")
+            and not item.payload.get("auto")
+        ]
         if goal:
             lines.append("## Goal")
-            lines.append(_entry_line(goal, stale_ids))
+            lines.append(_entry_line(goal, set()))
             lines.append("")
-            recent = [item for item in recent if item.id != goal.id]
         if steer:
             lines.append("## Steering")
-            lines.append(_entry_line(steer, stale_ids))
+            lines.append(_entry_line(steer, set()))
             lines.append("")
-            recent = [item for item in recent if item.id != steer.id]
         if questions:
             lines.append("## Open questions")
             for question in questions:
@@ -259,7 +270,7 @@ def render(
                     f" {_id8(item_id)}"
                     for item_id in question.payload.get("depends_on", [])
                 )
-                lines.append(_entry_line(question, stale_ids, deps))
+                lines.append(_entry_line(question, set(), deps))
             lines.append("")
         for key, title in (
             ("avoid", "## Avoid / Previous failed paths"),
@@ -308,7 +319,7 @@ def render(
         age = _checkpoint_age(steps)
         if age is not None and age >= CHECKPOINT_NUDGE_AFTER:
             lines.append(f"last @agent checkpoint {age} steps ago")
-        if len(steps) > nudge_after:
+        if len(recent) > nudge_after:
             lines.append("")
             lines.append(
                 f"Recent has {len(recent)} steps. "

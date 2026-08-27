@@ -146,7 +146,8 @@ def _build_server():
         """Add or close open questions.
 
         With text: add a question (depends_on = notes it stands on).
-        You can have several. Empty text closes all, or only ``ids``.
+        Same text already open is a no-op. You can have several.
+        Empty text closes all, or only ``ids``.
         """
         memory = get_memory()
         result = call_tool(
