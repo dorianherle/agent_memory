@@ -65,7 +65,15 @@
   input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
     border-color: var(--accent);
   }
-  #project { flex: 1; min-width: 140px; }
+  #folder {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font: 13px/1.4 ui-sans-serif, system-ui, sans-serif;
+    color: var(--muted);
+  }
   #key { width: 200px; }
   button {
     border: 0;
@@ -219,9 +227,9 @@
   <header>
     <h1>Memory</h1>
     <form id="open">
-      <input id="project" type="text" placeholder="Open a project path" spellcheck="false">
+      <button type="button" id="pick">Open folder</button>
+      <span id="folder">No folder</span>
       <input id="key" type="password" placeholder="Cursor API key" autocomplete="off">
-      <button type="submit">Open</button>
     </form>
     <div id="status">Closed</div>
   </header>
@@ -295,12 +303,21 @@ function addMessage(role, text) {
   return node.querySelector(".body");
 }
 
-$("open").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const res = await fetch("/api/open", {
+function applyOpen(data) {
+  $("folder").textContent = data.name || data.project.split("/").pop() || data.project;
+  $("folder").title = data.project;
+  $("status").textContent = data.ready ? "Memory ready" : (data.hint || "Opened");
+  $("status").className = data.ready ? "ready" : "";
+  localStorage.setItem("studio-project", data.project);
+  if ($("key").value) localStorage.setItem("studio-key", $("key").value);
+  refreshMemory();
+}
+
+async function openProject(url, extra) {
+  const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ project: $("project").value, api_key: $("key").value }),
+    body: JSON.stringify({ api_key: $("key").value, ...extra }),
   });
   const data = await res.json();
   if (!res.ok) {
@@ -308,13 +325,10 @@ $("open").addEventListener("submit", async (event) => {
     $("status").className = "";
     return;
   }
-  $("project").value = data.project;
-  $("status").textContent = data.ready ? "Memory ready" : (data.hint || "Opened");
-  $("status").className = data.ready ? "ready" : "";
-  localStorage.setItem("studio-project", data.project);
-  if ($("key").value) localStorage.setItem("studio-key", $("key").value);
-  refreshMemory();
-});
+  applyOpen(data);
+}
+
+$("pick").addEventListener("click", () => openProject("/api/pick", {}));
 
 $("ask").addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -374,10 +388,10 @@ $("question").addEventListener("keydown", (event) => {
   }
 });
 
-$("project").value = localStorage.getItem("studio-project") || "";
 $("key").value = localStorage.getItem("studio-key") || "";
-if ($("project").value) $("open").requestSubmit();
-setInterval(() => { if ($("project").value) refreshMemory(); }, 4000);
+const last = localStorage.getItem("studio-project") || "";
+if (last) openProject("/api/open", { project: last });
+setInterval(() => { if ($("folder").title) refreshMemory(); }, 4000);
 </script>
 </body>
 </html>

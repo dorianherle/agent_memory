@@ -48,6 +48,8 @@ class StudioTests(MemoryTestCase):
         conn.close()
         self.assertEqual(response.status, 200)
         self.assertIn("One window", html)
+        self.assertIn("Open folder", html)
+        self.assertNotIn("Open a project path", html)
         self.assertIn("Goal", html)
 
         status, data = self._json("GET", "/api/memory")
@@ -68,3 +70,10 @@ class StudioTests(MemoryTestCase):
         self.assertEqual(status, 200)
         self.assertIn("Goal", data["packet"])
         self.assertNotIn("Steering", data["packet"])
+
+        from unittest.mock import patch
+
+        with patch("agent_memory.studio.pick_folder", return_value=str(self.path)):
+            status, data = self._json("POST", "/api/pick", {"api_key": "cursor_test"})
+        self.assertEqual(status, 200)
+        self.assertEqual(data["name"], self.path.name)

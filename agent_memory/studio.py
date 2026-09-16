@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
+import sys
 import threading
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -68,6 +70,46 @@ def memory_view(root: str) -> dict:
             }
             for row in graph.get("branches") or []
         ],
+    }
+
+
+def pick_folder() -> str | None:
+    if sys.platform == "darwin":
+        try:
+            out = subprocess.check_output(
+                [
+                    "osascript",
+                    "-e",
+                    'POSIX path of (choose folder with prompt "Open a project")',
+                ],
+                text=True,
+                stderr=subprocess.DEVNULL,
+            )
+        except subprocess.CalledProcessError:
+            return None
+        return out.strip().rstrip("/")
+    from tkinter import Tk, filedialog
+
+    root = Tk()
+    root.withdraw()
+    root.attributes("-topmost", True)
+    path = filedialog.askdirectory(title="Open a project")
+    root.destroy()
+    return path or None
+
+
+def _open_root(root: Path, key: str, model: str) -> dict:
+    with LOCK:
+        _close_agent()
+        SESSION["project"] = str(root)
+        SESSION["api_key"] = key or ""
+        SESSION["model"] = model
+    ready = (root / ".cursor" / "mcp.json").exists()
+    return {
+        "project": str(root),
+        "name": root.name,
+        "ready": ready,
+        "hint": None if ready else "Run: agent-memory cursor install --skip-gemini",
     }
 
 
@@ -201,22 +243,17 @@ class Handler(BaseHTTPRequestHandler):
             root = Path(project).resolve() if project else None
             if root is None or not root.is_dir():
                 return self._json(400, {"error": "That path is not a folder."})
-            with LOCK:
-                _close_agent()
-                SESSION["project"] = str(root)
-                SESSION["api_key"] = key or ""
-                SESSION["model"] = model
-            ready = (root / ".cursor" / "mcp.json").exists()
-            return self._json(
-                200,
-                {
-                    "project": str(root),
-                    "ready": ready,
-                    "hint": None
-                    if ready
-                    else 'Run: agent-memory cursor install --skip-gemini',
-                },
-            )
+            return self._json(200, _open_root(root, key or "", model))
+        if path == "/api/pick":
+            key = str(data.get("api_key") or "").strip() or SESSION.get("api_key")
+            model = str(data.get("model") or SESSION.get("model") or "composer-2.5")
+            picked = pick_folder()
+            if not picked:
+                return self._json(400, {"error": "Cancelled."})
+            root = Path(picked).expanduser().resolve()
+            if not root.is_dir():
+                return self._json(400, {"error": "That path is not a folder."})
+            return self._json(200, _open_root(root, key or "", model))
         if path == "/api/ask":
             question = str(data.get("question") or "").strip()
             if not question:
