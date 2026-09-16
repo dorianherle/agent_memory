@@ -239,10 +239,17 @@ class Handler(BaseHTTPRequestHandler):
         self.send_error(404)
 
 
-def serve(host: str = "127.0.0.1", port: int = 8765, *, open_browser: bool = True) -> None:
-    server = ThreadingHTTPServer((host, port), Handler)
-    url = f"http://{host}:{port}"
-    print(f"Studio {url}")
+def serve(host: str = "127.0.0.1", port: int = 8788, *, open_browser: bool = True) -> None:
+    try:
+        server = ThreadingHTTPServer((host, port), Handler)
+    except OSError:
+        if port == 0:
+            raise
+        server = ThreadingHTTPServer((host, 0), Handler)
+        print(f"Port {port} in use; using {server.server_address[1]}", flush=True)
+    bound = server.server_address[1]
+    url = f"http://{host}:{bound}"
+    print(f"Studio {url}", flush=True)
     if open_browser:
         webbrowser.open(url)
     try:
@@ -260,7 +267,7 @@ def main(argv: list[str] | None = None) -> None:
 
     parser = argparse.ArgumentParser(prog="agent-memory studio")
     parser.add_argument("--host", default="127.0.0.1")
-    parser.add_argument("--port", type=int, default=8765)
+    parser.add_argument("--port", type=int, default=8788)
     parser.add_argument("--no-browser", action="store_true")
     args = parser.parse_args(argv)
     serve(args.host, args.port, open_browser=not args.no_browser)

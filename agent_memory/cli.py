@@ -56,7 +56,7 @@ def main(argv: list[str] | None = None) -> None:
         help="Local Cursor SDK chat: fresh agent per question, memory on the side",
     )
     studio.add_argument("--host", default="127.0.0.1")
-    studio.add_argument("--port", type=int, default=8765)
+    studio.add_argument("--port", type=int, default=8788)
     studio.add_argument("--no-browser", action="store_true")
 
     args = parser.parse_args(argv)
