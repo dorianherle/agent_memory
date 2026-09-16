@@ -23,7 +23,7 @@ class McpServerTests(MemoryTestCase):
         except SystemExit as error:
             self.skipTest(str(error))
         names = set(server._tool_manager._tools)
-        self.assertIn("memory_state", names)
+        self.assertNotIn("memory_state", names)
         self.assertIn("memory_save", names)
         self.assertIn("memory_summarize", names)
         self.assertIn("memory_delete", names)
@@ -324,7 +324,7 @@ class AutoSaveTests(MemoryTestCase):
         self.assertTrue(path.exists())
         content = path.read_text()
         self.assertIn("note", content)
-        self.assertIn("Recent", content)
+        self.assertIn("Handoff", content)
         rule = self.path / ".cursor" / "rules" / "agent-memory-state.mdc"
         self.assertTrue(rule.exists())
         rule_text = rule.read_text()

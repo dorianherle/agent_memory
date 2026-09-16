@@ -324,13 +324,69 @@ class StateTests(MemoryTestCase):
         self.memory.auto_save("finished the turn")
         payload = self.memory.prompt_payload()
         self.assertEqual(payload["goal"]["id"], goal)
-        self.assertIn("Why is /login taking ~2s?", payload["goal"]["text"])
+        self.assertEqual(payload["goal"]["text"], "make login fast")
         self.assertIn("cookie path", payload["steering"]["text"])
         self.assertEqual([row["id"] for row in payload["findings"]], [finding])
         self.assertIn("src/auth/session.py:88", payload["findings"][0]["text"])
         self.assertIn("## Goal", payload["injected"])
         self.assertNotIn("Why is /login taking ~2s?", payload["injected"])
         self.assertNotIn("finished the turn", payload["injected"])
+
+    def test_packet_keeps_goal_drops_steering(self) -> None:
+        goal = self.memory.save_user("make login fast")
+        self.save("session lookup does a full scan")
+        self.memory.save_user("wait also check the cookie path")
+        text = self.memory.render_packet("what is the login timeout")
+        self.assertIn("## Goal", text)
+        self.assertIn(goal[:8], text)
+        self.assertIn("make login fast", text)
+        self.assertNotIn("## Steering", text)
+        self.assertNotIn("## Recent", text)
+        self.assertIn("## Handoff", text)
+        self.assertIn("session lookup does a full scan", text)
+
+    def test_packet_related_follows_the_question(self) -> None:
+        self.memory.save_user("original job")
+        auth = self.save("Authentication now uses a timeout of 30 seconds.")
+        invoice = self.save("Invoice export writes a CSV of paid bills.")
+        auth_text = self.memory.render_packet("authentication timeout")
+        invoice_text = self.memory.render_packet("invoice export csv")
+        self.assertIn(auth[:8], auth_text)
+        self.assertNotIn(invoice[:8], auth_text.split("## Related", 1)[-1] if "## Related" in auth_text else "")
+        self.assertIn(invoice[:8], invoice_text)
+        self.assertIn("## Goal", auth_text)
+        self.assertIn("original job", auth_text)
+
+    def test_packet_goal_survives_a_new_question(self) -> None:
+        goal = self.memory.save_user("make login fast")
+        self.save("found the n-plus-one query")
+        first = self.memory.render_packet("why is login slow")
+        self.memory.save_user("also look at invoices")
+        second = self.memory.render_packet("also look at invoices")
+        self.assertIn(f"[{goal[:8]}]", first)
+        self.assertIn(f"[{goal[:8]}]", second)
+        self.assertIn("make login fast", second)
+        self.assertNotIn("## Steering", second)
+
+    def test_save_user_and_auto_save_keep_subject_only(self) -> None:
+        self.file.write_text("changed")
+        user = self.memory.save_user(
+            "make login fast\n\nWhy is /login taking ~2s?"
+        )
+        auto = self.memory.auto_save(
+            "Auth timeout is 30s\nWhy: measured in src/auth.py:88"
+        )
+        self.assertEqual(
+            self.memory.find(ids=user)[0].message, "make login fast"
+        )
+        self.assertEqual(
+            self.memory.find(ids=auto)[0].message, "Auth timeout is 30s"
+        )
+        shown = self.memory._run("ls-tree", "-r", "--name-only", auto)
+        self.assertIn("work.txt", shown)
+        self.assertEqual(
+            self.memory._run("show", f"{auto}:work.txt"), "changed"
+        )
 
     def test_render_inspect_banner(self) -> None:
         a = self.save("step a")

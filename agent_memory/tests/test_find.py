@@ -129,7 +129,7 @@ class TestFind(MemoryTestCase):
         self.assertEqual(scoped, "Nothing found.")
         self.assertIn("Fixed matrix", wide)
 
-    def test_query_without_provider_announces_substring_fallback(self):
+    def test_query_without_provider_uses_fts(self):
         from agent_memory import call_tool
         from agent_memory.prompt import SUBSTRING_FALLBACK
 
@@ -140,7 +140,15 @@ class TestFind(MemoryTestCase):
                 {"action": "find", "query": "matrix"},
             )
         self.assertIn("Created matrix", result)
-        self.assertIn(SUBSTRING_FALLBACK, result)
+        self.assertNotIn(SUBSTRING_FALLBACK, result)
+
+    def test_query_fts_matches_any_word(self):
+        self.save("Authentication now uses a timeout of 30 seconds.")
+        with patch.dict(os.environ, {"AGENT_MEMORY_PROVIDER": ""}, clear=False):
+            found = self.memory.find(query="authentication timeout")
+        self.assertTrue(
+            any("timeout of 30 seconds" in item.message for item in found)
+        )
 
     def test_search_returns_headlines_not_bodies(self):
         from agent_memory import call_tool
@@ -209,7 +217,8 @@ class TestFind(MemoryTestCase):
             "memory",
             {"action": "find", "ids": [item_id[:8]]},
         )
-        self.assertIn("src/auth.py:88", result)
+        self.assertIn("Auth timeout is 30s", result)
+        self.assertNotIn("src/auth.py:88", result)
 
     def test_find_caps_long_bodies(self):
         from agent_memory import call_tool

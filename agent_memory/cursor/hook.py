@@ -139,7 +139,9 @@ def handle(event: str, data: dict) -> dict:
         # One delivery channel: the alwaysApply rule. The hook only
         # points at it so memory state is delivered once.
         rule_rel = ".cursor/rules/agent-memory-state.mdc"
-        state = memory.render_state()
+        state = memory.render_packet(
+            prompt.strip() if isinstance(prompt, str) else None
+        )
         pointer = (
             f"MEMORY STATE is in the alwaysApply rule `{rule_rel}`."
         )

@@ -37,13 +37,6 @@ def _build_server():
     mcp = _mcp_server("agent-memory")
 
     @mcp.tool()
-    def memory_state() -> str:
-        """Compact MEMORY STATE. Already injected each turn; SDK-only."""
-        memory = get_memory()
-        memory.write_state_file()
-        return memory.render_state()
-
-    @mcp.tool()
     def memory_find(
         query: str | None = None,
         text: str | None = None,

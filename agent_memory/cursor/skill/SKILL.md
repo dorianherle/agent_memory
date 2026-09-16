@@ -12,9 +12,9 @@ Hooks save user prompts and finished answers. Save useful mid-turn findings your
 
 ## Read the state
 
-MEMORY STATE contains Goal, latest Steering, Open questions, and the newest
-8 work headlines. Read it before searching. Use `memory_state` only when state
-is unavailable or you have changed branches.
+MEMORY STATE contains Goal, the last Handoff, Open questions, and up to
+3 Related headlines for this question. Read it before searching. Use
+`memory_state` only when state is unavailable or you have changed branches.
 
 Use visible note IDs. Retrieve details before relying on a headline. A `[stale]`
 marker means the note's files changed; inspect the current files. Saved claims

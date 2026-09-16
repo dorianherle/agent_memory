@@ -25,6 +25,13 @@ FIELD_SEPARATOR = "\x00"
 RECORD_SEPARATOR = "\x02"
 GENERATED_STATE_FILES = (".cursor/MEMORY_STATE.md", ".cursor/rules/agent-memory-state.mdc")
 
+
+def _first_line(text: str, max_len: int) -> str:
+    head = (text or "").strip().split("\n", 1)[0].strip()
+    if len(head) > max_len:
+        head = head[: max_len - 1].rstrip() + "…"
+    return head
+
 # Never snapshot VCS metadata into the memory store. The host project's
 # `.git/` and any nested clone would otherwise be picked up by `git add -A`
 # (agent-memory uses its own `--git-dir`, so those look like normal folders).
@@ -458,28 +465,34 @@ class Memory:
                 items = [self._row_item(row, score) for row, score in ranked]
             except Exception:
                 # Embedding stack optional; missing API key / provider errors
-                # fall back to substring (matches memory_find docstring).
+                # fall back to local FTS.
                 use_semantic = False
-                self._find_used_substring = True
+                self._find_used_substring = False
         if not use_semantic:
             if query is not None:
-                # No provider / no embedding deps: substring fallback.
-                self._find_used_substring = True
-                if text:
-                    text = f"{text} {query}"
-                else:
-                    text = query
-            rows = self._catalog.select(
-                branch=branch_name,
-                ids=wanted,
-                text=text,
-                payload=payload,
-                since=since,
-                until=until,
-                include_historical=include_historical,
-                limit=k,
-            )
-            items = [self._row_item(row) for row in rows]
+                items = self._fts_items(
+                    query,
+                    branch=branch_name,
+                    ids=wanted,
+                    text=text,
+                    payload=payload,
+                    since=since,
+                    until=until,
+                    include_historical=include_historical,
+                    k=k,
+                )
+            else:
+                rows = self._catalog.select(
+                    branch=branch_name,
+                    ids=wanted,
+                    text=text,
+                    payload=payload,
+                    since=since,
+                    until=until,
+                    include_historical=include_historical,
+                    limit=k,
+                )
+                items = [self._row_item(row) for row in rows]
             if dedupe:
                 seen = set()
                 items = [
@@ -498,6 +511,45 @@ class Memory:
                 used += tokens
             items = selected
         return items
+
+    def _fts_items(
+        self,
+        query: str,
+        *,
+        branch: str | None,
+        ids: list[str] | None,
+        text: str | None,
+        payload: dict | None,
+        since: datetime | None,
+        until: datetime | None,
+        include_historical: bool,
+        k: int,
+    ) -> list[MemoryItem]:
+        hits = self._catalog.fts(query, max(k * 4, 16))
+        if not hits:
+            return []
+        ordered = [memory_id for memory_id, _score in hits]
+        if ids is not None:
+            wanted = set(ids)
+            ordered = [memory_id for memory_id in ordered if memory_id in wanted]
+        if not ordered:
+            return []
+        rows = self._catalog.select(
+            branch=branch,
+            ids=ordered,
+            text=text,
+            payload=payload,
+            since=since,
+            until=until,
+            include_historical=include_historical,
+            limit=None,
+        )
+        by_id = {row["id"]: row for row in rows}
+        return [
+            self._row_item(by_id[memory_id])
+            for memory_id in ordered
+            if memory_id in by_id
+        ][:k]
 
     def state(self) -> list[MemoryItem]:
         self._sync_catalog()
@@ -592,6 +644,11 @@ class Memory:
 
         if self.inspecting() is not None:
             return None
+        from agent_memory.prompt import SUBJECT_MAX
+
+        text = _first_line(text, SUBJECT_MAX)
+        if not text:
+            return None
         latest = self.find(payload={"user": True}, k=1)
         if latest and latest[0].message == text:
             return None
@@ -617,7 +674,9 @@ class Memory:
         """
         from agent_memory.identity import DEFAULT_AGENT, resolve_agent
 
-        text = (text or "").strip()
+        from agent_memory.prompt import SUBJECT_MAX
+
+        text = _first_line(text, SUBJECT_MAX)
         if not text or self.inspecting() is not None:
             return None
         who = resolve_agent(agent)
@@ -764,13 +823,54 @@ class Memory:
         return payload
 
     def render_state(self) -> str:
-        """Compact MEMORY STATE for prompt injection.
-
-        Goal, steering, open questions, newest Recent subjects.
-        """
+        """Compact MEMORY STATE for SDK / tests (Goal, Steering, Recent)."""
         return self.prompt_payload()["injected"]
 
-    def write_state_rule(self, path: str | Path | None = None) -> Path:
+    def related_notes(self, question: str, *, k: int | None = None) -> list:
+        """Work notes matching the question via FTS. Skips transcript and Goal."""
+        from agent_memory.prompt import (
+            RELATED_CAP,
+            _goal,
+            _handoff,
+            _transcript,
+        )
+
+        question = (question or "").strip()
+        if not question:
+            return []
+        cap = RELATED_CAP if k is None else k
+        items = self.find(query=question, k=max(cap * 3, 8), branch="current")
+        state = self.state()
+        skip = {item.id for item in (_goal(state), _handoff(state)) if item}
+        related = []
+        for item in items:
+            if item.id in skip or _transcript(item):
+                continue
+            related.append(item)
+            if len(related) >= cap:
+                break
+        return related
+
+    def render_packet(self, question: str | None = None) -> str:
+        """Goal / Handoff / questions / Related for this question."""
+        from agent_memory.prompt import _latest_user_text, render_packet
+
+        items = self.state()
+        query = (question or "").strip() or _latest_user_text(items)
+        related = self.related_notes(query) if query else []
+        return render_packet(
+            items,
+            related,
+            self.branches(),
+            self.inspecting(),
+        )
+
+    def write_state_rule(
+        self,
+        path: str | Path | None = None,
+        *,
+        packet: str | None = None,
+    ) -> Path:
         """Write MEMORY STATE into an alwaysApply Cursor rule.
 
         Cursor reloads always-apply rules each turn. Embedding live state
@@ -789,7 +889,7 @@ class Memory:
             "alwaysApply: true\n"
             "---\n\n"
             "# MEMORY STATE\n\n"
-            f"```\n{self.render_state()}\n```\n"
+            f"```\n{packet if packet is not None else self.render_packet()}\n```\n"
         )
         target.write_text(body)
         return target
@@ -798,12 +898,13 @@ class Memory:
         """Write MEMORY STATE markdown + alwaysApply rule for prompt injection."""
         target = Path(path) if path else self._path / ".cursor" / "MEMORY_STATE.md"
         target.parent.mkdir(parents=True, exist_ok=True)
+        packet = self.render_packet()
         body = (
             "# MEMORY STATE\n\n"
-            f"```\n{self.render_state()}\n```\n"
+            f"```\n{packet}\n```\n"
         )
         target.write_text(body)
-        self.write_state_rule()
+        self.write_state_rule(packet=packet)
         return target
 
     @property
@@ -834,7 +935,7 @@ class Memory:
         from agent_memory.prompt import MEMORY_INSTRUCTIONS
 
         self.save_user(prompt)
-        state_text = self.render_state()
+        state_text = self.render_packet(prompt)
         content = "\n\n".join(
             [
                 prompt.strip(),

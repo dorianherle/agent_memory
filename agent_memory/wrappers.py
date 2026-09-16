@@ -119,7 +119,7 @@ class MemoryEnhancedOpenAI:
                 if isinstance(message.get("content"), str):
                     self.memory.save_user(message["content"])
                 break
-        state_text = self.memory.render_state()
+        state_text = self.memory.render_packet()
         messages = [
             {"role": "system", "content": MEMORY_INSTRUCTIONS},
             {
@@ -158,7 +158,7 @@ class MemoryEnhancedOpenAI:
 
     def _refresh_state(self, messages):
         # Own slot, replaced before every request; never accumulate packets.
-        messages[1] = {"role": "system", "content": f"MEMORY STATE\n{self.memory.render_state()}"}
+        messages[1] = {"role": "system", "content": f"MEMORY STATE\n{self.memory.render_packet()}"}
 
     def _stream(self, messages, tools, kwargs):
         while True:

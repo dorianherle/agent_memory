@@ -15,6 +15,8 @@ FIND_DEFAULT_K = 8
 FIND_BODY_MAX = 800
 FIND_CHILD_CAP = 6
 HISTORY_CAP = 16
+RELATED_CAP = 3
+RELATED_FTS = 8
 SUBSTRING_FALLBACK = "(substring fallback — set GEMINI_API_KEY)"
 _NARRATION = re.compile(
     r"^(i\s+)?("
@@ -32,7 +34,7 @@ MEMORY_INSTRUCTIONS = """
 You work without chat history. Each turn you only see MEMORY STATE and
 the last tool result. Unsaved work is gone next turn. Use function calling.
 
-State: Goal, Steering, open questions, Recent headlines. Use only ids
+State: Goal, Handoff, open questions, Related headlines. Use only ids
 you can see. [stale] means that note's files changed.
 
 memory actions: save (summary=true to fold Recent); find (ids= for
@@ -260,6 +262,69 @@ def render_timeline(items: list[MemoryItem], *, full: bool = False) -> str:
                 if child is not None:
                     lines.append(f"    {fmt(child)}")
     return "\n".join(lines) or "Nothing saved yet."
+
+
+def _handoff(items: list[MemoryItem]) -> MemoryItem | None:
+    """Newest work note, or the latest summary if Recent is empty."""
+    findings = _recent_findings(items)
+    if findings:
+        return findings[-1]
+    history, _ = split_state(items)
+    summaries = [item for item in history if item.payload.get("covers")]
+    return summaries[-1] if summaries else None
+
+
+def _latest_user_text(items: list[MemoryItem]) -> str:
+    users = [item for item in items if item.payload.get("user")]
+    return (users[-1].message or "") if users else ""
+
+
+def render_packet(
+    items: list[MemoryItem],
+    related: list[MemoryItem],
+    branches: list[dict] | None = None,
+    inspecting: dict | None = None,
+) -> str:
+    """Goal first, then handoff, questions, and question-matched notes."""
+    lines: list[str] = []
+    goal = _goal(items)
+    if goal:
+        lines.append("## Goal")
+        lines.append(_entry_line(goal, set()))
+        lines.append("")
+    handoff = _handoff(items)
+    if handoff:
+        lines.append("## Handoff")
+        lines.append(_subject(handoff))
+        lines.append("")
+    questions = split_open_questions(items)
+    if questions:
+        lines.append("## Open questions")
+        for question in questions:
+            deps = "".join(
+                f" {_id8(item_id)}"
+                for item_id in question.payload.get("depends_on", [])
+            )
+            lines.append(_entry_line(question, set(), deps))
+        lines.append("")
+    if inspecting:
+        lines.append(
+            f"INSPECTING [{inspecting['id'][:8]}]: files are at that "
+            f"snapshot. Call memory with action=inspect_done to return "
+            f"to '{inspecting['branch']}'."
+        )
+        lines.append("")
+    if branches and len(branches) > 1:
+        current = next((b for b in branches if b["current"]), None)
+        if current:
+            lines.append(f"* {current['name']} (you are here)")
+            lines.append("")
+    if related:
+        lines.append("## Related")
+        for item in related:
+            lines.append(_subject(item))
+        lines.append("")
+    return "\n".join(lines).rstrip()
 
 
 def render_find(

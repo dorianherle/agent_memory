@@ -20,22 +20,18 @@ Already in your context. Do not call `memory_state` to fetch it.
 ## Goal                      ← the original job
 [a1b2c3d4] Why is login so slow?
 
-## Steering                  ← latest user course-correct, if any
-[e5f6g7h8] wait, also look at the cookie path
+## Handoff                   ← last work note
+[6ca98198] @agent Login loads the whole users table every time
 
 ## Open questions            ← zero or more
 [11111111] Why is it still slow after caching? [6ca98198]
 
-* main (you are here)        ← only when there is more than one line of work
-
-## Recent                    ← newest 8 headlines
-[6ca98198] @agent Login loads the whole users table every time
-(+4 earlier — memory_find / memory_history)
+## Related                   ← up to 3 notes for this question
+[7b8c9d0e] @agent Timeout is set in src/auth.py
 ```
 
 - **Goal** is the original job. Later user notes do not replace it.
-- **Steering** is the latest human course-correct. It does not
-  replace open questions.
+- **Handoff** is the latest work note. **Related** matches this question.
 - **Open questions** are unsolved things. A trailing `[id]` is an
   older note the question stands on (here, the finding in Recent).
   Find those ids before you cite or extend them. Close when answered.
