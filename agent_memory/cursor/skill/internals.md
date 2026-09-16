@@ -40,8 +40,7 @@ derived state and rebuild themselves from the git history.
 | `memory_find` | `(query=None, text=None, ids=None, all_branches=False)` | Read. Up to 50 full entries, newest first, plus steps covered by any matched summary. `query=` without embeddings appends a substring-fallback notice. |
 | `memory_history` | `()` | Whole current branch, oldest first, folded steps indented under their summary. |
 | `memory_state` | `()` | The same compact state that is already injected each turn. |
-| `memory_check` | `(command)` | Run a recognized check. Exit 0 advances last green. Nonzero writes a `RED` latch under `.agent_memory/LATCH`; save/summarize/delete/inspect then raise. Only `memory_branch` clears it. |
-| `memory_branch` | `(id, name, label)` | `label` required: one precise line of what went wrong (`save_hygiene` is an error here). Caps the dead line, **restores files**. While red, `id` is ignored and last green is used. That sentence is Avoid. |
+| `memory_branch` | `(id, name, label)` | Save label as a summary of the current line, then restore working files to the requested id. Old work stays searchable. |
 | `memory_inspect` | `(id)` | **Restores files** to that entry, detached, and blocks saving until closed. |
 | `memory_inspect_done` | `()` | Restores the branch and its files. |
 
@@ -148,24 +147,10 @@ marker. While that marker exists:
 A session that dies while inspecting is repaired on the next load: the store
 detects the stale marker and returns to the branch automatically.
 
-`memory_check(command)` runs the command in the project root. Exit 0 writes
-`.agent_memory/LATCH` as `GREEN(HEAD)`. Nonzero writes `RED(last_green,
-command, digest, failure_id)`. While red, `save` / `summarize` / `delete` /
-`inspect` / another `check` raise. Hook `save_user` / `auto_save` still
-work. **This cannot stop Shell or Write** — only memory mutations and
-callers of `require_green`.
-
-`memory_branch(id, name, label)`:
-
-- `label` is required: one precise line. Vague (`tests failed`) or
-  multiline labels raise; `save_hygiene` is an error, not a warning.
-- first commits that sentence as a dead-end autopsy on the current line
-- while red, `id` is ignored and last green is restored; the latch is
-  consumed (`GREEN` at that checkpoint). One `failure_id` → one Avoid row.
-- if `id` is the tip of an existing branch, that branch is resumed and `name` is
-  ignored; otherwise a new branch `name` is created at `id`
-- working files are restored to the target snapshot
-- the autopsy is injected under Avoid on later turns
+`memory_branch(id, name, label)` saves the current line's summary, then restores
+files to the requested snapshot. If that snapshot is another branch's tip, it
+resumes that branch; otherwise it creates `name`. The summary stays searchable
+in the old history. No test outcome forces a branch change.
 
 ## Hook events
 
@@ -195,7 +180,6 @@ error never blocks the agent loop, it just means nothing was saved.
 | Path | Role |
 |---|---|
 | `.agent_memory/` | The store: git dir, SQLite catalog, HNSW index, credentials |
-| `.agent_memory/LATCH` | Persisted GREEN/RED check state (survives process restart) |
 | `.agent_memory/live/index.html` | Self-refreshing browser view of the timeline and prompt packets |
 | `.cursor/rules/agent-memory.mdc` | Always-applied bootstrap rule |
 | `.cursor/rules/agent-memory-state.mdc` | Always-applied live MEMORY STATE (generated, gitignored) |

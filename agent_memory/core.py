@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import fcntl
-import hashlib
 import json
 import os
-import shlex
 import shutil
 import subprocess
 from contextlib import contextmanager
@@ -21,11 +19,11 @@ ARCHIVE_PREFIX = ".agent_memory_archive_"
 MARKER = "AGENT_MEMORY"
 LOCK_FILE = "AGENT_LOCK"
 INSPECT_FILE = "INSPECTING"
-LATCH_FILE = "LATCH"
 PAYLOAD_PREFIX = "Agent-Memory-Payload: "
 OPERATION_KEY = "_agent_memory"
 FIELD_SEPARATOR = "\x00"
 RECORD_SEPARATOR = "\x02"
+GENERATED_STATE_FILES = (".cursor/MEMORY_STATE.md", ".cursor/rules/agent-memory-state.mdc")
 
 # Never snapshot VCS metadata into the memory store. The host project's
 # `.git/` and any nested clone would otherwise be picked up by `git add -A`
@@ -39,6 +37,7 @@ EXCLUDE_ENTRIES = (
     ".env",
     "__pycache__/",
     ".pytest_cache/",
+    *GENERATED_STATE_FILES,
 )
 
 
@@ -62,17 +61,6 @@ def split_state(items: list[MemoryItem]) -> tuple[list[MemoryItem], list[MemoryI
 
 OPEN_QUESTION_KEY = "open_question"
 GOAL_KEY = "goal"
-DEAD_END_KEY = "dead_end"
-
-
-def _failure_digest(result: subprocess.CompletedProcess) -> str:
-    """Compact evidence from a failed check (last lines, capped)."""
-    text = (result.stderr or result.stdout or "").strip()
-    lines = [line for line in text.splitlines() if line.strip()][-20:]
-    digest = "\n".join(lines).strip() or f"exit {result.returncode}"
-    if len(digest) > 500:
-        digest = digest[:499].rstrip() + "…"
-    return digest
 
 
 def all_open_questions(items: list[MemoryItem]) -> list[MemoryItem]:
@@ -349,14 +337,11 @@ class Memory:
         summary: bool = False,
         _operation: dict | None = None,
         agent: str | None = None,
-        _bypass_latch: bool = False,
     ) -> str:
         if self.inspecting() is not None:
             raise RuntimeError(
                 "cannot save while inspecting; call inspect_done first"
             )
-        if not _bypass_latch:
-            self.require_green("save")
         from agent_memory.identity import DEFAULT_AGENT, ensure_agent_payload
 
         payload = payload or {}
@@ -393,6 +378,8 @@ class Memory:
         with self._lock():
             # Refresh excludes each save: nested clones may appear mid-session.
             self._ensure_exclude(self._git_dir / "info" / "exclude")
+            # Also untrack state already captured by older saves; keep local files.
+            self._run("rm", "--cached", "--ignore-unmatch", "--", *GENERATED_STATE_FILES)
             self._run("add", "-A")
             arguments = ["commit"]
             if allow_empty:
@@ -615,7 +602,6 @@ class Memory:
             text,
             payload,
             agent=agent or USER_AGENT,
-            _bypass_latch=True,
         )
 
     def auto_save(
@@ -644,7 +630,7 @@ class Memory:
                 and last.payload.get("agent", DEFAULT_AGENT) == who
             ):
                 return None
-        return self.save(text, {"auto": True}, agent=who, _bypass_latch=True)
+        return self.save(text, {"auto": True}, agent=who)
 
     def summarize(self, text: str, *, agent: str | None = None) -> str:
         """Fold Recent behind one line. Model-owned compaction."""
@@ -737,28 +723,6 @@ class Memory:
                 stale.add(item.id)
         return stale
 
-    def prompt_sections(self, k: int = 5) -> dict[str, list[MemoryItem]]:
-        """Avoid = autopsies written at memory_branch. Nothing else."""
-        self._sync_catalog()
-        rows = self._catalog.select(
-            branch=None,
-            payload={DEAD_END_KEY: True},
-            include_historical=False,
-            limit=max(k * 4, k),
-        )
-        seen: set[str] = set()
-        avoid: list[MemoryItem] = []
-        for row in rows:
-            item = self._row_item(row)
-            key = item.payload.get("failure_id") or item.id
-            if key in seen:
-                continue
-            seen.add(key)
-            avoid.append(item)
-            if len(avoid) >= k:
-                break
-        return {"avoid": avoid} if avoid else {}
-
     def prompt_payload(self) -> dict:
         """Current prompt: compact injected text plus full-body sections.
 
@@ -785,15 +749,9 @@ class Memory:
         if steer:
             sample.append(steer)
         sample.extend(split_open_questions(items))
-        sections = {}
-        if not self.inspecting():
-            try:
-                sections = self.prompt_sections()
-            except Exception:
-                sections = {}
         stale_ids = self._stale_ids(sample)
         payload = current_prompt(
-            items, sections=sections, stale_ids=stale_ids
+            items, stale_ids=stale_ids
         )
         text = render(
             items,
@@ -801,21 +759,7 @@ class Memory:
             self.inspecting(),
             compact=True,
             stale_ids=stale_ids,
-            sections=sections,
         )
-        latch = self.latch()
-        if latch and latch.get("status") == "red":
-            cid = (latch.get("checkpoint_id") or "")[:8]
-            command = latch.get("command") or "check"
-            digest = (latch.get("failure_digest") or "").split("\n", 1)[0]
-            banner = (
-                f"RED: `{command}` failed. Only memory_branch is allowed. "
-                f"Last green [{cid}]."
-            )
-            if digest:
-                banner = f"{banner}\n{digest}"
-            text = f"{banner}\n\n{text}"
-            payload["red"] = banner
         payload["injected"] = text
         return payload
 
@@ -946,123 +890,21 @@ class Memory:
             finally:
                 self._run("checkout", branch)
 
-    def latch(self) -> dict | None:
-        """Persisted GREEN/RED check latch, or None if never written."""
-        path = self._git_dir / LATCH_FILE
-        if not path.exists():
-            return None
-        try:
-            data = json.loads(path.read_text())
-        except (OSError, json.JSONDecodeError):
-            return None
-        return data if isinstance(data, dict) else None
-
-    def last_green(self) -> str | None:
-        """Last verified-green checkpoint, else current HEAD."""
-        stored = self.latch()
-        if stored and stored.get("checkpoint_id"):
-            return stored["checkpoint_id"]
-        if self._has_commits():
-            return self._run("rev-parse", "HEAD")
-        return None
-
-    def require_green(self, op: str = "mutate") -> None:
-        """Reject mutating work while a check is red."""
-        stored = self.latch()
-        if stored and stored.get("status") == "red":
-            cid = stored.get("checkpoint_id") or ""
-            raise RuntimeError(
-                f"cannot {op} while a check is red; "
-                f"call memory_branch to restore [{cid[:8]}]. "
-                "Only memory_branch is allowed"
-            )
-
-    def _write_latch(self, data: dict) -> None:
-        (self._git_dir / LATCH_FILE).write_text(json.dumps(data))
-
-    def check(self, command: str | list[str]) -> str:
-        """Run a recognized check. Zero advances last green; else RED.
-
-        Agent-memory cannot stop arbitrary Shell/Write tools. This is
-        the mediated check boundary; while red, memory mutations other
-        than branch are rejected. Harnesses should also call
-        ``require_green`` before their own writes.
-        """
-        if self.inspecting() is not None:
-            raise RuntimeError(
-                "cannot check while inspecting; call inspect_done first"
-            )
-        self.require_green("check")
-        if not self._has_commits():
-            raise RuntimeError("save a checkpoint before running a check")
-        parts = command if isinstance(command, list) else shlex.split(command)
-        if not parts:
-            raise ValueError("check requires a command")
-        shown = command if isinstance(command, str) else " ".join(parts)
-        result = subprocess.run(
-            parts,
-            cwd=self._path,
-            capture_output=True,
-            text=True,
-        )
-        checkpoint = self.last_green() or self._run("rev-parse", "HEAD")
-        if result.returncode == 0:
-            head = self._run("rev-parse", "HEAD")
-            self._write_latch({"status": "green", "checkpoint_id": head})
-            return f"check passed: {shown}"
-        digest = _failure_digest(result)
-        failure_id = hashlib.sha1(
-            f"{checkpoint}\0{shown}\0{digest}".encode()
-        ).hexdigest()[:16]
-        self._write_latch(
-            {
-                "status": "red",
-                "checkpoint_id": checkpoint,
-                "command": shown,
-                "failure_digest": digest,
-                "exit_code": result.returncode,
-                "failure_id": failure_id,
-            }
-        )
-        raise RuntimeError(
-            f"check failed ({result.returncode}): {digest}\n"
-            f"call memory_branch to restore [{checkpoint[:8]}]. "
-            "Only memory_branch is allowed until then."
-        )
-
     def branch(self, base_id: str, name: str, summary: str) -> Memory:
-        """Rewind to an entry. ``summary`` is the autopsy: what went wrong.
+        """Save the current line's summary, then restore the requested snapshot.
 
-        That sentence is capped onto the abandoned line and later injected
-        as Avoid so the next agent does not repeat it. Then files restore
-        to the target snapshot. If the target is another branch's tip,
-        that branch is resumed instead of creating a duplicate.
-
-        While a check is red, ``base_id`` is ignored and the latch's last
-        green checkpoint is restored. The latch is consumed on success.
+        If the target is another branch's tip, resume it; otherwise create
+        the named branch. The summary remains searchable in the old history.
         """
-        from agent_memory.prompt import autopsy_hygiene
-
         if self.inspecting() is not None:
             raise RuntimeError(
                 "cannot branch while inspecting; call inspect_done first"
             )
         text = (summary or "").strip()
-        bad = autopsy_hygiene(text)
-        if bad:
-            raise ValueError(bad)
-        stored = self.latch()
-        payload = {DEAD_END_KEY: True}
-        if stored and stored.get("status") == "red":
-            commit_id = stored["checkpoint_id"]
-            if stored.get("failure_id"):
-                payload["failure_id"] = stored["failure_id"]
-            abandoned = self._branch_name()
-            if abandoned:
-                payload["abandoned_branch"] = abandoned
-        else:
-            commit_id = self._resolve(base_id)
-        self.save(text, payload, summary=True, _bypass_latch=True)
+        if not text:
+            raise ValueError("branch requires a summary")
+        commit_id = self._resolve(base_id)
+        self.save(text, summary=True)
         with self._lock():
             if self._run("status", "--porcelain", check=False):
                 raise RuntimeError("save current changes before branching")
@@ -1077,7 +919,6 @@ class Memory:
                 self._run("checkout", "-b", name, commit_id)
             self._search = None
             self._sync_catalog()
-            self._write_latch({"status": "green", "checkpoint_id": commit_id})
         return self
 
     def inspecting(self) -> dict | None:
@@ -1093,7 +934,6 @@ class Memory:
         The repo stays there until inspect_done() checks the branch back
         out. Inspecting again just switches snapshots.
         """
-        self.require_green("inspect")
         with self._lock():
             item = self._item(item_id)
             marker = self.inspecting()

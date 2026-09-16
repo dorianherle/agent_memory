@@ -52,10 +52,6 @@ or all with `memory_open_questions`.
 user prompt or auto-saved answer. Finished work leaves this view.
 The agent opens it with `memory_find` or `memory_history`.
 
-After a failed test the agent must rewind — see
-[When a test fails](#when-a-test-fails). Those autopsies show up as
-**Avoid**. A new notebook has none.
-
 Watch it live: `.agent_memory/live/index.html`.
 
 ---
@@ -74,8 +70,7 @@ The agent writes the rest.
 | `memory_find` | Open a note (by id, words, or meaning) |
 | `memory_history` | The whole timeline of this line of work |
 | `memory_state` | The same compact view already in the prompt |
-| `memory_check` | Run a test/check; fail latches red until `memory_branch` |
-| `memory_branch` | Leave a dead end — **requires what went wrong**, rewinds files |
+| `memory_branch` | Summarize current work and restore a requested snapshot |
 | `memory_inspect` | Peek at an old snapshot — **rewinds the files** |
 | `memory_inspect_done` | Put the files back |
 
@@ -84,40 +79,16 @@ Everything else only writes to the notebook.
 
 ---
 
-## When a test fails
+## Working with memory
 
-Do not keep going. Rewind.
+Run tests with normal tools. Save the useful result, relevant files, and next
+step with `memory_save`. Memory stores context; the agent decides how to use it.
 
-1. Route the check through `memory_check`. A nonzero exit
-   persists a red latch.
-2. While red, save / summarize / delete / inspect are rejected.
-   The only escape is `memory_branch`. `label` is required —
-   one sentence of **exactly what went wrong**.
-3. Files restore to the last green checkpoint (the id you pass
-   is ignored while red). The sentence is stored as a
-   dead-end autopsy.
-4. Every later turn injects those autopsies:
+Use `memory_branch(id, name, label)` when you want to restore a specific snapshot.
+The label summarizes the work being left behind. That history stays searchable.
 
-```text
-## Avoid / Previous failed paths
-[44444444] Redis cache made p95 worse. Do not retry under this schema.
-```
-
-That is the whole method. No counts, no embeddings, no reconstructed
-capsules. The agent wrote the lesson; the next agent reads it.
-
-`memory_branch` without a `label` is an error.
-
-Agent-memory cannot stop arbitrary Shell or file-edit tools. The
-honest contract is: checks that go through `memory_check` cannot
-quietly continue in memory. Harnesses that mediate edits should
-call `Memory.require_green` before writing.
-
-```bash
-python -m agent_memory.demo_v1
-```
-
-Runs the Redis miss, branches with an autopsy, prints the header.
+Generated memory-state files are excluded from snapshots. The SDK wrapper replaces
+its state packet before each model request, including requests inside tool loops.
 
 ---
 
@@ -145,7 +116,7 @@ in Cursor: MCP tools, auto-save hooks, and the agent-memory skill.
    PY -m pip install "agent-memory[cursor] @ git+https://github.com/dorianherle/agent_memory.git@main"
 
 3. Ask me for a Gemini API key before you install — it turns on
-   meaning-based memory_find. Avoid autopsies work without it.
+   meaning-based memory_find. Notes and literal lookup work without it.
    Do not skip it silently and do not decide for me.
    With a key (or if GEMINI_API_KEY is already in my env or project .env):
      PY -m agent_memory.cli cursor install --python PY --no-interactive
@@ -284,8 +255,7 @@ response = client.chat.completions.create(
 ## Semantic search (Gemini)
 
 One optional key, one job: `memory_find(query=…)` finds notes by
-meaning instead of exact words. Avoid autopsies need nothing from
-it.
+meaning instead of exact words. Notes and literal lookup work without it.
 
 Without a key, `memory_find` falls back to literal substring search
 (and says so). Everything else works unchanged.
@@ -296,3 +266,9 @@ Without a key, `memory_find` falls back to literal substring search
 
 Host and nested `.git/` folders are skipped so a repo-inside-a-repo
 does not break saves.
+
+## Tests
+
+```sh
+.venv/bin/python -m pytest agent_memory/tests -q
+```

@@ -50,8 +50,7 @@ Use tools for judgment and checkpoints:
 - memory_summarize when a chunk of work is finished (keeps Recent short)
 - memory_delete — hide specific noise entries from Recent (pass ids)
 - memory_find to recall detail (query= uses Gemini when configured)
-- memory_check — run pytest / a compile through memory; a fail latches red
-- memory_branch after a red check (label = what went wrong); memory_inspect to look at an old snapshot
+- memory_branch to restore a saved snapshot (label summarizes current work); memory_inspect to look at an old snapshot
 Always call memory_inspect_done before answering if you inspected.
 Prefer facts from MEMORY STATE (always-applied rule) or tool results; do not
 invent entry ids.
@@ -162,17 +161,12 @@ def handle(event: str, data: dict) -> dict:
         else:
             memory.write_state_file()
         # One delivery channel: the alwaysApply rule. The hook only
-        # points at it so Avoid / RED never land twice in the prompt.
+        # points at it so memory state is delivered once.
         rule_rel = ".cursor/rules/agent-memory-state.mdc"
         state = memory.render_state()
         pointer = (
             f"MEMORY STATE is in the alwaysApply rule `{rule_rel}`."
         )
-        latch = memory.latch()
-        if latch and latch.get("status") == "red":
-            pointer = (
-                f"{pointer} A check is red. Only memory_branch is allowed."
-            )
         if entry_id and isinstance(prompt, str) and prompt.strip():
             try:
                 from agent_memory.live_html import default_live_dir

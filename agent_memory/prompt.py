@@ -39,9 +39,6 @@ MEMORY STATE
 - Steering: the latest user course-correct, if any.
 - Open questions: unsolved things, each `[id] text [dep] [dep]`.
   Same text already open is a no-op.
-- Avoid: autopsies from memory_branch. A test failure must
-  run through memory_check; a red latch blocks other writes
-  until you branch back with a one-line what-went-wrong.
 - Recent: the newest 10 work headlines since the last summary
   (not user prompts or auto-saved answers). A [stale] tag on a
   Recent line means that entry's files have changed since it was
@@ -68,11 +65,8 @@ Pick action on the single memory tool:
 - graph when the user wants the whole tree: every branch and entry in
   one picture. Set html to true to also write an explorable HTML page
   for the user; give them its path.
-- check to run a recognized test/check. Nonzero exit sets a red
-  latch; only branch is then allowed. Passing advances last green.
-- branch to leave a dead end. After a red check, the last green
-  checkpoint is used (the id you pass is ignored). label is
-  required: one line of what went wrong. That line is Avoid.
+- branch to resume work from a specific saved snapshot. Set id to that
+  entry and label to a summary of the work you are leaving. Restores files.
 - inspect to temporarily set every working file to how it was at an
   entry, to look around. inspect_done returns you to your branch.
   Always call inspect_done before answering; edits made while
@@ -89,12 +83,6 @@ RULES
 """.strip()
 
 
-_VAGUE_AUTOPSY = re.compile(
-    r"^(tests?\s+failed|didn't work|did not work|dead end|failed|it failed)\.?$",
-    re.IGNORECASE,
-)
-
-
 def save_hygiene(text: str) -> str | None:
     """Warn when a judgment save will be a bad headline in state."""
     head = (text or "").strip().split("\n", 1)[0].strip()
@@ -108,27 +96,6 @@ def save_hygiene(text: str) -> str | None:
             "Warning: headline reads like narration — "
             "state a finding or decision."
         )
-    return None
-
-
-def autopsy_hygiene(text: str) -> str | None:
-    """Error text if a branch autopsy is not a usable Avoid headline."""
-    raw = (text or "").strip()
-    if not raw:
-        return (
-            "branch requires a summary of what went wrong "
-            "(the next agent will see it under Avoid)"
-        )
-    if "\n" in raw:
-        return "autopsy must be one line"
-    if _VAGUE_AUTOPSY.match(raw):
-        return (
-            "autopsy is too vague — name the approach, "
-            "the failure, and the constraint"
-        )
-    warn = save_hygiene(raw)
-    if warn:
-        return warn.removeprefix("Warning: ").rstrip(".")
     return None
 
 
@@ -194,11 +161,9 @@ def _recent_findings(items: list[MemoryItem]) -> list[MemoryItem]:
 def current_prompt(
     items: list[MemoryItem],
     *,
-    sections: dict | None = None,
     stale_ids: set[str] | None = None,
 ) -> dict:
     """Structured current prompt with full bodies (for the live page)."""
-    sections = sections or {}
     stale_ids = stale_ids or set()
     goal = _goal(items)
     steer = _steering(items, goal)
@@ -206,7 +171,6 @@ def current_prompt(
         "goal": _item_view(goal) if goal else None,
         "steering": _item_view(steer) if steer else None,
         "questions": [_item_view(item) for item in split_open_questions(items)],
-        "avoid": [_item_view(item) for item in (sections.get("avoid") or [])],
         "findings": [
             _item_view(item, stale_ids)
             for item in _recent_findings(items)[-RECENT_CAP:]
@@ -305,18 +269,14 @@ def render(
     *,
     compact: bool = False,
     stale_ids: set[str] | None = None,
-    sections: dict | None = None,
 ) -> str:
     """Render MEMORY STATE.
 
     compact=True (prompt injection): goal, steering, open questions,
-    current-branch marker, newest RECENT_CAP subjects. ``sections``
-    optionally carries ``avoid`` MemoryItem lists from
-    prompt_sections(); renders only when non-empty.
+    current-branch marker, newest RECENT_CAP subjects.
     """
     history, recent = split_state(items)
     stale_ids = stale_ids or set()
-    sections = sections or {}
 
     def line_for(item: MemoryItem) -> str:
         if compact:
@@ -349,15 +309,6 @@ def render(
                 )
                 lines.append(_entry_line(question, set(), deps))
             lines.append("")
-        for key, title in (
-            ("avoid", "## Avoid / Previous failed paths"),
-        ):
-            chosen = sections.get(key) or []
-            if chosen:
-                lines.append(title)
-                for item in chosen:
-                    lines.append(_entry_line(item, stale_ids))
-                lines.append("")
     if inspecting:
         lines.append(
             f"INSPECTING [{inspecting['id'][:8]}]: files are at that "

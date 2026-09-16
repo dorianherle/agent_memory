@@ -1,0 +1,44 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/dorianherle/Documents/Personal/agent_memory/.venv/bin/python -m agent_memory.cursor.hook"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/dorianherle/Documents/Personal/agent_memory/.venv/bin/python -m agent_memory.cursor.hook"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/dorianherle/Documents/Personal/agent_memory/.venv/bin/python -m agent_memory.cursor.hook"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/dorianherle/Documents/Personal/agent_memory/.venv/bin/python -m agent_memory.cursor.hook"
+          }
+        ]
+      }
+    ]
+  }
+}

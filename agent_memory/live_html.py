@@ -487,10 +487,6 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     max-height: 7.2em;
     overflow: auto;
   }
-  .prompt-block.red .body {
-    border-color: var(--delete);
-    color: var(--delete);
-  }
   .prompt-block .q-deps { margin-top: 4px; }
   .prompt-block .q-deps button {
     background: none;
@@ -1580,9 +1576,8 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
   }
   function promptHasContent(p) {
     if (!p) return false;
-    return !!(p.goal || p.steering || p.red
+    return !!(p.goal || p.steering
       || (p.questions || []).length
-      || (p.avoid || []).length
       || (p.findings || []).length
       || (p.injected || "").trim());
   }
@@ -1637,18 +1632,6 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     el.style.display = "block";
     pinned.innerHTML = "";
     findings.innerHTML = "";
-    if (p.red) {
-      const block = document.createElement("div");
-      block.className = "prompt-block red";
-      const h3 = document.createElement("h3");
-      h3.textContent = "Red";
-      block.appendChild(h3);
-      const body = document.createElement("div");
-      body.className = "body";
-      body.textContent = p.red;
-      block.appendChild(body);
-      pinned.appendChild(block);
-    }
     const add = (parent, title, entry) => {
       const block = promptBlock(title, entry);
       if (block) parent.appendChild(block);
@@ -1656,7 +1639,6 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     add(pinned, "Goal", p.goal);
     add(pinned, "Steering", p.steering);
     (p.questions || []).forEach((q) => add(pinned, "Open question", q));
-    (p.avoid || []).forEach((item) => add(pinned, "Avoid", item));
     const found = p.findings || [];
     const findingsHead = document.createElement("div");
     findingsHead.className = "prompt-block";
@@ -2031,15 +2013,6 @@ def demo_payload() -> dict:
                     "text": "OPEN: is the retry gate sound?",
                     "stale": False,
                     "depends_on": [b2],
-                }
-            ],
-            "avoid": [
-                {
-                    "id": a5,
-                    "agent": "agent",
-                    "text": "polling breaks under concurrent writes.\nAbandoned — do not retry polling.",
-                    "stale": False,
-                    "depends_on": [],
                 }
             ],
             "findings": [

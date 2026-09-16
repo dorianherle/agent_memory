@@ -1,10 +1,28 @@
 from datetime import datetime
 
 from agent_memory import MemoryItem
+from agent_memory.core import GENERATED_STATE_FILES
 from agent_memory.tests.helpers import MemoryTestCase
 
 
 class TestSave(MemoryTestCase):
+    def test_generated_state_is_excluded_even_when_previously_tracked(self):
+        self.save("source")
+        for name in GENERATED_STATE_FILES:
+            path = self.path / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("old generated state")
+            self.memory._run("add", "-f", "--", name)
+        self.memory._run("commit", "-m", "Previously tracked generated state")
+        self.memory.write_state_file()
+        self.memory.write_state_rule()
+        snapshot = self.memory.save("Current source and notes")
+        names = self.memory._run("ls-tree", "-r", "--name-only", snapshot).splitlines()
+        for name in GENERATED_STATE_FILES:
+            self.assertNotIn(name, names)
+            self.assertTrue((self.path / name).exists())
+        self.assertEqual(self.memory._run("show", f"{snapshot}:work.txt"), "source")
+
     def test_message_and_return_id(self):
         self.file.write_text("content")
         item_id = self.memory.save("Created file")

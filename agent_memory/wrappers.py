@@ -133,6 +133,7 @@ class MemoryEnhancedOpenAI:
             return self._stream(messages, tools, kwargs)
 
         while True:
+            self._refresh_state(messages)
             response = self.client.chat.completions.create(
                 messages=messages,
                 tools=tools,
@@ -155,8 +156,13 @@ class MemoryEnhancedOpenAI:
                     {"role": "tool", "tool_call_id": call.id, "content": result}
                 )
 
+    def _refresh_state(self, messages):
+        # Own slot, replaced before every request; never accumulate packets.
+        messages[1] = {"role": "system", "content": f"MEMORY STATE\n{self.memory.render_state()}"}
+
     def _stream(self, messages, tools, kwargs):
         while True:
+            self._refresh_state(messages)
             stream = self.client.chat.completions.create(
                 messages=messages,
                 tools=tools,

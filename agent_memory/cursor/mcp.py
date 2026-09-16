@@ -172,34 +172,8 @@ def _build_server():
         return call_tool(get_memory(), "memory", {"action": "history"})
 
     @mcp.tool()
-    def memory_check(command: str) -> str:
-        """Run a recognized check (pytest, a compile, …).
-
-        Exit 0 advances last green. Nonzero persists a red latch:
-        only memory_branch is then allowed. The base checkpoint is
-        taken from that latch, not from an agent-supplied id.
-        Agent-memory cannot stop arbitrary Shell/Write tools — route
-        checks here.
-        """
-        memory = get_memory()
-        try:
-            result = memory.check(command)
-        except (ValueError, RuntimeError) as error:
-            memory.write_state_file()
-            return f"Error: {error}"
-        memory.write_state_file()
-        try:
-            memory.write_live_html()
-        except Exception:
-            pass
-        return result
-
-    @mcp.tool()
     def memory_branch(id: str, name: str, label: str) -> str:
-        """Leave a dead end. label is required: what went wrong. Restores working files to id.
-
-        After a red memory_check, id is ignored and last green is used.
-        """
+        """Save label as the current line's summary, then restore working files to id."""
         memory = get_memory()
         result = call_tool(
             memory,

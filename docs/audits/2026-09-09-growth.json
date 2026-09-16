@@ -1,0 +1,38 @@
+{
+  "python": "3.14.3",
+  "platform": "Darwin",
+  "samples_per_read_operation": 3,
+  "worktree": "one small unchanged text file; no provider; no summaries",
+  "observations": [
+    {
+      "records": 10,
+      "save_last_10_median_ms": 100.868,
+      "reopen_median_ms": 10.537,
+      "render_state_median_ms": 130.045,
+      "literal_find_median_ms": 14.69,
+      "live_export_median_ms": 174.818,
+      "state_characters": 689,
+      "live_data_bytes": 18209
+    },
+    {
+      "records": 100,
+      "save_last_10_median_ms": 69.16,
+      "reopen_median_ms": 17.935,
+      "render_state_median_ms": 132.349,
+      "literal_find_median_ms": 18.96,
+      "live_export_median_ms": 170.354,
+      "state_characters": 814,
+      "live_data_bytes": 112988
+    },
+    {
+      "records": 500,
+      "save_last_10_median_ms": 60.504,
+      "reopen_median_ms": 14.818,
+      "render_state_median_ms": 214.332,
+      "literal_find_median_ms": 94.015,
+      "live_export_median_ms": 272.633,
+      "state_characters": 824,
+      "live_data_bytes": 535843
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+[mcp_servers.agent-memory]
+command = "/Users/dorianherle/Documents/Personal/agent_memory/.venv/bin/python"
+args = [
+    "-m",
+    "agent_memory.cursor.mcp",
+    "--root",
+    "/Users/dorianherle/Documents/Personal/agent_memory",
+]
+
+[mcp_servers.agent-memory.env]
+AGENT_MEMORY_PROVIDER = "agent_memory.providers.gemini:GeminiProvider"

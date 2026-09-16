@@ -1,4 +1,5 @@
 import json
+import copy
 from types import SimpleNamespace
 
 from agent_memory import wrap
@@ -40,7 +41,7 @@ class FakeClient:
         )
 
     def create(self, **kwargs):
-        self.requests.append(kwargs)
+        self.requests.append(copy.deepcopy(kwargs))
         return self.replies.pop(0)
 
 
@@ -110,7 +111,6 @@ class TestWrapper(MemoryTestCase):
                 "delete",
                 "history",
                 "graph",
-                "check",
                 "branch",
                 "inspect",
                 "inspect_done",
@@ -121,6 +121,27 @@ class TestWrapper(MemoryTestCase):
         second = fake.requests[1]
         self.assertEqual(second["messages"][-1]["role"], "tool")
         self.assertTrue(second["messages"][-1]["content"].startswith("Saved ["))
+
+    def test_fresh_state_replaces_packet_after_each_tool_call(self):
+        fake = FakeClient([
+            reply(tool_calls=[tool_call("memory", {"action": "save", "text": "NEW EVIDENCE AFTER CALL"})]),
+            reply(content="done"),
+        ])
+        wrap(fake, self.memory).chat.completions.create(model="test", messages=[{"role": "user", "content": "work"}])
+        first, second = fake.requests
+        self.assertNotIn("NEW EVIDENCE AFTER CALL", first["messages"][1]["content"])
+        self.assertIn("NEW EVIDENCE AFTER CALL", second["messages"][1]["content"])
+        for request in fake.requests:
+            self.assertEqual(sum(isinstance(m, dict) and m.get("role") == "system" and m.get("content", "").startswith("MEMORY STATE\n") for m in request["messages"]), 1)
+
+    def test_streaming_state_replaces_packet_after_each_tool_call(self):
+        fake = FakeClient([
+            [chunk(tool_calls=[call_delta(0, id="c", name="memory", arguments=json.dumps({"action": "save", "text": "STREAM EVIDENCE"}))])],
+            [chunk(content="done")],
+        ])
+        list(wrap(fake, self.memory).chat.completions.create(model="test", messages=[{"role": "user", "content": "work"}], stream=True))
+        self.assertNotIn("STREAM EVIDENCE", fake.requests[0]["messages"][1]["content"])
+        self.assertIn("STREAM EVIDENCE", fake.requests[1]["messages"][1]["content"])
 
     def test_user_tools_pass_through(self):
         weather = {

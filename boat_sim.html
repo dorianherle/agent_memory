@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>3D Playable Boat on Water</title>
+<style>
+  body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Arial, sans-serif; }
+  #info {
+    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+    color: #fff; background: rgba(0,0,0,0.55); padding: 10px 24px;
+    border-radius: 8px; font-size: 14px; text-align: center;
+    backdrop-filter: blur(4px); pointer-events: none;
+    user-select: none;
+  }
+  #info kbd {
+    background: rgba(255,255,255,0.15); padding: 2px 8px;
+    border-radius: 4px; font-weight: 600;
+  }
+  #hud {
+    position: absolute; top: 20px; right: 20px;
+    color: #fff; font-size: 13px;
+    background: rgba(0,0,0,0.45); padding: 12px 16px;
+    border-radius: 8px; backdrop-filter: blur(4px);
+    font-family: 'Courier New', monospace; line-height: 1.6;
+    user-select: none; pointer-events: none;
+  }
+  #hud span { color: #8cf; }
+</style>
+</head>
+<body>
+<div id="hud">SPD: <span id="spd">0.0</span> kn<br/>HDG: <span id="hdg">0</span>°</div>
+<div id="info"><kbd>W</kbd> Throttle Up &nbsp; <kbd>S</kbd> Throttle Down &nbsp; <kbd>A</kbd> / <kbd>D</kbd> Steer &nbsp; <kbd>Space</kbd> Reset</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ─── scene setup ──────────────────────────────────────────────────────────
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87ceeb); // sky blue
+scene.fog = new THREE.FogExp2(0x87ceeb, 0.0035);
+
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 800);
+camera.position.set(25, 18, 35);
+camera.lookAt(0, 0, 0);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+document.body.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.maxPolarAngle = Math.PI / 2.3;
+controls.minDistance = 8;
+controls.maxDistance = 80;
+controls.target.set(0, 0, 0);
+
+// ─── lighting ──────────────────────────────────────────────────────────────
+const ambientLight = new THREE.AmbientLight(0x404060, 0.5);
+scene.add(ambientLight);
+
+const sun = new THREE.DirectionalLight(0xffeedd, 2.8);
+sun.position.set(80, 100, 60);
+sun.castShadow = true;
+sun.shadow.mapSize.width = 2048;
+sun.shadow.mapSize.height = 2048;
+sun.shadow.camera.near = 0.1;
+sun.shadow.camera.far = 300;
+sun.shadow.camera.left = -80;
+sun.shadow.camera.right = 80;
+sun.shadow.camera.top = 80;
+sun.shadow.camera.bottom = -80;
+scene.add(sun);
+
+const hemi = new THREE.HemisphereLight(0x88ccff, 0x445566, 0.6);
+scene.add(hemi);
+
+// ─── water ─────────────────────────────────────────────────────────────────
+const WATER_SIZE = 200;
+const WATER_SEGMENTS = 128;
+const waterGeom = new THREE.PlaneGeometry(WATER_SIZE, WATER_SIZE, WATER_SEGMENTS, WATER_SEGMENTS);
+waterGeom.rotateX(-Math.PI / 2);
+
+// Store original vertex positions for wave displacement
+const posAttr = waterGeom.attributes.position;
+const vertCount = posAttr.count;
+const origX = new Float32Array(vertCount);
+const origZ = new Float32Array(vertCount);
+for (let i = 0; i < vertCount; i++) {
+  origX[i] = posAttr.getX(i);
+  origZ[i] = posAttr.getZ(i);
+}
+
+// Water material with animated wave shader
+const waterMat = new THREE.ShaderMaterial({
+  uniforms: {
+    uTime: { value: 0 },
+    uLightDir: { value: new THREE.Vector3(0.5, 0.8, 0.3).normalize() },
+  },
+  vertexShader: `
+    uniform float uTime;
+    varying vec3 vNormal;
+    varying vec3 vWorldPos;
+    varying float vHeight;
+
+    void main() {
+      vec3 pos = position;
+
+      // Multi-octave wave displacement
+      float x = pos.x;
+      float z = pos.z;
+
+      // Primary waves (large swells)
+      float w1 = sin(x * 0.04 + z * 0.06 + uTime * 0.8) * 1.2;
+      float w2 = sin(x * 0.07 - z * 0.05 + uTime * 1.2) * 0.9;
+      float w3 = sin(x * 0.12 + z * 0.08 + uTime * 1.8) * 0.5;
+      float w4 = sin(x * 0.18 - z * 0.14 + uTime * 2.5) * 0.3;
+      float w5 = sin((x + z) * 0.09 + uTime * 1.0) * 0.6;
+
+      pos.y = w1 + w2 + w3 + w4 + w5;
+
+      // Approximate normal via wave derivatives
+      float dx = (
+        cos(x * 0.04 + z * 0.06 + uTime * 0.8) * 1.2 * 0.04 +
+        cos(x * 0.07 - z * 0.05 + uTime * 1.2) * 0.9 * 0.07 +
+        cos(x * 0.12 + z * 0.08 + uTime * 1.8) * 0.5 * 0.12 +
+        cos(x * 0.18 - z * 0.14 + uTime * 2.5) * 0.3 * 0.18 +
+        cos((x + z) * 0.09 + uTime * 1.0) * 0.6 * 0.09
+      );
+      float dz = (
+        cos(x * 0.04 + z * 0.06 + uTime * 0.8) * 1.2 * 0.06 +
+        cos(x * 0.07 - z * 0.05 + uTime * 1.2) * 0.9 * -0.05 +
+        cos(x * 0.12 + z * 0.08 + uTime * 1.8) * 0.5 * 0.08 +
+        cos(x * 0.18 - z * 0.14 + uTime * 2.5) * 0.3 * -0.14 +
+        cos((x + z) * 0.09 + uTime * 1.0) * 0.6 * 0.09
+      );
+      vNormal = normalize(vec3(-dx, 1.0, -dz));
+
+      vec4 worldPos = modelMatrix * vec4(pos, 1.0);
+      vWorldPos = worldPos.xyz;
+      vHeight = pos.y;
+
+      gl_Position = projectionMatrix * viewMatrix * worldPos;
+    }
+  `,
+  fragmentShader: `
+    uniform vec3 uLightDir;
+    varying vec3 vNormal;
+    varying vec3 vWorldPos;
+    varying float vHeight;
+
+    void main() {
+      vec3 N = normalize(vNormal);
+      vec3 L = normalize(uLightDir);
+      vec3 V = normalize(cameraPosition - vWorldPos);
+      vec3 H = normalize(L + V);
+
+      // Fresnel (Schlick approximation)
+      float fresnel = 0.04 + 0.96 * pow(1.0 - max(dot(N, V), 0.0), 5.0);
+
+      // Deep water colour
+      vec3 deep = vec3(0.008, 0.035, 0.055);
+      vec3 shallow = vec3(0.08, 0.35, 0.32);
+      float depthFactor = smoothstep(-1.0, 1.5, vHeight);
+      vec3 base = mix(deep, shallow, depthFactor);
+
+      // Specular
+      float spec = pow(max(dot(N, H), 0.0), 64.0);
+      vec3 sunColor = vec3(1.0, 0.95, 0.8);
+
+      // Diffuse
+      float diff = max(dot(N, L), 0.0) * 0.7 + 0.3;
+
+      // Foam on wave crests
+      float foam = smoothstep(1.8, 3.0, vHeight) * 0.5;
+
+      vec3 color = base * diff * (1.0 - fresnel) + sunColor * spec * 0.6 + foam * vec3(0.9);
+
+      // Atmospheric perspective
+      float dist = length(vWorldPos - cameraPosition);
+      color = mix(color, vec3(0.53, 0.81, 0.92), clamp(dist * 0.003, 0.0, 0.6));
+
+      gl_FragColor = vec4(color, 1.0);
+    }
+  `,
+  side: THREE.DoubleSide,
+});
+
+// Apply displacement in CPU for physics queries and boat alignment
+function getWaveHeight(x, z, time) {
+  let h =
+    Math.sin(x * 0.04 + z * 0.06 + time * 0.8) * 1.2 +
+    Math.sin(x * 0.07 - z * 0.05 + time * 1.2) * 0.9 +
+    Math.sin(x * 0.12 + z * 0.08 + time * 1.8) * 0.5 +
+    Math.sin(x * 0.18 - z * 0.14 + time * 2.5) * 0.3 +
+    Math.sin((x + z) * 0.09 + time * 1.0) * 0.6;
+  return h;
+}
+
+// Compute wave normal at a point (for boat tilt)
+function getWaveNormal(x, z, time) {
+  let dx =
+    Math.cos(x * 0.04 + z * 0.06 + time * 0.8) * 1.2 * 0.04 +
+    Math.cos(x * 0.07 - z * 0.05 + time * 1.2) * 0.9 * 0.07 +
+    Math.cos(x * 0.12 + z * 0.08 + time * 1.8) * 0.5 * 0.12 +
+    Math.cos(x * 0.18 - z * 0.14 + time * 2.5) * 0.3 * 0.18 +
+    Math.cos((x + z) * 0.09 + time * 1.0) * 0.6 * 0.09;
+  let dz =
+    Math.cos(x * 0.04 + z * 0.06 + time * 0.8) * 1.2 * 0.06 +
+    Math.cos(x * 0.07 - z * 0.05 + time * 1.2) * 0.9 * -0.05 +
+    Math.cos(x * 0.12 + z * 0.08 + time * 1.8) * 0.5 * 0.08 +
+    Math.cos(x * 0.18 - z * 0.14 + time * 2.5) * 0.3 * -0.14 +
+    Math.cos((x + z) * 0.09 + time * 1.0) * 0.6 * 0.09;
+  let n = new THREE.Vector3(-dx, 1.0, -dz).normalize();
+  return n;
+}
+
+const water = new THREE.Mesh(waterGeom, waterMat);
+water.receiveShadow = true;
+scene.add(water);
+
+// ─── boat ──────────────────────────────────────────────────────────────────
+const boat = new THREE.Group();
+
+// Hull (rounded bottom using a custom shape)
+function buildHull() {
+  const shape = new THREE.Shape();
+  // Profile of half-hull (top-down)
+  const len = 5;
+  const maxBeam = 1.8;
+  shape.moveTo(0, -maxBeam * 0.4); // stern
+  shape.quadraticCurveTo(len * 0.3, -maxBeam, len * 0.5, -maxBeam);
+  shape.quadraticCurveTo(len * 0.7, -maxBeam, len, maxBeam * 0.1);
+  shape.quadraticCurveTo(len * 0.8, maxBeam * 0.5, 0, maxBeam * 0.4); // bow
+
+  const extrudeSettings = {
+    steps: 20,
+    depth: 1.5,
+    bevelEnabled: true,
+    bevelThickness: 0.3,
+    bevelSize: 0.15,
+    bevelSegments: 8,
+  };
+  const geom = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+  geom.translate(-2.5, 0, -0.75); // center
+  return geom;
+}
+
+const hullGeom = buildHull();
+// Smooth the hull normals
+hullGeom.computeVertexNormals();
+
+const hullMat = new THREE.MeshStandardMaterial({
+  color: 0x8cb4d6,
+  roughness: 0.3,
+  metalness: 0.4,
+  flatShading: false,
+  envMapIntensity: 0.6,
+});
+const hull = new THREE.Mesh(hullGeom, hullMat);
+hull.castShadow = true;
+hull.receiveShadow = true;
+hull.position.y = 0.4;
+boat.add(hull);
+
+// Deck
+const deckMat = new THREE.MeshStandardMaterial({ color: 0xd4b896, roughness: 0.8 });
+const deckGeom = new THREE.BoxGeometry(4.2, 0.1, 1.6);
+const deck = new THREE.Mesh(deckGeom, deckMat);
+deck.position.set(-0.1, 0.95, 0);
+deck.castShadow = true;
+deck.receiveShadow = true;
+boat.add(deck);
+
+// Cabin
+const cabinMat = new THREE.MeshStandardMaterial({ color: 0x5a7a9a, roughness: 0.5 });
+const cabinGeom = new THREE.BoxGeometry(1.4, 0.6, 1.0);
+const cabin = new THREE.Mesh(cabinGeom, cabinMat);
+cabin.position.set(-0.8, 1.3, 0);
+cabin.castShadow = true;
+cabin.receiveShadow = true;
+boat.add(cabin);
+
+// Cabin windows
+const windowMat = new THREE.MeshStandardMaterial({ color: 0x88ccff, roughness: 0.0, metalness: 0.8 });
+const winGeom = new THREE.PlaneGeometry(0.25, 0.2);
+const winPositions = [[-0.95, 1.5, 0.501], [-0.65, 1.5, 0.501], [-0.95, 1.5, -0.501], [-0.65, 1.5, -0.501]];
+for (const wp of winPositions) {
+  const win = new THREE.Mesh(winGeom.clone(), windowMat);
+  win.position.set(wp[0], wp[1], wp[2]);
+  if (wp[2] > 0) win.rotation.y = Math.PI;
+  boat.add(win);
+}
+
+// Mast
+const mastMat = new THREE.MeshStandardMaterial({ color: 0x6b4c2a, roughness: 0.9 });
+const mastGeom = new THREE.CylinderGeometry(0.06, 0.08, 2.2);
+const mast = new THREE.Mesh(mastGeom, mastMat);
+mast.position.set(1.2, 1.6, 0);
+mast.castShadow = true;
+boat.add(mast);
+
+// Sail
+const sailMat = new THREE.MeshStandardMaterial({
+  color: 0xf5f0e0,
+  roughness: 0.9,
+  side: THREE.DoubleSide,
+});
+function buildSail() {
+  const shape = new THREE.Shape();
+  const h = 2.0;
+  const w = 1.4;
+  shape.moveTo(0, -h * 0.5);
+  shape.quadraticCurveTo(w * 0.3, 0, 0, h * 0.5);
+  shape.quadraticCurveTo(-w * 0.2, 0, 0, -h * 0.5);
+  const geom = new THREE.ShapeGeometry(shape);
+  return geom;
+}
+const sailGeom = buildSail();
+const sail1 = new THREE.Mesh(sailGeom, sailMat);
+sail1.position.set(1.2, 2.2, 0.3);
+sail1.rotation.y = 0.2;
+sail1.castShadow = true;
+boat.add(sail1);
+
+const sail2 = new THREE.Mesh(sailGeom.clone(), sailMat);
+sail2.position.set(1.2, 2.2, -0.3);
+sail2.rotation.y = -0.2;
+sail2.scale.set(1, 1, 0.6);
+sail2.castShadow = true;
+boat.add(sail2);
+
+// Railing posts
+const postMat = new THREE.MeshStandardMaterial({ color: 0x8b7355, roughness: 0.7 });
+for (let i = -1.5; i <= 1.8; i += 0.6) {
+  for (let side = -1; side <= 1; side += 2) {
+    if (Math.abs(i) < 0.3) continue;
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.3), postMat);
+    post.position.set(i + 0.5, 1.15, side * 0.8);
+    boat.add(post);
+  }
+}
+
+// Propeller / rudder detail (visible under transom)
+const rudderMat = new THREE.MeshStandardMaterial({ color: 0x444444, metalness: 0.7, roughness: 0.3 });
+const rudder = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.1, 0.05), rudderMat);
+rudder.position.set(-2.8, 0.3, 0);
+boat.add(rudder);
+
+// Position boat
+boat.position.set(0, 0, 0);
+boat.scale.set(1, 1, 1);
+scene.add(boat);
+
+// ─── wake particles ───────────────────────────────────────────────────────
+const wakeParticles = [];
+const wakeMat = new THREE.PointsMaterial({
+  color: 0xffffff,
+  size: 0.15,
+  transparent: true,
+  opacity: 0.6,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false,
+});
+const wakeGeom = new THREE.BufferGeometry();
+const maxWake = 200;
+const wakePos = new Float32Array(maxWake * 3);
+const wakeVel = new Float32Array(maxWake);
+const wakeLife = new Float32Array(maxWake);
+for (let i = 0; i < maxWake; i++) {
+  wakeLife[i] = -1; // inactive
+}
+wakeGeom.setAttribute('position', new THREE.BufferAttribute(wakePos, 3));
+const wakePoints = new THREE.Points(wakeGeom, wakeMat);
+scene.add(wakePoints);
+
+let wakeIdx = 0;
+function emitWake(x, y, z, vx, vz) {
+  const i = wakeIdx % maxWake;
+  wakeIdx++;
+  wakePos[i * 3] = x;
+  wakePos[i * 3 + 1] = y;
+  wakePos[i * 3 + 2] = z;
+  wakeVel[i] = 0.5 + Math.random() * 0.5;
+  wakeLife[i] = 1.2;
+  wakePoints.geometry.attributes.position.needsUpdate = true;
+}
+
+// ─── controls state ──────────────────────────────────────────────────────
+const keys = { forward: false, backward: false, left: false, right: false };
+let throttle = 0; // 0..1
+let steerAngle = 0; // -1..1
+const MAX_SPEED = 12;
+const ACCEL = 2.5;
+const STEER_SPEED = 2.0;
+const STEER_DAMP = 3.0;
+const HULL_DAMP = 0.98;
+
+let boatSpeed = 0;
+let boatHeading = 0; // radians, 0 = along -Z
+let totalTime = 0;
+
+document.addEventListener('keydown', (e) => {
+  switch (e.code) {
+    case 'KeyW': case 'ArrowUp': keys.forward = true; break;
+    case 'KeyS': case 'ArrowDown': keys.backward = true; break;
+    case 'KeyA': case 'ArrowLeft': keys.left = true; break;
+    case 'KeyD': case 'ArrowRight': keys.right = true; break;
+    case 'Space':
+      boatSpeed = 0; throttle = 0; steerAngle = 0; boatHeading = 0;
+      boat.position.set(0, 0, 0);
+      controls.target.set(0, 0, 0);
+      break;
+  }
+});
+document.addEventListener('keyup', (e) => {
+  switch (e.code) {
+    case 'KeyW': case 'ArrowUp': keys.forward = false; break;
+    case 'KeyS': case 'ArrowDown': keys.backward = false; break;
+    case 'KeyA': case 'ArrowLeft': keys.left = false; break;
+    case 'KeyD': case 'ArrowRight': keys.right = false; break;
+  }
+});
+
+// ─── animation loop ──────────────────────────────────────────────────────
+const clock = new THREE.Clock();
+
+function animate() {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  totalTime += dt;
+
+  // Update water shader
+  waterMat.uniforms.uTime.value = totalTime;
+
+  // ── Throttle ──
+  if (keys.forward) throttle = Math.min(1, throttle + ACCEL * dt);
+  else if (keys.backward) throttle = Math.max(-0.4, throttle - ACCEL * dt);
+  else {
+    if (throttle > 0) throttle = Math.max(0, throttle - ACCEL * dt * 0.5);
+    else throttle = Math.min(0, throttle + ACCEL * dt * 0.5);
+  }
+
+  const targetSpeed = throttle * MAX_SPEED;
+  boatSpeed += (targetSpeed - boatSpeed) * dt * 2.5;
+  boatSpeed *= HULL_DAMP;
+
+  // ── Steering ──
+  if (keys.left) steerAngle = Math.min(1, steerAngle + STEER_SPEED * dt);
+  else if (keys.right) steerAngle = Math.max(-1, steerAngle - STEER_SPEED * dt);
+  else {
+    if (steerAngle > 0) steerAngle = Math.max(0, steerAngle - STEER_DAMP * dt);
+    else steerAngle = Math.min(0, steerAngle + STEER_DAMP * dt);
+  }
+
+  // Turning rate proportional to speed
+  const turnRate = steerAngle * 1.5 * (0.3 + 0.7 * Math.abs(boatSpeed) / MAX_SPEED);
+  if (Math.abs(boatSpeed) > 0.2) {
+    boatHeading += turnRate * dt;
+  }
+
+  // ── Move boat ──
+  // Heading: 0 = -Z (forward in world)
+  const forwardVec = new THREE.Vector3(
+    -Math.sin(boatHeading),
+    0,
+    -Math.cos(boatHeading)
+  );
+  const displacement = forwardVec.clone().multiplyScalar(boatSpeed * dt);
+  boat.position.x += displacement.x;
+  boat.position.z += displacement.z;
+
+  // ── Align boat to waves ──
+  const bx = boat.position.x;
+  const bz = boat.position.z;
+  const waveH = getWaveHeight(bx, bz, totalTime);
+  const normal = getWaveNormal(bx, bz, totalTime);
+
+  // Boat height = wave height at position
+  boat.position.y = waveH;
+
+  // Boat tilt to match wave normal
+  // Up vector of boat should align to wave normal
+  const quat = new THREE.Quaternion();
+  const up = new THREE.Vector3(0, 1, 0);
+  quat.setFromUnitVectors(up, normal);
+  boat.quaternion.copy(quat);
+
+  // Then apply heading rotation around the (now tilted) local up
+  const headingQuat = new THREE.Quaternion().setFromAxisAngle(
+    new THREE.Vector3(0, 1, 0),
+    boatHeading
+  );
+  boat.quaternion.multiply(headingQuat);
+
+  // ── Wake particles ──
+  if (Math.abs(boatSpeed) > 1.0) {
+    // Emit particles at stern, spread behind
+    const sternLocal = new THREE.Vector3(-3.0, 0.5, 0);
+    const sternWorld = sternLocal.clone().applyQuaternion(boat.quaternion).add(boat.position);
+    const wakeCount = Math.min(Math.floor(Math.abs(boatSpeed) * 2 * dt * 60), 6);
+    for (let i = 0; i < wakeCount; i++) {
+      const spread = (Math.random() - 0.5) * 1.2;
+      const offset = new THREE.Vector3(0, 0, spread).applyQuaternion(boat.quaternion);
+      emitWake(
+        sternWorld.x + offset.x,
+        sternWorld.y + Math.random() * 0.3,
+        sternWorld.z + offset.z,
+        -forwardVec.x * 0.5 + (Math.random() - 0.5) * 0.3,
+        -forwardVec.z * 0.5 + (Math.random() - 0.5) * 0.3
+      );
+    }
+  }
+
+  // Update wake particles
+  const posAttr2 = wakePoints.geometry.attributes.position;
+  for (let i = 0; i < maxWake; i++) {
+    if (wakeLife[i] > 0) {
+      wakeLife[i] -= dt;
+      posAttr2.array[i * 3 + 1] -= dt * 0.1; // sink slowly
+      if (wakeLife[i] < 0) {
+        posAttr2.array[i * 3 + 1] = -10; // hide
+      }
+    }
+  }
+  posAttr2.needsUpdate = true;
+
+  // ── Orbit controls target ──
+  controls.target.lerp(boat.position, 0.05);
+
+  // ── HUD ──
+  document.getElementById('spd').textContent = (Math.abs(boatSpeed) * 3.6).toFixed(1);
+  let deg = ((boatHeading * 180 / Math.PI) % 360 + 360) % 360;
+  document.getElementById('hdg').textContent = deg.toFixed(0);
+
+  controls.update();
+  renderer.render(scene, camera);
+  requestAnimationFrame(animate);
+}
+
+animate();
+
+// ─── resize ──────────────────────────────────────────────────────────────
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>

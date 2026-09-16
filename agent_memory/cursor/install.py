@@ -62,8 +62,7 @@ Use **agent-memory** MCP tools for judgment and checkpoints:
 - `memory_delete` — hide specific noise entries from Recent (pass `ids`)
 - `memory_find` — recall detail (`query=` uses Gemini when configured)
 - Browser monitor: `.agent_memory/live/index.html` (auto-created; self-refreshing; click an entry for the full prompt packet)
-- `memory_check` — run pytest / a compile through memory; a fail latches red
-- `memory_branch` — red check: rewind to last green; `label` = what went wrong (becomes Avoid)
+- `memory_branch` — restore a requested snapshot; `label` summarizes current work
 - `memory_inspect` / `memory_inspect_done` — look at an old snapshot
 - `memory_state` — agent context only (do not dump graphs/history in chat to “show” memory)
 - `memory_history` — full timeline text (folded steps under summaries)

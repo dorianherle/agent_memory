@@ -1,0 +1,75 @@
+{
+  "task_isolation": {
+    "new_request": "Build invoice export",
+    "goal": "Fix authentication timeouts",
+    "steering": "Build invoice export"
+  },
+  "completed_knowledge": {
+    "summary_in_fresh_packet": false,
+    "build_command_in_fresh_packet": false,
+    "summary_retrievable_by_id": true
+  },
+  "read_only_observation_freshness": {
+    "current_file": "timeout=60",
+    "old_note": "config.txt specifies timeout=30",
+    "marked_stale": false
+  },
+  "unsaved_file_freshness": {
+    "current_file": "timeout=60",
+    "marked_stale": false
+  },
+  "offline_search": {
+    "single_word_hits": 1,
+    "separated_word_hits": 0,
+    "fts_hits_for_same_words": 1
+  },
+  "summary_lookup_size": {
+    "characters_returned_for_one_summary": 35243,
+    "folded_observations_returned": 12,
+    "approximate_tokens_len_div_4": 8811
+  },
+  "packet_budget": {
+    "open_questions": 60,
+    "characters": 6739,
+    "approximate_tokens_len_div_4": 1685
+  },
+  "green_checkpoint_identity": {
+    "tested_content": "new verified content",
+    "green_snapshot_content": "old snapshot",
+    "green_still_points_to_old_snapshot": true
+  },
+  "second_client_during_inspect": {
+    "before_second_client": "old",
+    "after_second_client": "current",
+    "inspection_still_active": false
+  },
+  "default_snapshot_exclusions": {
+    "env_tracked": false,
+    "env_local_tracked": true
+  },
+  "wrapper_boundary": {
+    "earlier_assistant_history_forwarded": true,
+    "finished_answer_persisted": false
+  },
+  "cross_goal_failed_path": {
+    "new_request": "Build invoice export",
+    "injected_avoid": [
+      "Redis increased login latency under benchmark A."
+    ]
+  },
+  "concurrent_goal_creation": {
+    "records_marked_as_original_goal": 2,
+    "expected_by_single_goal_contract": 1
+  },
+  "save_acknowledgement": {
+    "save_reported_error": "synthetic provider configuration error",
+    "note_persisted_despite_error": true
+  },
+  "independent_git_graphs": {
+    "different_git_directories": true,
+    "goal_a_restored": true,
+    "goal_b_head_unchanged": true,
+    "goal_b_worktree_unchanged": true,
+    "goal_b_notes_absent_from_a": true
+  }
+}

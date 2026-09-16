@@ -1,8 +1,34 @@
+import subprocess
+import sys
+
 from agent_memory import Memory
 from agent_memory.tests.helpers import MemoryTestCase
 
 
 class TestBranch(MemoryTestCase):
+    def test_failed_command_allows_revision_without_branch(self):
+        self.save("initial")
+        result = subprocess.run(
+            [sys.executable, "-c", "from pathlib import Path; assert Path('work.txt').read_text() == 'fixed'"],
+            cwd=self.path, capture_output=True,
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.file.write_text("fixed")
+        saved = self.memory.save("Fixed content after the assertion failed")
+        self.assertEqual(self.memory._branch_name(), "main")
+        self.assertEqual(self.memory._run("show", f"{saved}:work.txt"), "fixed")
+
+    def test_branch_summary_is_searchable_without_becoming_an_instruction(self):
+        first = self.save("initial")
+        self.save("candidate")
+        summary = "This candidate failed on empty input."
+        self.memory.branch(first, "retry", summary=summary)
+        found = self.memory.find(text=summary, branch=None)
+        self.assertEqual(len(found), 1)
+        self.assertEqual(found[0].message, summary)
+        self.assertNotIn(summary, self.memory.render_state())
+        self.assertEqual(self.file.read_text(), "initial")
+
     def test_base_id_name_and_return_value(self):
         first = self.save("first")
         self.save("second")

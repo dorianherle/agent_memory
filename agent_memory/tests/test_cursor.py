@@ -28,7 +28,7 @@ class McpServerTests(MemoryTestCase):
         self.assertIn("memory_summarize", names)
         self.assertIn("memory_delete", names)
         self.assertIn("memory_open_questions", names)
-        self.assertIn("memory_check", names)
+        self.assertNotIn("memory_check", names)
         self.assertNotIn("memory_pin", names)
         self.assertIn("memory_history", names)
         self.assertNotIn("memory_write_canvas", names)
@@ -607,7 +607,6 @@ class SkillTests(MemoryTestCase):
         "memory_find",
         "memory_history",
         "memory_state",
-        "memory_check",
         "memory_branch",
         "memory_inspect",
         "memory_inspect_done",

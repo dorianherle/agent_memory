@@ -7,7 +7,6 @@ ACTIONS = (
     "delete",
     "history",
     "graph",
-    "check",
     "branch",
     "inspect",
     "inspect_done",
@@ -39,13 +38,8 @@ MEMORY_TOOL = {
             "- graph: visual tree of every branch and entry (like "
             "git log --graph). Set html=true to also write an "
             "explorable HTML page.\n"
-            "- check: run a recognized test/check. Nonzero exit "
-            "sets a red latch; only branch is then allowed. "
-            "Passing advances last green.\n"
-            "- branch: required after a red check. Rewind to the "
-            "last green checkpoint (id is ignored while red). "
-            "label must say exactly what failed; that sentence "
-            "is injected as Avoid.\n"
+            "- branch: restore the snapshot given by id; label summarizes "
+            "the work being left behind. Restores working files.\n"
             "- inspect: set every working file to how it was at an "
             "entry, to look around. Read-only; call inspect_done to "
             "return.\n"
@@ -65,7 +59,6 @@ MEMORY_TOOL = {
                     "description": (
                         "save: what to remember. "
                         "find: match a substring of the entry text. "
-                        "check: the command to run (e.g. pytest)."
                     ),
                 },
                 "payload": {
@@ -125,8 +118,7 @@ MEMORY_TOOL = {
                 "label": {
                     "type": ["string", "null"],
                     "description": (
-                        "branch only, required: one line of what went "
-                        "wrong. The next agent sees it under Avoid."
+                        "branch only, required: summary of the work being left behind."
                     ),
                 },
                 "agent": {
@@ -264,9 +256,6 @@ def _run_action(memory: Memory, arguments: dict) -> str:
             page = memory.export_html()
             result += f"\n\nExplorable version written to {page}"
         return result
-    if action == "check":
-        _require(arguments, "text")
-        return memory.check(arguments["text"])
     if action == "branch":
         _require(arguments, "id", "name", "label")
         before = memory._branch_name()
