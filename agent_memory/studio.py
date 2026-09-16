@@ -131,6 +131,26 @@ def _close_agent() -> None:
     SESSION["run"] = None
 
 
+def _block_text(block) -> str:
+    if isinstance(block, dict):
+        kind, text = block.get("type"), block.get("text") or ""
+    else:
+        kind, text = getattr(block, "type", None), getattr(block, "text", "") or ""
+    return text if kind in (None, "text") else ""
+
+
+def validate_key(key: str) -> str | None:
+    if not key:
+        return "Add a Cursor API key."
+    try:
+        from cursor_sdk import Cursor
+
+        Cursor.models.list(api_key=key)
+    except Exception as error:
+        return str(error)
+    return None
+
+
 def _ask(question: str, write) -> None:
     try:
         from cursor_sdk import Agent, LocalAgentOptions
@@ -145,33 +165,33 @@ def _ask(question: str, write) -> None:
     if not project:
         write({"type": "error", "message": "Open a project first."})
         return
-    with LOCK:
-        _close_agent()
-        SESSION["cancel"] = False
-        agent = Agent.create(
-            model=SESSION["model"],
-            api_key=key,
-            local=LocalAgentOptions(
-                cwd=project,
-                setting_sources=["project"],
-            ),
-        )
-        SESSION["agent"] = agent
-        run = agent.send(question)
-        SESSION["run"] = run
+    write({"type": "status", "text": "Starting…"})
     try:
-        stream = run.messages() if hasattr(run, "messages") else run.stream()
-        for message in stream:
+        with LOCK:
+            _close_agent()
+            SESSION["cancel"] = False
+            agent = Agent.create(
+                model=SESSION["model"],
+                api_key=key,
+                local=LocalAgentOptions(cwd=project),
+            )
+            SESSION["agent"] = agent
+            run = agent.send(question)
+            SESSION["run"] = run
+        had_text = False
+        for text in run.iter_text():
             if SESSION.get("cancel"):
                 break
-            kind = getattr(message, "type", None)
-            payload = getattr(message, "message", None)
-            if kind == "assistant" and payload is not None:
-                for block in getattr(payload, "content", []) or []:
-                    if getattr(block, "type", None) == "text":
-                        write({"type": "delta", "text": getattr(block, "text", "")})
+            if text:
+                had_text = True
+                write({"type": "delta", "text": text})
         result = run.wait()
         status = getattr(result, "status", "finished")
+        leftover = (getattr(result, "result", None) or "").strip()
+        if leftover and not had_text:
+            write({"type": "delta", "text": leftover})
+        if status == "error":
+            write({"type": "error", "message": leftover or "Agent run failed."})
         write({"type": "done", "status": status})
     except Exception as error:
         write({"type": "error", "message": str(error)})
@@ -255,8 +275,10 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(400, {"error": "That path is not a folder."})
             return self._json(200, _open_root(root, key or "", model))
         if path == "/api/key":
-            SESSION["api_key"] = str(data.get("api_key") or "").strip()
-            return self._json(200, {"ok": bool(SESSION["api_key"])})
+            key = str(data.get("api_key") or "").strip()
+            SESSION["api_key"] = key
+            error = validate_key(key)
+            return self._json(200, {"ok": error is None, "error": error})
         if path == "/api/ask":
             question = str(data.get("question") or "").strip()
             key = str(data.get("api_key") or "").strip()

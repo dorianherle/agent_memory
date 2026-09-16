@@ -82,7 +82,9 @@ class StudioTests(MemoryTestCase):
         SESSION["api_key"] = ""
         status, data = self._json("GET", "/api/session")
         self.assertFalse(data["has_key"])
-        status, data = self._json("POST", "/api/key", {"api_key": "cursor_test"})
+        with patch("agent_memory.studio.validate_key", return_value=None):
+            status, data = self._json("POST", "/api/key", {"api_key": "cursor_test"})
         self.assertEqual(status, 200)
+        self.assertTrue(data["ok"])
         status, data = self._json("GET", "/api/session")
         self.assertTrue(data["has_key"])

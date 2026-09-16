@@ -383,10 +383,15 @@ $("ask").addEventListener("submit", async (event) => {
         for (const line of lines) {
           if (!line.trim()) continue;
           const event = JSON.parse(line);
+          if (event.type === "status" && !body.textContent) body.textContent = event.text || "";
           if (event.type === "delta") body.textContent += event.text || "";
           if (event.type === "error") {
             body.parentElement.className = "msg error";
             body.textContent = event.message;
+          }
+          if (event.type === "done" && event.status === "error" && !body.textContent) {
+            body.parentElement.className = "msg error";
+            body.textContent = "Agent run failed.";
           }
         }
         $("thread").scrollTop = $("thread").scrollHeight;
@@ -409,21 +414,32 @@ $("question").addEventListener("keydown", (event) => {
   }
 });
 
-function markKey() {
+function markKey(ok) {
+  $("keybox").classList.toggle("ok", Boolean(ok));
+}
+
+async function saveKey() {
   const key = $("key").value.trim();
-  $("keybox").classList.toggle("ok", Boolean(key));
   if (key) localStorage.setItem("studio-key", $("key").value);
   else localStorage.removeItem("studio-key");
-  fetch("/api/key", {
+  markKey(false);
+  const res = await fetch("/api/key", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ api_key: $("key").value }),
   });
+  const data = await res.json();
+  markKey(data.ok);
+  if (key && !data.ok) {
+    $("status").textContent = data.error || "Invalid API key";
+    $("status").className = "";
+  }
 }
-$("key").addEventListener("input", markKey);
-$("key").addEventListener("paste", () => setTimeout(markKey, 0));
+$("key").addEventListener("change", saveKey);
+$("key").addEventListener("paste", () => setTimeout(saveKey, 0));
 $("key").value = localStorage.getItem("studio-key") || "";
-markKey();
+if ($("key").value) saveKey();
+else markKey(false);
 const last = localStorage.getItem("studio-project") || "";
 if (last) openProject("/api/open", { project: last });
 setInterval(() => { if ($("folder").title) refreshMemory(); }, 4000);
