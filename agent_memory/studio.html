@@ -74,7 +74,25 @@
     font: 13px/1.4 ui-sans-serif, system-ui, sans-serif;
     color: var(--muted);
   }
-  #key { width: 200px; }
+  .keybox { position: relative; display: flex; align-items: center; }
+  #key { width: 200px; padding-right: 30px; }
+  #key-ok {
+    position: absolute;
+    right: 8px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--ok);
+    color: #fff;
+    font: 11px/18px ui-sans-serif, system-ui, sans-serif;
+    text-align: center;
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    pointer-events: none;
+  }
+  .keybox.ok #key-ok { opacity: 1; transform: scale(1); }
+  .keybox.ok #key { border-color: var(--ok); }
   button {
     border: 0;
     border-radius: 8px;
@@ -229,7 +247,10 @@
     <form id="open">
       <button type="button" id="pick">Open folder</button>
       <span id="folder">No folder</span>
-      <input id="key" type="password" placeholder="Cursor API key" autocomplete="off">
+      <div class="keybox" id="keybox">
+        <input id="key" type="password" placeholder="Cursor API key" autocomplete="off">
+        <span id="key-ok">✓</span>
+      </div>
     </form>
     <div id="status">Closed</div>
   </header>
@@ -388,7 +409,16 @@ $("question").addEventListener("keydown", (event) => {
   }
 });
 
+function markKey() {
+  const key = $("key").value.trim();
+  $("keybox").classList.toggle("ok", Boolean(key));
+  if (key) localStorage.setItem("studio-key", $("key").value);
+  else localStorage.removeItem("studio-key");
+}
+$("key").addEventListener("input", markKey);
+$("key").addEventListener("paste", () => setTimeout(markKey, 0));
 $("key").value = localStorage.getItem("studio-key") || "";
+markKey();
 const last = localStorage.getItem("studio-project") || "";
 if (last) openProject("/api/open", { project: last });
 setInterval(() => { if ($("folder").title) refreshMemory(); }, 4000);

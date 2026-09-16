@@ -49,6 +49,7 @@ class StudioTests(MemoryTestCase):
         self.assertEqual(response.status, 200)
         self.assertIn("One window", html)
         self.assertIn("Open folder", html)
+        self.assertIn("key-ok", html)
         self.assertNotIn("Open a project path", html)
         self.assertIn("Goal", html)
 
