@@ -78,3 +78,11 @@ class StudioTests(MemoryTestCase):
             status, data = self._json("POST", "/api/pick", {"api_key": "cursor_test"})
         self.assertEqual(status, 200)
         self.assertEqual(data["name"], self.path.name)
+
+        SESSION["api_key"] = ""
+        status, data = self._json("GET", "/api/session")
+        self.assertFalse(data["has_key"])
+        status, data = self._json("POST", "/api/key", {"api_key": "cursor_test"})
+        self.assertEqual(status, 200)
+        status, data = self._json("GET", "/api/session")
+        self.assertTrue(data["has_key"])

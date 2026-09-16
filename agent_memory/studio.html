@@ -364,7 +364,7 @@ $("ask").addEventListener("submit", async (event) => {
     const res = await fetch("/api/ask", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ question, api_key: $("key").value }),
     });
     if (!res.ok || !res.body) {
       const err = await res.json().catch(() => ({ error: "Ask failed" }));
@@ -414,6 +414,11 @@ function markKey() {
   $("keybox").classList.toggle("ok", Boolean(key));
   if (key) localStorage.setItem("studio-key", $("key").value);
   else localStorage.removeItem("studio-key");
+  fetch("/api/key", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ api_key: $("key").value }),
+  });
 }
 $("key").addEventListener("input", markKey);
 $("key").addEventListener("paste", () => setTimeout(markKey, 0));

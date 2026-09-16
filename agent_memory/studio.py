@@ -254,8 +254,14 @@ class Handler(BaseHTTPRequestHandler):
             if not root.is_dir():
                 return self._json(400, {"error": "That path is not a folder."})
             return self._json(200, _open_root(root, key or "", model))
+        if path == "/api/key":
+            SESSION["api_key"] = str(data.get("api_key") or "").strip()
+            return self._json(200, {"ok": bool(SESSION["api_key"])})
         if path == "/api/ask":
             question = str(data.get("question") or "").strip()
+            key = str(data.get("api_key") or "").strip()
+            if key:
+                SESSION["api_key"] = key
             if not question:
                 return self._json(400, {"error": "Type a question."})
             self.send_response(200)
