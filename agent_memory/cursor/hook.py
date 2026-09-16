@@ -33,32 +33,12 @@ from agent_memory.identity import (
 
 CURSOR_INSTRUCTIONS = """
 You have long-term project memory via the agent-memory MCP tools.
-Read the skill `.cursor/skills/agent-memory/SKILL.md` before multi-step
-work: it covers when to retrieve, how to write entries that stay useful,
-and snapshot safety for branch/inspect.
-Hooks auto-save user prompts and finished answers at turn boundaries.
-
-For any stretch of work that might outlast this turn — investigations,
-multi-step edits, experiments — call memory_save at real milestones
-(findings, decisions, working checkpoints). Prefer a few solid saves
-over silence; if the session dies, only checkpoints survive.
-Skip pure noise (e.g. "opened file X") but do not wait until the final
-answer if useful progress already exists.
-
-Use tools for judgment and checkpoints:
-- memory_save — durable mid-turn checkpoint (pass agent)
-- memory_summarize when a chunk of work is finished (keeps Recent short)
-- memory_delete — hide specific noise entries from Recent (pass ids)
-- memory_find to recall detail (query= uses Gemini when configured)
-- memory_branch to restore a saved snapshot (label summarizes current work); memory_inspect to look at an old snapshot
-Always call memory_inspect_done before answering if you inspected.
-Prefer facts from MEMORY STATE (always-applied rule) or tool results; do not
-invent entry ids.
-Every memory entry is tagged with an agent name (@agent, @explore·…, @user).
-When calling memory tools, pass agent=<your name> if the tool asks; your
-session agent name is also in AGENT_MEMORY_AGENT.
-A self-updating HTML live view is also kept at `.agent_memory/live/index.html`
-(open in a browser; it polls for updates).
+Read `.cursor/skills/agent-memory/SKILL.md` before multi-step work.
+Hooks auto-save prompts and finished answers. Call memory_save at
+mid-turn milestones so progress survives if the session dies.
+Prefer facts from MEMORY STATE; do not invent entry ids.
+Pass agent=<your name> on memory_save / memory_summarize.
+Live HTML: `.agent_memory/live/index.html`.
 """.strip()
 
 

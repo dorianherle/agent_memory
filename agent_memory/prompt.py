@@ -60,8 +60,9 @@ Pick action on the single memory tool:
   MEMORY STATE. Do not delete findings or the current user request.
 - find when you need the exact detail behind a summary. Set
   all_branches to true to also search entries on other branches.
-- history when the user asks what happened: the full timeline of this
-  branch, with folded steps shown under their summary.
+- history when the user asks what happened: the timeline of this
+  branch (headlines, folded steps under their summary). Set full
+  for complete bodies.
 - graph when the user wants the whole tree: every branch and entry in
   one picture. Set html to true to also write an explorable HTML page
   for the user; give them its path.
@@ -244,21 +245,47 @@ def _line(item: MemoryItem) -> str:
     return f"[{item.id[:8]}] {who}{prefix}{item.message}"
 
 
-def render_timeline(items: list[MemoryItem]) -> str:
-    """The full history: raw steps indented under the summary that
-    folded them, everything oldest first."""
+FIND_DEFAULT_K = 12
+
+
+def render_timeline(items: list[MemoryItem], *, full: bool = False) -> str:
+    """History: summaries with folded steps indented under them.
+
+    Default is commit subjects. full=True keeps complete bodies.
+    """
+    fmt = _line if full else _subject
     by_id = {item.id: item for item in items}
     covered = {c for item in items for c in item.payload.get("covers", [])}
     lines = []
     for item in items:
         if item.id in covered:
             continue
-        lines.append(_line(item))
+        lines.append(fmt(item))
         for child_id in item.payload.get("covers", []):
             child = by_id.get(child_id)
             if child is not None:
-                lines.append(f"    {_line(child)}")
+                lines.append(f"    {fmt(child)}")
     return "\n".join(lines) or "Nothing saved yet."
+
+
+def render_find(
+    items: list[MemoryItem],
+    *,
+    full_ids: set[str] | None = None,
+    children: dict[str, list[MemoryItem]] | None = None,
+) -> str:
+    """Search hits. Full body only for explicit ids; others are subjects.
+
+    A summary hit lists covered child headlines underneath.
+    """
+    full_ids = full_ids or set()
+    children = children or {}
+    lines = []
+    for item in items:
+        lines.append(_line(item) if item.id in full_ids else _subject(item))
+        for child in children.get(item.id, []):
+            lines.append(f"    {_subject(child)}")
+    return "\n".join(lines) or "Nothing found."
 
 
 def render(

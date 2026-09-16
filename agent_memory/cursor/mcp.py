@@ -50,10 +50,9 @@ def _build_server():
         ids: list[str] | None = None,
         all_branches: bool = False,
     ) -> str:
-        """Search stored memory. Use query for meaning (falls back to substring
-        match when no embedding provider is configured, or when embeddings
-        fail — e.g. missing GEMINI_API_KEY — and says so), text for substring,
-        or ids from MEMORY STATE.
+        """Search memory. query= meaning (substring fallback if no Gemini),
+        text= substring, ids= full bodies. Search hits are headlines;
+        a summary lists the folded child headlines.
         """
         return call_tool(
             get_memory(),
@@ -167,9 +166,11 @@ def _build_server():
         return result
 
     @mcp.tool()
-    def memory_history() -> str:
-        """Full timeline text for the agent (summaries with folded steps). Live UI: .agent_memory/live/index.html."""
-        return call_tool(get_memory(), "memory", {"action": "history"})
+    def memory_history(full: bool = False) -> str:
+        """Timeline headlines (folded steps under summaries). full=True for bodies."""
+        return call_tool(
+            get_memory(), "memory", {"action": "history", "full": full}
+        )
 
     @mcp.tool()
     def memory_branch(id: str, name: str, label: str) -> str:

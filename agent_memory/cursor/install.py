@@ -65,7 +65,7 @@ Use **agent-memory** MCP tools for judgment and checkpoints:
 - `memory_branch` — restore a requested snapshot; `label` summarizes current work
 - `memory_inspect` / `memory_inspect_done` — look at an old snapshot
 - `memory_state` — agent context only (do not dump graphs/history in chat to “show” memory)
-- `memory_history` — full timeline text (folded steps under summaries)
+- `memory_history` — timeline headlines (folded steps under summaries)
 
 MEMORY STATE is injected every turn via the alwaysApply rule
 `.cursor/rules/agent-memory-state.mdc` (auto-rewritten on each prompt).

@@ -142,6 +142,50 @@ class TestFind(MemoryTestCase):
         self.assertIn("Created matrix", result)
         self.assertIn(SUBSTRING_FALLBACK, result)
 
+    def test_search_returns_headlines_not_bodies(self):
+        from agent_memory import call_tool
+
+        self.save("Auth timeout is 30s\nWhy: measured in src/auth.py:88")
+        result = call_tool(
+            self.memory,
+            "memory",
+            {"action": "find", "text": "Auth timeout"},
+        )
+        self.assertIn("Auth timeout is 30s", result)
+        self.assertNotIn("src/auth.py:88", result)
+
+    def test_ids_return_full_bodies(self):
+        from agent_memory import call_tool
+
+        item_id = self.save(
+            "Auth timeout is 30s\nWhy: measured in src/auth.py:88"
+        )
+        result = call_tool(
+            self.memory,
+            "memory",
+            {"action": "find", "ids": [item_id[:8]]},
+        )
+        self.assertIn("Auth timeout is 30s", result)
+        self.assertIn("src/auth.py:88", result)
+
+    def test_summary_hit_lists_child_headlines(self):
+        from agent_memory import call_tool
+
+        child = self.save(
+            "Auth timeout is 30s\nWhy: measured in src/auth.py:88"
+        )
+        summary = self.memory.save("Finished auth timeout work", summary=True)
+        result = call_tool(
+            self.memory,
+            "memory",
+            {"action": "find", "text": "Finished auth"},
+        )
+        self.assertIn("Finished auth timeout work", result)
+        self.assertIn(child[:8], result)
+        self.assertIn("Auth timeout is 30s", result)
+        self.assertNotIn("src/auth.py:88", result)
+        self.assertIn(summary[:8], result)
+
     def test_text_search_does_not_announce_fallback(self):
         from agent_memory import call_tool
         from agent_memory.prompt import SUBSTRING_FALLBACK

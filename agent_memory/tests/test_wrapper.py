@@ -401,6 +401,18 @@ class TestWrapper(MemoryTestCase):
         self.assertEqual(lines[2], f"    [{b[:8]}] @agent step b")
         self.assertEqual(lines[3], f"[{c[:8]}] @agent step c")
 
+    def test_call_tool_history_defaults_to_subjects(self):
+        from agent_memory import call_tool
+
+        self.save("Auth timeout is 30s\nWhy: measured in src/auth.py:88")
+        compact = call_tool(self.memory, "memory", {"action": "history"})
+        full = call_tool(
+            self.memory, "memory", {"action": "history", "full": True}
+        )
+        self.assertIn("Auth timeout is 30s", compact)
+        self.assertNotIn("src/auth.py:88", compact)
+        self.assertIn("src/auth.py:88", full)
+
     def test_call_tool_graph_shows_every_branch(self):
         from agent_memory import call_tool
 

@@ -546,7 +546,7 @@ class Memory:
 
     def graph(self) -> str:
         """An ASCII graph of every branch and entry, newest first."""
-        from agent_memory.prompt import _line
+        from agent_memory.prompt import _subject
 
         self._sync_catalog()
         raw = self._run(
@@ -560,7 +560,7 @@ class Memory:
             left, refs = line.split(FIELD_SEPARATOR, 1)
             prefix, sha = left[:-40], left[-40:]
             row = self._catalog.get(sha)
-            text = f"{prefix}{_line(self._row_item(row))}"
+            text = f"{prefix}{_subject(self._row_item(row))}"
             if refs.strip():
                 text += f" ({refs.strip()})"
             lines.append(text)

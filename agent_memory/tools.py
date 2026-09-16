@@ -1,5 +1,11 @@
 from agent_memory.core import Memory
-from agent_memory.prompt import SUBSTRING_FALLBACK, _line, render_timeline, save_hygiene
+from agent_memory.prompt import (
+    FIND_DEFAULT_K,
+    SUBSTRING_FALLBACK,
+    render_find,
+    render_timeline,
+    save_hygiene,
+)
 
 ACTIONS = (
     "save",
@@ -26,15 +32,16 @@ MEMORY_TOOL = {
             "- open_questions: add an unsolved question (and the notes "
             "it stands on). Same text already open is a no-op. Empty "
             "text closes all, or the ids you pass.\n"
-            "- find: read stored entries, including steps folded behind "
-            "a summary. An explicit id is found even on another branch.\n"
+            "- find: search stored entries. Search returns headlines "
+            "(plus child headlines under a summary). Pass ids for full "
+            "bodies. An explicit id is found even on another branch.\n"
             "- delete: hide specific entries from Recent, find, and the "
             "live timeline. Use for noise that should not have been "
             "saved. Snapshots stay in git; the delete commit itself "
             "does not appear in Recent.\n"
-            "- history: full timeline of the current branch, oldest "
-            "first, with folded steps under their summary. Use it to "
-            "show the user everything.\n"
+            "- history: timeline of the current branch, oldest first, "
+            "headlines with folded steps under their summary. Set full "
+            "to true for complete bodies.\n"
             "- graph: visual tree of every branch and entry (like "
             "git log --graph). Set html=true to also write an "
             "explorable HTML page.\n"
@@ -121,6 +128,13 @@ MEMORY_TOOL = {
                         "branch only, required: summary of the work being left behind."
                     ),
                 },
+                "full": {
+                    "type": ["boolean", "null"],
+                    "description": (
+                        "history only: true for complete bodies. "
+                        "Default is headlines."
+                    ),
+                },
                 "agent": {
                     "type": ["string", "null"],
                     "description": (
@@ -142,6 +156,7 @@ MEMORY_TOOL = {
                 "id",
                 "name",
                 "label",
+                "full",
                 "agent",
             ],
             "additionalProperties": False,
@@ -202,19 +217,41 @@ def _run_action(memory: Memory, arguments: dict) -> str:
     if action == "find":
         branch = None if arguments.get("all_branches") else "current"
         queried = bool(arguments.get("query"))
+        explicit = bool(arguments.get("ids"))
         items = memory.find(
             arguments.get("query"),
             ids=arguments.get("ids"),
             text=arguments.get("text"),
             payload=arguments.get("payload"),
-            k=50,
+            k=50 if explicit else FIND_DEFAULT_K,
             branch=branch,
         )
         used_substring = memory._find_used_substring
-        covered = [c for item in items for c in item.payload.get("covers", [])]
-        items += memory.find(ids=covered, k=50, branch=branch)
-        lines = "\n".join(_line(item) for item in items)
-        result = lines or "Nothing found."
+        cover_ids = [
+            child_id
+            for item in items
+            for child_id in item.payload.get("covers", [])
+        ]
+        kids = (
+            memory.find(ids=cover_ids, k=len(cover_ids), branch=branch)
+            if cover_ids
+            else []
+        )
+        by_id = {item.id: item for item in kids}
+        children = {
+            item.id: [
+                by_id[child_id]
+                for child_id in item.payload.get("covers", [])
+                if child_id in by_id
+            ]
+            for item in items
+            if item.payload.get("covers")
+        }
+        result = render_find(
+            items,
+            full_ids={item.id for item in items} if explicit else set(),
+            children=children,
+        )
         if queried and used_substring:
             result = f"{result}\n\n{SUBSTRING_FALLBACK}"
         return result
@@ -232,7 +269,9 @@ def _run_action(memory: Memory, arguments: dict) -> str:
             hidden.append(target[:8])
         return "Deleted [" + "], [".join(hidden) + "]."
     if action == "history":
-        return render_timeline(memory.history())
+        return render_timeline(
+            memory.history(), full=bool(arguments.get("full"))
+        )
     if action == "open_questions":
         if not (arguments.get("text") or "").strip():
             closed = memory.close_questions(arguments.get("ids"))

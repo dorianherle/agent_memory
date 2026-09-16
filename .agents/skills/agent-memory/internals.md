@@ -37,8 +37,8 @@ derived state and rebuild themselves from the git history.
 | `memory_summarize` | `(text, agent=None)` | Same, plus `covers` = every entry since the last summary. Returns `Summarized [id8] @agent`. Same headline warning as save. |
 | `memory_open_questions` | `(text="", depends_on=None, ids=None)` | Add a question (`text` + notes it stands on). Empty `text` closes all, or only `ids`. Several can be live. |
 | `memory_delete` | `(ids)` | Tombstone. Hides those ids from state / find / history / live HTML. Returns `Deleted [id8], …`. Raises on unknown id. The delete commit is `kind=delete` and does not appear in Recent. |
-| `memory_find` | `(query=None, text=None, ids=None, all_branches=False)` | Read. Up to 50 full entries, newest first, plus steps covered by any matched summary. `query=` without embeddings appends a substring-fallback notice. |
-| `memory_history` | `()` | Whole current branch, oldest first, folded steps indented under their summary. |
+| `memory_find` | `(query=None, text=None, ids=None, all_branches=False)` | Read. Search returns up to 12 headlines; `ids=` returns those full bodies. A matched summary lists folded child headlines. `query=` without embeddings appends a substring-fallback notice. |
+| `memory_history` | `(full=False)` | Current branch, oldest first, folded steps indented under their summary. Headlines by default; `full=True` for bodies. |
 | `memory_state` | `()` | The same compact state that is already injected each turn. |
 | `memory_branch` | `(id, name, label)` | Save label as a summary of the current line, then restore working files to the requested id. Old work stays searchable. |
 | `memory_inspect` | `(id)` | **Restores files** to that entry, detached, and blocks saving until closed. |
@@ -100,13 +100,15 @@ always-applied rule, rewritten on every durable write) and mirrored to
    `(substring fallback — set GEMINI_API_KEY for semantic)`.
 4. **Substring.** `text=` is a case-insensitive `instr` match on the message.
    Under fallback, `query` is appended to `text`.
-5. **Unfolding.** Any matched summary pulls in the entries listed in its
-   `covers`, so hitting a summary returns the work behind it.
-6. **Output.** `k=50`, rendered as full message bodies, not subjects.
+5. **Unfolding.** Any matched summary lists the entries in its `covers`
+   as indented headlines, so hitting a summary shows the work behind it
+   without dumping those bodies.
+6. **Output.** Search uses `k=12` headlines. Explicit `ids=` return full
+   bodies of those notes only.
 
-Practical consequence: `memory_find(query="…")` on a vague concept can return
-tens of full agent answers. Prefer `ids=`, then `text=` with a symbol or path,
-then `query=` with at least one literal token in it.
+Practical consequence: `memory_find(query="…")` on a vague concept returns
+a short headline list. Prefer `ids=` when you need the body, then `text=`
+with a symbol or path, then `query=` with at least one literal token.
 
 ## Folding
 

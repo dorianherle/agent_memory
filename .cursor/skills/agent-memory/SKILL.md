@@ -134,8 +134,8 @@ Pass `agent=` (it is in `AGENT_MEMORY_AGENT`) so voices stay apart.
 
 ## Finding a note
 
-`memory_find` returns up to 50 full notes. A broad query can dump
-thousands of tokens. Start narrow.
+`memory_find` returns headlines (default 12). Pass `ids=` for full
+bodies. A summary hit lists the folded child headlines. Start narrow.
 
 | You have | Call |
 |---|---|
@@ -150,8 +150,8 @@ matches words and says so. Put a real token (path, symbol, error)
 in every query so both modes work.
 
 `"Nothing found."` with `ids=` means the id is wrong, not that the
-work was never saved. A hit on a `Summary:` also returns the steps
-it folded.
+work was never saved. A hit on a `Summary:` lists the folded steps
+as headlines; pass those ids for bodies.
 
 Then check. If a note says `auth.py:88`, read `auth.py` before you
 edit it.
