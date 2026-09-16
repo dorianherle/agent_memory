@@ -13,6 +13,7 @@ dependencies = [
 # FastMCP lives in mcp 1.x; mcp 2.0 removed it
 cursor = ["mcp>=1.2,<2", "google-genai"]
 gemini = ["google-genai"]
+studio = ["cursor-sdk"]
 test = ["pytest>=8", "mcp>=1.2,<2", "google-genai"]
 
 [project.scripts]
@@ -24,3 +25,6 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["agent_memory"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"agent_memory/studio.html" = "agent_memory/studio.html"

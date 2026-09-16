@@ -51,7 +51,21 @@ def main(argv: list[str] | None = None) -> None:
         help="Never prompt; require --gemini-api-key / env / .env or --skip-gemini",
     )
 
+    studio = sub.add_parser(
+        "studio",
+        help="Local Cursor SDK chat: fresh agent per question, memory on the side",
+    )
+    studio.add_argument("--host", default="127.0.0.1")
+    studio.add_argument("--port", type=int, default=8765)
+    studio.add_argument("--no-browser", action="store_true")
+
     args = parser.parse_args(argv)
+
+    if args.command == "studio":
+        from agent_memory.studio import serve
+
+        serve(args.host, args.port, open_browser=not args.no_browser)
+        return
 
     if args.command == "cursor" and args.cursor_command == "install":
         from agent_memory.cursor.install import GeminiSetupError, install_cursor

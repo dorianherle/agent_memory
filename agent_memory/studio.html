@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Memory</title>
+<style>
+  :root {
+    --paper: #f4efe6;
+    --ink: #1c1915;
+    --muted: #6e675d;
+    --faint: #9a9388;
+    --line: #e4ddd2;
+    --card: #fffcf7;
+    --accent: #c96442;
+    --accent-soft: #f3d7cc;
+    --user: #2c2a26;
+    --ok: #3d6b4f;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: var(--paper);
+    color: var(--ink);
+    font: 15px/1.5 "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  }
+  body {
+    display: grid;
+    grid-template-rows: 56px 1fr;
+    min-height: 100%;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 18px;
+    border-bottom: 1px solid var(--line);
+    background: var(--card);
+  }
+  header h1 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  header form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+  }
+  input, textarea, button {
+    font: 13px/1.4 ui-sans-serif, system-ui, sans-serif;
+  }
+  input[type="text"], input[type="password"] {
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 8px;
+    padding: 7px 10px;
+    outline: none;
+  }
+  input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
+    border-color: var(--accent);
+  }
+  #project { flex: 1; min-width: 140px; }
+  #key { width: 200px; }
+  button {
+    border: 0;
+    border-radius: 8px;
+    padding: 7px 12px;
+    background: var(--ink);
+    color: var(--card);
+    cursor: pointer;
+  }
+  button.ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--line);
+  }
+  button.accent { background: var(--accent); }
+  button:disabled { opacity: 0.45; cursor: default; }
+  #status {
+    font: 12px/1 ui-sans-serif, system-ui, sans-serif;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  #status.ready { color: var(--ok); }
+  main {
+    display: grid;
+    grid-template-columns: minmax(320px, 1fr) minmax(320px, 0.92fr);
+    min-height: 0;
+  }
+  .pane {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .chat { border-right: 1px solid var(--line); }
+  .label {
+    font: 11px/1 ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--faint);
+    padding: 16px 22px 8px;
+  }
+  #thread {
+    flex: 1;
+    overflow: auto;
+    padding: 8px 22px 24px;
+  }
+  .empty {
+    color: var(--muted);
+    max-width: 28em;
+    margin-top: 12vh;
+  }
+  .empty p:first-child {
+    font-size: 22px;
+    color: var(--ink);
+    margin: 0 0 8px;
+  }
+  .msg { margin: 0 0 22px; }
+  .msg .who {
+    font: 11px/1 ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 6px;
+  }
+  .msg.user .body { color: var(--user); }
+  .msg.agent .body { white-space: pre-wrap; }
+  .msg.error .body { color: var(--accent); }
+  .composer {
+    display: flex;
+    gap: 8px;
+    padding: 14px 18px 18px;
+    border-top: 1px solid var(--line);
+    background: var(--card);
+  }
+  textarea {
+    flex: 1;
+    resize: none;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    border-radius: 10px;
+    padding: 10px 12px;
+    min-height: 48px;
+    max-height: 160px;
+    outline: none;
+    color: var(--ink);
+  }
+  .memory {
+    background: #f8f3ea;
+    min-height: 0;
+  }
+  #goal {
+    padding: 8px 22px 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  #goal h2 {
+    margin: 0 0 6px;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+  #goal .id, .commit .id {
+    font: 11px/1.2 ui-sans-serif, ui-monospace, monospace;
+    color: var(--faint);
+  }
+  .card {
+    padding: 10px 22px 0;
+  }
+  .card p {
+    margin: 4px 0 12px;
+  }
+  #timeline {
+    flex: 1;
+    overflow: auto;
+    padding: 8px 0 28px;
+  }
+  .commit {
+    display: grid;
+    grid-template-columns: 16px 1fr;
+    gap: 10px;
+    padding: 8px 22px;
+  }
+  .commit .rail {
+    position: relative;
+  }
+  .commit .rail::before {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 0;
+    bottom: -8px;
+    width: 1px;
+    background: var(--line);
+  }
+  .commit .dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 1.5px solid var(--muted);
+    margin-top: 4px;
+    position: relative;
+    z-index: 1;
+  }
+  .commit.summary .dot { border-color: var(--accent); background: var(--accent-soft); }
+  .commit.user .dot { border-color: #7aa2c5; }
+  .commit.open_question .dot { border-color: #c4922a; }
+  .commit .title { color: var(--ink); }
+  .hint { color: var(--muted); padding: 12px 22px; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Memory</h1>
+    <form id="open">
+      <input id="project" type="text" placeholder="Open a project path" spellcheck="false">
+      <input id="key" type="password" placeholder="Cursor API key" autocomplete="off">
+      <button type="submit">Open</button>
+    </form>
+    <div id="status">Closed</div>
+  </header>
+  <main>
+    <section class="pane chat">
+      <div class="label">Chat</div>
+      <div id="thread">
+        <div class="empty" id="welcome">
+          <p>One window. A new agent every question.</p>
+          <p>Open a project, then ask. The previous agent is discarded. Memory keeps the goal and the last handoff.</p>
+        </div>
+      </div>
+      <form class="composer" id="ask">
+        <textarea id="question" rows="2" placeholder="Ask something…"></textarea>
+        <button class="accent" id="send" type="submit">Ask</button>
+        <button class="ghost" id="stop" type="button">Stop</button>
+      </form>
+    </section>
+    <section class="pane memory">
+      <div class="label">Goal</div>
+      <div id="goal"><h2>Open a project to see the job.</h2></div>
+      <div class="card" id="handoff"></div>
+      <div class="card" id="questions"></div>
+      <div class="label">Commits</div>
+      <div id="timeline"><div class="hint">Notes and snapshots will land here.</div></div>
+    </section>
+  </main>
+<script>
+const $ = (id) => document.getElementById(id);
+const state = { busy: false };
+
+function esc(value) {
+  return String(value || "").replace(/[&<>"]/g, (ch) => (
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]
+  ));
+}
+
+async function refreshMemory() {
+  const res = await fetch("/api/memory");
+  if (!res.ok) return;
+  const data = await res.json();
+  if (data.goal) {
+    $("goal").innerHTML = `<div class="id">[${esc(data.goal.id)}]</div><h2>${esc(data.goal.text)}</h2>`;
+  }
+  $("handoff").innerHTML = data.handoff
+    ? `<div class="label" style="padding:0 0 6px">Handoff</div><p>[${esc(data.handoff.id)}] ${esc(data.handoff.text)}</p>`
+    : "";
+  $("questions").innerHTML = (data.questions || []).length
+    ? `<div class="label" style="padding:0 0 6px">Open questions</div>` +
+      data.questions.map((q) => `<p>[${esc(q.id)}] ${esc(q.text)}</p>`).join("")
+    : "";
+  $("timeline").innerHTML = (data.commits || []).map((c) => `
+    <div class="commit ${esc(c.kind)}">
+      <div class="rail"><div class="dot"></div></div>
+      <div>
+        <div class="id">[${esc(c.id)}] ${esc(c.kind)}${c.agent ? " · " + esc(c.agent) : ""}</div>
+        <div class="title">${esc(c.title)}</div>
+      </div>
+    </div>
+  `).join("") || `<div class="hint">No commits yet.</div>`;
+}
+
+function addMessage(role, text) {
+  $("welcome")?.remove();
+  const node = document.createElement("div");
+  node.className = "msg " + role;
+  node.innerHTML = `<div class="who">${role === "user" ? "You" : role === "error" ? "Error" : "Agent"}</div><div class="body"></div>`;
+  node.querySelector(".body").textContent = text;
+  $("thread").appendChild(node);
+  $("thread").scrollTop = $("thread").scrollHeight;
+  return node.querySelector(".body");
+}
+
+$("open").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const res = await fetch("/api/open", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ project: $("project").value, api_key: $("key").value }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    $("status").textContent = data.error || "Could not open";
+    $("status").className = "";
+    return;
+  }
+  $("project").value = data.project;
+  $("status").textContent = data.ready ? "Memory ready" : (data.hint || "Opened");
+  $("status").className = data.ready ? "ready" : "";
+  localStorage.setItem("studio-project", data.project);
+  if ($("key").value) localStorage.setItem("studio-key", $("key").value);
+  refreshMemory();
+});
+
+$("ask").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const question = $("question").value.trim();
+  if (!question || state.busy) return;
+  state.busy = true;
+  $("send").disabled = true;
+  addMessage("user", question);
+  $("question").value = "";
+  const body = addMessage("agent", "");
+  try {
+    const res = await fetch("/api/ask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question }),
+    });
+    if (!res.ok || !res.body) {
+      const err = await res.json().catch(() => ({ error: "Ask failed" }));
+      body.parentElement.className = "msg error";
+      body.textContent = err.error || "Ask failed";
+    } else {
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = "";
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split("\n");
+        buf = lines.pop() || "";
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          const event = JSON.parse(line);
+          if (event.type === "delta") body.textContent += event.text || "";
+          if (event.type === "error") {
+            body.parentElement.className = "msg error";
+            body.textContent = event.message;
+          }
+        }
+        $("thread").scrollTop = $("thread").scrollHeight;
+      }
+    }
+  } catch (error) {
+    body.parentElement.className = "msg error";
+    body.textContent = String(error);
+  }
+  state.busy = false;
+  $("send").disabled = false;
+  refreshMemory();
+});
+
+$("stop").addEventListener("click", () => fetch("/api/cancel", { method: "POST" }));
+$("question").addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    $("ask").requestSubmit();
+  }
+});
+
+$("project").value = localStorage.getItem("studio-project") || "";
+$("key").value = localStorage.getItem("studio-key") || "";
+if ($("project").value) $("open").requestSubmit();
+setInterval(() => { if ($("project").value) refreshMemory(); }, 4000);
+</script>
+</body>
+</html>
