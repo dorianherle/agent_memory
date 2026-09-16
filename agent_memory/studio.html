@@ -1,448 +1,608 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Memory</title>
-<style>
-  :root {
-    --paper: #f4efe6;
-    --ink: #1c1915;
-    --muted: #6e675d;
-    --faint: #9a9388;
-    --line: #e4ddd2;
-    --card: #fffcf7;
-    --accent: #c96442;
-    --accent-soft: #f3d7cc;
-    --user: #2c2a26;
-    --ok: #3d6b4f;
-  }
-  * { box-sizing: border-box; }
-  html, body {
-    margin: 0;
-    height: 100%;
-    background: var(--paper);
-    color: var(--ink);
-    font: 15px/1.5 "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-  }
-  body {
-    display: grid;
-    grid-template-rows: 56px 1fr;
-    min-height: 100%;
-  }
-  header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 0 18px;
-    border-bottom: 1px solid var(--line);
-    background: var(--card);
-  }
-  header h1 {
-    margin: 0;
-    font-size: 17px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-  }
-  header form {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex: 1;
-    min-width: 0;
-  }
-  input, textarea, button {
-    font: 13px/1.4 ui-sans-serif, system-ui, sans-serif;
-  }
-  input[type="text"], input[type="password"] {
-    border: 1px solid var(--line);
-    background: var(--paper);
-    color: var(--ink);
-    border-radius: 8px;
-    padding: 7px 10px;
-    outline: none;
-  }
-  input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
-    border-color: var(--accent);
-  }
-  #folder {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font: 13px/1.4 ui-sans-serif, system-ui, sans-serif;
-    color: var(--muted);
-  }
-  .keybox { position: relative; display: flex; align-items: center; }
-  #key { width: 200px; padding-right: 30px; }
-  #key-ok {
-    position: absolute;
-    right: 8px;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--ok);
-    color: #fff;
-    font: 11px/18px ui-sans-serif, system-ui, sans-serif;
-    text-align: center;
-    opacity: 0;
-    transform: scale(0.6);
-    transition: opacity 0.18s ease, transform 0.18s ease;
-    pointer-events: none;
-  }
-  .keybox.ok #key-ok { opacity: 1; transform: scale(1); }
-  .keybox.ok #key { border-color: var(--ok); }
-  button {
-    border: 0;
-    border-radius: 8px;
-    padding: 7px 12px;
-    background: var(--ink);
-    color: var(--card);
-    cursor: pointer;
-  }
-  button.ghost {
-    background: transparent;
-    color: var(--muted);
-    border: 1px solid var(--line);
-  }
-  button.accent { background: var(--accent); }
-  button:disabled { opacity: 0.45; cursor: default; }
-  #status {
-    font: 12px/1 ui-sans-serif, system-ui, sans-serif;
-    color: var(--muted);
-    white-space: nowrap;
-  }
-  #status.ready { color: var(--ok); }
-  main {
-    display: grid;
-    grid-template-columns: minmax(320px, 1fr) minmax(320px, 0.92fr);
-    min-height: 0;
-  }
-  .pane {
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-  }
-  .chat { border-right: 1px solid var(--line); }
-  .label {
-    font: 11px/1 ui-sans-serif, system-ui, sans-serif;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--faint);
-    padding: 16px 22px 8px;
-  }
-  #thread {
-    flex: 1;
-    overflow: auto;
-    padding: 8px 22px 24px;
-  }
-  .empty {
-    color: var(--muted);
-    max-width: 28em;
-    margin-top: 12vh;
-  }
-  .empty p:first-child {
-    font-size: 22px;
-    color: var(--ink);
-    margin: 0 0 8px;
-  }
-  .msg { margin: 0 0 22px; }
-  .msg .who {
-    font: 11px/1 ui-sans-serif, system-ui, sans-serif;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--faint);
-    margin-bottom: 6px;
-  }
-  .msg.user .body { color: var(--user); }
-  .msg.agent .body { white-space: pre-wrap; }
-  .msg.error .body { color: var(--accent); }
-  .composer {
-    display: flex;
-    gap: 8px;
-    padding: 14px 18px 18px;
-    border-top: 1px solid var(--line);
-    background: var(--card);
-  }
-  textarea {
-    flex: 1;
-    resize: none;
-    border: 1px solid var(--line);
-    background: var(--paper);
-    border-radius: 10px;
-    padding: 10px 12px;
-    min-height: 48px;
-    max-height: 160px;
-    outline: none;
-    color: var(--ink);
-  }
-  .memory {
-    background: #f8f3ea;
-    min-height: 0;
-  }
-  #goal {
-    padding: 8px 22px 18px;
-    border-bottom: 1px solid var(--line);
-  }
-  #goal h2 {
-    margin: 0 0 6px;
-    font-size: 22px;
-    font-weight: 600;
-    letter-spacing: -0.03em;
-  }
-  #goal .id, .commit .id {
-    font: 11px/1.2 ui-sans-serif, ui-monospace, monospace;
-    color: var(--faint);
-  }
-  .card {
-    padding: 10px 22px 0;
-  }
-  .card p {
-    margin: 4px 0 12px;
-  }
-  #timeline {
-    flex: 1;
-    overflow: auto;
-    padding: 8px 0 28px;
-  }
-  .commit {
-    display: grid;
-    grid-template-columns: 16px 1fr;
-    gap: 10px;
-    padding: 8px 22px;
-  }
-  .commit .rail {
-    position: relative;
-  }
-  .commit .rail::before {
-    content: "";
-    position: absolute;
-    left: 5px;
-    top: 0;
-    bottom: -8px;
-    width: 1px;
-    background: var(--line);
-  }
-  .commit .dot {
-    width: 11px;
-    height: 11px;
-    border-radius: 50%;
-    background: var(--card);
-    border: 1.5px solid var(--muted);
-    margin-top: 4px;
-    position: relative;
-    z-index: 1;
-  }
-  .commit.summary .dot { border-color: var(--accent); background: var(--accent-soft); }
-  .commit.user .dot { border-color: #7aa2c5; }
-  .commit.open_question .dot { border-color: #c4922a; }
-  .commit .title { color: var(--ink); }
-  .hint { color: var(--muted); padding: 12px 22px; }
-</style>
-</head>
-<body>
-  <header>
-    <h1>Memory</h1>
-    <form id="open">
-      <button type="button" id="pick">Open folder</button>
-      <span id="folder">No folder</span>
-      <div class="keybox" id="keybox">
-        <input id="key" type="password" placeholder="Cursor API key" autocomplete="off">
-        <span id="key-ok">✓</span>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Agent Memory Studio</title>
+    <style>
+:root{--paper:#f1f3f6;--card:#fff;--ink:#202938;--muted:#6d7788;--line:#e4e8ee;--accent:#3364d6;--soft:#edf3ff;--error:#b43b42;--radius:12px;color-scheme:light}
+*{box-sizing:border-box}body{margin:0;height:100dvh;display:grid;grid-template-rows:68px minmax(0,1fr);background:var(--paper);color:var(--ink);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 12px;transition:background .12s,border-color .12s}button:hover{background:var(--soft);border-color:#c8d5ee}button:disabled{opacity:.45;cursor:default}button.primary{background:var(--accent);border-color:var(--accent);color:white}input,textarea,select{border:1px solid var(--line);border-radius:8px;background:var(--card);padding:9px 11px;min-width:0}button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}header{display:flex;align-items:center;gap:16px;width:min(1540px,calc(100% - 48px));margin:auto}h1{font-size:16px;letter-spacing:-.45px;margin:0;white-space:nowrap}.brand{display:flex;align-items:center;gap:10px}.logo{display:grid;place-items:center;background:#202e48;color:white;width:32px;height:32px;border-radius:10px;font-size:22px;box-shadow:0 3px 8px #14203918}#folder{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:12px;border-left:1px solid #d9dfe8;padding-left:16px}#status{font-size:12px;color:var(--muted);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#status:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#8793a5;margin-right:7px}#status.error{color:var(--error)}#status.error:before{background:var(--error)}main{width:min(1540px,calc(100% - 48px));margin:0 auto 24px;display:grid;grid-template-columns:306px minmax(0,1fr);min-height:0;border:1px solid #dde3eb;border-radius:16px;overflow:hidden;box-shadow:0 8px 28px #23395706}.memory{display:flex;flex-direction:column;border-right:1px solid var(--line);min-height:0;background:#f8f9fb;padding:22px 16px 12px}.eyebrow{font-size:10px;font-weight:650;letter-spacing:1.15px;text-transform:uppercase;color:var(--muted);margin:0 0 9px}.context{margin:0 0 14px;padding:14px;background:white;border:1px solid var(--line);border-radius:10px;flex-shrink:0}.context h2{font-size:14px;line-height:1.55;font-weight:600;letter-spacing:-.15px;margin:0;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.context .small{display:block;margin-top:6px}.context.handoff{border-color:#d8e2f6;background:#f3f7ff}.handoff .eyebrow{color:#4970b5}.handoff p:last-child{font-size:12px;margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.muted{color:var(--muted)}.small{font-size:12px}.question{font-size:12px;margin:7px 0;border-left:2px solid #b3c3e3;padding-left:9px}.timeline-head{display:flex;align-items:center;justify-content:space-between;margin:9px 4px}.timeline-head .eyebrow{margin:0}.count{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}.memory-tools{display:flex;gap:6px;margin:0 0 12px}.memory-tools input{width:100%;background:#fff;font-size:12px;padding:8px 10px}.memory-tools button{font-size:11px;white-space:nowrap}.memory-tools button[aria-pressed=true]{color:var(--accent);background:var(--soft)}#timeline{overflow:auto;min-height:0;flex:1;scrollbar-width:thin;scrollbar-color:#cbd3df transparent}.note{position:relative;margin:1px 0 2px;padding-left:13px}.note:before{content:"";position:absolute;left:3px;top:17px;width:5px;height:5px;background:#b7c2d4;border-radius:50%}.note:after{content:"";position:absolute;left:5px;top:25px;bottom:-5px;width:1px;background:#e0e5ed}.note:last-child:after{display:none}.note-button{display:block;text-align:left;width:100%;background:transparent;border:1px solid transparent;padding:8px 9px;border-radius:8px;overflow-wrap:anywhere}.note-button.selected{background:#e9effa;border-color:#d5e0f3}.note-title{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.5}.meta{display:block;font-size:10px;color:var(--muted);margin-top:4px}.summary>.note-button .note-title{font-weight:650}.summary:before{background:var(--accent);box-shadow:0 0 0 3px #e3ebfc}.summary details>summary{font-size:11px;color:var(--accent);padding:2px 9px 8px;cursor:pointer}.children{margin:0 0 6px 10px;padding-left:5px}.hint{color:var(--muted);font-size:13px;padding:14px 8px}.workspace{display:flex;flex-direction:column;min-height:0;min-width:0;background:white}.workspace-top{display:flex;align-items:center;gap:5px;padding:14px 24px;border-bottom:1px solid var(--line);min-height:59px}.tab{border-color:transparent;border-radius:7px;color:var(--muted);font-size:12px;padding:6px 10px}.tab[aria-selected=true]{background:#f0f3f8;color:var(--ink);font-weight:600}.workspace-top .session-label{margin-left:auto;font-size:11px;color:var(--muted);white-space:nowrap}.session-label:before{content:"";display:inline-block;width:6px;height:6px;background:#528e70;border-radius:50%;margin-right:7px}#chat{display:flex;flex-direction:column;min-height:0;flex:1}#thread{flex:1;overflow:auto;padding:28px max(32px,calc((100% - 760px)/2));scrollbar-width:thin}.empty{max-width:520px;margin:clamp(30px,10vh,160px) auto 32px}.empty .empty-icon{font-size:28px;display:grid;place-items:center;width:52px;height:52px;border:1px solid #dfe5ee;border-radius:16px;margin-bottom:23px;color:#395b95;background:linear-gradient(150deg,#f7faff,#edf2fb)}.empty h2{font-size:34px;line-height:1.2;letter-spacing:-1.2px;font-weight:600;margin:0 0 15px}.empty>p{color:var(--muted);margin:0;max-width:410px;font-size:14px;line-height:1.7}.suggestions{display:flex;gap:8px;flex-wrap:wrap;margin-top:25px}.suggestions button{font-size:12px;padding:9px 12px;color:#4c5b72;background:#fafbfd}.msg{margin:0 0 28px}.who{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:8px}.msg.agent .who:before{content:"≋";display:grid;place-items:center;width:21px;height:21px;border-radius:6px;background:#edf2fa;color:#3d608f;font-size:15px}.msg .body{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8;font-size:14px}.msg.user{margin-left:auto;max-width:88%}.msg.user .who{text-align:right;justify-content:flex-end}.msg.user .body{padding:12px 16px;border-radius:12px 12px 3px 12px;background:#f1f4f9}.msg.pending .body:empty:before{content:attr(data-phase);color:var(--muted);font-size:13px}.msg.pending .who:before{animation:breathe 1.4s ease-in-out infinite}.msg.error{color:var(--error)}.body pre{background:#f5f7fa;border:1px solid var(--line);padding:15px;border-radius:10px;overflow:auto;white-space:pre}.body code{font:12px/1.7 ui-monospace,monospace}.body h3{font-size:16px;margin:16px 0 4px}.body strong{font-weight:650}.run-status{display:flex;align-items:center;gap:10px;max-width:816px;width:100%;margin:0 auto;padding:0 28px;min-height:27px;color:var(--muted);font-size:11px}#activity:empty{display:none}#standby{margin-left:auto;font-size:11px}#standby[data-ready=true]{color:#438061}.composer-wrap{padding:8px 28px 19px;width:100%;max-width:816px;margin:0 auto}.composer{border:1px solid #dbe2ed;padding:9px 10px;border-radius:13px;background:white;box-shadow:0 3px 12px #23395706;transition:border-color .12s,box-shadow .12s}.composer:focus-within{border-color:#94addd;box-shadow:0 0 0 3px #3364d610}.composer textarea{display:block;width:100%;border:none;resize:none;min-height:62px;max-height:170px;background:transparent;padding:8px 6px;line-height:1.6}.composer textarea:focus-visible{outline:none}.composer-bottom{display:flex;align-items:center;gap:8px;padding:3px 3px 0}#model{border:0;padding:5px 2px;color:var(--muted);font-size:11px;max-width:190px;background:transparent}#send{margin-left:auto;border-radius:8px;padding:7px 13px;font-size:12px}#stop{margin-left:auto;color:var(--error);font-size:12px}.composer-note{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:10px;margin:9px 2px 0}#detail{overflow:auto;flex:1;padding:32px max(28px,calc((100% - 760px)/2))}#detail h2{font-size:25px;font-weight:600;letter-spacing:-.6px;line-height:1.4;overflow-wrap:anywhere}#detail .body{white-space:pre-wrap;overflow-wrap:anywhere}dialog{border:1px solid var(--line);border-radius:16px;padding:28px;width:min(490px,calc(100% - 32px));box-shadow:0 24px 80px #17251b22}dialog::backdrop{background:#18243d45;backdrop-filter:blur(3px)}dialog h2{margin:0 0 20px;font-size:21px;letter-spacing:-.5px}dialog label{display:block;font-size:12px;font-weight:600;margin:16px 0 6px}dialog input{width:100%}.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}#keybox{display:flex;align-items:center;gap:8px}#key-ok{color:#438061;display:none}#keybox.ok #key-ok{display:inline}#settings-message{color:var(--muted);font-size:12px;overflow-wrap:anywhere}#settings-message[data-state=success]{color:#238254}#settings-message[data-state=error]{color:var(--error)}#memory-toggle{display:none}#memory-backdrop{display:none}[hidden]{display:none!important}@keyframes breathe{50%{opacity:.4}}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}@media(min-width:1800px){body{grid-template-rows:84px minmax(0,1fr)}main{margin-bottom:40px}}@media(max-width:900px){header{width:calc(100% - 24px);gap:10px}main{width:calc(100% - 24px);margin-bottom:12px;grid-template-columns:270px minmax(0,1fr)}#thread{padding:24px}.empty h2{font-size:28px}.workspace-top{padding:14px 16px}#status{max-width:180px}.composer-wrap{padding:8px 18px 17px}.workspace-top .session-label{display:none}}@media(max-width:700px){body{grid-template-rows:60px minmax(0,1fr)}header{gap:8px}header h1{font-size:14px}#folder{display:none}#status{margin-left:auto;max-width:140px;font-size:10px}header button{padding:7px 9px;font-size:11px}main{display:block;position:relative}#memory-toggle{display:block}.workspace{height:100%}.memory{display:none;position:absolute;top:0;bottom:0;left:0;width:min(300px,86%);z-index:3;box-shadow:15px 0 40px #17274225}main.memory-open .memory{display:flex}main.memory-open #memory-backdrop{display:block;position:absolute;inset:0;border:0;border-radius:0;background:#18243d35;z-index:2}.workspace-top{padding:10px 12px;min-height:55px}.empty{margin:6vh auto 20px}.empty h2{font-size:28px}.empty .empty-icon{margin-bottom:18px}#thread,#detail{padding:22px}.composer-wrap{padding:6px 13px 13px}.run-status{padding:0 18px}.composer-note{font-size:9px}.suggestions{gap:6px}.suggestions button{font-size:11px}.msg.user{max-width:95%}}
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <span class="logo" aria-hidden="true">≋</span>
+        <h1>Agent Memory</h1>
       </div>
-    </form>
-    <div id="status">Closed</div>
-  </header>
-  <main>
-    <section class="pane chat">
-      <div class="label">Chat</div>
-      <div id="thread">
-        <div class="empty" id="welcome">
-          <p>One window. A new agent every question.</p>
-          <p>Open a project, then ask. The previous agent is discarded. Memory keeps the goal and the last handoff.</p>
+      <span id="folder">No project open</span
+      ><span id="status" role="status">Open a project to begin</span
+      ><button id="pick">Open folder</button
+      ><button id="settings-open" aria-label="Connection settings">
+        Settings
+      </button>
+    </header>
+    <main id="app-shell">
+      <button id="memory-backdrop" aria-label="Close memory panel" tabindex="-1"></button>
+      <aside class="memory" aria-label="Memory overview">
+        <div class="context">
+          <p class="eyebrow">Goal</p>
+          <div id="goal">
+            <h2>Your project’s memory.</h2>
+            <span class="muted small"
+              >Decisions and progress, one chapter at a time.</span
+            >
+          </div>
         </div>
-      </div>
-      <form class="composer" id="ask">
-        <textarea id="question" rows="2" placeholder="Ask something…"></textarea>
-        <button class="accent" id="send" type="submit">Ask</button>
-        <button class="ghost" id="stop" type="button">Stop</button>
+        <div class="context handoff" id="handoff-card" hidden><p class="eyebrow">Ready for the next agent</p><button class="note-button" id="handoff-text"></button></div>
+        <div class="context" id="questions" hidden></div>
+        <div class="timeline-head">
+          <p class="eyebrow">Memory trail</p><span class="count" id="note-count"></span>
+        </div>
+        <p id="memory-error" class="small" role="alert" hidden></p>
+        <div class="memory-tools"><input id="memory-search" type="search" placeholder="Find a note…" aria-label="Search memory notes"><button id="show-all" aria-pressed="true">All notes</button></div>
+        <div id="timeline">
+          <div class="hint">Open a folder to browse its memory.</div>
+        </div>
+      </aside>
+      <section class="workspace" aria-label="Conversation and note details">
+        <div class="workspace-top" role="tablist">
+          <button id="memory-toggle" aria-label="Show memory panel" aria-expanded="false">☰</button>
+          <button
+            class="tab"
+            id="chat-tab"
+            role="tab"
+            aria-selected="true"
+            aria-controls="chat"
+          >
+            Conversation</button
+          ><button
+            class="tab"
+            id="detail-tab"
+            role="tab"
+            aria-selected="false"
+            aria-controls="detail"
+          >
+            Note details</button
+          ><span class="session-label">Fresh agent · Shared memory</span>
+        </div>
+        <div id="chat" role="tabpanel">
+          <div id="thread">
+            <div class="empty" id="welcome">
+              <div class="empty-icon" aria-hidden="true">≋</div>
+              <h2>One window.<br>Work that carries forward.</h2>
+              <p>Pick up where you left off. Your next agent starts with the decisions, evidence, and next steps that matter.</p>
+              <div class="suggestions"><button data-prompt="Continue from the latest handoff. Verify the next step before proceeding.">Continue the work ↗</button><button data-prompt="Summarize our progress and what remains unresolved.">Review progress</button></div>
+            </div>
+          </div>
+          <div class="run-status"><span id="activity" role="status" aria-live="polite"></span><span id="standby"></span></div>
+          <div class="composer-wrap">
+            <form class="composer" id="ask">
+              <textarea
+                id="question"
+                aria-label="Message"
+                rows="2"
+                placeholder="What would you like to work on?"
+              ></textarea><div class="composer-bottom"><select id="model" aria-label="Agent model"><option value="grok-4.5">Grok 4.5 Fast</option></select
+              ><button id="stop" type="button" hidden>Stop</button
+              ><button class="primary" id="send" type="submit" disabled>
+                Send ↑
+              </button></div>
+            </form>
+            <p class="composer-note" id="composer-note">
+              Open a project and connect Cursor in Settings.
+            </p>
+          </div>
+        </div>
+        <div id="detail" role="tabpanel" hidden>
+          <p class="muted">
+            Select a note or summary in the overview to read it here.
+          </p>
+        </div>
+      </section>
+    </main>
+    <dialog id="settings">
+      <h2>Project & connection</h2>
+      <form id="open">
+        <label for="project-path">Project folder</label
+        ><input id="project-path" placeholder="/path/to/your/project" />
+        <div class="actions"><button type="submit">Open project</button></div>
       </form>
-    </section>
-    <section class="pane memory">
-      <div class="label">Goal</div>
-      <div id="goal"><h2>Open a project to see the job.</h2></div>
-      <div class="card" id="handoff"></div>
-      <div class="card" id="questions"></div>
-      <div class="label">Commits</div>
-      <div id="timeline"><div class="hint">Notes and snapshots will land here.</div></div>
-    </section>
-  </main>
-<script>
-const $ = (id) => document.getElementById(id);
-const state = { busy: false };
-
-function esc(value) {
-  return String(value || "").replace(/[&<>"]/g, (ch) => (
-    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]
-  ));
-}
-
-async function refreshMemory() {
-  const res = await fetch("/api/memory");
-  if (!res.ok) return;
-  const data = await res.json();
-  if (data.goal) {
-    $("goal").innerHTML = `<div class="id">[${esc(data.goal.id)}]</div><h2>${esc(data.goal.text)}</h2>`;
-  }
-  $("handoff").innerHTML = data.handoff
-    ? `<div class="label" style="padding:0 0 6px">Handoff</div><p>[${esc(data.handoff.id)}] ${esc(data.handoff.text)}</p>`
-    : "";
-  $("questions").innerHTML = (data.questions || []).length
-    ? `<div class="label" style="padding:0 0 6px">Open questions</div>` +
-      data.questions.map((q) => `<p>[${esc(q.id)}] ${esc(q.text)}</p>`).join("")
-    : "";
-  $("timeline").innerHTML = (data.commits || []).map((c) => `
-    <div class="commit ${esc(c.kind)}">
-      <div class="rail"><div class="dot"></div></div>
-      <div>
-        <div class="id">[${esc(c.id)}] ${esc(c.kind)}${c.agent ? " · " + esc(c.agent) : ""}</div>
-        <div class="title">${esc(c.title)}</div>
+      <label for="key">Cursor API key</label>
+      <div id="keybox">
+        <input
+          id="key"
+          type="password"
+          placeholder="Cursor API key"
+          autocomplete="off"
+        /><span id="key-ok" aria-label="Connected">✓</span>
       </div>
-    </div>
-  `).join("") || `<div class="hint">No commits yet.</div>`;
-}
-
-function addMessage(role, text) {
-  $("welcome")?.remove();
-  const node = document.createElement("div");
-  node.className = "msg " + role;
-  node.innerHTML = `<div class="who">${role === "user" ? "You" : role === "error" ? "Error" : "Agent"}</div><div class="body"></div>`;
-  node.querySelector(".body").textContent = text;
-  $("thread").appendChild(node);
-  $("thread").scrollTop = $("thread").scrollHeight;
-  return node.querySelector(".body");
-}
-
-function applyOpen(data) {
-  $("folder").textContent = data.name || data.project.split("/").pop() || data.project;
-  $("folder").title = data.project;
-  $("status").textContent = data.ready ? "Memory ready" : (data.hint || "Opened");
-  $("status").className = data.ready ? "ready" : "";
-  localStorage.setItem("studio-project", data.project);
-  if ($("key").value) localStorage.setItem("studio-key", $("key").value);
-  refreshMemory();
-}
-
-async function openProject(url, extra) {
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ api_key: $("key").value, ...extra }),
-  });
-  const data = await res.json();
-  if (!res.ok) {
-    $("status").textContent = data.error || "Could not open";
-    $("status").className = "";
-    return;
-  }
-  applyOpen(data);
-}
-
-$("pick").addEventListener("click", () => openProject("/api/pick", {}));
-
-$("ask").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const question = $("question").value.trim();
-  if (!question || state.busy) return;
-  state.busy = true;
-  $("send").disabled = true;
-  addMessage("user", question);
-  $("question").value = "";
-  const body = addMessage("agent", "");
-  try {
-    const res = await fetch("/api/ask", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question, api_key: $("key").value }),
-    });
-    if (!res.ok || !res.body) {
-      const err = await res.json().catch(() => ({ error: "Ask failed" }));
-      body.parentElement.className = "msg error";
-      body.textContent = err.error || "Ask failed";
-    } else {
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buf = "";
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        buf += decoder.decode(value, { stream: true });
-        const lines = buf.split("\n");
-        buf = lines.pop() || "";
-        for (const line of lines) {
-          if (!line.trim()) continue;
-          const event = JSON.parse(line);
-          if (event.type === "status" && !body.textContent) body.textContent = event.text || "";
-          if (event.type === "delta") body.textContent += event.text || "";
-          if (event.type === "error") {
-            body.parentElement.className = "msg error";
-            body.textContent = event.message;
+      <p class="small muted">The key stays in this running server session.</p>
+      <p id="settings-message" role="status"></p>
+      <div class="actions">
+        <button id="settings-close">Close</button
+        ><button id="connect" class="primary">Connect</button>
+      </div>
+    </dialog>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const state = {
+        busy: false,
+        project: "",
+        ready: false,
+        hasKey: false,
+        commits: [],
+        selected: null,
+        memoryJSON: "",
+        memoryETag: "",
+        refreshing: false,
+        showAll: true,
+        noteCache: new Map(),
+      };
+      const expanded = new Set();
+      const esc = (value) =>
+        String(value ?? "").replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      function rich(text) {
+        return String(text || "")
+          .split(/(```[\s\S]*?```)/g)
+          .map((part) =>
+            part.startsWith("```")
+              ? "<pre><code>" +
+                esc(part.replace(/^```[^\n]*\n?/, "").replace(/```$/, "")) +
+                "</code></pre>"
+              : esc(part)
+                  .replace(/`([^`\n]+)`/g, "<code>$1</code>")
+                  .replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>")
+                  .replace(/^#{1,4} (.+)$/gm, "<h3>$1</h3>"),
+          )
+          .join("");
+      }
+      async function api(url, data) {
+        const res = await fetch(
+          url,
+          data === undefined
+            ? {}
+            : {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+              },
+        );
+        const body = await res.json();
+        if (!res.ok) throw new Error(body.error || "Request failed");
+        return body;
+      }
+      function status(text, error = false) {
+        $("status").textContent = text;
+        $("status").title = text;
+        $("status").classList.toggle("error", error);
+      }
+      function controls() {
+        $("send").disabled =
+          state.busy || !state.project || !state.hasKey || !state.ready;
+        $("stop").hidden = !state.busy;
+        $("send").hidden = state.busy;
+        $("pick").disabled = state.busy;
+        $("model").disabled = state.busy;
+        $("composer-note").textContent = !state.project
+          ? "Open a project to begin."
+          : !state.ready
+            ? "Install memory in this folder: agent-memory cursor install"
+            : !state.hasKey
+              ? "Connect your Cursor API key in Settings."
+              : "Enter to send · Shift + Enter for a new line";
+      }
+      function tab(name) {
+        for (const id of ["chat", "detail"]) {
+          $(id).hidden = id !== name;
+          $(id + "-tab").setAttribute("aria-selected", String(id === name));
+        }
+      }
+      $("chat-tab").onclick = () => tab("chat");
+      $("detail-tab").onclick = () => tab("detail");
+      function allNotes(items) {
+        return items.flatMap((c) => [c, ...allNotes(c.children || [])]);
+      }
+      async function showNote(id) {
+        let note = allNotes(state.commits).find((c) => c.id === id);
+        if (!note) return;
+        state.selected = id;
+        tab("detail");
+        $("detail").innerHTML = `<p class="eyebrow">Memory note</p><h2>${esc(note.title)}</h2><p class="muted">Loading details…</p>`;
+        if (note.text === undefined) {
+          try {
+            const full = state.noteCache.get(id) || await api("/api/note?id=" + encodeURIComponent(id));
+            state.noteCache.set(id, full);
+            if (state.selected !== id) return;
+            note = {...note, ...full};
+          } catch (error) { if (state.selected === id) $("detail").innerHTML = `<p class="error">${esc(error.message)}</p>`; return; }
+        }
+        const children = note.children || [];
+        $("detail").innerHTML =
+          `<p class="eyebrow">${esc(note.kind === "summary" ? "Summary commit" : note.kind === "user" ? "User note" : "Memory note")}</p><h2>${esc(note.title)}</h2><p class="muted small">${esc(note.id)} · ${esc(new Date(note.at).toLocaleString())}${note.agent ? " · " + esc(note.agent) : ""}</p><div class="body">${rich(note.text.slice(note.title.length).trim())}</div>${children.length ? `<p class="eyebrow" style="margin-top:30px">Grouped commits · ${children.length}</p>` + children.map((c) => noteButton(c)).join("") : ""}`;
+        document
+          .querySelectorAll(".note-button")
+          .forEach((el) =>
+            el.classList.toggle("selected", el.dataset.note === id),
+          );
+        tab("detail");
+        toggleMemory(false);
+      }
+      function noteButton(c) {
+        return `<button class="note-button${state.selected === c.id ? " selected" : ""}" data-note="${esc(c.id)}"><span class="note-title">${esc(c.title)}</span><span class="meta">${esc(c.kind === "summary" ? "Summary" : c.kind === "user" ? "You" : c.kind === "answer" ? "Agent" : c.kind === "open_question" ? "Open question" : "Note")} · ${esc(c.id)}</span></button>`;
+      }
+      function noteHTML(c) {
+        const children = c.children || [];
+        return `<div class="note ${c.kind === "summary" ? "summary" : ""}">${noteButton(c)}${children.length ? `<details data-group="${esc(c.id)}"${expanded.has(c.id) ? " open" : ""}><summary>${children.length} grouped ${children.length === 1 ? "note" : "notes"}</summary><div class="children">${children.map(noteHTML).join("")}</div></details>` : ""}</div>`;
+      }
+      function renderMemory(data) {
+        $("memory-error").hidden = true;
+        state.commits = data.commits || [];
+        const serial = JSON.stringify(data);
+        if (serial === state.memoryJSON) return;
+        state.memoryJSON = serial;
+        $("goal").innerHTML = data.goal
+          ? `<button class="note-button" data-note="${esc(data.goal.id)}"><h2>${esc(data.goal.text)}</h2><span class="meta">View goal</span></button>`
+          : '<h2>No goal yet.</h2><span class="muted small">Your first message starts the job.</span>';
+        const questions = data.questions || [];
+        $("questions").hidden = !questions.length;
+        $("questions").innerHTML =
+          '<p class="eyebrow">Open questions</p>' +
+          questions
+            .map((q) => `<p class="question">${esc(q.text)}</p>`)
+            .join("");
+        $("handoff-card").hidden = !data.handoff;
+        $("handoff-text").textContent = data.handoff?.text || "";
+        $("handoff-text").dataset.note = data.handoff?.id || "";
+        state.pinned = new Set([data.goal?.id, ...questions.map((q) => q.id)]);
+        renderTimeline();
+      }
+      function renderTimeline() {
+        const query = $("memory-search").value.trim().toLowerCase();
+        const source = query ? allNotes(state.commits) : state.commits;
+        const notes = source.filter(c => (query || !state.pinned?.has(c.id)) && (query || state.showAll || !["user","answer"].includes(c.kind)) && (!query || c.title.toLowerCase().includes(query)));
+        $("note-count").textContent = allNotes(state.commits).length + " saved";
+        $("timeline").innerHTML = notes.map(query ? noteButton : noteHTML).join("") || '<div class="hint">' + (query ? 'No matching notes.' : (state.commits.length ? 'No notes in this view. Turn on All notes to see saved messages.' : 'No saved notes in this folder yet.')) + '</div>';
+      }
+      $("memory-search").oninput = renderTimeline;
+      $("show-all").onclick = () => { state.showAll = !state.showAll; $("show-all").setAttribute("aria-pressed", state.showAll); renderTimeline(); };
+      function toggleMemory(open) { $("app-shell").classList.toggle("memory-open", open); $("memory-toggle").setAttribute("aria-expanded", open); }
+      $("memory-toggle").onclick = () => toggleMemory(!$("app-shell").classList.contains("memory-open"));
+      $("memory-backdrop").onclick = () => toggleMemory(false);
+      async function refreshMemory() {
+        if (!state.project || state.refreshing || document.hidden) return;
+        const project = state.project;
+        state.refreshing = true;
+        try {
+          const response = await fetch("/api/memory?compact=1", {headers: state.memoryETag ? {"If-None-Match": state.memoryETag} : {}});
+          if (response.status === 304) return;
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || "Memory unavailable");
+          if (project === state.project) {
+            state.memoryETag = response.headers.get("ETag") || "";
+            renderMemory(data);
           }
-          if (event.type === "done" && event.status === "error" && !body.textContent) {
-            body.parentElement.className = "msg error";
-            body.textContent = "Agent run failed.";
+        } catch (error) {
+          $("memory-error").hidden = false;
+          $("memory-error").textContent = "Could not refresh memory: " + error.message;
+        }
+        finally { state.refreshing = false; }
+      }
+      document.addEventListener("click", (event) => {
+        const suggestion = event.target.closest("[data-prompt]");
+        if (suggestion) { $("question").value = suggestion.dataset.prompt; $("question").focus(); }
+        const button = event.target.closest("[data-note]");
+        if (button) showNote(button.dataset.note);
+      });
+      $("timeline").addEventListener(
+        "toggle",
+        (event) => {
+          const id = event.target.dataset.group;
+          if (id) {
+            if (event.target.open) expanded.add(id);
+            else expanded.delete(id);
+          }
+        },
+        true,
+      );
+      function applyOpen(data) {
+        const changed = state.project !== data.project;
+        state.project = data.project;
+        state.ready = data.ready;
+        $("folder").textContent = data.name || data.project.split("/").pop();
+        $("folder").title = data.project;
+        $("project-path").value = data.project;
+        localStorage.setItem("studio-project", data.project);
+        if (changed) {
+          state.memoryJSON = "";
+          state.memoryETag = "";
+          state.noteCache.clear();
+          state.commits = [];
+          state.pinned = new Set();
+          $("goal").innerHTML = '<h2>Loading memory…</h2>';
+          $("timeline").innerHTML = '<div class="hint">Loading saved notes…</div>';
+          $("handoff-card").hidden = true;
+          $("questions").hidden = true;
+          state.selected = null;
+          expanded.clear();
+          $("activity").textContent = "";
+          $("activity").removeAttribute("title");
+          $("question").value = "";
+          $("thread").innerHTML = welcomeHTML;
+          $("thread").querySelector("h2").textContent = "Ready to pick up the thread.";
+          $("detail").innerHTML =
+            '<p class="muted">Select a note or summary to read it here.</p>';
+          tab("chat");
+        }
+        status(
+          data.ready ? "Memory connected" : data.hint || "Memory setup needed",
+        );
+        controls();
+        refreshMemory();
+        refreshStandby();
+      }
+      async function openProject(url, extra = {}) {
+        try {
+          const data = await api(url, extra);
+          applyOpen(data);
+          $("settings").close();
+        } catch (error) {
+          status(error.message, true);
+          $("settings-message").dataset.state = "error";
+          $("settings-message").textContent = error.message;
+        }
+      }
+      $("pick").onclick = () => openProject("/api/pick");
+      $("open").onsubmit = (event) => {
+        event.preventDefault();
+        openProject("/api/open", { project: $("project-path").value });
+      };
+      $("settings-open").onclick = () => $("settings").showModal();
+      $("settings-close").onclick = () => $("settings").close();
+      async function loadModels() {
+        try {
+          const data = await api("/api/models");
+          const current =
+            localStorage.getItem("studio-model-v3") ||
+            $("model").value ||
+            "grok-4.5";
+          const models = data.models || [];
+          $("model").innerHTML = models
+            .map((m) => `<option value="${esc(m.id)}">${esc(m.name)}</option>`)
+            .join("");
+          if (models.some((m) => m.id === current)) $("model").value = current;
+        } catch (error) {
+          status(error.message, true);
+        }
+      }
+      $("model").onchange = async () => {
+        localStorage.setItem("studio-model-v3", $("model").value);
+        try {
+          await api("/api/model", { model: $("model").value });
+        } catch (error) {
+          status(error.message, true);
+          const session = await api("/api/session").catch(() => null);
+          if (session) { $("model").value = session.model; localStorage.setItem("studio-model-v3", session.model); }
+        }
+      };
+      $("connect").onclick = async () => {
+        $("connect").disabled = true;
+        $("settings-message").textContent = "Connecting…";
+        $("settings-message").dataset.state = "pending";
+        try {
+          const data = await api("/api/key", {
+            api_key: $("key").value.trim(),
+          });
+          state.hasKey = data.ok;
+          $("settings-message").dataset.state = data.ok ? "success" : "error";
+          $("keybox").classList.toggle("ok", data.ok);
+          $("settings-message").textContent = data.ok
+            ? "Connected."
+            : data.error;
+          if (data.ok) {
+            $("key").value = "";
+            $("key").placeholder = "Connected for this session";
+            status("Cursor connected");
+            await loadModels();
+          }
+        } catch (error) {
+          $("settings-message").dataset.state = "error";
+          $("settings-message").textContent = error.message;
+        } finally {
+          $("connect").disabled = false;
+          controls();
+        }
+      };
+      function addMessage(role, text) {
+        $("welcome")?.remove();
+        const node = document.createElement("div");
+        node.className = "msg " + role;
+        node.innerHTML = `<div class="who">${role === "user" ? "You" : "Agent"}</div><div class="body"></div>`;
+        node.querySelector(".body").textContent = text;
+        $("thread").appendChild(node);
+        return node.querySelector(".body");
+      }
+      $("ask").onsubmit = async (event) => {
+        event.preventDefault();
+        const question = $("question").value.trim();
+        if (!question || $("send").disabled) return;
+        state.busy = true;
+        status("Agent running");
+        controls();
+        tab("chat");
+        addMessage("user", question);
+        $("question").value = "";
+        const body = addMessage("agent", "");
+        body.dataset.phase = "Sending request…";
+        body.parentElement.classList.add("pending");
+        $("activity").textContent = "Starting…";
+        const startedAt = performance.now();
+        let firstTextAt = null;
+        $("thread").scrollTop = $("thread").scrollHeight;
+        let answer = "",
+          failed = false,
+          ended = false;
+        function receive(event) {
+          if (event.type === "memory") refreshMemory();
+          if (event.type === "status") {
+            const phase = event.text === "Reading the handoff…" ? "Waiting for response…" : event.text || "Waiting for response…";
+            $("activity").textContent = phase;
+            body.dataset.phase = phase;
+          }
+          if (event.type === "delta") {
+            answer += event.text || "";
+            if (firstTextAt === null) firstTextAt = performance.now();
+            body.parentElement.classList.remove("pending");
+            body.textContent = answer;
+          }
+          if (event.type === "error") {
+            failed = true;
+            body.parentElement.classList.add("error");
+            body.textContent = event.message;
+            status("Agent could not complete the request", true);
+          }
+          if (event.type === "done") {
+            ended = true;
+            if (event.timings)
+              $("activity").title =
+                `Agent wait: ${event.timings.agent_wait_ms} ms · Send: ${event.timings.send_ms} ms · First text: ${event.timings.first_text_ms ?? "—"} ms`;
+            if (!failed)
+              status(
+                event.status === "cancelled" ? "Stopped" : "Memory connected",
+              );
+            $("activity").textContent =
+              event.status === "cancelled"
+                ? "Stopped."
+                : event.status === "error"
+                  ? "Run failed."
+                  : "Finished in " + ((performance.now() - startedAt) / 1000).toFixed(1) + "s";
+            body.parentElement.classList.remove("pending");
+            refreshStandby();
           }
         }
-        $("thread").scrollTop = $("thread").scrollHeight;
+        try {
+          const res = await fetch("/api/ask", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ question, model: $("model").value }),
+          });
+          if (!res.ok || !res.body)
+            throw new Error(
+              (await res.json()).error || "Could not start agent",
+            );
+          const reader = res.body.getReader(),
+            decoder = new TextDecoder();
+          let buf = "";
+          while (true) {
+            const { value, done } = await reader.read();
+            buf += done
+              ? decoder.decode()
+              : decoder.decode(value, { stream: true });
+            const lines = buf.split("\n");
+            buf = lines.pop() || "";
+            for (const line of lines)
+              if (line.trim()) receive(JSON.parse(line));
+            $("thread").scrollTop = $("thread").scrollHeight;
+            if (ended) { reader.cancel().catch(() => {}); break; }
+            if (done) break;
+          }
+          if (buf.trim()) receive(JSON.parse(buf));
+          if (!ended && !failed)
+            throw new Error("Connection ended before the agent finished.");
+          if (!failed) body.innerHTML = rich(answer || "No response returned.");
+        } catch (error) {
+          failed = true;
+          body.parentElement.classList.add("error");
+          body.textContent = error.message;
+          status(error.message, true);
+        } finally {
+          state.busy = false;
+          body.parentElement.classList.remove("pending");
+          controls();
+          if (failed)
+            $("activity").textContent = "Check the error above and retry.";
+          await refreshMemory();
+        }
+      };
+      $("stop").onclick = async () => {
+        $("stop").disabled = true;
+        $("activity").textContent = "Stopping…";
+        try {
+          await api("/api/cancel", {});
+        } catch (error) {
+          status(error.message, true);
+        } finally {
+          $("stop").disabled = false;
+        }
+      };
+      $("question").onkeydown = (event) => {
+        if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
+          event.preventDefault();
+          $("ask").requestSubmit();
+        }
+      };
+      async function init() {
+        localStorage.removeItem("studio-key");
+        try {
+          const session = await api("/api/session");
+          state.hasKey = session.has_key;
+          if (!localStorage.getItem("studio-model-v3"))
+            localStorage.setItem("studio-model-v3", "grok-4.5");
+          $("keybox").classList.toggle("ok", session.has_key);
+          let modelsReady = Promise.resolve();
+          if (session.has_key) {
+            $("key").placeholder = "Connected for this session";
+            $("settings-message").textContent = "Connected.";
+            $("settings-message").dataset.state = "success";
+            modelsReady = loadModels();
+          }
+          if (session.project) applyOpen(session);
+          else {
+            const last = localStorage.getItem("studio-project");
+            if (last) await openProject("/api/open", { project: last });
+          }
+          await modelsReady;
+          if (state.project && state.hasKey && !session.running && session.model !== $("model").value)
+            await api("/api/model", { model: $("model").value });
+          controls();
+        } catch (error) {
+          status("Studio server unavailable: " + error.message, true);
+        }
       }
-    }
-  } catch (error) {
-    body.parentElement.className = "msg error";
-    body.textContent = String(error);
-  }
-  state.busy = false;
-  $("send").disabled = false;
-  refreshMemory();
-});
-
-$("stop").addEventListener("click", () => fetch("/api/cancel", { method: "POST" }));
-$("question").addEventListener("keydown", (event) => {
-  if (event.key === "Enter" && !event.shiftKey) {
-    event.preventDefault();
-    $("ask").requestSubmit();
-  }
-});
-
-function markKey(ok) {
-  $("keybox").classList.toggle("ok", Boolean(ok));
-}
-
-async function saveKey() {
-  const key = $("key").value.trim();
-  if (key) localStorage.setItem("studio-key", $("key").value);
-  else localStorage.removeItem("studio-key");
-  markKey(false);
-  const res = await fetch("/api/key", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ api_key: $("key").value }),
-  });
-  const data = await res.json();
-  markKey(data.ok);
-  if (key && !data.ok) {
-    $("status").textContent = data.error || "Invalid API key";
-    $("status").className = "";
-  }
-}
-$("key").addEventListener("change", saveKey);
-$("key").addEventListener("paste", () => setTimeout(saveKey, 0));
-$("key").value = localStorage.getItem("studio-key") || "";
-if ($("key").value) saveKey();
-else markKey(false);
-const last = localStorage.getItem("studio-project") || "";
-if (last) openProject("/api/open", { project: last });
-setInterval(() => { if ($("folder").title) refreshMemory(); }, 4000);
-</script>
-</body>
+      const welcomeHTML = $("thread").innerHTML;
+      init();
+      async function refreshStandby() {
+        if (!state.project || !state.hasKey || document.hidden) return;
+        try {
+          const session = await api("/api/session");
+          if (session.project === state.project && state.ready !== session.ready) {
+            state.ready = session.ready;
+            controls();
+            if (!state.busy) status(session.ready ? "Memory connected" : "Memory setup needed");
+          }
+          $("standby").dataset.ready = session.standby === "ready";
+          $("standby").textContent =
+            session.standby === "ready"
+              ? "Next agent ready"
+              : session.standby === "preparing"
+                ? "Preparing next agent…"
+                : "";
+        } catch (_) { $("standby").textContent = "Connection lost"; $("standby").dataset.ready = "false"; }
+      }
+      setInterval(() => {
+        refreshMemory();
+        refreshStandby();
+      }, 4000);
+    </script>
+  </body>
 </html>

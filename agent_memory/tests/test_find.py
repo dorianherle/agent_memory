@@ -218,7 +218,7 @@ class TestFind(MemoryTestCase):
             {"action": "find", "ids": [item_id[:8]]},
         )
         self.assertIn("Auth timeout is 30s", result)
-        self.assertNotIn("src/auth.py:88", result)
+        self.assertIn("src/auth.py:88", result)
 
     def test_find_caps_long_bodies(self):
         from agent_memory import call_tool

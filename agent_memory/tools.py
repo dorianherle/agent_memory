@@ -6,6 +6,7 @@ from agent_memory.prompt import (
     render_find,
     render_timeline,
     save_hygiene,
+    summary_guidance,
 )
 
 ACTIONS = (
@@ -109,7 +110,7 @@ MEMORY_TOOL = {
                 "full": {
                     "type": ["boolean", "null"],
                     "description": (
-                        "history only: true for complete bodies. "
+                        "find/history: true for complete bodies. "
                         "Default is headlines."
                     ),
                 },
@@ -190,6 +191,8 @@ def _run_action(memory: Memory, arguments: dict) -> str:
             agent=agent,
         )
         result = f"Saved [{item_id[:8]}]."
+        if not arguments.get("summary"):
+            result += "\n" + summary_guidance("memory(action=save, summary=true)")
         warn = save_hygiene(arguments["text"])
         return f"{result}\n{warn}" if warn else result
     if action == "find":
@@ -231,6 +234,7 @@ def _run_action(memory: Memory, arguments: dict) -> str:
             items,
             full_ids={item.id for item in items} if explicit else set(),
             children=children,
+            full=bool(arguments.get("full")),
         )
         if queried and used_substring:
             result = f"{result}\n\n{SUBSTRING_FALLBACK}"

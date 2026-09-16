@@ -27,6 +27,13 @@ def content_hash(text: str) -> str:
 
 
 def canonical_document(message: str, payload: dict) -> str:
+    # Transcript retention must not turn into unbounded embedding token spend.
+    # Full bodies remain in memories.message and SQLite FTS; only their former
+    # headline-sized representation is sent to the optional embedding provider.
+    if payload.get("user") or payload.get("auto"):
+        message = message.strip().split("\n", 1)[0].strip()
+        if len(message) > 100:
+            message = message[:99].rstrip() + "…"
     metadata = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     return f"{message}\nMetadata: {metadata}"
 

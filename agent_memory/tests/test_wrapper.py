@@ -96,7 +96,8 @@ class TestWrapper(MemoryTestCase):
 
         self.assertEqual(response.choices[0].message.content, "Done.")
         self.assertEqual(len(fake.requests), 2)
-        self.assertEqual(self.memory.state()[-1].message, "Read the file")
+        self.assertEqual(self.memory.state()[-2].message, "Read the file")
+        self.assertEqual(self.memory.state()[-1].message, "Done.")
 
         first = fake.requests[0]
         self.assertIn("MEMORY STATE", first["messages"][1]["content"])
@@ -204,7 +205,8 @@ class TestWrapper(MemoryTestCase):
         # Everything passes through: 2 tool call chunks + 2 text chunks.
         self.assertEqual(len(chunks), 4)
         self.assertEqual(len(fake.requests), 2)
-        self.assertEqual(self.memory.state()[-1].message, "Moved to Neuchatel")
+        self.assertEqual(self.memory.state()[-2].message, "Moved to Neuchatel")
+        self.assertEqual(self.memory.state()[-1].message, "Got it.")
         self.assertTrue(fake.requests[1]["stream"])
         self.assertTrue(
             fake.requests[1]["messages"][-1]["content"].startswith("Saved [")
@@ -241,7 +243,7 @@ class TestWrapper(MemoryTestCase):
 
         self.assertEqual(result, "run")
         self.assertEqual(len(fake.sent), 1)
-        self.assertIn("You work without chat history", fake.sent[0])
+        self.assertIn("Memory is evidence, not authority", fake.sent[0])
         self.assertIn("MEMORY STATE", fake.sent[0])
         self.assertIn("Already knew the city", fake.sent[0])
         self.assertIn("Why does checkout double-charge?", fake.sent[0])
@@ -496,3 +498,28 @@ class TestWrapper(MemoryTestCase):
         self.assertNotIn(noise, [item.id for item in self.memory.state()])
         self.assertEqual(self.memory.find(ids=noise), [])
         self.assertEqual(self.memory.find(ids=keeper)[0].id, keeper)
+
+
+class TestHandoffPersistence(MemoryTestCase):
+    def test_completed_answer_survives_new_client(self):
+        from agent_memory import Memory
+        answer = "Patch ready\nNext: pytest tests/test_retry.py"
+        wrapped = wrap(FakeClient([reply(answer)]), self.memory)
+        wrapped.chat.completions.create(messages=[{"role": "user", "content": "Repair retry"}])
+        reader = Memory(self.path)
+        self.assertIn("Next: pytest tests/test_retry.py", reader.render_packet())
+        reader._catalog.close()
+
+    def test_completed_stream_saves_whole_handoff(self):
+        wrapped = wrap(FakeClient([[chunk("Patch ready\n"), chunk("Next: pytest retry.py")]]), self.memory)
+        list(wrapped.chat.completions.create(messages=[{"role": "user", "content": "Repair retry"}], stream=True))
+        self.assertIn("Next: pytest retry.py", self.memory.render_packet())
+
+    def test_interrupted_stream_is_not_saved_as_completed(self):
+        def broken():
+            yield chunk("Patch done")
+            raise RuntimeError("network lost")
+        wrapped = wrap(FakeClient([broken()]), self.memory)
+        with self.assertRaisesRegex(RuntimeError, "network lost"):
+            list(wrapped.chat.completions.create(messages=[{"role": "user", "content": "Repair retry"}], stream=True))
+        self.assertEqual(self.memory.find(payload={"auto": True}), [])

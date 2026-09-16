@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "agent-memory": {
+      "command": "/Users/dorianherle/Documents/Personal/agent_memory/.venv/bin/python",
+      "args": [
+        "-m",
+        "agent_memory.cursor.mcp",
+        "--root",
+        "/Users/dorianherle/Documents/Personal/agent_memory/test_repro"
+      ]
+    }
+  }
+}

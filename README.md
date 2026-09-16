@@ -13,44 +13,36 @@ The agent can search what was decided, and it can go back.
 
 ## What the agent sees every turn
 
-A short header. That is the whole memory prompt.
+A bounded packet, normally at most 1,200 characters:
 
 ```text
 ## Goal
-[a1b2c3d4] Why is login so slow?
+[a1b2c3d4] Fix duplicate checkout writes
 
 ## Steering
-[e5f6g7h8] wait, also look at the cookie path
+[e5f6a7b8] Keep the public API unchanged
+
+## Handoff
+[11111111] Idempotency patch ready
+Rejected: blind retry duplicates writes.
+Next: pytest tests/test_checkout.py -k retry
 
 ## Open questions
-[11111111] Why is it still slow after caching? [6ca98198]
-[22222222] Do we still need the extra database index?
-
-## Recent
-[6ca98198] @agent Login loads the whole users table every time
+[22222222] Does the timeout fixture reproduce production?
 ```
 
-Every `[8 characters]` is a note id. Same shape everywhere.
+Goal preserves the original job; Steering preserves the latest user correction.
+An explicit handoff stays preferred over incidental notes. Related excerpts are
+selected for the current question. Full notes remain on disk and can be fetched
+by id when the excerpt lacks necessary details. Omitted entries are signposted.
+No model runs to assemble or shorten the packet.
 
-The extra id after a question (`[6ca98198]` above) is not a second
-question. It points at an older note the question stands on — here,
-the finding in Recent. The agent opens that note with `memory_find`.
-
-**Goal** is the original job — the thing you started the loop for.
-It does not change when you type mid-run.
-
-**Steering** is your latest course-correct (“wait, also check X”).
-Optional. It does **not** replace open questions. Goal is the
-mission; steering is the latest nudge; open questions are what
-the agent still has to resolve.
-
-**Open questions** are the unsolved things right now. You can have
-several. Adding the same question twice does nothing. Clear one
-or all with `memory_open_questions`.
-
-**Recent** is the last 8 work headlines — findings, not every
-user prompt or auto-saved answer. Finished work leaves this view.
-The agent opens it with `memory_find` or `memory_history`.
+Mark a transfer checkpoint with `memory_save(text, payload={"handoff": True,
+"files": ["src/checkout.py"]})`. Include verified state, failed approaches and
+why, uncertainty, and an exact `Next:` action. Declared evidence files allow
+`[stale]` warnings even for note-only saves and unsaved tracked changes.
+Use `memory_find(ids=[...], full=True)` only when the default 800-character body
+view omits needed evidence. Prompts and finished answers retain full text on disk.
 
 Watch it live: `.agent_memory/live/index.html`.
 
@@ -177,6 +169,39 @@ Re-run install anytime; it merges safely.
 
 ---
 
+## Studio
+
+```bash
+pip install -e ".[studio,cursor]"
+agent-memory studio
+```
+
+Open a project folder and connect a Cursor API key in Settings. Install the
+project's memory integration with `agent-memory cursor install` first. Studio
+loads the selected folder’s MCP servers explicitly. It saves prompts and finished
+answers directly and injects fresh memory before each send. SDK project hooks
+are disabled so nested folders cannot write to a parent repository’s notebook.
+Keys entered in Settings stay in the running server session.
+
+The left overview keeps the goal and open questions visible. Summary commits
+fold completed notes into expandable groups; selecting a note opens its full
+text on the right. The agent creates summaries when milestones are complete;
+MCP save responses prompt it to make that decision. No manual summary step is needed.
+Original commits and snapshots stay retrievable. Summaries are scoped to the
+current memory branch, and later summaries absorb obsolete steering notes.
+
+Grok 4.5 Fast is the default (high effort, Fast enabled). Studio prepares one unused agent ahead of the
+next message and replenishes it during each run. A standby has no conversation;
+memory is refreshed before sending. Changing project, key, or model invalidates it.
+The status shows when the next agent is ready. Run timing separates local agent
+wait, send startup, and time to first text; model/network latency still applies.
+
+Agent activity is separate from answer text. Cursor authentication, model, and
+usage-limit errors appear in the conversation; an accepted key does not guarantee
+remaining model allowance.
+
+---
+
 ## Live view
 
 `.agent_memory/live/index.html` — created on session start, updated on
@@ -257,8 +282,8 @@ response = client.chat.completions.create(
 One optional key, one job: `memory_find(query=…)` finds notes by
 meaning instead of exact words. Notes and literal lookup work without it.
 
-Without a key, `memory_find` falls back to literal substring search
-(and says so). Everything else works unchanged.
+Without a key, `memory_find(query=...)` uses local SQLite full-text search.
+`text=...` performs literal substring search. Everything else works unchanged.
 
 ---
 
@@ -272,3 +297,19 @@ does not break saves.
 ```sh
 .venv/bin/python -m pytest agent_memory/tests -q
 ```
+
+## Handoff evaluation
+
+See [fresh-agent recovery results](docs/benchmarks/handoff-recovery.md) for the
+controlled before/after benchmark, token accounting, raw responses and limits.
+Generate fixtures with `scripts/benchmark_handoff.py`. This measures interrupted
+task recovery; it does not establish success on arbitrary hours-long tasks.
+
+Inspection rewrites shared files and requires coordination. Opening a new memory
+client never auto-restores an inspection; call `memory_inspect_done` explicitly
+after interruption. Concurrent code writers should use separate workspaces.
+
+Full transcript storage does not increase optional embedding input: user prompts
+and auto-saved answers embed only their former 100-character headline. Full
+bodies remain available through local full-text search and explicit ID reads.
+Work notes retain their normal semantic indexing.

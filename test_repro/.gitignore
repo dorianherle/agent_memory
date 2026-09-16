@@ -1,0 +1,4 @@
+# agent-memory store + live prompt state (auto-generated)
+.agent_memory/
+.cursor/MEMORY_STATE.md
+.cursor/rules/agent-memory-state.mdc

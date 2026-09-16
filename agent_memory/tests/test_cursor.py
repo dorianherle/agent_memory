@@ -50,6 +50,8 @@ class McpServerTests(MemoryTestCase):
             result = tool.fn(text="mid-turn finding: auth in src/auth.ts", agent="agent")
         self.assertIn("Saved [", result)
         self.assertIn("@agent", result)
+        self.assertIn("If this completes a milestone, call memory_summarize", result)
+        self.assertIn("Keep unfinished work and open questions explicit", result)
         last = Memory(self.path).state()[-1]
         self.assertIn("auth in src/auth.ts", last.message)
         self.assertFalse(last.payload.get("auto"))

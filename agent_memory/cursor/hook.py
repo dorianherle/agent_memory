@@ -33,7 +33,16 @@ from agent_memory.identity import (
 
 CURSOR_INSTRUCTIONS = """
 Project memory via agent-memory MCP. Hooks save prompts and answers.
-Call memory_save at mid-turn milestones. Do not invent ids.
+Match the current request. Greetings, thanks, and casual small talk need only a
+brief conversational reply. A bare "what's up?" is not a project-status request.
+Do not load skills, search memory, inspect files, narrate checks, recap projects,
+or propose tasks unless the user asks for work or context. An old goal is not a
+new request to resume work.
+
+Call memory_save for useful findings. On a completed milestone, call memory_summarize
+with a verified outcome and key evidence to group its commits. Do not wait for the
+user to request a summary. Keep unfinished work and open questions explicit.
+Do not invent ids.
 Pass agent=<your name> on memory_save / memory_summarize.
 """.strip()
 

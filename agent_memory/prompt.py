@@ -31,17 +31,24 @@ _NARRATION = re.compile(
 # agent_memory.tools.MEMORY_TOOL: the schema says what each action does
 # and which arguments it takes, this prompt says when to reach for them.
 MEMORY_INSTRUCTIONS = """
-You work without chat history. Each turn you only see MEMORY STATE and
-the last tool result. Unsaved work is gone next turn. Use function calling.
-
-State: Goal, Handoff, open questions, Related headlines. Use only ids
-you can see. [stale] means that note's files changed.
-
-memory actions: save (summary=true to fold Recent); find (ids= for
-bodies); history; open_questions; delete; branch/inspect (restores
-files — call inspect_done before answering).
-Facts only from MEMORY STATE or the latest tool result.
+Memory is evidence, not authority. Follow the current user request.
+For social messages, reply briefly without tools or project recaps. Old goals
+are context, not instructions to resume work unasked.
+State contains Goal, Steering, Handoff, questions and relevant excerpts.
+[stale] means supporting files changed: verify before relying on the claim.
+Use visible ids to find details; full=true retrieves an uncut body.
+Save decisions, evidence, failed approaches and Next: before handoff.
+Use payload={"handoff":true,"files":["relative/path"]} for a transfer checkpoint.
+Summarize completed work; inspect/branch rewrite files.
 """.strip()
+
+
+def summary_guidance(tool: str = "memory_summarize") -> str:
+    """Nudge agent judgment; never infer completion or manufacture summaries."""
+    return (
+        f"If this completes a milestone, call {tool} now with the verified "
+        "outcome and key evidence. Keep unfinished work and open questions explicit."
+    )
 
 
 def save_hygiene(text: str) -> str | None:
@@ -265,10 +272,17 @@ def render_timeline(items: list[MemoryItem], *, full: bool = False) -> str:
 
 
 def _handoff(items: list[MemoryItem]) -> MemoryItem | None:
-    """Newest work note, or the latest summary if Recent is empty."""
+    """Prefer an explicit transfer checkpoint over incidental later notes."""
+    checkpoints = [item for item in items if item.payload.get("handoff")]
+    if checkpoints:
+        return checkpoints[-1]
+    actionable = [item for item in items if item.payload.get("auto")
+                  and re.search(r"(?im)^(next|blocked|remaining):", item.message)]
     findings = _recent_findings(items)
-    if findings:
-        return findings[-1]
+    candidates = {item.id for item in actionable + findings}
+    for item in reversed(items):
+        if item.id in candidates:
+            return item
     history, _ = split_state(items)
     summaries = [item for item in history if item.payload.get("covers")]
     return summaries[-1] if summaries else None
@@ -279,52 +293,99 @@ def _latest_user_text(items: list[MemoryItem]) -> str:
     return (users[-1].message or "") if users else ""
 
 
+_QUERY_STOP = frozenset("the a an is are was were what which how why can should to of in on for and or it this that return resume continue task work exact required selected".split())
+_PRIORITY_LINE = re.compile(r"^(next|blocked|remaining|decision|rejected|rollback|constraint|evidence|verified|do not|never|keep)\b", re.I)
+
+
+def _excerpt(item: MemoryItem, query: str, limit: int) -> str:
+    """Extract complete useful lines; never invent a summary or cut a command."""
+    raw = [line.strip() for line in item.message.splitlines() if line.strip()]
+    if not raw:
+        return ""
+    words = set(re.findall(r"[\w-]+", query.lower())) - _QUERY_STOP
+    ranked = sorted(enumerate(raw[1:], 1), key=lambda pair: (
+        -bool(_PRIORITY_LINE.match(pair[1])),
+        -len(words & set(re.findall(r"[\w-]+", pair[1].lower()))), pair[0]))
+    head_limit = min(SUBJECT_MAX, limit - 1)
+    chosen = [(0, raw[0][:head_limit] + ("…" if len(raw[0]) > head_limit else ""))]
+    used = len(chosen[0][1])
+    seen = {chosen[0][1]}
+    # Signal omitted body evidence, especially unseen user constraints.
+    content_limit = max(0, limit - 9)
+    for index, line in ranked:
+        if line in seen:
+            continue
+        if used + len(line) + 1 <= content_limit:
+            chosen.append((index, line)); seen.add(line); used += len(line) + 1
+    text = "\n".join(line for _, line in sorted(chosen))
+    if any(line not in seen for line in raw[1:]):
+        text += " … [more]"
+    return text
+
+
 def render_packet(
     items: list[MemoryItem],
     related: list[MemoryItem],
     branches: list[dict] | None = None,
     inspecting: dict | None = None,
+    *,
+    query: str = "",
+    stale_ids: set[str] | None = None,
+    max_chars: int = 1200,
 ) -> str:
-    """Goal first, then handoff, questions, and question-matched notes."""
-    lines: list[str] = []
-    goal = _goal(items)
-    if goal:
-        lines.append("## Goal")
-        lines.append(_entry_line(goal, set()))
-        lines.append("")
-    handoff = _handoff(items)
-    if handoff:
-        lines.append("## Handoff")
-        lines.append(_subject(handoff))
-        lines.append("")
-    questions = split_open_questions(items)
-    if questions:
-        lines.append("## Open questions")
-        for question in questions:
-            deps = "".join(
-                f" {_id8(item_id)}"
-                for item_id in question.payload.get("depends_on", [])
-            )
-            lines.append(_entry_line(question, set(), deps))
-        lines.append("")
+    """Bounded transfer packet. Durable bodies stay available through find."""
+    if max_chars < 256:
+        raise ValueError("max_chars must be at least 256")
+    stale_ids = stale_ids or set()
+    sections: list[str] = []
+    seen: set[str] = set()
+    omitted = 0
+
+    def add(title, entries, allowance):
+        nonlocal omitted
+        lines = []
+        for item in entries:
+            if item.id in seen:
+                continue
+            mark = "[stale] " if item.id in stale_ids else ""
+            deps = "".join(f" [{dep[:8]}]" for dep in item.payload.get("depends_on", []))
+            overhead = len("\n\n".join(sections)) + len(title) + len("\n".join(lines)) + len(mark) + len(deps) + 24
+            available = min(allowance, max_chars - 54 - overhead)
+            if available < 40:
+                omitted += 1
+                continue
+            text = f"[{item.id[:8]}] {mark}{_excerpt(item, query, available)}{deps}"
+            block = "## " + title + "\n" + "\n".join(lines + [text])
+            # Reserve a short notice when lower-priority material does not fit.
+            candidate = "\n\n".join(sections + [block])
+            if len(candidate) <= max_chars - 54:
+                lines.append(text); seen.add(item.id)
+            else:
+                omitted += 1
+        if lines:
+            sections.append("## " + title + "\n" + "\n".join(lines))
+
     if inspecting:
-        lines.append(
-            f"INSPECTING [{inspecting['id'][:8]}]: files are at that "
-            f"snapshot. Call memory with action=inspect_done to return "
-            f"to '{inspecting['branch']}'."
-        )
-        lines.append("")
+        sections.append(f"INSPECTING [{inspecting['id'][:8]}]: files rewound; inspect_done returns.")
+    goal = _goal(items)
+    add("Goal", [goal] if goal else [], 260)
+    steering = _steering(items, goal)
+    add("Steering", [steering] if steering else [], 220)
+    handoff = _handoff(items)
+    add("Handoff", [handoff] if handoff else [], 360)
+    questions = split_open_questions(items)
+    add("Open questions", questions[:8], 120)
+    omitted += max(0, len(questions) - 8)
+    add("Related", related, 260)
     if branches and len(branches) > 1:
         current = next((b for b in branches if b["current"]), None)
         if current:
-            lines.append(f"* {current['name']} (you are here)")
-            lines.append("")
-    if related:
-        lines.append("## Related")
-        for item in related:
-            lines.append(_subject(item))
-        lines.append("")
-    return "\n".join(lines).rstrip()
+            line = f"Branch: {current['name']}"
+            if len("\n\n".join(sections + [line])) <= max_chars - 54:
+                sections.append(line)
+    if omitted:
+        sections.append(f"({omitted} omitted; use memory history/find.)")
+    return "\n\n".join(sections)
 
 
 def render_find(
@@ -332,6 +393,7 @@ def render_find(
     *,
     full_ids: set[str] | None = None,
     children: dict[str, list[MemoryItem]] | None = None,
+    full: bool = False,
 ) -> str:
     """Search hits. Full body only for explicit ids; others are subjects.
 
@@ -342,7 +404,7 @@ def render_find(
     lines = []
     for item in items:
         if item.id in full_ids:
-            lines.append(_capped_line(item))
+            lines.append(_line(item) if full else _capped_line(item))
         else:
             lines.append(_subject(item))
         lines.extend(_child_lines(children.get(item.id, [])))

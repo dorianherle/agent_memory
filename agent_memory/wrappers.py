@@ -144,6 +144,8 @@ class MemoryEnhancedOpenAI:
             if not calls or any(
                 call.function.name != MEMORY_TOOL_NAME for call in calls
             ):
+                if not calls and isinstance(message.content, str):
+                    self.memory.auto_save(message.content)
                 return response
             messages.append(message)
             for call in calls:
@@ -169,9 +171,12 @@ class MemoryEnhancedOpenAI:
                 **kwargs,
             )
             calls = []
+            text_parts = []
             for chunk in stream:
                 yield chunk
                 delta = chunk.choices[0].delta if chunk.choices else None
+                if delta is not None and isinstance(getattr(delta, "content", None), str):
+                    text_parts.append(delta.content)
                 if delta is not None and delta.tool_calls:
                     for piece in delta.tool_calls:
                         while len(calls) <= piece.index:
@@ -189,6 +194,8 @@ class MemoryEnhancedOpenAI:
             if not calls or any(
                 call["name"] != MEMORY_TOOL_NAME for call in calls
             ):
+                if not calls and text_parts:
+                    self.memory.auto_save("".join(text_parts))
                 return
             messages.append(
                 {

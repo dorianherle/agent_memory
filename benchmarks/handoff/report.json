@@ -1,0 +1,51 @@
+{
+  "tokenizer": "cl100k_base",
+  "model": "grok-4.6",
+  "scope": "visible benchmark text only; provider hidden context/reasoning/billing unavailable",
+  "rows": [
+    {
+      "mode": "before",
+      "trial": 2,
+      "correct": 5,
+      "total": 8,
+      "input_tokens": 2099,
+      "output_tokens": 179,
+      "visible_total_tokens": 2278,
+      "evidence_tokens": 759,
+      "body_reads": 10
+    },
+    {
+      "mode": "before",
+      "trial": 3,
+      "correct": 5,
+      "total": 8,
+      "input_tokens": 2118,
+      "output_tokens": 184,
+      "visible_total_tokens": 2302,
+      "evidence_tokens": 773,
+      "body_reads": 11
+    },
+    {
+      "mode": "after",
+      "trial": 2,
+      "correct": 8,
+      "total": 8,
+      "input_tokens": 936,
+      "output_tokens": 103,
+      "visible_total_tokens": 1039,
+      "evidence_tokens": 547,
+      "body_reads": 0
+    },
+    {
+      "mode": "after",
+      "trial": 3,
+      "correct": 8,
+      "total": 8,
+      "input_tokens": 936,
+      "output_tokens": 103,
+      "visible_total_tokens": 1039,
+      "evidence_tokens": 547,
+      "body_reads": 0
+    }
+  ]
+}

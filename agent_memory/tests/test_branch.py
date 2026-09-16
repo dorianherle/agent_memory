@@ -126,15 +126,19 @@ class TestBranch(MemoryTestCase):
         self.memory.inspect_done()
         self.assertEqual(self.file.read_text(), "third")
 
-    def test_stale_inspect_marker_is_recovered(self):
+    def test_second_client_does_not_cancel_active_inspection(self):
+        from agent_memory import Memory
         first = self.save("first")
         self.save("second")
         self.memory.inspect(first)
-
-        memory = Memory(self.path)
-
-        self.assertIsNone(memory.inspecting())
+        reader = Memory(self.path)
+        self.assertIsNotNone(reader.inspecting())
+        self.assertEqual(self.file.read_text(), "first")
+        with self.assertRaisesRegex(RuntimeError, "cannot save while inspecting"):
+            reader.save("must not write during inspection")
+        reader.inspect_done()
         self.assertEqual(self.file.read_text(), "second")
+        reader._catalog.close()
 
     def test_inspect_done_without_inspect(self):
         self.save("first")

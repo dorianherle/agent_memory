@@ -324,7 +324,7 @@ class StateTests(MemoryTestCase):
         self.memory.auto_save("finished the turn")
         payload = self.memory.prompt_payload()
         self.assertEqual(payload["goal"]["id"], goal)
-        self.assertEqual(payload["goal"]["text"], "make login fast")
+        self.assertTrue(payload["goal"]["text"].startswith("make login fast"))
         self.assertIn("cookie path", payload["steering"]["text"])
         self.assertEqual([row["id"] for row in payload["findings"]], [finding])
         self.assertIn("src/auth/session.py:88", payload["findings"][0]["text"])
@@ -332,7 +332,7 @@ class StateTests(MemoryTestCase):
         self.assertNotIn("Why is /login taking ~2s?", payload["injected"])
         self.assertNotIn("finished the turn", payload["injected"])
 
-    def test_packet_keeps_goal_drops_steering(self) -> None:
+    def test_packet_keeps_goal_and_steering(self) -> None:
         goal = self.memory.save_user("make login fast")
         self.save("session lookup does a full scan")
         self.memory.save_user("wait also check the cookie path")
@@ -340,7 +340,7 @@ class StateTests(MemoryTestCase):
         self.assertIn("## Goal", text)
         self.assertIn(goal[:8], text)
         self.assertIn("make login fast", text)
-        self.assertNotIn("## Steering", text)
+        self.assertIn("## Steering", text)
         self.assertNotIn("## Recent", text)
         self.assertIn("## Handoff", text)
         self.assertIn("session lookup does a full scan", text)
@@ -366,9 +366,9 @@ class StateTests(MemoryTestCase):
         self.assertIn(f"[{goal[:8]}]", first)
         self.assertIn(f"[{goal[:8]}]", second)
         self.assertIn("make login fast", second)
-        self.assertNotIn("## Steering", second)
+        self.assertIn("## Steering", second)
 
-    def test_save_user_and_auto_save_keep_subject_only(self) -> None:
+    def test_save_user_and_auto_save_keep_full_evidence(self) -> None:
         self.file.write_text("changed")
         user = self.memory.save_user(
             "make login fast\n\nWhy is /login taking ~2s?"
@@ -377,10 +377,10 @@ class StateTests(MemoryTestCase):
             "Auth timeout is 30s\nWhy: measured in src/auth.py:88"
         )
         self.assertEqual(
-            self.memory.find(ids=user)[0].message, "make login fast"
+            self.memory.find(ids=user)[0].message, "make login fast\n\nWhy is /login taking ~2s?"
         )
         self.assertEqual(
-            self.memory.find(ids=auto)[0].message, "Auth timeout is 30s"
+            self.memory.find(ids=auto)[0].message, "Auth timeout is 30s\nWhy: measured in src/auth.py:88"
         )
         shown = self.memory._run("ls-tree", "-r", "--name-only", auto)
         self.assertIn("work.txt", shown)
@@ -402,6 +402,19 @@ class StateTests(MemoryTestCase):
         self.assertIn(f"INSPECTING [{a[:8]}]", text)
         self.assertIn("return to 'main'", text)
         self.memory.inspect_done()
+
+    def test_next_summary_folds_obsolete_steering(self):
+        goal = self.memory.save_user('Build the notebook')
+        old = self.memory.save_user('Check search first')
+        self.save('Search checked')
+        first = self.memory.summarize('Search works')
+        latest = self.memory.save_user('Now check summaries')
+        self.save('Summary children verified')
+        second = self.memory.summarize('Summary grouping works')
+        state = {item.id for item in self.memory.state()}
+        self.assertNotIn(old, state)
+        self.assertTrue({goal, latest, first, second}.issubset(state))
+        self.assertIn(old, self.memory.find(ids=second)[0].payload['covers'])
 
 
 if __name__ == "__main__":

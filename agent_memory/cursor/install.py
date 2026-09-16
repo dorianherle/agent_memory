@@ -38,6 +38,12 @@ alwaysApply: true
 
 # Agent Memory
 
+Match the current request. Greetings, thanks, and casual small talk need only a
+brief conversational reply. A bare "what's up?" is not a project-status request.
+Do not load skills, search memory, inspect files, narrate checks, recap projects,
+or propose tasks unless the user asks for work or context. An old goal is not a
+new request to resume work.
+
 Hooks save prompts and answers. `memory_save` mid-turn. Do not invent ids.
 Pass `agent` on save/summarize. MEMORY STATE is `agent-memory-state.mdc`.
 

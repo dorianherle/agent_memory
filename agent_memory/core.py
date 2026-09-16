@@ -146,9 +146,8 @@ class Memory:
         exclude = self._git_dir / "info" / "exclude"
         exclude.parent.mkdir(parents=True, exist_ok=True)
         self._ensure_exclude(exclude)
-        if self.inspecting() is not None:
-            # A previous session died while inspecting a snapshot.
-            self.inspect_done()
+        # Opening a reader must never restore another agent's working files.
+        # An interrupted inspection remains explicit until inspect_done().
         self._catalog = Catalog(self._git_dir)
         self._sync_catalog()
 
@@ -361,7 +360,7 @@ class Memory:
             allow_empty = True
             # Goal, latest steering, and open questions are not finished work.
             state = self.state()
-            recent = split_state(state)[1]
+            recent = [item for item in state if "covers" not in item.payload]
             goal = split_goals(state)
             goal_id = goal[0].id if goal else None
             users = [
@@ -383,6 +382,8 @@ class Memory:
             stored_payload[OPERATION_KEY] = _operation
         body = f"{message}\n\n{PAYLOAD_PREFIX}{json.dumps(stored_payload)}"
         with self._lock():
+            if self.inspecting() is not None:
+                raise RuntimeError("cannot save while inspecting; call inspect_done first")
             # Refresh excludes each save: nested clones may appear mid-session.
             self._ensure_exclude(self._git_dir / "info" / "exclude")
             # Also untrack state already captured by older saves; keep local files.
@@ -644,9 +645,8 @@ class Memory:
 
         if self.inspecting() is not None:
             return None
-        from agent_memory.prompt import SUBJECT_MAX
-
-        text = _first_line(text, SUBJECT_MAX)
+        # Keep durable evidence intact; prompt rendering owns the size limit.
+        text = text.strip()
         if not text:
             return None
         latest = self.find(payload={"user": True}, k=1)
@@ -674,9 +674,8 @@ class Memory:
         """
         from agent_memory.identity import DEFAULT_AGENT, resolve_agent
 
-        from agent_memory.prompt import SUBJECT_MAX
-
-        text = _first_line(text, SUBJECT_MAX)
+        # Keep durable evidence intact; prompt rendering owns the size limit.
+        text = text.strip()
         if not text or self.inspecting() is not None:
             return None
         who = resolve_agent(agent)
@@ -751,9 +750,9 @@ class Memory:
         return closed
 
     def _stale_ids(self, items: list[MemoryItem]) -> set[str]:
-        """Ids whose own files have changed between that commit and HEAD.
+        """Ids whose snapshot files or declared dependencies changed, including unsaved edits.
 
-        Empty commits (note-only saves) are never stale. Inspect mode
+        Explicit file dependencies also cover note-only saves. Inspect mode
         skips this — HEAD is the detached snapshot, not the live tree.
         """
         stale: set[str] = set()
@@ -762,19 +761,18 @@ class Memory:
         head = self._run("rev-parse", "HEAD", check=False)
         if not head:
             return stale
-        for item in items:
-            if item.id == head:
-                continue
+        for item in {entry.id: entry for entry in items}.values():
             names = self._run(
                 "show", "--pretty=format:", "--name-only", item.id, check=False
             )
             files = {name for name in names.splitlines() if name.strip()}
+            files.update(item.payload.get("files") or [])
             if not files:
                 continue
             later = {
                 name
                 for name in self._run(
-                    "diff", "--name-only", item.id, "HEAD", check=False
+                    "diff", "--name-only", item.id, "--", check=False
                 ).splitlines()
                 if name.strip()
             }
@@ -826,7 +824,7 @@ class Memory:
         """Compact MEMORY STATE for SDK / tests (Goal, Steering, Recent)."""
         return self.prompt_payload()["injected"]
 
-    def related_notes(self, question: str, *, k: int | None = None) -> list:
+    def related_notes(self, question: str, *, k: int | None = None, _state=None) -> list:
         """Work notes matching the question via FTS. Skips transcript and Goal."""
         from agent_memory.prompt import (
             RELATED_CAP,
@@ -839,30 +837,37 @@ class Memory:
         if not question:
             return []
         cap = RELATED_CAP if k is None else k
-        items = self.find(query=question, k=max(cap * 3, 8), branch="current")
-        state = self.state()
+        state = self.state() if _state is None else _state
         skip = {item.id for item in (_goal(state), _handoff(state)) if item}
-        related = []
-        for item in items:
-            if item.id in skip or _transcript(item):
-                continue
-            related.append(item)
-            if len(related) >= cap:
-                break
-        return related
+        limit = max(cap * 3, 8)
+        while True:
+            items = self.find(query=question, k=limit, branch="current")
+            related = [item for item in items if item.id not in skip and not _transcript(item)]
+            if len(related) >= cap or len(items) < limit:
+                return related[:cap]
+            # Transcript hits must not crowd useful work out of the result set.
+            # This grows local retrieval only, never the model-visible packet.
+            limit *= 2
 
-    def render_packet(self, question: str | None = None) -> str:
+    def render_packet(self, question: str | None = None, *, max_chars: int = 1200) -> str:
         """Goal / Handoff / questions / Related for this question."""
-        from agent_memory.prompt import _latest_user_text, render_packet
+        from agent_memory.prompt import _latest_user_text, _goal, _steering, _handoff, render_packet
 
         items = self.state()
         query = (question or "").strip() or _latest_user_text(items)
-        related = self.related_notes(query) if query else []
+        related = self.related_notes(query, _state=items) if query else []
+        # Check only candidates that can enter the bounded packet, not all history.
+        goal = _goal(items)
+        candidates = [entry for entry in (goal, _steering(items, goal), _handoff(items)) if entry]
+        candidates += split_open_questions(items)[:8] + related
         return render_packet(
             items,
             related,
             self.branches(),
             self.inspecting(),
+            query=query,
+            stale_ids=self._stale_ids(candidates),
+            max_chars=max_chars,
         )
 
     def write_state_rule(

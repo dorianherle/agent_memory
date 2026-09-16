@@ -1,0 +1,28 @@
+{
+  "constraints": {
+    "region": "eu-west-3",
+    "access": "private"
+  },
+  "handoff": {
+    "command": "pytest tests/test_larch.py -k redelivery"
+  },
+  "decision": {
+    "chosen": "idempotency-key",
+    "rejected": "blind-retry"
+  },
+  "stale": {
+    "action": "recheck"
+  },
+  "checkpoint": {
+    "command": "pytest tests/test_cedar.py -k escaped_quote"
+  },
+  "unknown": {
+    "p99": "unknown"
+  },
+  "simple": {
+    "seconds": 45
+  },
+  "buried": {
+    "command": "alder migrate --restore checkpoint-17"
+  }
+}

@@ -9,7 +9,7 @@ Works with mcp SDK v1 (`FastMCP`) and v2 (`MCPServer`).
 from __future__ import annotations
 
 from agent_memory.cursor.common import get_memory
-from agent_memory.prompt import save_hygiene
+from agent_memory.prompt import save_hygiene, summary_guidance
 from agent_memory.tools import call_tool
 
 
@@ -42,6 +42,7 @@ def _build_server():
         text: str | None = None,
         ids: list[str] | None = None,
         all_branches: bool = False,
+        full: bool = False,
     ) -> str:
         """Search. query=/text= work headlines; ids= bodies (capped). Transcript omitted unless ids=."""
         return call_tool(
@@ -53,12 +54,13 @@ def _build_server():
                 "text": text,
                 "ids": ids,
                 "all_branches": all_branches,
+                "full": full,
             },
         )
 
     @mcp.tool()
     def memory_save(text: str, agent: str | None = None) -> str:
-        """Mid-turn checkpoint. Pass agent. Skip noise."""
+        """Save a finding. After a completed milestone, call memory_summarize to fold its commits."""
         memory = get_memory()
         item_id = memory.save(text, agent=agent)
         memory.write_state_file()
@@ -70,7 +72,7 @@ def _build_server():
         from agent_memory.identity import DEFAULT_AGENT
 
         label = who[0].payload.get("agent", DEFAULT_AGENT) if who else DEFAULT_AGENT
-        result = f"Saved [{item_id[:8]}] @{label}."
+        result = f"Saved [{item_id[:8]}] @{label}.\n{summary_guidance()}"
         warn = save_hygiene(text)
         return f"{result}\n{warn}" if warn else result
 
