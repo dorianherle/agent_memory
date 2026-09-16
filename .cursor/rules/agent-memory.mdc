@@ -5,36 +5,11 @@ alwaysApply: true
 
 # Agent Memory
 
-Expert guidance — when to retrieve, how to write entries that stay useful,
-snapshot safety — is the **agent-memory skill** at
-`.cursor/skills/agent-memory/SKILL.md`. Read it before multi-step work.
+Hooks save prompts and answers. `memory_save` mid-turn. Do not invent ids.
+Pass `agent` on save/summarize. MEMORY STATE is `agent-memory-state.mdc`.
 
-Hooks auto-save user prompts and finished answers at turn boundaries.
-
-For any stretch of work that might outlast this turn — investigations,
-multi-step edits, experiments — call `memory_save` at real milestones
-(findings, decisions, working checkpoints). Prefer a few solid saves
-over silence; if the session dies, only checkpoints survive.
-Skip pure noise (e.g. “opened file X”) but do not wait for the final
-answer if useful progress already exists.
-
-Subagents share the same memory store. Every entry is tagged with an
-`agent` name (`agent`, `explore·abc123`, `user`, …) so the live HTML
-can color who said what.
-
-Use **agent-memory** MCP tools for judgment and checkpoints:
-- `memory_save` — durable mid-turn checkpoint (pass `agent`)
-- `memory_summarize` — hide finished work so Recent stays short (pass `agent`)
-- `memory_open_questions` — add or close unsolved questions
-- `memory_delete` — hide specific noise entries from Recent (pass `ids`)
-- `memory_find` — recall detail (`query=` uses Gemini when configured)
-- Browser monitor: `.agent_memory/live/index.html` (auto-created; self-refreshing; click an entry for the full prompt packet)
-- `memory_check` — run pytest / a compile through memory; a fail latches red
-- `memory_branch` — red check: rewind to last green; `label` = what went wrong (becomes Avoid)
-- `memory_inspect` / `memory_inspect_done` — look at an old snapshot
-- `memory_state` — agent context only (do not dump graphs/history in chat to “show” memory)
-- `memory_history` — timeline headlines (folded steps under summaries)
-
-MEMORY STATE is injected every turn via the alwaysApply rule
-`.cursor/rules/agent-memory-state.mdc` (auto-rewritten on each prompt).
-Only use entry ids you can see there or in tool results.
+- `memory_find` — headlines; `ids=` for bodies
+- `memory_summarize` / `memory_delete` / `memory_open_questions`
+- `memory_history` — work notes, not the chat transcript
+- `memory_branch` / `memory_inspect` — restore a snapshot
+- Live: `.agent_memory/live/index.html`

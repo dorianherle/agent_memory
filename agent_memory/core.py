@@ -789,8 +789,6 @@ class Memory:
             "alwaysApply: true\n"
             "---\n\n"
             "# MEMORY STATE\n\n"
-            "Top-level commit subjects only (not full bodies). "
-            "Use memory_find / memory_history for detail.\n\n"
             f"```\n{self.render_state()}\n```\n"
         )
         target.write_text(body)
@@ -801,9 +799,7 @@ class Memory:
         target = Path(path) if path else self._path / ".cursor" / "MEMORY_STATE.md"
         target.parent.mkdir(parents=True, exist_ok=True)
         body = (
-            "# Active Memory State\n\n"
-            "Top-level commit subjects only. Prefer memory_find / "
-            "memory_history for full detail; do not invent ids.\n\n"
+            "# MEMORY STATE\n\n"
             f"```\n{self.render_state()}\n```\n"
         )
         target.write_text(body)

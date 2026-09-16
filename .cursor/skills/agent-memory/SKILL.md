@@ -28,7 +28,7 @@ Already in your context. Do not call `memory_state` to fetch it.
 
 * main (you are here)        ← only when there is more than one line of work
 
-## Recent                    ← newest 10 headlines
+## Recent                    ← newest 8 headlines
 [6ca98198] @agent Login loads the whole users table every time
 (+4 earlier — memory_find / memory_history)
 ```
@@ -134,8 +134,8 @@ Pass `agent=` (it is in `AGENT_MEMORY_AGENT`) so voices stay apart.
 
 ## Finding a note
 
-`memory_find` returns headlines (default 12). Pass `ids=` for full
-bodies. A summary hit lists the folded child headlines. Start narrow.
+`memory_find` returns headlines (default 8). Pass `ids=` for bodies
+(capped). Chat transcript is omitted unless you pass `ids=`. Start narrow.
 
 | You have | Call |
 |---|---|

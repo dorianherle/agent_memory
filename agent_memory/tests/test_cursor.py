@@ -504,7 +504,8 @@ class InstallTests(MemoryTestCase):
             )
 
         self.assertTrue(written["rule"].exists())
-        self.assertIn(".cursor/skills/agent-memory", written["rule"].read_text())
+        self.assertIn("memory_save", written["rule"].read_text())
+        self.assertTrue(written["skill"].exists())
         self.assertTrue(written["sdk_guide"].exists())
         guide = written["sdk_guide"].read_text()
         self.assertIn('setting_sources=["project"]', guide)

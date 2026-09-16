@@ -38,7 +38,7 @@ def _build_server():
 
     @mcp.tool()
     def memory_state() -> str:
-        """Compact MEMORY STATE for the agent (not for showing the user). Live HTML is at .agent_memory/live/index.html."""
+        """Compact MEMORY STATE. Already injected each turn; SDK-only."""
         memory = get_memory()
         memory.write_state_file()
         return memory.render_state()
@@ -50,10 +50,7 @@ def _build_server():
         ids: list[str] | None = None,
         all_branches: bool = False,
     ) -> str:
-        """Search memory. query= meaning (substring fallback if no Gemini),
-        text= substring, ids= full bodies. Search hits are headlines;
-        a summary lists the folded child headlines.
-        """
+        """Search. query=/text= work headlines; ids= bodies (capped). Transcript omitted unless ids=."""
         return call_tool(
             get_memory(),
             "memory",
@@ -68,15 +65,7 @@ def _build_server():
 
     @mcp.tool()
     def memory_save(text: str, agent: str | None = None) -> str:
-        """Checkpoint meaningful mid-turn progress before the turn ends.
-
-        Hooks only save at turn boundaries (user prompt / finished answer).
-        During long work, call this at milestones — findings, decisions,
-        working checkpoints — so progress survives if the session dies.
-        Prefer a few solid saves over silence; skip pure noise.
-        Pass agent to tag who wrote it (defaults to AGENT_MEMORY_AGENT or agent).
-        Refreshes the live HTML monitor automatically.
-        """
+        """Mid-turn checkpoint. Pass agent. Skip noise."""
         memory = get_memory()
         item_id = memory.save(text, agent=agent)
         memory.write_state_file()
@@ -94,11 +83,7 @@ def _build_server():
 
     @mcp.tool()
     def memory_summarize(text: str, agent: str | None = None) -> str:
-        """Fold finished work behind one line so Recent stays short. Still retrievable with memory_find.
-
-        Pass agent to tag who did the work (defaults to AGENT_MEMORY_AGENT or agent).
-        Refreshes the live HTML monitor automatically.
-        """
+        """Fold finished work into one line. Pass agent."""
         memory = get_memory()
         item_id = memory.summarize(text, agent=agent)
         memory.write_state_file()
@@ -116,13 +101,7 @@ def _build_server():
 
     @mcp.tool()
     def memory_delete(ids: list[str]) -> str:
-        """Hide specific entries from Recent, find, and the live timeline.
-
-        Use for noise that should not have been saved — not for finished
-        work (summarize that). Snapshots stay in git; the delete commit
-        itself does not appear in Recent. Pass ids from MEMORY STATE.
-        Refreshes the live HTML monitor automatically.
-        """
+        """Hide noise ids from Recent/find. Snapshots stay in git."""
         memory = get_memory()
         result = call_tool(
             memory,
@@ -142,12 +121,7 @@ def _build_server():
         depends_on: list[str] | None = None,
         ids: list[str] | None = None,
     ) -> str:
-        """Add or close open questions.
-
-        With text: add a question (depends_on = notes it stands on).
-        Same text already open is a no-op. You can have several.
-        Empty text closes all, or only ``ids``.
-        """
+        """Add a question, or empty text to close ids/all."""
         memory = get_memory()
         result = call_tool(
             memory,
@@ -167,14 +141,14 @@ def _build_server():
 
     @mcp.tool()
     def memory_history(full: bool = False) -> str:
-        """Timeline headlines (folded steps under summaries). full=True for bodies."""
+        """Work-note headlines. full=True for the whole transcript."""
         return call_tool(
             get_memory(), "memory", {"action": "history", "full": full}
         )
 
     @mcp.tool()
     def memory_branch(id: str, name: str, label: str) -> str:
-        """Save label as the current line's summary, then restore working files to id."""
+        """Summarize this line, restore files to id."""
         memory = get_memory()
         result = call_tool(
             memory,
@@ -190,12 +164,12 @@ def _build_server():
 
     @mcp.tool()
     def memory_inspect(id: str) -> str:
-        """Temporarily set working files to how they were at an entry. Call memory_inspect_done after."""
+        """Restore files to id. Call memory_inspect_done after."""
         return call_tool(get_memory(), "memory", {"action": "inspect", "id": id})
 
     @mcp.tool()
     def memory_inspect_done() -> str:
-        """Leave inspect mode and restore the current branch's files."""
+        """Leave inspect; restore the branch."""
         memory = get_memory()
         result = call_tool(memory, "memory", {"action": "inspect_done"})
         memory.write_state_file()

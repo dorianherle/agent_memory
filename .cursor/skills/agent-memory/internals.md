@@ -62,7 +62,7 @@ targets. `Memory.find(..., include_historical=True)` can still retrieve them.
   text again returns the existing id. Closing one closes its twins.
 - **Current branch** is a single `* name (you are here)` line when more than
   one branch exists. Other branch listings stay in `memory_history`.
-- **Recent** is the newest 10 work subjects since the last summary
+- **Recent** is the newest 8 work subjects since the last summary
   (user prompts and auto-saved answers are omitted; Goal and Steering
   already hold the ones that matter). Older Recent lines stay findable;
   a `(+N earlier)` marker says they exist.
@@ -104,12 +104,11 @@ always-applied rule, rewritten on every durable write) and mirrored to
 5. **Unfolding.** Any matched summary lists the entries in its `covers`
    as indented headlines, so hitting a summary shows the work behind it
    without dumping those bodies.
-6. **Output.** Search uses `k=12` headlines. Explicit `ids=` return full
-   bodies of those notes only.
+6. **Output.** Search uses `k=8` headlines and skips auto-saved answers.
+   Explicit `ids=` return those bodies, capped at 800 characters.
 
-Practical consequence: `memory_find(query="…")` on a vague concept returns
-a short headline list. Prefer `ids=` when you need the body, then `text=`
-with a symbol or path, then `query=` with at least one literal token.
+Practical consequence: `memory_find(query="…")` returns a short headline
+list of work notes. Prefer `ids=` when you need the body.
 
 ## Folding
 

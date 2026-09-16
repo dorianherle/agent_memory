@@ -197,7 +197,6 @@ class StateTests(MemoryTestCase):
         self.assertIn(
             f"[{item[:8]}] @agent fixed the webhook retry", before_compact
         )
-        self.assertIn("Commit subjects only", before_compact)
 
         self.memory.save("step two with\nmultiple lines")
         summary = self.memory.save("finished pairing steps", summary=True)

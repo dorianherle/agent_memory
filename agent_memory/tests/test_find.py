@@ -186,6 +186,44 @@ class TestFind(MemoryTestCase):
         self.assertNotIn("src/auth.py:88", result)
         self.assertIn(summary[:8], result)
 
+    def test_search_skips_transcript(self):
+        from agent_memory import call_tool
+
+        self.memory.auto_save("Auth timeout is 30s\nWhy: measured")
+        self.memory.save_user("please check the Auth timeout")
+        result = call_tool(
+            self.memory,
+            "memory",
+            {"action": "find", "text": "Auth timeout"},
+        )
+        self.assertEqual(result, "Nothing found.")
+
+    def test_ids_can_open_auto_saves(self):
+        from agent_memory import call_tool
+
+        item_id = self.memory.auto_save(
+            "Auth timeout is 30s\nWhy: measured in src/auth.py:88"
+        )
+        result = call_tool(
+            self.memory,
+            "memory",
+            {"action": "find", "ids": [item_id[:8]]},
+        )
+        self.assertIn("src/auth.py:88", result)
+
+    def test_find_caps_long_bodies(self):
+        from agent_memory import call_tool
+        from agent_memory.prompt import FIND_BODY_MAX
+
+        item_id = self.save("head\n" + ("x" * (FIND_BODY_MAX + 50)))
+        result = call_tool(
+            self.memory,
+            "memory",
+            {"action": "find", "ids": [item_id[:8]]},
+        )
+        self.assertIn("more)", result)
+        self.assertLess(len(result), FIND_BODY_MAX + 40)
+
     def test_text_search_does_not_announce_fallback(self):
         from agent_memory import call_tool
         from agent_memory.prompt import SUBSTRING_FALLBACK

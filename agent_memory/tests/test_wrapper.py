@@ -397,9 +397,14 @@ class TestWrapper(MemoryTestCase):
 
         lines = result.split("\n")
         self.assertEqual(lines[0], f"[{summary[:8]}] @agent Summary: did a and b")
-        self.assertEqual(lines[1], f"    [{a[:8]}] @agent step a")
-        self.assertEqual(lines[2], f"    [{b[:8]}] @agent step b")
-        self.assertEqual(lines[3], f"[{c[:8]}] @agent step c")
+        self.assertEqual(lines[1], f"[{c[:8]}] @agent step c")
+        self.assertNotIn("step a", result)
+
+        full = call_tool(
+            self.memory, "memory", {"action": "history", "full": True}
+        )
+        self.assertIn(f"    [{a[:8]}] @agent step a", full)
+        self.assertIn(f"    [{b[:8]}] @agent step b", full)
 
     def test_call_tool_history_defaults_to_subjects(self):
         from agent_memory import call_tool

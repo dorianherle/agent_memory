@@ -48,7 +48,7 @@ the agent still has to resolve.
 several. Adding the same question twice does nothing. Clear one
 or all with `memory_open_questions`.
 
-**Recent** is the last 10 work headlines — findings, not every
+**Recent** is the last 8 work headlines — findings, not every
 user prompt or auto-saved answer. Finished work leaves this view.
 The agent opens it with `memory_find` or `memory_history`.
 

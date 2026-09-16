@@ -32,13 +32,9 @@ from agent_memory.identity import (
 )
 
 CURSOR_INSTRUCTIONS = """
-You have long-term project memory via the agent-memory MCP tools.
-Read `.cursor/skills/agent-memory/SKILL.md` before multi-step work.
-Hooks auto-save prompts and finished answers. Call memory_save at
-mid-turn milestones so progress survives if the session dies.
-Prefer facts from MEMORY STATE; do not invent entry ids.
+Project memory via agent-memory MCP. Hooks save prompts and answers.
+Call memory_save at mid-turn milestones. Do not invent ids.
 Pass agent=<your name> on memory_save / memory_summarize.
-Live HTML: `.agent_memory/live/index.html`.
 """.strip()
 
 

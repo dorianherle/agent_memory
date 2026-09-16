@@ -2,6 +2,7 @@ from agent_memory.core import Memory
 from agent_memory.prompt import (
     FIND_DEFAULT_K,
     SUBSTRING_FALLBACK,
+    _transcript,
     render_find,
     render_timeline,
     save_hygiene,
@@ -25,33 +26,10 @@ MEMORY_TOOL = {
         "name": "memory",
         "strict": True,
         "description": (
-            "Long-term memory for this agent. Pick an action:\n"
-            "- save: store a step. Set summary=true when a piece of work "
-            "is finished so Recent is folded behind this text (still "
-            "retrievable with find).\n"
-            "- open_questions: add an unsolved question (and the notes "
-            "it stands on). Same text already open is a no-op. Empty "
-            "text closes all, or the ids you pass.\n"
-            "- find: search stored entries. Search returns headlines "
-            "(plus child headlines under a summary). Pass ids for full "
-            "bodies. An explicit id is found even on another branch.\n"
-            "- delete: hide specific entries from Recent, find, and the "
-            "live timeline. Use for noise that should not have been "
-            "saved. Snapshots stay in git; the delete commit itself "
-            "does not appear in Recent.\n"
-            "- history: timeline of the current branch, oldest first, "
-            "headlines with folded steps under their summary. Set full "
-            "to true for complete bodies.\n"
-            "- graph: visual tree of every branch and entry (like "
-            "git log --graph). Set html=true to also write an "
-            "explorable HTML page.\n"
-            "- branch: restore the snapshot given by id; label summarizes "
-            "the work being left behind. Restores working files.\n"
-            "- inspect: set every working file to how it was at an "
-            "entry, to look around. Read-only; call inspect_done to "
-            "return.\n"
-            "- inspect_done: return from inspect; current branch and "
-            "its files are checked back out."
+            "Project memory. Actions: save (summary=true folds Recent); "
+            "find (headlines; ids= for bodies); history; "
+            "open_questions; delete; graph; branch/inspect "
+            "(restores files; inspect_done to return)."
         ),
         "parameters": {
             "type": "object",
@@ -227,6 +205,8 @@ def _run_action(memory: Memory, arguments: dict) -> str:
             branch=branch,
         )
         used_substring = memory._find_used_substring
+        if not explicit:
+            items = [item for item in items if not _transcript(item)]
         cover_ids = [
             child_id
             for item in items

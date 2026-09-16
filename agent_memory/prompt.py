@@ -9,11 +9,13 @@ from agent_memory.core import (
 )
 
 SUBJECT_MAX = 100
-RECENT_CAP = 10
+RECENT_CAP = 8
 CHECKPOINT_NUDGE_AFTER = 8
-SUBSTRING_FALLBACK = (
-    "(substring fallback — set GEMINI_API_KEY for semantic)"
-)
+FIND_DEFAULT_K = 8
+FIND_BODY_MAX = 800
+FIND_CHILD_CAP = 6
+HISTORY_CAP = 16
+SUBSTRING_FALLBACK = "(substring fallback — set GEMINI_API_KEY)"
 _NARRATION = re.compile(
     r"^(i\s+)?("
     r"investigated|looked(\s+into|\s+at)|"
@@ -28,59 +30,15 @@ _NARRATION = re.compile(
 # and which arguments it takes, this prompt says when to reach for them.
 MEMORY_INSTRUCTIONS = """
 You work without chat history. Each turn you only see MEMORY STATE and
-the result of your last tool call. Anything you do not save is gone on
-the next turn.
+the last tool result. Unsaved work is gone next turn. Use function calling.
 
-Use the memory tool through function calling. Do not invent your own
-JSON reply format and do not write tool calls as plain text.
+State: Goal, Steering, open questions, Recent headlines. Use only ids
+you can see. [stale] means that note's files changed.
 
-MEMORY STATE
-- Goal: the original job (not later user notes).
-- Steering: the latest user course-correct, if any.
-- Open questions: unsolved things, each `[id] text [dep] [dep]`.
-  Same text already open is a no-op.
-- Recent: the newest 10 work headlines since the last summary
-  (not user prompts or auto-saved answers). A [stale] tag on a
-  Recent line means that entry's files have changed since it was
-  saved. Goal, Steering, and open questions are never [stale].
-  Finished work lives in history — call find/history for it.
-- Injected state is headlines only — call find/history for detail.
-- Every entry starts with an id like [1a2b3c4d]. Use only ids you can
-  see there and never invent one.
-
-WHEN TO CALL memory
-Pick action on the single memory tool:
-- save after every meaningful step, or its result is lost.
-- open_questions to add an unsolved question (plus the notes it
-  stands on). Same text already listed is a no-op. Empty text
-  closes all, or the ids you pass.
-- save with summary set to true as soon as a piece of work is finished,
-  so Recent stays short.
-- delete to hide specific noise entries from Recent. Pass ids from
-  MEMORY STATE. Do not delete findings or the current user request.
-- find when you need the exact detail behind a summary. Set
-  all_branches to true to also search entries on other branches.
-- history when the user asks what happened: the timeline of this
-  branch (headlines, folded steps under their summary). Set full
-  for complete bodies.
-- graph when the user wants the whole tree: every branch and entry in
-  one picture. Set html to true to also write an explorable HTML page
-  for the user; give them its path.
-- branch to resume work from a specific saved snapshot. Set id to that
-  entry and label to a summary of the work you are leaving. Restores files.
-- inspect to temporarily set every working file to how it was at an
-  entry, to look around. inspect_done returns you to your branch.
-  Always call inspect_done before answering; edits made while
-  inspecting are discarded.
-
-WHEN TO STOP
-When the task is done, reply with a final answer in plain text and do
-not call a tool.
-
-RULES
-- State only facts backed by MEMORY STATE or the latest tool result.
-- Never save a claim about work or files you did not verify this turn.
-  If you cannot reach or verify something, save that instead.
+memory actions: save (summary=true to fold Recent); find (ids= for
+bodies); history; open_questions; delete; branch/inspect (restores
+files — call inspect_done before answering).
+Facts only from MEMORY STATE or the latest tool result.
 """.strip()
 
 
@@ -245,26 +203,62 @@ def _line(item: MemoryItem) -> str:
     return f"[{item.id[:8]}] {who}{prefix}{item.message}"
 
 
-FIND_DEFAULT_K = 12
+def _transcript(item: MemoryItem) -> bool:
+    payload = item.payload
+    return bool(
+        payload.get("auto")
+        or payload.get("user")
+        or payload.get("open_question")
+    )
+
+
+def _capped_line(item: MemoryItem, limit: int = FIND_BODY_MAX) -> str:
+    text = _line(item)
+    if len(text) <= limit:
+        return text
+    extra = len(text) - limit + 1
+    return text[: limit - 1].rstrip() + f"… ({extra} more)"
+
+
+def _child_lines(kids: list[MemoryItem]) -> list[str]:
+    visible = kids[:FIND_CHILD_CAP]
+    lines = [f"    {_subject(child)}" for child in visible]
+    hidden = len(kids) - len(visible)
+    if hidden:
+        lines.append(f"    (+{hidden} more)")
+    return lines
 
 
 def render_timeline(items: list[MemoryItem], *, full: bool = False) -> str:
-    """History: summaries with folded steps indented under them.
+    """History: work notes, oldest first.
 
-    Default is commit subjects. full=True keeps complete bodies.
+    Default skips chat transcript (user/auto) and folded children.
+    full=True keeps every body, including folded steps.
     """
     fmt = _line if full else _subject
     by_id = {item.id: item for item in items}
     covered = {c for item in items for c in item.payload.get("covers", [])}
     lines = []
+    kept: list[MemoryItem] = []
     for item in items:
         if item.id in covered:
             continue
+        if not full and _transcript(item):
+            continue
+        kept.append(item)
+    if not full and len(kept) > HISTORY_CAP:
+        lines.append(
+            f"(+{len(kept) - HISTORY_CAP} earlier — "
+            "memory_find or history full=true)"
+        )
+        kept = kept[-HISTORY_CAP:]
+    for item in kept:
         lines.append(fmt(item))
-        for child_id in item.payload.get("covers", []):
-            child = by_id.get(child_id)
-            if child is not None:
-                lines.append(f"    {fmt(child)}")
+        if full:
+            for child_id in item.payload.get("covers", []):
+                child = by_id.get(child_id)
+                if child is not None:
+                    lines.append(f"    {fmt(child)}")
     return "\n".join(lines) or "Nothing saved yet."
 
 
@@ -276,15 +270,17 @@ def render_find(
 ) -> str:
     """Search hits. Full body only for explicit ids; others are subjects.
 
-    A summary hit lists covered child headlines underneath.
+    A summary hit lists a few covered child headlines underneath.
     """
     full_ids = full_ids or set()
     children = children or {}
     lines = []
     for item in items:
-        lines.append(_line(item) if item.id in full_ids else _subject(item))
-        for child in children.get(item.id, []):
-            lines.append(f"    {_subject(child)}")
+        if item.id in full_ids:
+            lines.append(_capped_line(item))
+        else:
+            lines.append(_subject(item))
+        lines.extend(_child_lines(children.get(item.id, [])))
     return "\n".join(lines) or "Nothing found."
 
 
@@ -380,11 +376,6 @@ def render(
                 f"Recent has {len(recent)} steps. "
                 "Summarize the finished work before continuing."
             )
-        lines.append("")
-        lines.append(
-            "Commit subjects only. Use memory_find / memory_history "
-            "for full bodies or folded steps."
-        )
         return "\n".join(lines)
     if history:
         lines.append("## History")
