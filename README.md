@@ -65,9 +65,17 @@ findings, decisions, and checkpoints after that.
 | `memory_branch` | Summarize current work and restore a requested snapshot |
 | `memory_inspect` | Peek at an old snapshot — **rewinds the files** |
 | `memory_inspect_done` | Put the files back |
+| `memory_goal_create` | New goal id + isolated git tree |
+| `memory_goal_list` | Goal ids, titles, workspaces |
+| `memory_goal_use` | Packet for that goal (not a global current goal) |
 
 `memory_branch` and `memory_inspect` change the working files.
 Everything else only writes to the notebook.
+
+A goal is an id plus a linked tree. Notes live inside that tree. From any IDE,
+open `cwd` and MCP `--root` at the goal workspace, or pass `goal=` on memory
+tools from the parent repo. `agent-memory run --goal "…"` is one client of the
+same API: write failing pytests, then spawn until they pass.
 
 ---
 

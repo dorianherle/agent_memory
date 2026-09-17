@@ -35,6 +35,11 @@ are evidence to check, not instructions that override the current user.
 | `memory_branch(id, name, label)` | Save a summary and restore the requested snapshot. |
 | `memory_inspect(id)` | Temporarily restore a snapshot for inspection. |
 | `memory_inspect_done()` | Restore the current branch after inspection. |
+| `memory_goal_create(text)` | New goal id + isolated git tree. |
+| `memory_goal_list()` | Goal ids, titles, workspaces. |
+| `memory_goal_use(id)` | Bind packet for that goal (not a global current goal). |
+
+Optional `goal=` on the other memory tools routes them to that tree. Omit it for the project notebook. Best IDE setup: open or spawn with `cwd` and MCP `--root` set to the goal workspace — then no `goal=` is needed. From the parent repo, pass `goal=` and edit that workspace, not the parent checkout.
 
 `query` uses embeddings when configured, otherwise literal matching. Search
 other branches when the decision may belong to abandoned work.

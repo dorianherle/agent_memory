@@ -25,6 +25,9 @@ class McpServerTests(MemoryTestCase):
         names = set(server._tool_manager._tools)
         self.assertNotIn("memory_state", names)
         self.assertIn("memory_save", names)
+        self.assertIn("memory_goal_create", names)
+        self.assertIn("memory_goal_list", names)
+        self.assertIn("memory_goal_use", names)
         self.assertIn("memory_summarize", names)
         self.assertIn("memory_delete", names)
         self.assertIn("memory_open_questions", names)
@@ -617,6 +620,9 @@ class SkillTests(MemoryTestCase):
         "memory_branch",
         "memory_inspect",
         "memory_inspect_done",
+        "memory_goal_create",
+        "memory_goal_list",
+        "memory_goal_use",
     )
 
     def test_install_writes_skill_with_references(self) -> None:

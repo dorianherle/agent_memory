@@ -19,7 +19,11 @@ ACTIONS = (
     "inspect",
     "inspect_done",
     "open_questions",
+    "goal_create",
+    "goal_list",
+    "goal_use",
 )
+GOAL_ACTIONS = ("goal_create", "goal_list", "goal_use")
 
 MEMORY_TOOL = {
     "type": "function",
@@ -30,7 +34,9 @@ MEMORY_TOOL = {
             "Project memory. Actions: save (summary=true folds Recent); "
             "find (headlines; ids= for bodies); history; "
             "open_questions; delete; graph; branch/inspect "
-            "(restores files; inspect_done to return)."
+            "(restores files; inspect_done to return); "
+            "goal_create / goal_list / goal_use (isolated goal id + tree). "
+            "Pass goal= to target a goal workspace; omit it for this project notebook."
         ),
         "parameters": {
             "type": "object",
@@ -122,6 +128,14 @@ MEMORY_TOOL = {
                         "AGENT_MEMORY_AGENT or main."
                     ),
                 },
+                "goal": {
+                    "type": ["string", "null"],
+                    "description": (
+                        "Optional goal id. Routes this call to that "
+                        "goal's isolated workspace. Omit for the "
+                        "project notebook. cwd=workspace needs no goal=."
+                    ),
+                },
             },
             "required": [
                 "action",
@@ -137,6 +151,7 @@ MEMORY_TOOL = {
                 "label",
                 "full",
                 "agent",
+                "goal",
             ],
             "additionalProperties": False,
         },
@@ -156,12 +171,24 @@ def call_tool(memory: Memory, name: str, arguments: dict) -> str:
         result = f"Unknown tool {name}."
         memory._last_tool_result = result
         return result
+    arguments = dict(arguments or {})
     try:
-        result = _run_action(memory, dict(arguments or {}))
+        memory = _bound_memory(memory, arguments)
+        result = _run_action(memory, arguments)
     except (ValueError, RuntimeError, KeyError, TypeError) as error:
         result = f"Error: {error}"
     memory._last_tool_result = result
     return result
+
+
+def _bound_memory(memory: Memory, arguments: dict) -> Memory:
+    goal = arguments.get("goal")
+    action = arguments.get("action")
+    if not goal or action in GOAL_ACTIONS:
+        return memory
+    from agent_memory.goals import memory_for
+
+    return memory_for(memory._path, goal)
 
 
 def _require(arguments: dict, *keys: str) -> None:
@@ -180,6 +207,21 @@ def _run_action(memory: Memory, arguments: dict) -> str:
             f"unknown action {action!r}; "
             f"expected one of: {', '.join(ACTIONS)}"
         )
+    if action == "goal_create":
+        from agent_memory.goals import bind_packet, create_goal, format_created, host_project
+
+        _require(arguments, "text")
+        record = create_goal(host_project(memory._path), arguments["text"])
+        return format_created(record, bind_packet(record["project"], record["id"]))
+    if action == "goal_list":
+        from agent_memory.goals import format_goal_list, host_project
+
+        return format_goal_list(host_project(memory._path))
+    if action == "goal_use":
+        from agent_memory.goals import bind_packet, host_project
+
+        _require(arguments, "id")
+        return bind_packet(host_project(memory._path), arguments["id"])
     if action == "save":
         _require(arguments, "text")
         payload = dict(arguments.get("payload") or {})

@@ -1,6 +1,6 @@
 ---
 name: agent-memory
-description: Expert operation of the agent-memory MCP tools (memory_save, memory_find, memory_summarize, memory_open_questions, memory_delete, memory_history, memory_state, memory_check, memory_branch, memory_inspect, memory_inspect_done). Use whenever MEMORY STATE appears in context, at the start of any multi-step or long-running task, when the user refers to earlier work ("continue", "why did we", "like last time", "the thing we decided"), before risky or irreversible edits, when recalling past decisions or dead ends, when folding finished work, when deleting noise from Recent, when coordinating subagents, or when recovering a lost session.
+description: Expert operation of the agent-memory MCP tools (memory_save, memory_find, memory_summarize, memory_open_questions, memory_delete, memory_history, memory_state, memory_check, memory_branch, memory_inspect, memory_inspect_done, memory_goal_create, memory_goal_list, memory_goal_use). Use whenever MEMORY STATE appears in context, at the start of any multi-step or long-running task, when the user refers to earlier work ("continue", "why did we", "like last time", "the thing we decided"), before risky or irreversible edits, when recalling past decisions or dead ends, when folding finished work, when deleting noise from Recent, when coordinating subagents, or when recovering a lost session.
 ---
 
 # Agent Memory
@@ -8,6 +8,12 @@ description: Expert operation of the agent-memory MCP tools (memory_save, memory
 This is a notebook plus snapshots. Every note is what was decided
 **and** the project files at that moment. The notebook is
 `.agent_memory/` — it never touches the project's own `.git/`.
+
+A **goal** is an id plus a linked tree (`memory_goal_create`). Notes
+stay inside that tree; they do not get their own checkout. From any
+IDE, open `cwd` + MCP `--root` at the goal workspace, or pass `goal=`
+on memory tools while working from the parent repo. `memory_goal_use`
+returns the packet; it does not set a process-global current goal.
 
 Hooks already save the user's prompt and your finished answer.
 Everything in the middle only exists if you save it.

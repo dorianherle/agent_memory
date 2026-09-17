@@ -43,6 +43,11 @@ derived state and rebuild themselves from the git history.
 | `memory_branch` | `(id, name, label)` | Save label as a summary of the current line, then restore working files to the requested id. Old work stays searchable. |
 | `memory_inspect` | `(id)` | **Restores files** to that entry, detached, and blocks saving until closed. |
 | `memory_inspect_done` | `()` | Restores the branch and its files. |
+| `memory_goal_create` | `(text)` | Allocate a goal id and isolated tree (`git worktree` or copy). Notebook is `Memory(workspace)`. |
+| `memory_goal_list` | `()` | Goal ids, titles, workspaces, last runner status. |
+| `memory_goal_use` | `(id)` | Bind packet (`Goal [id]`, workspace, branch). Not a process-global current goal. |
+
+Other tools accept optional `goal=` to target that workspace. Omit it for the project notebook. Preferred host setup: `cwd` and MCP `--root` are the goal workspace.
 
 There is no edit tool. `memory_delete` appends a tombstone; git history is
 never rewritten. Default find / state / history / live HTML skip deleted

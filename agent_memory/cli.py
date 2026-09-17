@@ -59,7 +59,47 @@ def main(argv: list[str] | None = None) -> None:
     studio.add_argument("--port", type=int, default=8788)
     studio.add_argument("--no-browser", action="store_true")
 
+    run = sub.add_parser(
+        "run",
+        help="Auto-run a goal: write failing pytests, respawn until green",
+    )
+    run.add_argument("--goal", dest="goal_text", default=None, help="Goal text")
+    run.add_argument("--resume", dest="goal_id", default=None, help="Existing goal id")
+    run.add_argument("--root", default=".", help="Project root")
+    run.add_argument("--max-agents", type=int, default=8)
+    run.add_argument(
+        "--pytest",
+        nargs=argparse.REMAINDER,
+        default=[],
+        help="Extra pytest args after --pytest",
+    )
+
     args = parser.parse_args(argv)
+
+    if args.command == "run":
+        from agent_memory.runner import cursor_worker, run_goal
+
+        if not args.goal_text and not args.goal_id:
+            parser.error("run requires --goal TEXT or --resume ID")
+
+        def report(status: dict) -> None:
+            pytest = status.get("pytest") or {}
+            print(
+                f"[{status.get('goal_id')}] agent {status.get('agent')} "
+                f"{pytest.get('summary', '')} {status.get('state')}",
+                flush=True,
+            )
+
+        status = run_goal(
+            args.root,
+            args.goal_text,
+            goal_id=args.goal_id,
+            worker=cursor_worker,
+            max_agents=args.max_agents,
+            pytest_args=args.pytest,
+            on_observe=report,
+        )
+        sys.exit(0 if status.get("state") == "passed" else 1)
 
     if args.command == "studio":
         from agent_memory.studio import serve

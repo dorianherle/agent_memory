@@ -118,6 +118,9 @@ class TestWrapper(MemoryTestCase):
                 "inspect",
                 "inspect_done",
                 "open_questions",
+                "goal_create",
+                "goal_list",
+                "goal_use",
             ],
         )
 

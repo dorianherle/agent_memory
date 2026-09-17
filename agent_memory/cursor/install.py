@@ -124,6 +124,7 @@ def sdk_next_steps_lines() -> list[str]:
         "Next (Cursor IDE):",
         "  Reload MCP in Cursor Settings → Tools & MCP",
         "  Start an Agent chat — hooks set the goal; use memory_* tools for durable notes",
+        "  Isolated jobs: memory_goal_create, then cwd=workspace (or pass goal=)",
         f"  Skill installed: .cursor/skills/{SKILL_NAME}/SKILL.md",
         "",
         "Next (Cursor SDK — local, no wrap):",

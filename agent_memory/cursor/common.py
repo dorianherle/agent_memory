@@ -64,10 +64,17 @@ def memory_root(argv: list[str] | None = None) -> Path:
     return resolve_root(argv)
 
 
-def get_memory() -> Memory:
+def get_memory(goal: str | None = None) -> Memory:
     root = memory_root()
     # Gemini key + AGENT_MEMORY_PROVIDER from cursor install.
     from agent_memory.cursor.install import apply_credentials_env
 
     apply_credentials_env(root)
-    return Memory(root)
+    if not goal:
+        return Memory(root)
+    from agent_memory.goals import host_project, resolve_goal
+
+    record = resolve_goal(host_project(root), goal)
+    workspace = Path(record["workspace"])
+    apply_credentials_env(workspace)
+    return Memory(workspace)

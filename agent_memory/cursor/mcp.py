@@ -37,16 +37,36 @@ def _build_server():
     mcp = _mcp_server("agent-memory")
 
     @mcp.tool()
+    def memory_goal_create(text: str) -> str:
+        """Create a goal id and isolated git tree. Any IDE. cwd=workspace needs no goal=."""
+        return call_tool(
+            get_memory(), "memory", {"action": "goal_create", "text": text}
+        )
+
+    @mcp.tool()
+    def memory_goal_list() -> str:
+        """List goal ids, titles, workspaces."""
+        return call_tool(get_memory(), "memory", {"action": "goal_list"})
+
+    @mcp.tool()
+    def memory_goal_use(id: str) -> str:
+        """Bind packet for a goal id. Does not set a process-global current goal."""
+        return call_tool(
+            get_memory(), "memory", {"action": "goal_use", "id": id}
+        )
+
+    @mcp.tool()
     def memory_find(
         query: str | None = None,
         text: str | None = None,
         ids: list[str] | None = None,
         all_branches: bool = False,
         full: bool = False,
+        goal: str | None = None,
     ) -> str:
         """Search. query=/text= work headlines; ids= bodies (capped). Transcript omitted unless ids=."""
         return call_tool(
-            get_memory(),
+            get_memory(goal),
             "memory",
             {
                 "action": "find",
@@ -59,9 +79,9 @@ def _build_server():
         )
 
     @mcp.tool()
-    def memory_save(text: str, agent: str | None = None) -> str:
+    def memory_save(text: str, agent: str | None = None, goal: str | None = None) -> str:
         """Save a finding. After a completed milestone, call memory_summarize to fold its commits."""
-        memory = get_memory()
+        memory = get_memory(goal)
         item_id = memory.save(text, agent=agent)
         memory.write_state_file()
         try:
@@ -77,9 +97,9 @@ def _build_server():
         return f"{result}\n{warn}" if warn else result
 
     @mcp.tool()
-    def memory_summarize(text: str, agent: str | None = None) -> str:
+    def memory_summarize(text: str, agent: str | None = None, goal: str | None = None) -> str:
         """Fold finished work into one line. Pass agent."""
-        memory = get_memory()
+        memory = get_memory(goal)
         item_id = memory.summarize(text, agent=agent)
         memory.write_state_file()
         try:
@@ -95,9 +115,9 @@ def _build_server():
         return f"{result}\n{warn}" if warn else result
 
     @mcp.tool()
-    def memory_delete(ids: list[str]) -> str:
+    def memory_delete(ids: list[str], goal: str | None = None) -> str:
         """Hide noise ids from Recent/find. Snapshots stay in git."""
-        memory = get_memory()
+        memory = get_memory(goal)
         result = call_tool(
             memory,
             "memory",
@@ -115,9 +135,10 @@ def _build_server():
         text: str = "",
         depends_on: list[str] | None = None,
         ids: list[str] | None = None,
+        goal: str | None = None,
     ) -> str:
         """Add a question, or empty text to close ids/all."""
-        memory = get_memory()
+        memory = get_memory(goal)
         result = call_tool(
             memory,
             "memory",
@@ -135,16 +156,16 @@ def _build_server():
         return result
 
     @mcp.tool()
-    def memory_history(full: bool = False) -> str:
+    def memory_history(full: bool = False, goal: str | None = None) -> str:
         """Work-note headlines. full=True for the whole transcript."""
         return call_tool(
-            get_memory(), "memory", {"action": "history", "full": full}
+            get_memory(goal), "memory", {"action": "history", "full": full}
         )
 
     @mcp.tool()
-    def memory_branch(id: str, name: str, label: str) -> str:
+    def memory_branch(id: str, name: str, label: str, goal: str | None = None) -> str:
         """Summarize this line, restore files to id."""
-        memory = get_memory()
+        memory = get_memory(goal)
         result = call_tool(
             memory,
             "memory",
@@ -158,14 +179,14 @@ def _build_server():
         return result
 
     @mcp.tool()
-    def memory_inspect(id: str) -> str:
+    def memory_inspect(id: str, goal: str | None = None) -> str:
         """Restore files to id. Call memory_inspect_done after."""
-        return call_tool(get_memory(), "memory", {"action": "inspect", "id": id})
+        return call_tool(get_memory(goal), "memory", {"action": "inspect", "id": id})
 
     @mcp.tool()
-    def memory_inspect_done() -> str:
+    def memory_inspect_done(goal: str | None = None) -> str:
         """Leave inspect; restore the branch."""
-        memory = get_memory()
+        memory = get_memory(goal)
         result = call_tool(memory, "memory", {"action": "inspect_done"})
         memory.write_state_file()
         return result
