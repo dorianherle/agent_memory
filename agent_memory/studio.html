@@ -25,12 +25,16 @@
     <main id="app-shell">
       <button id="memory-backdrop" aria-label="Close memory panel" tabindex="-1"></button>
       <aside class="memory" aria-label="Memory overview">
+        <div class="timeline-head">
+          <p class="eyebrow">Goals</p><span class="count" id="goal-count"></span>
+        </div>
+        <div id="goals"><div class="hint">Open a folder to see its goals.</div></div>
         <div class="context">
-          <p class="eyebrow">Goal</p>
+          <p class="eyebrow">Selected goal</p>
           <div id="goal">
-            <h2>Your project’s memory.</h2>
+            <h2>No goal selected.</h2>
             <span class="muted small"
-              >Decisions and progress, one chapter at a time.</span
+              >Start a goal or pick one to watch pytest.</span
             >
           </div>
         </div>
@@ -55,7 +59,7 @@
             aria-selected="true"
             aria-controls="chat"
           >
-            Conversation</button
+            Board</button
           ><button
             class="tab"
             id="detail-tab"
@@ -64,15 +68,14 @@
             aria-controls="detail"
           >
             Note details</button
-          ><span class="session-label">Fresh agent · Shared memory</span>
+          ><span class="session-label" id="worker-label">No agent login</span>
         </div>
         <div id="chat" role="tabpanel">
           <div id="thread">
             <div class="empty" id="welcome">
               <div class="empty-icon" aria-hidden="true">≋</div>
-              <h2>One window.<br>Work that carries forward.</h2>
-              <p>Pick up where you left off. Your next agent starts with the decisions, evidence, and next steps that matter.</p>
-              <div class="suggestions"><button data-prompt="Continue from the latest handoff. Verify the next step before proceeding.">Continue the work ↗</button><button data-prompt="Summarize our progress and what remains unresolved.">Review progress</button></div>
+              <h2>One board.<br>Goals that keep running.</h2>
+              <p>Write a goal. The next agent writes failing pytests, then new agents spawn on that tree until they pass.</p>
             </div>
           </div>
           <div class="run-status"><span id="activity" role="status" aria-live="polite"></span><span id="standby"></span></div>
@@ -82,11 +85,12 @@
                 id="question"
                 aria-label="Message"
                 rows="2"
-                placeholder="What would you like to work on?"
+                placeholder="New goal…"
               ></textarea><div class="composer-bottom"><select id="model" aria-label="Agent model"><option value="grok-4.5">Grok 4.5 Fast</option></select
+              ><button id="resume" type="button" hidden>Resume</button
               ><button id="stop" type="button" hidden>Stop</button
               ><button class="primary" id="send" type="submit" disabled>
-                Send ↑
+                Run ↑
               </button></div>
             </form>
             <p class="composer-note" id="composer-note">
@@ -108,6 +112,7 @@
         ><input id="project-path" placeholder="/path/to/your/project" />
         <div class="actions"><button type="submit">Open project</button></div>
       </form>
+      <p class="small muted" id="worker-hint">Uses Codex if you already ran <code>codex login</code>. Cursor key is the fallback.</p>
       <label for="key">Cursor API key</label>
       <div id="keybox">
         <input
@@ -121,7 +126,8 @@
       <p id="settings-message" role="status"></p>
       <div class="actions">
         <button id="settings-close">Close</button
-        ><button id="connect" class="primary">Connect</button>
+        ><button id="connect-codex" type="button">Connect Codex</button
+        ><button id="connect" class="primary">Connect Cursor</button>
       </div>
     </dialog>
     <dialog id="prompt-dialog" class="prompt-dialog">
@@ -149,6 +155,9 @@
         project: "",
         ready: false,
         hasKey: false,
+        worker: "none",
+        goalId: "",
+        goals: [],
         commits: [],
         selected: null,
         memoryJSON: "",
@@ -227,20 +236,36 @@
           " input tokens in the Studio prompt";
         $("prompt-dialog").showModal();
       }
+      function canLaunch() {
+        return state.worker === "codex" || state.worker === "cursor" || state.worker === "test" || state.hasKey;
+      }
+      function workerLabel() {
+        return state.worker === "codex"
+          ? "Codex · logged in"
+          : state.worker === "cursor" || state.hasKey
+            ? "Cursor · key"
+            : state.worker === "test"
+              ? "Test worker"
+              : "No agent login";
+      }
       function controls() {
+        const launch = canLaunch();
         $("send").disabled =
-          state.busy || !state.project || !state.hasKey || !state.ready;
+          state.busy || !state.project || !state.ready || !launch;
+        $("resume").hidden = state.busy || !state.goalId;
+        $("resume").disabled = $("send").disabled;
         $("stop").hidden = !state.busy;
         $("send").hidden = state.busy;
         $("pick").disabled = state.busy;
         $("model").disabled = state.busy;
+        $("worker-label").textContent = workerLabel();
         $("composer-note").textContent = !state.project
           ? "Open a project to begin."
           : !state.ready
             ? "Install memory in this folder: agent-memory cursor install"
-            : !state.hasKey
-              ? "Connect your Cursor API key in Settings."
-              : "Enter to send · Shift + Enter for a new line";
+            : !launch
+              ? "Connect Codex or a Cursor key in Settings."
+              : "Enter to run a new goal · Resume continues the selected one";
       }
       function tab(name) {
         for (const id of ["chat", "detail"]) {
@@ -261,7 +286,7 @@
         $("detail").innerHTML = `<p class="eyebrow">Memory note</p><h2>${esc(note.title)}</h2><p class="muted">Loading details…</p>`;
         if (note.text === undefined) {
           try {
-            const full = state.noteCache.get(id) || await api("/api/note?id=" + encodeURIComponent(id));
+            const full = state.noteCache.get(id) || await api("/api/note?id=" + encodeURIComponent(id) + (state.goalId ? "&goal=" + encodeURIComponent(state.goalId) : ""));
             state.noteCache.set(id, full);
             if (state.selected !== id) return;
             note = {...note, ...full};
@@ -284,6 +309,27 @@
       function noteHTML(c) {
         const children = c.children || [];
         return `<div class="note ${c.kind === "summary" ? "summary" : ""}">${noteButton(c)}${children.length ? `<details data-group="${esc(c.id)}"${expanded.has(c.id) ? " open" : ""}><summary>${children.length} grouped ${children.length === 1 ? "note" : "notes"}</summary><div class="children">${children.map(noteHTML).join("")}</div></details>` : ""}</div>`;
+      }
+      function renderGoals(rows) {
+        state.goals = rows || [];
+        $("goal-count").textContent = state.goals.length
+          ? state.goals.length + (state.goals.length === 1 ? " goal" : " goals")
+          : "";
+        $("goals").innerHTML = state.goals.length
+          ? state.goals.map((g) => {
+              const pytest = (g.status && g.status.pytest) || {};
+              const line = pytest.summary || g.status?.state || "no run yet";
+              return `<button class="note-button${state.goalId === g.id ? " selected" : ""}" data-goal="${esc(g.id)}"><span class="note-title">${esc(g.title)}</span><span class="meta">${esc(g.id)} · ${esc(line)}</span></button>`;
+            }).join("")
+          : '<div class="hint">No isolated goals yet. Type one below and Run.</div>';
+      }
+      function showBoard(status) {
+        const pytest = (status && status.pytest) || {};
+        $("welcome")?.remove();
+        const existing = $("board");
+        const html = `<div class="empty" id="board"><p class="eyebrow">Goal [${esc(status.goal_id || state.goalId)}]</p><h2>${esc(status.goal || "Running")}</h2><p class="muted">${esc(status.workspace || "")}</p><p>Agent ${esc(status.agent ?? "—")} · ${esc(pytest.summary || "waiting for pytest")} · ${esc(status.state || "")}</p><pre style="white-space:pre-wrap">${esc(pytest.tail || "")}</pre></div>`;
+        if (existing) existing.outerHTML = html;
+        else $("thread").insertAdjacentHTML("afterbegin", html);
       }
       function renderMemory(data) {
         $("memory-error").hidden = true;
@@ -319,12 +365,20 @@
       function toggleMemory(open) { $("app-shell").classList.toggle("memory-open", open); $("memory-toggle").setAttribute("aria-expanded", open); }
       $("memory-toggle").onclick = () => toggleMemory(!$("app-shell").classList.contains("memory-open"));
       $("memory-backdrop").onclick = () => toggleMemory(false);
+      async function refreshGoals() {
+        if (!state.project) return;
+        try {
+          const data = await api("/api/goals");
+          renderGoals(data.goals || []);
+        } catch (_) {}
+      }
       async function refreshMemory() {
         if (!state.project || state.refreshing || document.hidden) return;
         const project = state.project;
         state.refreshing = true;
         try {
-          const response = await fetch("/api/memory?compact=1", {headers: state.memoryETag ? {"If-None-Match": state.memoryETag} : {}});
+          const goalQ = state.goalId ? "&goal=" + encodeURIComponent(state.goalId) : "";
+          const response = await fetch("/api/memory?compact=1" + goalQ, {headers: state.memoryETag ? {"If-None-Match": state.memoryETag} : {}});
           if (response.status === 304) return;
           const data = await response.json();
           if (!response.ok) throw new Error(data.error || "Memory unavailable");
@@ -338,9 +392,22 @@
         }
         finally { state.refreshing = false; }
       }
+      function selectGoal(id) {
+        state.goalId = id;
+        state.memoryJSON = "";
+        state.memoryETag = "";
+        state.noteCache.clear();
+        const row = state.goals.find((g) => g.id === id);
+        if (row) showBoard({ goal_id: row.id, goal: row.title, workspace: row.workspace, ...(row.status || {}) });
+        renderGoals(state.goals);
+        controls();
+        refreshMemory();
+      }
       document.addEventListener("click", (event) => {
         const suggestion = event.target.closest("[data-prompt]");
         if (suggestion) { $("question").value = suggestion.dataset.prompt; $("question").focus(); }
+        const goal = event.target.closest("[data-goal]");
+        if (goal) { selectGoal(goal.dataset.goal); return; }
         const button = event.target.closest("[data-note]");
         if (button) showNote(button.dataset.note);
       });
@@ -378,8 +445,10 @@
           $("activity").textContent = "";
           $("activity").removeAttribute("title");
           $("question").value = "";
+          state.goalId = "";
+          state.goals = [];
           $("thread").innerHTML = welcomeHTML;
-          $("thread").querySelector("h2").textContent = "Ready to pick up the thread.";
+          $("thread").querySelector("h2").textContent = "Ready to run a goal.";
           $("detail").innerHTML =
             '<p class="muted">Select a note or summary to read it here.</p>';
           tab("chat");
@@ -389,6 +458,7 @@
           false, data.ready,
         );
         controls();
+        refreshGoals();
         refreshMemory();
         refreshStandby();
       }
@@ -446,6 +516,24 @@
           if (session) { $("model").value = session.model; localStorage.setItem("studio-model-v3", session.model); }
         }
       };
+      $("connect-codex").onclick = async () => {
+        $("connect-codex").disabled = true;
+        $("settings-message").textContent = "Opening Codex login…";
+        $("settings-message").dataset.state = "pending";
+        try {
+          const data = await api("/api/connect-codex", {});
+          $("settings-message").dataset.state = "success";
+          $("settings-message").textContent = data.hint || "Finish login in the browser.";
+          const session = await api("/api/session");
+          state.worker = session.worker;
+          controls();
+        } catch (error) {
+          $("settings-message").dataset.state = "error";
+          $("settings-message").textContent = error.message;
+        } finally {
+          $("connect-codex").disabled = false;
+        }
+      };
       $("connect").onclick = async () => {
         $("connect").disabled = true;
         $("settings-message").textContent = "Connecting…";
@@ -488,87 +576,53 @@
         $("thread").appendChild(node);
         return node.querySelector(".body");
       }
-      $("ask").onsubmit = async (event) => {
-        event.preventDefault();
-        const question = $("question").value.trim();
-        if (!question || $("send").disabled) return;
+      async function startRun(payload) {
         state.busy = true;
         status("Agent running");
         controls();
         tab("chat");
-        addMessage("user", question);
-        $("question").value = "";
-        const body = addMessage("agent", "");
-        const agentMessage = body.parentElement;
-        body.dataset.phase = "Sending request…";
-        body.parentElement.classList.add("pending");
         $("activity").textContent = "Starting…";
         const startedAt = performance.now();
-        let firstTextAt = null;
-        $("thread").scrollTop = $("thread").scrollHeight;
-        let answer = "",
-          failed = false,
-          ended = false,
-          streamProtocol = 1;
+        let failed = false,
+          ended = false;
         function receive(event) {
-          if (event.stream_protocol) streamProtocol = event.stream_protocol;
-          if (event.type === "memory") refreshMemory();
-          if (event.type === "prompt") {
-            agentMessage._promptText = event.text || "";
-            agentMessage._promptTokens = event.prompt_tokens || 0;
-            const promptButton = agentMessage.querySelector(".agent-prompt");
-            if (promptButton) {
-              promptButton.disabled = !agentMessage._promptText;
-              promptButton.title = agentMessage._promptText
-                ? "View the exact prompt Studio sent"
-                : "Prompt unavailable";
-            }
-          }
-          if (event.type === "status") {
-            const phase = event.text === "Reading the handoff…" ? "Waiting for response…" : event.text || "Waiting for response…";
-            $("activity").textContent = phase;
-            body.dataset.phase = phase;
-          }
-          if (event.type === "delta") {
-            const fragment = event.text || "";
-            // Protocol 1 inserted this exact event after every SDK fragment.
-            if (streamProtocol < 2 && fragment === "\n\n") return;
-            answer += fragment;
-            if (firstTextAt === null) firstTextAt = performance.now();
-            body.parentElement.classList.remove("pending");
-            body.textContent = normalizeFragmentBreaks(answer);
+          if (event.type === "memory") { refreshMemory(); refreshGoals(); }
+          if (event.type === "status") $("activity").textContent = event.text || "Running…";
+          if (event.type === "observe") {
+            state.goalId = event.goal_id || state.goalId;
+            showBoard(event);
+            $("activity").textContent = `[${event.goal_id}] agent ${event.agent} ${event.pytest?.summary || ""}`;
           }
           if (event.type === "error") {
             failed = true;
-            body.parentElement.classList.add("error");
-            body.textContent = event.message;
-            status("Agent could not complete the request", true);
+            status(event.message, true);
+            $("activity").textContent = event.message;
           }
           if (event.type === "done") {
             ended = true;
-            if (event.timings)
-              $("activity").title =
-                `Agent wait: ${event.timings.agent_wait_ms} ms · Send: ${event.timings.send_ms} ms · First text: ${event.timings.first_text_ms ?? "—"} ms`;
+            if (event.result) {
+              state.goalId = event.result.goal_id || state.goalId;
+              showBoard(event.result);
+            }
             if (!failed)
               status(
-                event.status === "cancelled" ? "Stopped" : "Memory connected",
+                event.status === "cancelled" || event.status === "stopped" ? "Stopped" : "Goal " + (event.status || "done"),
                 false, event.status !== "cancelled" && state.ready,
               );
             $("activity").textContent =
-              event.status === "cancelled"
+              event.status === "cancelled" || event.status === "stopped"
                 ? "Stopped."
                 : event.status === "error"
                   ? "Run failed."
                   : "Finished in " + ((performance.now() - startedAt) / 1000).toFixed(1) + "s";
-            body.parentElement.classList.remove("pending");
             refreshStandby();
           }
         }
         try {
-          const res = await fetch("/api/ask", {
+          const res = await fetch("/api/run", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ question, model: $("model").value }),
+            body: JSON.stringify(payload),
           });
           if (!res.ok || !res.body)
             throw new Error(
@@ -593,20 +647,29 @@
           if (buf.trim()) receive(JSON.parse(buf));
           if (!ended && !failed)
             throw new Error("Connection ended before the agent finished.");
-          if (!failed) body.innerHTML = rich(answer || "No response returned.");
         } catch (error) {
           failed = true;
-          body.parentElement.classList.add("error");
-          body.textContent = error.message;
           status(error.message, true);
+          $("activity").textContent = error.message;
         } finally {
           state.busy = false;
-          body.parentElement.classList.remove("pending");
           controls();
           if (failed)
             $("activity").textContent = "Check the error above and retry.";
+          await refreshGoals();
           await refreshMemory();
         }
+      }
+      $("ask").onsubmit = async (event) => {
+        event.preventDefault();
+        const text = $("question").value.trim();
+        if (!text || $("send").disabled) return;
+        $("question").value = "";
+        await startRun({ text });
+      };
+      $("resume").onclick = async () => {
+        if (!state.goalId || $("send").disabled) return;
+        await startRun({ goal_id: state.goalId });
       };
       $("stop").onclick = async () => {
         $("stop").disabled = true;
@@ -630,6 +693,8 @@
         try {
           const session = await api("/api/session");
           state.hasKey = session.has_key;
+          state.worker = session.worker || "none";
+          state.goalId = session.goal_id || "";
           if (!localStorage.getItem("studio-model-v3"))
             localStorage.setItem("studio-model-v3", "grok-4.5");
           $("keybox").classList.toggle("ok", session.has_key);
@@ -659,6 +724,7 @@
         if (!state.project || !state.hasKey || document.hidden) return;
         try {
           const session = await api("/api/session");
+          state.worker = session.worker || state.worker;
           if (session.project === state.project && state.ready !== session.ready) {
             state.ready = session.ready;
             controls();
@@ -674,6 +740,7 @@
         } catch (_) { $("standby").textContent = "Connection lost"; $("standby").dataset.ready = "false"; }
       }
       setInterval(() => {
+        refreshGoals();
         refreshMemory();
         refreshStandby();
       }, 4000);

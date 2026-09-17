@@ -77,15 +77,19 @@ def main(argv: list[str] | None = None) -> None:
     args = parser.parse_args(argv)
 
     if args.command == "run":
-        from agent_memory.runner import cursor_worker, run_goal
+        from agent_memory.runner import detect_worker, run_goal
 
         if not args.goal_text and not args.goal_id:
             parser.error("run requires --goal TEXT or --resume ID")
+        name, worker = detect_worker()
+        if worker is None:
+            print("error: connect Codex (codex login) or set CURSOR_API_KEY", file=sys.stderr)
+            sys.exit(2)
 
         def report(status: dict) -> None:
             pytest = status.get("pytest") or {}
             print(
-                f"[{status.get('goal_id')}] agent {status.get('agent')} "
+                f"[{status.get('goal_id')}] {name} agent {status.get('agent')} "
                 f"{pytest.get('summary', '')} {status.get('state')}",
                 flush=True,
             )
@@ -94,7 +98,7 @@ def main(argv: list[str] | None = None) -> None:
             args.root,
             args.goal_text,
             goal_id=args.goal_id,
-            worker=cursor_worker,
+            worker=worker,
             max_agents=args.max_agents,
             pytest_args=args.pytest,
             on_observe=report,

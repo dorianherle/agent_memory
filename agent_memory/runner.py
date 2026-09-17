@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import os
+import shutil
 import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
+
+_ACTIVE: dict = {}
 
 from agent_memory.core import Memory
 from agent_memory.goals import (
@@ -106,6 +109,7 @@ def run_goal(
     max_agents: int = 8,
     pytest_args: list[str] | None = None,
     on_observe: Callable[[dict], None] | None = None,
+    cancelled: Callable[[], bool] | None = None,
 ) -> dict:
     """Create or resume a goal, then loop worker → pytest until green or max."""
     project = Path(project).resolve()
@@ -130,6 +134,14 @@ def run_goal(
             if phase == "bootstrap"
             else work_prompt(record, packet, last)
         )
+        if cancelled and cancelled():
+            status = _status_payload(
+                record, max(agent - 1, 0), max_agents, phase, last, "stopped"
+            )
+            write_status(project, record["id"], status)
+            if on_observe:
+                on_observe(status)
+            return status
         worker(prompt, workspace)
         last = observe_pytest(workspace, pytest_args)
         if phase == "bootstrap":
@@ -160,8 +172,8 @@ def run_goal(
     return status
 
 
-def cursor_worker(prompt: str, cwd: Path) -> None:
-    key = os.environ.get("CURSOR_API_KEY", "").strip()
+def cursor_worker(prompt: str, cwd: Path, api_key: str | None = None) -> None:
+    key = (api_key or os.environ.get("CURSOR_API_KEY") or "").strip()
     if not key:
         raise RuntimeError("CURSOR_API_KEY required for the Cursor runner adapter")
     from agent_memory.studio_runtime import (
@@ -179,3 +191,72 @@ def cursor_worker(prompt: str, cwd: Path) -> None:
         run.wait()
     finally:
         close_agent(agent)
+
+
+def codex_command(prompt: str, cwd: Path) -> list[str]:
+    return [
+        "codex",
+        "exec",
+        "--skip-git-repo-check",
+        "--sandbox",
+        "workspace-write",
+        "--cd",
+        str(cwd),
+        prompt,
+    ]
+
+
+def codex_logged_in(*, which=shutil.which, run=subprocess.run) -> bool:
+    if not which("codex"):
+        return False
+    result = run(
+        ["codex", "login", "status"],
+        capture_output=True,
+        text=True,
+    )
+    return result.returncode == 0
+
+
+def detect_worker(
+    cursor_key: str | None = None,
+    *,
+    which=shutil.which,
+    run=subprocess.run,
+) -> tuple[str, Worker | None]:
+    """Pick Codex if already logged in, else a Cursor key, else none."""
+    if codex_logged_in(which=which, run=run):
+        return "codex", codex_worker
+    key = (cursor_key or os.environ.get("CURSOR_API_KEY") or "").strip()
+    if key:
+        return "cursor", lambda prompt, cwd: cursor_worker(prompt, cwd, api_key=key)
+    return "none", None
+
+
+def cancel_active() -> None:
+    proc = _ACTIVE.get("proc")
+    if proc is not None and proc.poll() is None:
+        proc.terminate()
+
+
+def start_codex_login(*, popen=subprocess.Popen) -> dict:
+    if not shutil.which("codex"):
+        raise RuntimeError("codex is not on PATH. Install Codex CLI, then retry.")
+    popen(["codex", "login"])
+    return {"ok": True, "hint": "Finish ChatGPT login in the browser, then refresh."}
+
+
+def codex_worker(prompt: str, cwd: Path, *, run=None) -> None:
+    command = codex_command(prompt, cwd)
+    if run is not None:
+        result = run(command, cwd=str(cwd))
+        if getattr(result, "returncode", 0):
+            raise RuntimeError(f"codex exec exited {result.returncode}")
+        return
+    proc = subprocess.Popen(command, cwd=str(cwd))
+    _ACTIVE["proc"] = proc
+    try:
+        code = proc.wait()
+        if code:
+            raise RuntimeError(f"codex exec exited {code}")
+    finally:
+        _ACTIVE.pop("proc", None)

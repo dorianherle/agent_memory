@@ -1,7 +1,14 @@
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
 from agent_memory.core import Memory
-from agent_memory.runner import run_goal
+from agent_memory.runner import (
+    codex_command,
+    codex_worker,
+    detect_worker,
+    run_goal,
+)
 from agent_memory.tests.helpers import MemoryTestCase
 
 
@@ -68,3 +75,51 @@ class RunnerTests(MemoryTestCase):
         self.assertGreaterEqual(calls["n"], 3)
         self.assertEqual(status["state"], "passed")
         self.assertGreaterEqual(status["agent"], 2)
+
+
+class WorkerDetectTests(MemoryTestCase):
+    def test_prefers_codex_when_logged_in(self) -> None:
+        name, worker = detect_worker(
+            "",
+            which=lambda _: "/usr/bin/codex",
+            run=lambda *a, **k: SimpleNamespace(returncode=0),
+        )
+        self.assertEqual(name, "codex")
+        self.assertIs(worker, codex_worker)
+
+    def test_cursor_key_when_codex_missing(self) -> None:
+        name, worker = detect_worker(
+            "cursor_test",
+            which=lambda _: None,
+            run=lambda *a, **k: SimpleNamespace(returncode=1),
+        )
+        self.assertEqual(name, "cursor")
+        self.assertTrue(callable(worker))
+
+    def test_none_without_login(self) -> None:
+        with patch.dict("os.environ", {"CURSOR_API_KEY": ""}, clear=False):
+            name, worker = detect_worker(
+                "",
+                which=lambda _: None,
+                run=lambda *a, **k: SimpleNamespace(returncode=1),
+            )
+        self.assertEqual(name, "none")
+        self.assertIsNone(worker)
+
+    def test_codex_command_shape(self) -> None:
+        cwd = self.path
+        seen = {}
+
+        def fake_run(command, cwd=None):
+            seen["command"] = command
+            seen["cwd"] = cwd
+            return SimpleNamespace(returncode=0)
+
+        prompt = "write failing tests"
+        command = codex_command(prompt, cwd)
+        self.assertEqual(command[:5], ["codex", "exec", "--skip-git-repo-check", "--sandbox", "workspace-write"])
+        self.assertIn(str(cwd), command)
+        self.assertEqual(command[-1], prompt)
+        codex_worker(prompt, cwd, run=fake_run)
+        self.assertEqual(seen["command"], command)
+        self.assertEqual(seen["cwd"], str(cwd))

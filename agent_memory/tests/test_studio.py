@@ -20,6 +20,13 @@ class StudioTests(MemoryTestCase):
         self.pool_patch = patch('agent_memory.studio.STANDBY', StandbyAgent())
         self.pool_patch.start()
         self.addCleanup(self.pool_patch.stop)
+        self.codex_patch = patch("agent_memory.runner.codex_logged_in", return_value=False)
+        self.codex_patch.start()
+        self.addCleanup(self.codex_patch.stop)
+        import agent_memory.studio as studio
+
+        studio.RUN_WORKER = None
+        self.addCleanup(lambda: setattr(studio, "RUN_WORKER", None))
         SESSION.update(
             {
                 "api_key": "",
@@ -28,6 +35,7 @@ class StudioTests(MemoryTestCase):
                 "agent": None,
                 "run": None,
                 "cancel": False,
+                "goal_id": "",
             }
         )
         self.server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
@@ -75,7 +83,7 @@ class StudioTests(MemoryTestCase):
         html = response.read().decode()
         conn.close()
         self.assertEqual(response.status, 200)
-        self.assertIn("One window", html)
+        self.assertIn("One board", html)
         self.assertIn("Open folder", html)
         self.assertIn("key-ok", html)
         self.assertNotIn('id="token-saved"', html)
@@ -116,12 +124,14 @@ class StudioTests(MemoryTestCase):
         SESSION["api_key"] = ""
         status, data = self._json("GET", "/api/session")
         self.assertFalse(data["has_key"])
+        self.assertEqual(data["worker"], "none")
         with patch("agent_memory.studio.validate_key", return_value=None):
             status, data = self._json("POST", "/api/key", {"api_key": "cursor_test"})
         self.assertEqual(status, 200)
         self.assertTrue(data["ok"])
         status, data = self._json("GET", "/api/session")
         self.assertTrue(data["has_key"])
+        self.assertEqual(data["worker"], "cursor")
 
     def test_summary_children_and_branch_scope(self):
         goal = self.memory.save_user('Build a reliable notebook')
@@ -319,3 +329,59 @@ class StudioTests(MemoryTestCase):
         self.assertEqual(len(view['commits']), 1)
         self.assertEqual(events[-1]['status'], 'error')
         self.assertTrue(any(e['type'] == 'error' for e in events))
+
+    def _ndjson(self, path: str, payload: dict) -> tuple[int, list]:
+        conn = HTTPConnection("127.0.0.1", self.port, timeout=20)
+        body = json.dumps(payload).encode()
+        conn.request("POST", path, body=body, headers={"Content-Type": "application/json"})
+        response = conn.getresponse()
+        raw = response.read().decode()
+        conn.close()
+        events = [json.loads(line) for line in raw.splitlines() if line.strip()]
+        return response.status, events
+
+    def test_run_board_with_fake_worker(self) -> None:
+        from pathlib import Path
+        import agent_memory.studio as studio
+
+        def worker(prompt: str, cwd: Path) -> None:
+            tests = cwd / "tests" / "test_goal.py"
+            tests.parent.mkdir(parents=True, exist_ok=True)
+            app = cwd / "app.py"
+            if "acceptance criteria" in prompt:
+                if not app.exists():
+                    app.write_text("VALUE = 1\n")
+                tests.write_text(
+                    "from app import VALUE\n\ndef test_value():\n    assert VALUE == 2\n"
+                )
+            else:
+                app.write_text("VALUE = 2\n")
+
+        studio.RUN_WORKER = worker
+        status, opened = self._json("POST", "/api/open", {"project": str(self.path)})
+        self.assertEqual(status, 200)
+        status, events = self._ndjson("/api/run", {"text": "VALUE must be 2"})
+        self.assertEqual(status, 200)
+        observes = [e for e in events if e.get("type") == "observe"]
+        self.assertTrue(observes)
+        done = events[-1]
+        self.assertEqual(done["type"], "done")
+        self.assertEqual(done["status"], "passed")
+        self.assertEqual(done["result"]["agent"], 1)
+        self.assertTrue(done["result"]["pytest"]["ok"])
+        self.assertTrue(done["result"]["goal_id"])
+        status, goals = self._json("GET", "/api/goals")
+        self.assertEqual(status, 200)
+        self.assertEqual(goals["goals"][0]["id"], done["result"]["goal_id"])
+        status, session = self._json("GET", "/api/session")
+        self.assertEqual(session["worker"], "test")
+        self.assertEqual(session["goal_id"], done["result"]["goal_id"])
+
+    def test_connect_codex_spawns_login(self) -> None:
+        from unittest.mock import patch
+
+        with patch("agent_memory.runner.start_codex_login", return_value={"ok": True, "hint": "Finish login"}):
+            status, data = self._json("POST", "/api/connect-codex", {})
+        self.assertEqual(status, 200)
+        self.assertTrue(data["ok"])
+        self.assertIn("login", data["hint"].lower())

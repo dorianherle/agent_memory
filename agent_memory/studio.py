@@ -1,4 +1,4 @@
-"""Local Cursor SDK studio: one chat, fresh agent per question, memory on the side."""
+"""Local Studio: goal board that auto-runs agents against pytest."""
 
 from __future__ import annotations
 
@@ -26,7 +26,9 @@ SESSION: dict = {
     "agent": None,
     "run": None,
     "cancel": False,
+    "goal_id": "",
 }
+RUN_WORKER = None  # tests inject a fake worker
 LOCK = threading.Lock()
 RUN_LOCK = threading.Lock()
 STANDBY = StandbyAgent()
@@ -85,6 +87,30 @@ def _item(item) -> dict | None:
     if item is None:
         return None
     return {"id": item.id[:8], "text": _headline(item)}
+
+
+def session_worker_name() -> str:
+    if RUN_WORKER is not None:
+        return "test"
+    from agent_memory.runner import detect_worker
+
+    name, _ = detect_worker(SESSION.get("api_key"))
+    return name
+
+
+def bound_root(project: str, goal_id: str | None = None) -> str:
+    goal_id = goal_id or SESSION.get("goal_id") or ""
+    if not goal_id:
+        return project
+    from agent_memory.goals import resolve_goal
+
+    return resolve_goal(project, goal_id)["workspace"]
+
+
+def goals_view(project: str) -> dict:
+    from agent_memory.goals import list_goals
+
+    return {"goals": list_goals(project)}
 
 
 def memory_view(root: str, *, compact: bool = False) -> dict:
@@ -214,6 +240,10 @@ def _close_agent(*, cancel: bool = True) -> None:
     SESSION["cancel"] = cancel
     SESSION["agent"] = None
     SESSION["run"] = None
+    if cancel:
+        from agent_memory.runner import cancel_active
+
+        cancel_active()
     retire_agent(agent, run if cancel else None)
 
 
@@ -414,6 +444,61 @@ def _run_question(question: str, write) -> None:
             SESSION["cancel"] = False
 
 
+def _studio_worker():
+    if RUN_WORKER is not None:
+        return "test", RUN_WORKER
+    from agent_memory.runner import detect_worker
+
+    return detect_worker(SESSION.get("api_key"))
+
+
+def _run_goal_loop(text: str, goal_id: str, write) -> None:
+    from agent_memory.runner import run_goal
+
+    if not RUN_LOCK.acquire(blocking=False):
+        write({"type": "error", "message": "An agent is already running."})
+        return
+    try:
+        project = SESSION.get("project") or ""
+        if not project:
+            write({"type": "error", "message": "Open a project first."})
+            return
+        name, worker = _studio_worker()
+        if worker is None:
+            write({"type": "error", "message": "Connect Codex or a Cursor API key in Settings."})
+            return
+        with LOCK:
+            SESSION["cancel"] = False
+        write({"type": "status", "text": f"Starting {name} agent…", "worker": name})
+
+        def observe(status: dict) -> None:
+            with LOCK:
+                SESSION["goal_id"] = status.get("goal_id") or SESSION.get("goal_id")
+            write({"type": "observe", **status})
+            write({"type": "memory"})
+
+        result = run_goal(
+            project,
+            text or None,
+            goal_id=goal_id or None,
+            worker=worker,
+            on_observe=observe,
+            cancelled=lambda: bool(SESSION.get("cancel")),
+        )
+        with LOCK:
+            SESSION["goal_id"] = result.get("goal_id") or SESSION.get("goal_id")
+        write({"type": "done", "status": result.get("state"), "result": result})
+    except Exception as error:
+        if SESSION.get("cancel"):
+            write({"type": "done", "status": "cancelled"})
+        else:
+            write({"type": "error", "message": str(error)})
+    finally:
+        with LOCK:
+            SESSION["cancel"] = False
+        RUN_LOCK.release()
+
+
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, format: str, *args) -> None:
         return
@@ -452,15 +537,16 @@ class Handler(BaseHTTPRequestHandler):
             if not project:
                 return self._json(400, {"error": "Open a project first."})
             try:
+                root = bound_root(project, query.get("goal", [None])[0])
                 if query.get("compact") == ["1"]:
-                    revision = memory_revision(project)
+                    revision = memory_revision(root)
                     if self.headers.get("If-None-Match") == revision:
                         self.send_response(304)
                         self.send_header("ETag", revision)
                         self.end_headers()
                         return
-                    return self._json(200, cached_overview(project, revision), etag=revision)
-                return self._json(200, memory_view(project))
+                    return self._json(200, cached_overview(root, revision), etag=revision)
+                return self._json(200, memory_view(root))
             except Exception as error:
                 return self._json(500, {"error": str(error)})
         if path == "/api/note":
@@ -468,9 +554,18 @@ class Handler(BaseHTTPRequestHandler):
             if not project:
                 return self._json(400, {"error": "Open a project first."})
             try:
-                return self._json(200, note_view(project, query.get("id", [""])[0]))
+                root = bound_root(project, query.get("goal", [None])[0])
+                return self._json(200, note_view(root, query.get("id", [""])[0]))
             except ValueError as error:
                 return self._json(404, {"error": str(error)})
+        if path == "/api/goals":
+            project = SESSION.get("project")
+            if not project:
+                return self._json(400, {"error": "Open a project first."})
+            try:
+                return self._json(200, goals_view(project))
+            except Exception as error:
+                return self._json(500, {"error": str(error)})
         if path == "/api/session":
             project = SESSION.get("project") or ""
             return self._json(
@@ -484,6 +579,8 @@ class Handler(BaseHTTPRequestHandler):
                     "ready": bool(
                         project and project_ready(Path(project))
                     ),
+                    "worker": session_worker_name(),
+                    "goal_id": SESSION.get("goal_id") or "",
                 },
             )
         if path == "/api/models":
@@ -560,6 +657,32 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 STANDBY.clear()
             return self._json(200, {"ok": error is None, "error": error})
+        if path == "/api/connect-codex":
+            from agent_memory.runner import start_codex_login
+
+            try:
+                return self._json(200, start_codex_login())
+            except Exception as error:
+                return self._json(400, {"error": str(error)})
+        if path == "/api/run":
+            text = str(data.get("text") or data.get("question") or "").strip()
+            goal_id = str(data.get("goal_id") or "").strip()
+            if not text and not goal_id:
+                return self._json(400, {"error": "Type a goal or resume an id."})
+            if goal_id:
+                with LOCK:
+                    SESSION["goal_id"] = goal_id
+            self.send_response(200)
+            self.send_header("Content-Type", "application/x-ndjson")
+            self.send_header("Cache-Control", "no-cache")
+            self.end_headers()
+
+            def write_run(event: dict) -> None:
+                self.wfile.write((json.dumps(event) + "\n").encode())
+                self.wfile.flush()
+
+            _run_goal_loop(text, goal_id, write_run)
+            return
         if path == "/api/ask":
             question = str(data.get("question") or "").strip()
             key = str(data.get("api_key") or "").strip()
