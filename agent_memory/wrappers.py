@@ -114,12 +114,14 @@ class MemoryEnhancedOpenAI:
         )
 
     def create(self, messages, tools=None, **kwargs):
+        current_prompt = ""
         for message in reversed(messages):
             if isinstance(message, dict) and message.get("role") == "user":
                 if isinstance(message.get("content"), str):
-                    self.memory.save_user(message["content"])
+                    current_prompt = message["content"]
+                    self.memory.ensure_goal(current_prompt)
                 break
-        state_text = self.memory.render_packet()
+        state_text = self.memory.render_packet(current_prompt)
         messages = [
             {"role": "system", "content": MEMORY_INSTRUCTIONS},
             {
@@ -130,10 +132,10 @@ class MemoryEnhancedOpenAI:
         ]
         tools = MEMORY_TOOLS + list(tools or [])
         if kwargs.get("stream"):
-            return self._stream(messages, tools, kwargs)
+            return self._stream(messages, tools, kwargs, current_prompt)
 
         while True:
-            self._refresh_state(messages)
+            self._refresh_state(messages, current_prompt)
             response = self.client.chat.completions.create(
                 messages=messages,
                 tools=tools,
@@ -144,8 +146,6 @@ class MemoryEnhancedOpenAI:
             if not calls or any(
                 call.function.name != MEMORY_TOOL_NAME for call in calls
             ):
-                if not calls and isinstance(message.content, str):
-                    self.memory.auto_save(message.content)
                 return response
             messages.append(message)
             for call in calls:
@@ -158,25 +158,25 @@ class MemoryEnhancedOpenAI:
                     {"role": "tool", "tool_call_id": call.id, "content": result}
                 )
 
-    def _refresh_state(self, messages):
+    def _refresh_state(self, messages, question=""):
         # Own slot, replaced before every request; never accumulate packets.
-        messages[1] = {"role": "system", "content": f"MEMORY STATE\n{self.memory.render_packet()}"}
+        messages[1] = {
+            "role": "system",
+            "content": f"MEMORY STATE\n{self.memory.render_packet(question)}",
+        }
 
-    def _stream(self, messages, tools, kwargs):
+    def _stream(self, messages, tools, kwargs, question=""):
         while True:
-            self._refresh_state(messages)
+            self._refresh_state(messages, question)
             stream = self.client.chat.completions.create(
                 messages=messages,
                 tools=tools,
                 **kwargs,
             )
             calls = []
-            text_parts = []
             for chunk in stream:
                 yield chunk
                 delta = chunk.choices[0].delta if chunk.choices else None
-                if delta is not None and isinstance(getattr(delta, "content", None), str):
-                    text_parts.append(delta.content)
                 if delta is not None and delta.tool_calls:
                     for piece in delta.tool_calls:
                         while len(calls) <= piece.index:
@@ -194,8 +194,6 @@ class MemoryEnhancedOpenAI:
             if not calls or any(
                 call["name"] != MEMORY_TOOL_NAME for call in calls
             ):
-                if not calls and text_parts:
-                    self.memory.auto_save("".join(text_parts))
                 return
             messages.append(
                 {

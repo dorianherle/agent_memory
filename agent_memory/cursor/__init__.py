@@ -1,6 +1,6 @@
 """Cursor IDE integration: MCP tools + hooks.
 
-Hooks auto-save at turn boundaries. MCP adds mid-turn checkpoints
+Hooks establish the goal and refresh state. MCP adds selective checkpoints
 (`memory_save`) plus judgment tools (find, summarize, branch, inspect, …).
 """
 

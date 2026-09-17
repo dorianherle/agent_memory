@@ -3,36 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Snake</title>
+  <title>Snake — Crazy Sparkler</title>
   <style>
     :root {
-      --bg: #12141a;
-      --panel: #1c1f28;
-      --grid: #0e1014;
-      --snake: #6ee7b7;
-      --head: #34d399;
-      --food: #fb7185;
-      --text: #e8eaed;
-      --muted: #9aa3b2;
+      --bg: #07060c;
+      --panel: #12101c;
+      --grid: #0a0812;
+      --text: #f4f0ff;
+      --muted: #a89bc4;
     }
     * { box-sizing: border-box; }
     html, body {
       margin: 0;
       height: 100%;
-      background: var(--bg);
+      background:
+        radial-gradient(ellipse at 30% 20%, #2a1040 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, #0a2040 0%, transparent 45%),
+        var(--bg);
       color: var(--text);
-      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
     }
-    body {
-      display: grid;
-      place-items: center;
-    }
+    body { display: grid; place-items: center; }
     .wrap {
       width: min(92vw, 560px);
-      background: var(--panel);
-      border-radius: 16px;
+      background: linear-gradient(160deg, #1a1430, #0e0c18 60%);
+      border-radius: 18px;
       padding: 18px;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+      box-shadow:
+        0 0 0 1px rgba(255, 180, 80, 0.15),
+        0 0 40px rgba(255, 120, 40, 0.18),
+        0 20px 50px rgba(0, 0, 0, 0.5);
     }
     header {
       display: flex;
@@ -42,8 +42,17 @@
     }
     h1 {
       margin: 0;
-      font-size: 1.15rem;
-      letter-spacing: 0.04em;
+      font-size: 1.2rem;
+      letter-spacing: 0.06em;
+      background: linear-gradient(90deg, #ffd56a, #ff6b3d, #ff3d9a, #7cf);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: shimmer 2.4s linear infinite;
+    }
+    @keyframes shimmer {
+      to { background-position: 200% center; }
     }
     .score {
       color: var(--muted);
@@ -53,7 +62,8 @@
       display: block;
       width: 100%;
       background: var(--grid);
-      border-radius: 10px;
+      border-radius: 12px;
+      box-shadow: inset 0 0 60px rgba(255, 100, 40, 0.08);
     }
     p {
       margin: 12px 0 0;
@@ -65,33 +75,56 @@
 <body>
   <div class="wrap">
     <header>
-      <h1>Snake</h1>
+      <h1>SPARKLER SNAKE</h1>
       <div class="score">Score: <span id="score">0</span></div>
     </header>
     <canvas id="board" width="400" height="400"></canvas>
-    <p>Arrow keys or WASD to move. Space to restart after a crash.</p>
+    <p>Arrow keys / WASD. Eat for fireworks. Space restarts after a crash.</p>
   </div>
   <script>
     const SIZE = 20;
     const CELLS = 20;
-    const TICK_MS = 110;
+    const BASE_TICK_MS = 72;
+    const MIN_TICK_MS = 42;
     const canvas = document.getElementById("board");
     const ctx = canvas.getContext("2d");
     const scoreEl = document.getElementById("score");
 
-    let snake, dir, pending, food, score, alive, timer;
+    const SPARK_HUES = [35, 15, 50, 330, 190, 280];
+
+    let snake, prevSnake, dir, pending, food, score, alive;
+    let sparks = [];
+    let pulse = 0;
+    let raf;
+    let last = 0;
+    let accum = 0;
+    let tickProgress = 1;
+    let inputQueue = [];
+
+    function tickMs() {
+      return Math.max(MIN_TICK_MS, BASE_TICK_MS - score * 2.2);
+    }
+
+    function cloneSnake(s) {
+      return s.map((p) => ({ x: p.x, y: p.y }));
+    }
 
     function reset() {
       snake = [{ x: 8, y: 10 }, { x: 7, y: 10 }, { x: 6, y: 10 }];
+      prevSnake = cloneSnake(snake);
       dir = { x: 1, y: 0 };
       pending = dir;
+      inputQueue = [];
       score = 0;
       alive = true;
+      sparks = [];
+      accum = 0;
+      tickProgress = 1;
       scoreEl.textContent = score;
       placeFood();
-      clearInterval(timer);
-      timer = setInterval(tick, TICK_MS);
-      draw();
+      cancelAnimationFrame(raf);
+      last = performance.now();
+      raf = requestAnimationFrame(loop);
     }
 
     function placeFood() {
@@ -104,48 +137,266 @@
       food = { x, y };
     }
 
+    function cellCenter(p) {
+      return { x: p.x * SIZE + SIZE / 2, y: p.y * SIZE + SIZE / 2 };
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    // Ease-out: leave fast, land hard — snappier than smoothstep mush
+    function ease(t) {
+      return 1 - (1 - t) * (1 - t);
+    }
+
+    function visualPos(i, t) {
+      const cur = snake[Math.min(i, snake.length - 1)];
+      const prev = prevSnake[Math.min(i, prevSnake.length - 1)] || cur;
+      return {
+        x: lerp(prev.x, cur.x, t),
+        y: lerp(prev.y, cur.y, t),
+      };
+    }
+
+    function burst(x, y, n, power, hueBias) {
+      for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const sp = power * (0.35 + Math.random());
+        const hue = hueBias != null
+          ? hueBias + (Math.random() - 0.5) * 40
+          : SPARK_HUES[(Math.random() * SPARK_HUES.length) | 0];
+        sparks.push({
+          x, y,
+          vx: Math.cos(a) * sp,
+          vy: Math.sin(a) * sp,
+          life: 0.55 + Math.random() * 0.7,
+          max: 0.55 + Math.random() * 0.7,
+          size: 1.2 + Math.random() * 3.2,
+          hue,
+          trail: Math.random() > 0.45,
+        });
+      }
+    }
+
+    function trailSparkler(hx, hy) {
+      const back = Math.atan2(-dir.y, -dir.x);
+      for (let i = 0; i < 5; i++) {
+        const a = back + (Math.random() - 0.5) * 1.4;
+        const sp = 1.2 + Math.random() * 3.5;
+        sparks.push({
+          x: hx + (Math.random() - 0.5) * 6,
+          y: hy + (Math.random() - 0.5) * 6,
+          vx: Math.cos(a) * sp,
+          vy: Math.sin(a) * sp - 0.4,
+          life: 0.25 + Math.random() * 0.45,
+          max: 0.25 + Math.random() * 0.45,
+          size: 1 + Math.random() * 2.4,
+          hue: SPARK_HUES[(Math.random() * SPARK_HUES.length) | 0],
+          trail: true,
+        });
+      }
+    }
+
+    function applyQueuedTurn() {
+      while (inputQueue.length) {
+        const next = inputQueue.shift();
+        if (next.x + dir.x === 0 && next.y + dir.y === 0) continue;
+        pending = next;
+        break;
+      }
+      dir = pending;
+    }
+
     function tick() {
       if (!alive) return;
-      dir = pending;
+      prevSnake = cloneSnake(snake);
+      applyQueuedTurn();
       const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
       const hitWall = head.x < 0 || head.y < 0 || head.x >= CELLS || head.y >= CELLS;
       const hitSelf = snake.some((p) => p.x === head.x && p.y === head.y);
       if (hitWall || hitSelf) {
         alive = false;
-        draw();
+        const c = cellCenter(snake[0]);
+        burst(c.x, c.y, 90, 7, 10);
         return;
       }
       snake.unshift(head);
+      const c = cellCenter(head);
+      trailSparkler(c.x, c.y);
       if (head.x === food.x && head.y === food.y) {
         score += 1;
         scoreEl.textContent = score;
+        burst(c.x, c.y, 55 + score * 2, 5.5 + Math.min(score * 0.15, 3), null);
         placeFood();
+        // keep prev length aligned so new tail doesn't lerp from nowhere
+        prevSnake.unshift(prevSnake[0] ? { ...prevSnake[0] } : { ...head });
       } else {
         snake.pop();
       }
-      draw();
     }
 
-    function draw() {
-      ctx.fillStyle = "#0e1014";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "#fb7185";
-      ctx.fillRect(food.x * SIZE + 3, food.y * SIZE + 3, SIZE - 6, SIZE - 6);
-      snake.forEach((p, i) => {
-        ctx.fillStyle = i === 0 ? "#34d399" : "#6ee7b7";
-        ctx.fillRect(p.x * SIZE + 1, p.y * SIZE + 1, SIZE - 2, SIZE - 2);
-      });
-      if (!alive) {
-        ctx.fillStyle = "rgba(18, 20, 26, 0.62)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#e8eaed";
-        ctx.textAlign = "center";
-        ctx.font = "bold 28px ui-sans-serif, system-ui, sans-serif";
-        ctx.fillText("Game over", canvas.width / 2, canvas.height / 2 - 8);
-        ctx.font = "16px ui-sans-serif, system-ui, sans-serif";
-        ctx.fillStyle = "#9aa3b2";
-        ctx.fillText("Press space to restart", canvas.width / 2, canvas.height / 2 + 22);
+    function stepSparks(dt) {
+      for (const s of sparks) {
+        s.x += s.vx;
+        s.y += s.vy;
+        s.vy += 8 * dt;
+        s.vx *= 0.985;
+        s.vy *= 0.985;
+        s.life -= dt;
       }
+      sparks = sparks.filter((s) => s.life > 0);
+    }
+
+    function drawSparks() {
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      for (const s of sparks) {
+        const t = s.life / s.max;
+        const a = Math.max(0, t);
+        ctx.beginPath();
+        ctx.fillStyle = `hsla(${s.hue}, 100%, ${55 + t * 35}%, ${a})`;
+        ctx.shadowColor = `hsla(${s.hue}, 100%, 60%, ${a})`;
+        ctx.shadowBlur = 6 + s.size * 2;
+        ctx.arc(s.x, s.y, s.size * (0.6 + t), 0, Math.PI * 2);
+        ctx.fill();
+        if (s.trail) {
+          ctx.beginPath();
+          ctx.strokeStyle = `hsla(${s.hue}, 100%, 70%, ${a * 0.55})`;
+          ctx.lineWidth = s.size * 0.55;
+          ctx.moveTo(s.x, s.y);
+          ctx.lineTo(s.x - s.vx * 2.2, s.y - s.vy * 2.2);
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+    }
+
+    function drawSnakeGlow(t) {
+      const n = snake.length;
+      for (let i = 0; i < n; i++) {
+        const p = visualPos(i, t);
+        const px = p.x * SIZE;
+        const py = p.y * SIZE;
+        const cx = px + SIZE / 2;
+        const cy = py + SIZE / 2;
+        const grad = 1 - i / Math.max(n, 1);
+        const hue = 140 + grad * 40 + pulse * 20;
+        ctx.save();
+        ctx.globalCompositeOperation = "lighter";
+        ctx.fillStyle = `hsla(${hue}, 90%, 55%, ${0.15 + grad * 0.25})`;
+        ctx.shadowColor = `hsla(${hue}, 100%, 60%, 0.8)`;
+        ctx.shadowBlur = 12 + grad * 8;
+        const pad = 2 - grad;
+        ctx.fillRect(px + pad, py + pad, SIZE - pad * 2, SIZE - pad * 2);
+        ctx.restore();
+        ctx.fillStyle = i === 0
+          ? `hsl(${hue + 20}, 95%, 65%)`
+          : `hsl(${hue}, 85%, ${48 + grad * 18}%)`;
+        ctx.fillRect(px + 2, py + 2, SIZE - 4, SIZE - 4);
+        if (i === 0) {
+          ctx.save();
+          ctx.globalCompositeOperation = "lighter";
+          ctx.beginPath();
+          ctx.fillStyle = `hsla(${35 + pulse * 80}, 100%, 70%, 0.9)`;
+          ctx.shadowColor = "#ffaa33";
+          ctx.shadowBlur = 18;
+          ctx.arc(cx, cy, 5 + Math.sin(pulse * 8) * 1.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+    }
+
+    function drawFood() {
+      const c = cellCenter(food);
+      const r = 5 + Math.sin(pulse * 6) * 1.5;
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      ctx.beginPath();
+      ctx.fillStyle = "hsla(340, 100%, 65%, 0.9)";
+      ctx.shadowColor = "#ff4d7a";
+      ctx.shadowBlur = 16;
+      ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.fillStyle = "hsla(45, 100%, 80%, 0.85)";
+      ctx.arc(c.x, c.y, r * 0.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function draw(t) {
+      ctx.fillStyle = "#0a0812";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "rgba(255, 200, 120, 0.035)";
+      for (let i = 0; i < CELLS; i++) {
+        for (let j = 0; j < CELLS; j++) {
+          if ((i + j) % 2 === 0) {
+            ctx.fillRect(i * SIZE, j * SIZE, SIZE, SIZE);
+          }
+        }
+      }
+
+      drawFood();
+      drawSnakeGlow(t);
+      drawSparks();
+
+      if (!alive) {
+        ctx.fillStyle = "rgba(8, 6, 14, 0.55)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#ffe8c8";
+        ctx.textAlign = "center";
+        ctx.font = "bold 28px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText("Sparkler fizzled", canvas.width / 2, canvas.height / 2 - 8);
+        ctx.font = "16px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillStyle = "#c4b5e0";
+        ctx.fillText("Press space to relight", canvas.width / 2, canvas.height / 2 + 22);
+      }
+    }
+
+    function loop(now) {
+      const dtMs = Math.min(50, now - last);
+      last = now;
+      const dt = dtMs / 1000;
+      pulse += dt;
+
+      if (alive) {
+        accum += dtMs;
+        let step = tickMs();
+        while (accum >= step) {
+          accum -= step;
+          tick();
+          step = tickMs();
+        }
+        tickProgress = ease(accum / step);
+
+        const head = visualPos(0, tickProgress);
+        const hx = head.x * SIZE + SIZE / 2;
+        const hy = head.y * SIZE + SIZE / 2;
+        if (Math.random() < 0.55) {
+          const back = Math.atan2(-dir.y, -dir.x);
+          const a = back + (Math.random() - 0.5) * 1.8;
+          const sp = 0.8 + Math.random() * 2.8;
+          sparks.push({
+            x: hx, y: hy,
+            vx: Math.cos(a) * sp,
+            vy: Math.sin(a) * sp - 0.6,
+            life: 0.2 + Math.random() * 0.35,
+            max: 0.2 + Math.random() * 0.35,
+            size: 0.8 + Math.random() * 2,
+            hue: SPARK_HUES[(Math.random() * SPARK_HUES.length) | 0],
+            trail: true,
+          });
+        }
+      } else {
+        tickProgress = 1;
+      }
+
+      stepSparks(dt);
+      draw(tickProgress);
+      raf = requestAnimationFrame(loop);
     }
 
     const keys = {
@@ -166,7 +417,12 @@
       const next = keys[e.key];
       if (!next) return;
       e.preventDefault();
-      if (next.x + dir.x === 0 && next.y + dir.y === 0) return;
+      const base = inputQueue.length ? inputQueue[inputQueue.length - 1] : pending;
+      if (next.x + base.x === 0 && next.y + base.y === 0) return;
+      if (next.x === base.x && next.y === base.y) return;
+      // one buffered turn so quick double-taps (right→up) don't get eaten
+      if (inputQueue.length < 1) inputQueue.push(next);
+      else inputQueue[0] = next;
       pending = next;
     });
 

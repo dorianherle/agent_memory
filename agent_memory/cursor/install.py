@@ -32,7 +32,7 @@ HOOK_EVENTS = (
 )
 
 RULE_BODY = """---
-description: Long-term agent memory (MCP + automatic durability)
+description: Long-term agent memory (MCP + selective durability)
 alwaysApply: true
 ---
 
@@ -44,7 +44,9 @@ Do not load skills, search memory, inspect files, narrate checks, recap projects
 or propose tasks unless the user asks for work or context. An old goal is not a
 new request to resume work.
 
-Hooks save prompts and answers. `memory_save` mid-turn. Do not invent ids.
+The first request establishes the goal. Ordinary conversation is not memory.
+Use `memory_save` for distilled constraints, findings, decisions, and checkpoints;
+never copy raw prompts or answers. Do not invent ids.
 Pass `agent` on save/summarize. MEMORY STATE is `agent-memory-state.mdc`.
 
 - `memory_find` — headlines; `ids=` for bodies
@@ -59,7 +61,7 @@ SDK_GUIDE_BODY = """# Agent Memory + Cursor SDK
 `agent-memory cursor install` already wrote the project files this needs:
 
 - `.cursor/mcp.json` — `agent-memory` MCP server
-- `.cursor/hooks.json` — automatic saves (loaded from this project `cwd`)
+- `.cursor/hooks.json` — goal setup and state refresh (loaded from this project `cwd`)
 
 ## Local SDK (required opt-in for MCP)
 
@@ -104,7 +106,7 @@ const agent = Agent.create({
 | Piece | How it activates |
 |-------|------------------|
 | MCP `memory_*` tools (including mid-turn `memory_save`) | `setting_sources=["project"]` / `settingSources: ["project"]` |
-| Hooks auto-save (turn boundaries only) | automatic when `cwd` is this project (no settingSources needed) |
+| Hooks create the first goal and refresh state | automatic when `cwd` is this project (no settingSources needed) |
 
 Inline `mcp_servers` / `mcpServers` also works if you prefer not to use ambient project settings.
 
@@ -121,7 +123,7 @@ def sdk_next_steps_lines() -> list[str]:
     return [
         "Next (Cursor IDE):",
         "  Reload MCP in Cursor Settings → Tools & MCP",
-        "  Start an Agent chat — hooks auto-save; use memory_* tools",
+        "  Start an Agent chat — hooks set the goal; use memory_* tools for durable notes",
         f"  Skill installed: .cursor/skills/{SKILL_NAME}/SKILL.md",
         "",
         "Next (Cursor SDK — local, no wrap):",

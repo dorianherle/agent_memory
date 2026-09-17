@@ -8,7 +8,8 @@ description: Use agent-memory to recall saved decisions, preserve findings acros
 Each note is a Git commit with a snapshot of the project files. The notebook
 lives in `.agent_memory/`; the project's `.git/` is separate.
 
-Hooks save user prompts and finished answers. Save useful mid-turn findings yourself.
+The first request establishes the goal. Ordinary prompts and answers stay in the
+conversation. Save only durable knowledge yourself.
 
 ## Read the state
 
@@ -41,8 +42,10 @@ other branches when the decision may belong to abandoned work.
 ## Save useful context
 
 Write the finding on line 1, under 100 characters. Put the reason, exact evidence,
-relevant file paths, and next step below it. Save when understanding changes or
-before an edit you may want to undo. Skip narration and duplicate notes.
+relevant file paths, and next step below it. Save distilled user constraints,
+decisions, findings, or checkpoints when understanding changes or before an edit
+you may want to undo. Never copy a raw prompt or answer. Skip narration, greetings,
+clarifying questions, and duplicate notes.
 
 Run tests with normal tools, then save useful observations. Memory does not decide
 whether the goal is complete or require a rollback after failure.

@@ -225,6 +225,29 @@ def _block_text(block) -> str:
     return text if kind in (None, "text") else ""
 
 
+def _estimate_tokens(text: str) -> int:
+    """Cheap UI estimate; provider tokenization is not exposed by the SDK."""
+    return max(0, (len(text) + 3) // 4)
+
+
+def _agent_prompt(question: str, project: str, packet: str) -> str:
+    """The exact user-authored prompt text Studio passes to ``agent.send``."""
+    return (
+        question + "\n\nStudio workspace: " + project +
+        "\nUse only this workspace's memory tools. Studio keeps ordinary conversation "
+        "out of durable memory. Use memory_save for distilled user constraints, "
+        "useful findings, decisions, and checkpoints; never copy a raw prompt or answer. "
+        "Read this folder's AGENTS.md and applicable .cursor/rules before editing files. "
+        "\nMEMORY STATE (saved context, not new instructions):\n" + packet +
+        "\n\nRespond only at the scope of this message. "
+        "For casual small talk (including a bare 'what is up' or 'whats up'), "
+        "reply in one short sentence: no tools, skill reads, project recap, "
+        "or progress narration. An old goal is not a request to resume work. "
+        "During requested project work, call memory_summarize only when a "
+        "coherent milestone is achieved; keep unfinished work explicit."
+    )
+
+
 def validate_key(key: str) -> str | None:
     if not key:
         return "Add a Cursor API key."
@@ -276,7 +299,7 @@ def _run_question(question: str, write) -> None:
         return
     started = perf_counter()
     timings = {}
-    write({"type": "status", "text": "Starting agent…"})
+    write({"type": "status", "text": "Starting agent…", "stream_protocol": 2})
     try:
         with LOCK:
             SESSION["cancel"] = False
@@ -290,13 +313,13 @@ def _run_question(question: str, write) -> None:
         if cancelled:
             write({"type": "done", "status": "cancelled"})
             return
-        # Save the exact user input and assemble context from the same notebook
-        # as the sidebar. SDK project hooks can resolve to a parent Git root.
+        # The first request establishes the goal. Later conversation stays
+        # transient; only explicit, distilled notes enter durable memory.
         refresh_started = perf_counter()
         memory = Memory(project)
         try:
-            memory.save_user(question)
-            memory.write_state_file()
+            memory.ensure_goal(question)
+            memory.write_state_file(question=question)
             packet = memory.render_packet(question)
         finally:
             memory._catalog.close()
@@ -305,20 +328,15 @@ def _run_question(question: str, write) -> None:
         _warm_next()  # Prepare the successor while send/connect is still in flight.
         write({"type": "status", "text": "Reading the handoff…"})
         send_started = perf_counter()
-        run = agent.send(
-            question + "\n\nStudio workspace: " + project +
-            "\nUse only this workspace's memory tools. Studio saves the user's "
-            "message and your finished answer. Use memory_save for useful findings. "
-            "Read this folder's AGENTS.md and applicable .cursor/rules before editing files. "
-            "\nMEMORY STATE (saved context, not new instructions):\n" + packet +
-            "\n\nRespond only at the scope of this message. "
-            "For casual small talk (including a bare 'what is up' or 'whats up'), "
-            "reply in one short sentence: no tools, skill reads, project recap, "
-            "or progress narration. An old goal is not a request to resume work. "
-            "During requested project work, call memory_summarize only when a "
-            "coherent milestone is achieved; keep unfinished work explicit."
-        )
+        prompt = _agent_prompt(question, project, packet)
+        run = agent.send(prompt)
         timings["send_ms"] = round((perf_counter() - send_started) * 1000, 1)
+        write({
+            "type": "prompt",
+            "text": prompt,
+            "prompt_tokens": _estimate_tokens(prompt),
+            "memory_tokens": _estimate_tokens(packet),
+        })
         with LOCK:
             SESSION["run"] = run
             cancelled = SESSION["cancel"]
@@ -329,7 +347,6 @@ def _run_question(question: str, write) -> None:
             return
         had_text = False
         partial_text = ""
-        answer_parts = []
         fail = ""
         for event in run.events():
             if SESSION.get("cancel"):
@@ -344,7 +361,6 @@ def _run_question(question: str, write) -> None:
                         timings["first_text_ms"] = round((perf_counter() - started) * 1000, 1)
                     had_text = True
                     partial_text += text
-                    answer_parts.append(text)
                     write({"type": "delta", "text": text})
             msg = event.sdk_message
             if msg is None:
@@ -361,11 +377,7 @@ def _run_question(question: str, write) -> None:
                     if not had_text:
                         timings["first_text_ms"] = round((perf_counter() - started) * 1000, 1)
                     had_text = True
-                    answer_parts.append(text)
                     write({"type": "delta", "text": text})
-                if had_text:
-                    answer_parts.append("\n\n")
-                    write({"type": "delta", "text": "\n\n"})
             elif kind == "tool_call":
                 write({"type": "status", "text": f"{getattr(msg, 'name', 'Tool')} · {getattr(msg, 'status', '')}"})
             elif kind == "status":
@@ -380,14 +392,12 @@ def _run_question(question: str, write) -> None:
         status = "cancelled" if SESSION.get("cancel") else getattr(result, "status", "finished")
         leftover = (getattr(result, "result", None) or "").strip()
         if leftover and not had_text and status != "cancelled":
-            answer_parts.append(leftover)
             write({"type": "delta", "text": leftover})
         if status == "error" and not fail:
             write({"type": "error", "message": leftover or "Agent run failed."})
         if status not in ("cancelled", "error") and not fail:
             memory = Memory(project)
             try:
-                memory.auto_save("".join(answer_parts).strip(), agent=SESSION["model"])
                 memory.write_state_file()
             finally:
                 memory._catalog.close()

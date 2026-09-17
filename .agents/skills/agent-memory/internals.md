@@ -52,18 +52,17 @@ targets. `Memory.find(..., include_historical=True)` can still retrieve them.
 
 `render(compact=True)` produces what you see injected:
 
-- **Goal** is the original job (`goal=True` on the first user save, or
-  the oldest user entry if none is marked). It is not folded.
-- **Steering** is the latest user note that is not the goal. It is not folded.
+- **Goal** is the original job (`goal=True` on the first request). It is not folded.
+- **Steering** is a legacy explicit user note that is not the goal. New turns are
+  transient unless the agent saves distilled durable knowledge.
 - **Open questions** are all `open_question=True` entries. Each line is
   `[id] text [dep] [dep]`. They are not folded. The packet keeps the
   first of any same-text pair (case and spacing ignored). Adding that
   text again returns the existing id. Closing one closes its twins.
 - **Current branch** is a single `* name (you are here)` line when more than
   one branch exists. Other branch listings stay in `memory_history`.
-- **Recent** is the newest 8 work subjects since the last summary
-  (user prompts and auto-saved answers are omitted; Goal and Steering
-  already hold the ones that matter). Older Recent lines stay findable;
+- **Recent** is the newest 8 work subjects since the last summary.
+  Ordinary prompts and answers are not stored. Older Recent lines stay findable;
   a `(+N earlier)` marker says they exist.
 - `[stale]` on a Recent subject means that entry's own files changed
   between its commit and HEAD. Goal, Steering, and open questions are
@@ -158,14 +157,13 @@ in the old history. No test outcome forces a branch change.
 | Event | What it does |
 |---|---|
 | `sessionStart` | Injects instructions and the agent name; sets `AGENT_MEMORY_AGENT`; refreshes the state rule and live HTML |
-| `beforeSubmitPrompt` | Saves the user's prompt as `@user`; rewrites the alwaysApply state rule; `additional_context` is only a pointer to that rule (the packet is not pasted twice) |
-| `afterAgentResponse` | Saves the finished answer under the acting agent |
+| `beforeSubmitPrompt` | Creates the goal from the first request only; rewrites the alwaysApply state rule for the current prompt; `additional_context` is only a pointer to that rule (the packet is not pasted twice) |
+| `afterAgentResponse` | No-op; ordinary answers remain conversation, not memory |
 | `subagentStart` | Registers the subagent's name and saves `Spawned @name: <task>` under the parent |
 | `subagentStop` | Saves `[status] <summary>` under the subagent's name |
 
-Duplicate suppression: an identical consecutive auto-save is skipped, and a user
-prompt identical to the newest user entry is skipped. Hooks fail open — a memory
-error never blocks the agent loop, it just means nothing was saved.
+Hooks fail open — a memory error never blocks the agent loop, it just means the
+goal or state refresh may be unavailable.
 
 ## Environment
 

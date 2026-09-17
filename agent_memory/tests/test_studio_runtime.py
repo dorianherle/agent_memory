@@ -122,7 +122,7 @@ class WorkspaceScopeTests(TestCase):
             (child / '.cursor' / 'mcp.json').write_text(json.dumps({'mcpServers': {
                 'other': {'command':'keep'}, 'agent-memory': {'command':'python', 'args':['--root', str(root)]}
             }}))
-            with patch('cursor_sdk.Agent.create') as create:
+            with patch('cursor_sdk.Agent.create') as create, patch('agent_memory.studio_runtime.workspace_client'):
                 create_agent(AgentConfig(str(child), 'grok-4.5', 'test-key'))
             servers = create.call_args.args[0]['mcp_servers']
             self.assertNotIn('parent-only', servers)

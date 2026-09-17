@@ -38,6 +38,7 @@ State contains Goal, Steering, Handoff, questions and relevant excerpts.
 [stale] means supporting files changed: verify before relying on the claim.
 Use visible ids to find details; full=true retrieves an uncut body.
 Save decisions, evidence, failed approaches and Next: before handoff.
+Distill durable user constraints; never copy raw prompts or answers into memory.
 Use payload={"handoff":true,"files":["relative/path"]} for a transfer checkpoint.
 Summarize completed work; inspect/branch rewrite files.
 """.strip()

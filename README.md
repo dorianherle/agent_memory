@@ -42,7 +42,7 @@ Mark a transfer checkpoint with `memory_save(text, payload={"handoff": True,
 why, uncertainty, and an exact `Next:` action. Declared evidence files allow
 `[stale]` warnings even for note-only saves and unsaved tracked changes.
 Use `memory_find(ids=[...], full=True)` only when the default 800-character body
-view omits needed evidence. Prompts and finished answers retain full text on disk.
+view omits needed evidence. Ordinary conversation stays in the chat, not memory.
 
 Watch it live: `.agent_memory/live/index.html`.
 
@@ -50,8 +50,8 @@ Watch it live: `.agent_memory/live/index.html`.
 
 ## The tools
 
-Hooks already save your first prompt and each finished answer.
-The agent writes the rest.
+The first prompt establishes the goal. The agent saves only durable constraints,
+findings, decisions, and checkpoints after that.
 
 | Tool | In one line |
 |------|-------------|
@@ -96,7 +96,7 @@ agent-memory cursor install
 
 ```text
 Install the agent-memory package in this project so I get persistent memory
-in Cursor: MCP tools, auto-save hooks, and the agent-memory skill.
+in Cursor: MCP tools, selective-save hooks, and the agent-memory skill.
 
 1. Choose the Python that will still exist tomorrow — the project's .venv if
    there is one, otherwise create one and use it. Its path gets baked into
@@ -159,7 +159,7 @@ Re-run install anytime; it merges safely.
 | Path | What it is |
 |------|------------|
 | `.cursor/mcp.json` | The memory tools |
-| `.cursor/hooks.json` | Auto-save + refresh |
+| `.cursor/hooks.json` | Goal setup + state refresh |
 | `.cursor/rules/agent-memory.mdc` | Short always-on guide |
 | `.cursor/skills/agent-memory/` | How the agent should use memory |
 | `.cursor/rules/agent-memory-state.mdc` | Live notebook view (**gitignored**) |
@@ -178,9 +178,10 @@ agent-memory studio
 
 Open a project folder and connect a Cursor API key in Settings. Install the
 project's memory integration with `agent-memory cursor install` first. Studio
-loads the selected folder’s MCP servers explicitly. It saves prompts and finished
-answers directly and injects fresh memory before each send. SDK project hooks
-are disabled so nested folders cannot write to a parent repository’s notebook.
+loads the selected folder’s MCP servers explicitly. It creates a goal from the
+first request and injects fresh memory before each send. Ordinary prompts and
+answers remain conversation; the agent explicitly saves durable knowledge. SDK
+project hooks are disabled so nested folders cannot write to a parent repository’s notebook.
 Keys entered in Settings stay in the running server session.
 
 The left overview keeps the goal and open questions visible. Summary commits
@@ -195,6 +196,10 @@ next message and replenishes it during each run. A standby has no conversation;
 memory is refreshed before sending. Changing project, key, or model invalidates it.
 The status shows when the next agent is ready. Run timing separates local agent
 wait, send startup, and time to first text; model/network latency still applies.
+Studio does not claim token savings: actual usage and a comparable full-chat
+baseline are not available. Click an **Agent** label
+in the conversation to inspect and copy the exact prompt text Studio sent; the
+provider's separate system prompt and tool schemas are not exposed by the SDK.
 
 Agent activity is separate from answer text. Cursor authentication, model, and
 usage-limit errors appear in the conversation; an accepted key does not guarantee
@@ -207,8 +212,8 @@ remaining model allowance.
 `.agent_memory/live/index.html` — created on session start, updated on
 every save. Leave the tab open.
 
-Click a user prompt to see what the model was given. Click any other
-note for the full text. File paths open in Finder.
+Click a goal or note for its full text. Legacy transcript entries remain
+inspectable when shown. File paths open in Finder.
 
 ---
 
@@ -309,7 +314,6 @@ Inspection rewrites shared files and requires coordination. Opening a new memory
 client never auto-restores an inspection; call `memory_inspect_done` explicitly
 after interruption. Concurrent code writers should use separate workspaces.
 
-Full transcript storage does not increase optional embedding input: user prompts
-and auto-saved answers embed only their former 100-character headline. Full
-bodies remain available through local full-text search and explicit ID reads.
-Work notes retain their normal semantic indexing.
+Legacy transcript entries use only their former 100-character headline for
+optional embeddings. New ordinary prompts and answers are not stored as memory;
+work notes retain their normal semantic indexing.

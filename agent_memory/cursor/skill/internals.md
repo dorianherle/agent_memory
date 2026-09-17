@@ -57,14 +57,15 @@ searchable. `render_state()` is the older Goal/Steering/Recent display, retained
 for compatibility and dashboard use; it is not the injected packet.
 
 An explicit `payload={"handoff": true}` checkpoint takes precedence over incidental
-notes. Otherwise an actionable auto-saved answer (`Next:`, `Blocked:`, `Remaining:`)
-or a work note supplies the handoff. A summary provides the fallback. Excerpts
+notes. Otherwise a work note supplies the handoff; a summary provides the
+fallback. Excerpts
 copy complete useful body lines, prioritizing next steps, decisions, rejected
 approaches, rollback, constraints and evidence. They do not invoke a model.
 
-Prompts and finished answers retain their full text on disk. The first line is
-limited only for display, not storage. `[stale]` compares files changed by the
-note's snapshot, plus declared `payload.files`, against the current working tree.
+The first request is stored as the goal. Later prompts and finished answers stay
+in conversation unless the agent explicitly saves distilled durable knowledge.
+`[stale]` compares files changed by the note's snapshot, plus declared
+`payload.files`, against the current working tree.
 It includes unsaved tracked edits. Notes without changed or declared files have
 no automatic evidence invalidation; missing stale markers do not prove validity.
 
@@ -147,14 +148,13 @@ in the old history. No test outcome forces a branch change.
 | Event | What it does |
 |---|---|
 | `sessionStart` | Injects instructions and the agent name; sets `AGENT_MEMORY_AGENT`; refreshes the state rule and live HTML |
-| `beforeSubmitPrompt` | Saves the user's prompt as `@user`; rewrites the alwaysApply state rule; `additional_context` is only a pointer to that rule (the packet is not pasted twice) |
-| `afterAgentResponse` | Saves the finished answer under the acting agent |
+| `beforeSubmitPrompt` | Creates the goal from the first request only; rewrites the alwaysApply state rule for the current prompt; `additional_context` is only a pointer to that rule (the packet is not pasted twice) |
+| `afterAgentResponse` | No-op; ordinary answers remain conversation, not memory |
 | `subagentStart` | Registers the subagent's name and saves `Spawned @name: <task>` under the parent |
 | `subagentStop` | Saves `[status] <summary>` under the subagent's name |
 
-Duplicate suppression: an identical consecutive auto-save is skipped, and a user
-prompt identical to the newest user entry is skipped. Hooks fail open — a memory
-error never blocks the agent loop, it just means nothing was saved.
+Hooks fail open — a memory error never blocks the agent loop, it just means the
+goal or state refresh may be unavailable.
 
 ## Environment
 

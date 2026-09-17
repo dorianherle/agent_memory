@@ -661,6 +661,16 @@ class Memory:
             agent=agent or USER_AGENT,
         )
 
+    def ensure_goal(self, text: str, *, agent: str | None = None) -> str | None:
+        """Create the initial goal from the first request, but no chat log.
+
+        Turn text remains transient after a goal exists. Durable constraints,
+        decisions, findings, and checkpoints belong in explicit memory notes.
+        """
+        if split_goals(self.state()):
+            return None
+        return self.save_user(text, agent=agent)
+
     def auto_save(
         self,
         text: str,
@@ -899,11 +909,16 @@ class Memory:
         target.write_text(body)
         return target
 
-    def write_state_file(self, path: str | Path | None = None) -> Path:
+    def write_state_file(
+        self,
+        path: str | Path | None = None,
+        *,
+        question: str | None = None,
+    ) -> Path:
         """Write MEMORY STATE markdown + alwaysApply rule for prompt injection."""
         target = Path(path) if path else self._path / ".cursor" / "MEMORY_STATE.md"
         target.parent.mkdir(parents=True, exist_ok=True)
-        packet = self.render_packet()
+        packet = self.render_packet(question)
         body = (
             "# MEMORY STATE\n\n"
             f"```\n{packet}\n```\n"
@@ -934,12 +949,12 @@ class Memory:
     def messages(self, prompt: str) -> list[dict[str, str]]:
         """Build the system + user messages for one agent turn.
 
-        The prompt is recorded as a user entry, so the user's words are
-        part of memory before any work starts.
+        The first prompt establishes the goal. Later prompts are used to
+        retrieve relevant memory for this turn without becoming memory notes.
         """
         from agent_memory.prompt import MEMORY_INSTRUCTIONS
 
-        self.save_user(prompt)
+        self.ensure_goal(prompt)
         state_text = self.render_packet(prompt)
         content = "\n\n".join(
             [

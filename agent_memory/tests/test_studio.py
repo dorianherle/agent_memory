@@ -13,6 +13,9 @@ class StudioTests(MemoryTestCase):
         from agent_memory.studio_runtime import StandbyAgent
         self.warm_patch = patch('agent_memory.studio._warm_next')
         self.warm_patch.start()
+        client_patch = patch('agent_memory.studio_runtime.workspace_client')
+        client_patch.start()
+        self.addCleanup(client_patch.stop)
         self.addCleanup(self.warm_patch.stop)
         self.pool_patch = patch('agent_memory.studio.STANDBY', StandbyAgent())
         self.pool_patch.start()
@@ -75,6 +78,10 @@ class StudioTests(MemoryTestCase):
         self.assertIn("One window", html)
         self.assertIn("Open folder", html)
         self.assertIn("key-ok", html)
+        self.assertNotIn('id="token-saved"', html)
+        self.assertNotIn('id="show-all"', html)
+        self.assertIn('id="prompt-dialog"', html)
+        self.assertIn("view prompt", html)
         self.assertNotIn("Open a project path", html)
         self.assertIn("Goal", html)
         self.assertNotIn("+ Summary", html)
@@ -154,15 +161,20 @@ class StudioTests(MemoryTestCase):
             _ask('Verify memory', events.append)
         self.assertEqual(create.call_args.kwargs['local'].setting_sources, [])
         prompt = agent.send.call_args.args[0]
+        prompt_event = next(e for e in events if e["type"] == "prompt")
+        self.assertEqual(prompt_event["text"], prompt)
+        self.assertGreater(prompt_event["prompt_tokens"], prompt_event["memory_tokens"])
+        self.assertGreater(prompt_event["memory_tokens"], 0)
         self.assertIn('memory_summarize', prompt)
         self.assertIn('no tools, skill reads, project recap', prompt)
         self.assertIn('During requested project work', prompt)
         self.assertEqual(''.join(e['text'] for e in events if e['type']=='delta').strip(), 'Complete')
         view = memory_view(str(self.path))
         self.assertEqual(view['goal']['text'], 'Verify memory')
-        self.assertTrue(any(c['text'] == 'Complete' and c['kind'] == 'answer' for c in view['commits']))
+        self.assertFalse(any(c['kind'] == 'answer' for c in view['commits']))
         self.assertIn('Verify memory', prompt)
         self.assertNotIn('Respond only at the scope', view['goal']['text'])
+        self.assertTrue(any(e.get('stream_protocol') == 2 for e in events))
         self.assertEqual(events[-1]['status'], 'finished')
         self.assertIn('agent_wait_ms', events[-1]['timings'])
         agent.close.assert_called_once()
@@ -186,7 +198,28 @@ class StudioTests(MemoryTestCase):
         agent.send.return_value = run
         with patch("cursor_sdk.Agent.create", return_value=agent), patch("agent_memory.studio.project_ready", return_value=True):
             _ask("Hi", output.append)
-        self.assertEqual([e["text"] for e in output if e["type"] == "delta"], ["Hel", "lo", "!", "\n\n"])
+        self.assertEqual([e["text"] for e in output if e["type"] == "delta"], ["Hel", "lo", "!"])
+
+    def test_completed_assistant_fragments_keep_their_original_spacing(self):
+        from types import SimpleNamespace as N
+        from unittest.mock import Mock, patch
+        from agent_memory.studio import _ask
+        SESSION.update(api_key="test", project=str(self.path))
+        run = Mock()
+        run.events.return_value = [
+            N(sdk_message=N(type="assistant", message=N(content=[{"type": "text", "text": text}])))
+            for text in ["Hi", " —", " what’s", " up", "?"]
+        ]
+        run.wait.return_value = N(status="finished", result="Hi — what’s up?")
+        agent = Mock()
+        agent.send.return_value = run
+        output = []
+        with patch("cursor_sdk.Agent.create", return_value=agent), patch("agent_memory.studio.project_ready", return_value=True):
+            _ask("Hi", output.append)
+        answer = "".join(e["text"] for e in output if e["type"] == "delta")
+        self.assertEqual(answer, "Hi — what’s up?")
+        view = memory_view(str(self.path))
+        self.assertEqual([c["text"] for c in view["commits"]], ["Hi"])
 
     def test_concurrent_ask_does_not_replace_active_run(self):
         from agent_memory.studio import _ask, RUN_LOCK

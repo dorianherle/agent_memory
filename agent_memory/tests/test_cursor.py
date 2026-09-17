@@ -391,12 +391,16 @@ class HookTests(MemoryTestCase):
         self.assertNotIn("exact goal for live html", out["additional_context"])
         self.assertNotIn("## Goal", out["additional_context"])
 
-    def test_after_response_auto_saves(self) -> None:
+    def test_after_response_does_not_save_conversation(self) -> None:
         handle("afterAgentResponse", {"text": "fixed the webhook retry"})
-        last = Memory(self.path).state()[-1]
-        self.assertEqual(last.message, "fixed the webhook retry")
-        self.assertTrue(last.payload.get("auto"))
-        self.assertEqual(last.payload.get("agent"), "agent")
+        self.assertEqual(Memory(self.path).state(), [])
+
+    def test_only_first_prompt_establishes_goal(self) -> None:
+        handle("beforeSubmitPrompt", {"prompt": "fix checkout"})
+        handle("beforeSubmitPrompt", {"prompt": "so what were we discussing?"})
+        items = Memory(self.path).state()
+        self.assertEqual([item.message for item in items], ["fix checkout"])
+        self.assertTrue(items[0].payload.get("goal"))
 
     def test_session_start_injects_context(self) -> None:
         self.memory.save("prior work")

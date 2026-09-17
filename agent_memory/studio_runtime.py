@@ -30,6 +30,28 @@ class AgentConfig:
     api_key: str = field(repr=False)
 
 
+_CLIENT = None
+_CLIENT_LOCK = threading.Lock()
+
+
+def workspace_client():
+    """One bridge and executor cache shared by every fresh Studio agent."""
+    global _CLIENT
+    with _CLIENT_LOCK:
+        if _CLIENT is None:
+            import atexit
+            from cursor_sdk import CursorClient
+            from cursor_sdk._vendor import resolve_bridge_path
+            bridge = Path(resolve_bridge_path()).resolve().parent.parent
+            _CLIENT = CursorClient.launch_bridge(command=[
+                str(bridge / "bin" / "node"),
+                str(Path(__file__).with_name("studio_bridge.mjs")),
+                str(bridge / "dist" / "bin" / "cursor-sdk-bridge.js"),
+            ])
+            atexit.register(_CLIENT.close)
+        return _CLIENT
+
+
 def create_agent(config: AgentConfig):
     from cursor_sdk import Agent, LocalAgentOptions
     # The SDK discovers project settings at the enclosing Git root. That can
@@ -44,6 +66,7 @@ def create_agent(config: AgentConfig):
     }
     return Agent.create(
         {"mcp_servers": servers},
+        client=workspace_client(),
         api_key=config.api_key,
         model=model_selection(config.model),
         local=LocalAgentOptions(cwd=config.project, setting_sources=[]),

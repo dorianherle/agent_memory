@@ -6,7 +6,7 @@
     <title>Agent Memory Studio</title>
     <style>
 :root{--paper:#f1f3f6;--card:#fff;--ink:#202938;--muted:#6d7788;--line:#e4e8ee;--accent:#3364d6;--soft:#edf3ff;--error:#b43b42;--radius:12px;color-scheme:light}
-*{box-sizing:border-box}body{margin:0;height:100dvh;display:grid;grid-template-rows:68px minmax(0,1fr);background:var(--paper);color:var(--ink);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 12px;transition:background .12s,border-color .12s}button:hover{background:var(--soft);border-color:#c8d5ee}button:disabled{opacity:.45;cursor:default}button.primary{background:var(--accent);border-color:var(--accent);color:white}input,textarea,select{border:1px solid var(--line);border-radius:8px;background:var(--card);padding:9px 11px;min-width:0}button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}header{display:flex;align-items:center;gap:16px;width:min(1540px,calc(100% - 48px));margin:auto}h1{font-size:16px;letter-spacing:-.45px;margin:0;white-space:nowrap}.brand{display:flex;align-items:center;gap:10px}.logo{display:grid;place-items:center;background:#202e48;color:white;width:32px;height:32px;border-radius:10px;font-size:22px;box-shadow:0 3px 8px #14203918}#folder{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:12px;border-left:1px solid #d9dfe8;padding-left:16px}#status{font-size:12px;color:var(--muted);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#status:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#8793a5;margin-right:7px}#status.error{color:var(--error)}#status.error:before{background:var(--error)}main{width:min(1540px,calc(100% - 48px));margin:0 auto 24px;display:grid;grid-template-columns:306px minmax(0,1fr);min-height:0;border:1px solid #dde3eb;border-radius:16px;overflow:hidden;box-shadow:0 8px 28px #23395706}.memory{display:flex;flex-direction:column;border-right:1px solid var(--line);min-height:0;background:#f8f9fb;padding:22px 16px 12px}.eyebrow{font-size:10px;font-weight:650;letter-spacing:1.15px;text-transform:uppercase;color:var(--muted);margin:0 0 9px}.context{margin:0 0 14px;padding:14px;background:white;border:1px solid var(--line);border-radius:10px;flex-shrink:0}.context h2{font-size:14px;line-height:1.55;font-weight:600;letter-spacing:-.15px;margin:0;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.context .small{display:block;margin-top:6px}.context.handoff{border-color:#d8e2f6;background:#f3f7ff}.handoff .eyebrow{color:#4970b5}.handoff p:last-child{font-size:12px;margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.muted{color:var(--muted)}.small{font-size:12px}.question{font-size:12px;margin:7px 0;border-left:2px solid #b3c3e3;padding-left:9px}.timeline-head{display:flex;align-items:center;justify-content:space-between;margin:9px 4px}.timeline-head .eyebrow{margin:0}.count{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}.memory-tools{display:flex;gap:6px;margin:0 0 12px}.memory-tools input{width:100%;background:#fff;font-size:12px;padding:8px 10px}.memory-tools button{font-size:11px;white-space:nowrap}.memory-tools button[aria-pressed=true]{color:var(--accent);background:var(--soft)}#timeline{overflow:auto;min-height:0;flex:1;scrollbar-width:thin;scrollbar-color:#cbd3df transparent}.note{position:relative;margin:1px 0 2px;padding-left:13px}.note:before{content:"";position:absolute;left:3px;top:17px;width:5px;height:5px;background:#b7c2d4;border-radius:50%}.note:after{content:"";position:absolute;left:5px;top:25px;bottom:-5px;width:1px;background:#e0e5ed}.note:last-child:after{display:none}.note-button{display:block;text-align:left;width:100%;background:transparent;border:1px solid transparent;padding:8px 9px;border-radius:8px;overflow-wrap:anywhere}.note-button.selected{background:#e9effa;border-color:#d5e0f3}.note-title{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.5}.meta{display:block;font-size:10px;color:var(--muted);margin-top:4px}.summary>.note-button .note-title{font-weight:650}.summary:before{background:var(--accent);box-shadow:0 0 0 3px #e3ebfc}.summary details>summary{font-size:11px;color:var(--accent);padding:2px 9px 8px;cursor:pointer}.children{margin:0 0 6px 10px;padding-left:5px}.hint{color:var(--muted);font-size:13px;padding:14px 8px}.workspace{display:flex;flex-direction:column;min-height:0;min-width:0;background:white}.workspace-top{display:flex;align-items:center;gap:5px;padding:14px 24px;border-bottom:1px solid var(--line);min-height:59px}.tab{border-color:transparent;border-radius:7px;color:var(--muted);font-size:12px;padding:6px 10px}.tab[aria-selected=true]{background:#f0f3f8;color:var(--ink);font-weight:600}.workspace-top .session-label{margin-left:auto;font-size:11px;color:var(--muted);white-space:nowrap}.session-label:before{content:"";display:inline-block;width:6px;height:6px;background:#528e70;border-radius:50%;margin-right:7px}#chat{display:flex;flex-direction:column;min-height:0;flex:1}#thread{flex:1;overflow:auto;padding:28px max(32px,calc((100% - 760px)/2));scrollbar-width:thin}.empty{max-width:520px;margin:clamp(30px,10vh,160px) auto 32px}.empty .empty-icon{font-size:28px;display:grid;place-items:center;width:52px;height:52px;border:1px solid #dfe5ee;border-radius:16px;margin-bottom:23px;color:#395b95;background:linear-gradient(150deg,#f7faff,#edf2fb)}.empty h2{font-size:34px;line-height:1.2;letter-spacing:-1.2px;font-weight:600;margin:0 0 15px}.empty>p{color:var(--muted);margin:0;max-width:410px;font-size:14px;line-height:1.7}.suggestions{display:flex;gap:8px;flex-wrap:wrap;margin-top:25px}.suggestions button{font-size:12px;padding:9px 12px;color:#4c5b72;background:#fafbfd}.msg{margin:0 0 28px}.who{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:8px}.msg.agent .who:before{content:"≋";display:grid;place-items:center;width:21px;height:21px;border-radius:6px;background:#edf2fa;color:#3d608f;font-size:15px}.msg .body{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8;font-size:14px}.msg.user{margin-left:auto;max-width:88%}.msg.user .who{text-align:right;justify-content:flex-end}.msg.user .body{padding:12px 16px;border-radius:12px 12px 3px 12px;background:#f1f4f9}.msg.pending .body:empty:before{content:attr(data-phase);color:var(--muted);font-size:13px}.msg.pending .who:before{animation:breathe 1.4s ease-in-out infinite}.msg.error{color:var(--error)}.body pre{background:#f5f7fa;border:1px solid var(--line);padding:15px;border-radius:10px;overflow:auto;white-space:pre}.body code{font:12px/1.7 ui-monospace,monospace}.body h3{font-size:16px;margin:16px 0 4px}.body strong{font-weight:650}.run-status{display:flex;align-items:center;gap:10px;max-width:816px;width:100%;margin:0 auto;padding:0 28px;min-height:27px;color:var(--muted);font-size:11px}#activity:empty{display:none}#standby{margin-left:auto;font-size:11px}#standby[data-ready=true]{color:#438061}.composer-wrap{padding:8px 28px 19px;width:100%;max-width:816px;margin:0 auto}.composer{border:1px solid #dbe2ed;padding:9px 10px;border-radius:13px;background:white;box-shadow:0 3px 12px #23395706;transition:border-color .12s,box-shadow .12s}.composer:focus-within{border-color:#94addd;box-shadow:0 0 0 3px #3364d610}.composer textarea{display:block;width:100%;border:none;resize:none;min-height:62px;max-height:170px;background:transparent;padding:8px 6px;line-height:1.6}.composer textarea:focus-visible{outline:none}.composer-bottom{display:flex;align-items:center;gap:8px;padding:3px 3px 0}#model{border:0;padding:5px 2px;color:var(--muted);font-size:11px;max-width:190px;background:transparent}#send{margin-left:auto;border-radius:8px;padding:7px 13px;font-size:12px}#stop{margin-left:auto;color:var(--error);font-size:12px}.composer-note{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:10px;margin:9px 2px 0}#detail{overflow:auto;flex:1;padding:32px max(28px,calc((100% - 760px)/2))}#detail h2{font-size:25px;font-weight:600;letter-spacing:-.6px;line-height:1.4;overflow-wrap:anywhere}#detail .body{white-space:pre-wrap;overflow-wrap:anywhere}dialog{border:1px solid var(--line);border-radius:16px;padding:28px;width:min(490px,calc(100% - 32px));box-shadow:0 24px 80px #17251b22}dialog::backdrop{background:#18243d45;backdrop-filter:blur(3px)}dialog h2{margin:0 0 20px;font-size:21px;letter-spacing:-.5px}dialog label{display:block;font-size:12px;font-weight:600;margin:16px 0 6px}dialog input{width:100%}.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}#keybox{display:flex;align-items:center;gap:8px}#key-ok{color:#438061;display:none}#keybox.ok #key-ok{display:inline}#settings-message{color:var(--muted);font-size:12px;overflow-wrap:anywhere}#settings-message[data-state=success]{color:#238254}#settings-message[data-state=error]{color:var(--error)}#memory-toggle{display:none}#memory-backdrop{display:none}[hidden]{display:none!important}@keyframes breathe{50%{opacity:.4}}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}@media(min-width:1800px){body{grid-template-rows:84px minmax(0,1fr)}main{margin-bottom:40px}}@media(max-width:900px){header{width:calc(100% - 24px);gap:10px}main{width:calc(100% - 24px);margin-bottom:12px;grid-template-columns:270px minmax(0,1fr)}#thread{padding:24px}.empty h2{font-size:28px}.workspace-top{padding:14px 16px}#status{max-width:180px}.composer-wrap{padding:8px 18px 17px}.workspace-top .session-label{display:none}}@media(max-width:700px){body{grid-template-rows:60px minmax(0,1fr)}header{gap:8px}header h1{font-size:14px}#folder{display:none}#status{margin-left:auto;max-width:140px;font-size:10px}header button{padding:7px 9px;font-size:11px}main{display:block;position:relative}#memory-toggle{display:block}.workspace{height:100%}.memory{display:none;position:absolute;top:0;bottom:0;left:0;width:min(300px,86%);z-index:3;box-shadow:15px 0 40px #17274225}main.memory-open .memory{display:flex}main.memory-open #memory-backdrop{display:block;position:absolute;inset:0;border:0;border-radius:0;background:#18243d35;z-index:2}.workspace-top{padding:10px 12px;min-height:55px}.empty{margin:6vh auto 20px}.empty h2{font-size:28px}.empty .empty-icon{margin-bottom:18px}#thread,#detail{padding:22px}.composer-wrap{padding:6px 13px 13px}.run-status{padding:0 18px}.composer-note{font-size:9px}.suggestions{gap:6px}.suggestions button{font-size:11px}.msg.user{max-width:95%}}
+*{box-sizing:border-box}body{margin:0;height:100dvh;display:grid;grid-template-rows:68px minmax(0,1fr);background:var(--paper);color:var(--ink);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 12px;transition:background .12s,border-color .12s}button:hover{background:var(--soft);border-color:#c8d5ee}button:disabled{opacity:.45;cursor:default}button.primary{background:var(--accent);border-color:var(--accent);color:white}input,textarea,select{border:1px solid var(--line);border-radius:8px;background:var(--card);padding:9px 11px;min-width:0}button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}header{display:flex;align-items:center;gap:16px;width:min(1540px,calc(100% - 48px));margin:auto}h1{font-size:16px;letter-spacing:-.45px;margin:0;white-space:nowrap}.brand{display:flex;align-items:center;gap:10px}.logo{display:grid;place-items:center;background:#202e48;color:white;width:32px;height:32px;border-radius:10px;font-size:22px;box-shadow:0 3px 8px #14203918}#folder{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:12px;border-left:1px solid #d9dfe8;padding-left:16px}#status{font-size:12px;color:var(--muted);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#status:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#8793a5;margin-right:7px}#status.connected{color:#238254}#status.connected:before{background:#238254}#status.error{color:var(--error)}#status.error:before{background:var(--error)}main{width:min(1540px,calc(100% - 48px));margin:0 auto 24px;display:grid;grid-template-columns:306px minmax(0,1fr);min-height:0;border:1px solid #dde3eb;border-radius:16px;overflow:hidden;box-shadow:0 8px 28px #23395706}.memory{display:flex;flex-direction:column;border-right:1px solid var(--line);min-height:0;background:#f8f9fb;padding:22px 16px 12px}.eyebrow{font-size:10px;font-weight:650;letter-spacing:1.15px;text-transform:uppercase;color:var(--muted);margin:0 0 9px}.context{margin:0 0 14px;padding:14px;background:white;border:1px solid var(--line);border-radius:10px;flex-shrink:0}.context h2{font-size:14px;line-height:1.55;font-weight:600;letter-spacing:-.15px;margin:0;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.context .small{display:block;margin-top:6px}.context.handoff{border-color:#d8e2f6;background:#f3f7ff}.handoff .eyebrow{color:#4970b5}.handoff p:last-child{font-size:12px;margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.muted{color:var(--muted)}.small{font-size:12px}.question{font-size:12px;margin:7px 0;border-left:2px solid #b3c3e3;padding-left:9px}.timeline-head{display:flex;align-items:center;justify-content:space-between;margin:9px 4px}.timeline-head .eyebrow{margin:0}.count{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}.memory-tools{display:flex;gap:6px;margin:0 0 12px}.memory-tools input{width:100%;background:#fff;font-size:12px;padding:8px 10px}#timeline{overflow:auto;min-height:0;flex:1;scrollbar-width:thin;scrollbar-color:#cbd3df transparent}.note{position:relative;margin:1px 0 2px;padding-left:13px}.note:before{content:"";position:absolute;left:3px;top:17px;width:5px;height:5px;background:#b7c2d4;border-radius:50%}.note:after{content:"";position:absolute;left:5px;top:25px;bottom:-5px;width:1px;background:#e0e5ed}.note:last-child:after{display:none}.note-button{display:block;text-align:left;width:100%;background:transparent;border:1px solid transparent;padding:8px 9px;border-radius:8px;overflow-wrap:anywhere}.note-button.selected{background:#e9effa;border-color:#d5e0f3}.note-title{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.5}.meta{display:block;font-size:10px;color:var(--muted);margin-top:4px}.summary>.note-button .note-title{font-weight:650}.summary:before{background:var(--accent);box-shadow:0 0 0 3px #e3ebfc}.summary details>summary{font-size:11px;color:var(--accent);padding:2px 9px 8px;cursor:pointer}.children{margin:0 0 6px 10px;padding-left:5px}.hint{color:var(--muted);font-size:13px;padding:14px 8px}.workspace{display:flex;flex-direction:column;min-height:0;min-width:0;background:white}.workspace-top{display:flex;align-items:center;gap:5px;padding:14px 24px;border-bottom:1px solid var(--line);min-height:59px}.tab{border-color:transparent;border-radius:7px;color:var(--muted);font-size:12px;padding:6px 10px}.tab[aria-selected=true]{background:#f0f3f8;color:var(--ink);font-weight:600}.workspace-top .session-label{margin-left:auto;font-size:11px;color:var(--muted);white-space:nowrap}.session-label:before{content:"";display:inline-block;width:6px;height:6px;background:#528e70;border-radius:50%;margin-right:7px}#chat{display:flex;flex-direction:column;min-height:0;flex:1}#thread{flex:1;overflow:auto;padding:28px max(32px,calc((100% - 760px)/2));scrollbar-width:thin}.empty{max-width:520px;margin:clamp(30px,10vh,160px) auto 32px}.empty .empty-icon{font-size:28px;display:grid;place-items:center;width:52px;height:52px;border:1px solid #dfe5ee;border-radius:16px;margin-bottom:23px;color:#395b95;background:linear-gradient(150deg,#f7faff,#edf2fb)}.empty h2{font-size:34px;line-height:1.2;letter-spacing:-1.2px;font-weight:600;margin:0 0 15px}.empty>p{color:var(--muted);margin:0;max-width:410px;font-size:14px;line-height:1.7}.suggestions{display:flex;gap:8px;flex-wrap:wrap;margin-top:25px}.suggestions button{font-size:12px;padding:9px 12px;color:#4c5b72;background:#fafbfd}.msg{margin:0 0 28px}.who{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:8px}.msg.agent .who:before{content:"≋";display:grid;place-items:center;width:21px;height:21px;border-radius:6px;background:#edf2fa;color:#3d608f;font-size:15px}.agent-prompt{border:0;background:transparent;padding:2px 0;border-radius:4px;color:var(--muted);font-size:11px;font-weight:600}.agent-prompt:not(:disabled):after{content:" · view prompt";font-weight:500;color:var(--accent)}.agent-prompt:not(:disabled):hover{background:transparent;color:var(--ink);text-decoration:underline;text-underline-offset:3px}.msg .body{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8;font-size:14px}.msg.user{margin-left:auto;max-width:88%}.msg.user .who{text-align:right;justify-content:flex-end}.msg.user .body{padding:12px 16px;border-radius:12px 12px 3px 12px;background:#f1f4f9}.msg.pending .body:empty:before{content:attr(data-phase);color:var(--muted);font-size:13px}.msg.pending .who:before{animation:breathe 1.4s ease-in-out infinite}.msg.error{color:var(--error)}.body pre{background:#f5f7fa;border:1px solid var(--line);padding:15px;border-radius:10px;overflow:auto;white-space:pre}.body code{font:12px/1.7 ui-monospace,monospace}.body h3{font-size:16px;margin:16px 0 4px}.body strong{font-weight:650}.run-status{display:flex;align-items:center;gap:10px;max-width:816px;width:100%;margin:0 auto;padding:0 28px;min-height:27px;color:var(--muted);font-size:11px}#activity:empty{display:none}#standby{margin-left:auto;font-size:11px}#standby[data-ready=true]{color:#438061}.composer-wrap{padding:8px 28px 19px;width:100%;max-width:816px;margin:0 auto}.composer{border:1px solid #dbe2ed;padding:9px 10px;border-radius:13px;background:white;box-shadow:0 3px 12px #23395706;transition:border-color .12s,box-shadow .12s}.composer:focus-within{border-color:#94addd;box-shadow:0 0 0 3px #3364d610}.composer textarea{display:block;width:100%;border:none;resize:none;min-height:62px;max-height:170px;background:transparent;padding:8px 6px;line-height:1.6}.composer textarea:focus-visible{outline:none}.composer-bottom{display:flex;align-items:center;gap:8px;padding:3px 3px 0}#model{border:0;padding:5px 2px;color:var(--muted);font-size:11px;max-width:190px;background:transparent}#send{margin-left:auto;border-radius:8px;padding:7px 13px;font-size:12px}#stop{margin-left:auto;color:var(--error);font-size:12px}.composer-note{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:10px;margin:9px 2px 0}#detail{overflow:auto;flex:1;padding:32px max(28px,calc((100% - 760px)/2))}#detail h2{font-size:25px;font-weight:600;letter-spacing:-.6px;line-height:1.4;overflow-wrap:anywhere}#detail .body{white-space:pre-wrap;overflow-wrap:anywhere}dialog{border:1px solid var(--line);border-radius:16px;padding:28px;width:min(490px,calc(100% - 32px));box-shadow:0 24px 80px #17251b22}dialog::backdrop{background:#18243d45;backdrop-filter:blur(3px)}dialog h2{margin:0 0 20px;font-size:21px;letter-spacing:-.5px}dialog label{display:block;font-size:12px;font-weight:600;margin:16px 0 6px}dialog input{width:100%}.dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}.dialog-head h2{margin:0}.prompt-dialog{width:min(840px,calc(100% - 32px));max-height:min(86vh,840px);overflow:auto}.prompt-dialog .prompt-note{margin:8px 0 16px}.prompt-dialog pre{margin:0;max-height:52vh;overflow:auto;border:1px solid var(--line);border-radius:10px;background:#f5f7fa;padding:16px;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace}.prompt-stats{margin:0 0 10px;color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}#keybox{display:flex;align-items:center;gap:8px}#key-ok{color:#438061;display:none}#keybox.ok #key-ok{display:inline}#settings-message{color:var(--muted);font-size:12px;overflow-wrap:anywhere}#settings-message[data-state=success]{color:#238254}#settings-message[data-state=error]{color:var(--error)}#memory-toggle{display:none}#memory-backdrop{display:none}[hidden]{display:none!important}@keyframes breathe{50%{opacity:.4}}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}@media(min-width:1800px){body{grid-template-rows:84px minmax(0,1fr)}main{margin-bottom:40px}}@media(max-width:900px){header{width:calc(100% - 24px);gap:10px}main{width:calc(100% - 24px);margin-bottom:12px;grid-template-columns:270px minmax(0,1fr)}#thread{padding:24px}.empty h2{font-size:28px}.workspace-top{padding:14px 16px}#status{max-width:180px}.composer-wrap{padding:8px 18px 17px}.workspace-top .session-label{display:none}}@media(max-width:700px){body{grid-template-rows:60px minmax(0,1fr)}header{gap:8px}header h1{font-size:14px}.brand{margin-right:auto}#folder{display:none}#status{display:none}header button{padding:7px 9px;font-size:11px}main{display:block;position:relative}#memory-toggle{display:block}.workspace{height:100%}.memory{display:none;position:absolute;top:0;bottom:0;left:0;width:min(300px,86%);z-index:3;box-shadow:15px 0 40px #17274225}main.memory-open .memory{display:flex}main.memory-open #memory-backdrop{display:block;position:absolute;inset:0;border:0;border-radius:0;background:#18243d35;z-index:2}.workspace-top{padding:10px 12px;min-height:55px}.empty{margin:6vh auto 20px}.empty h2{font-size:28px}.empty .empty-icon{margin-bottom:18px}#thread,#detail{padding:22px}.composer-wrap{padding:6px 13px 13px}.run-status{padding:0 18px}.composer-note{font-size:9px}.suggestions{gap:6px}.suggestions button{font-size:11px}.msg.user{max-width:95%}}
     </style>
   </head>
   <body>
@@ -40,7 +40,7 @@
           <p class="eyebrow">Memory trail</p><span class="count" id="note-count"></span>
         </div>
         <p id="memory-error" class="small" role="alert" hidden></p>
-        <div class="memory-tools"><input id="memory-search" type="search" placeholder="Find a note…" aria-label="Search memory notes"><button id="show-all" aria-pressed="true">All notes</button></div>
+        <div class="memory-tools"><input id="memory-search" type="search" placeholder="Find a memory…" aria-label="Search memory"></div>
         <div id="timeline">
           <div class="hint">Open a folder to browse its memory.</div>
         </div>
@@ -124,6 +124,24 @@
         ><button id="connect" class="primary">Connect</button>
       </div>
     </dialog>
+    <dialog id="prompt-dialog" class="prompt-dialog">
+      <div class="dialog-head">
+        <div>
+          <p class="eyebrow">Agent input</p>
+          <h2>Prompt sent by Studio</h2>
+        </div>
+        <button id="prompt-close" aria-label="Close prompt">Close</button>
+      </div>
+      <p class="small muted prompt-note">
+        Exact text passed to the Cursor SDK. Provider-added system instructions
+        and tool schemas are separate and are not exposed here.
+      </p>
+      <p class="prompt-stats" id="prompt-stats"></p>
+      <pre id="prompt-text"></pre>
+      <div class="actions">
+        <button id="prompt-copy">Copy prompt</button>
+      </div>
+    </dialog>
     <script>
       const $ = (id) => document.getElementById(id);
       const state = {
@@ -136,7 +154,6 @@
         memoryJSON: "",
         memoryETag: "",
         refreshing: false,
-        showAll: true,
         noteCache: new Map(),
       };
       const expanded = new Set();
@@ -152,8 +169,13 @@
               "'": "&#39;",
             })[c],
         );
+      const normalizeFragmentBreaks = (text) =>
+        String(text || "")
+          .replace(/\n\n(?=[ \t]|[.,!?;:)\]}`])/g, "")
+          .replace(/([([{`])\n\n/g, "$1")
+          .replace(/([A-Za-z0-9])\n\n(?=[a-z])/g, "$1");
       function rich(text) {
-        return String(text || "")
+        return normalizeFragmentBreaks(text)
           .split(/(```[\s\S]*?```)/g)
           .map((part) =>
             part.startsWith("```")
@@ -182,10 +204,28 @@
         if (!res.ok) throw new Error(body.error || "Request failed");
         return body;
       }
-      function status(text, error = false) {
+      function status(text, error = false, connected = false) {
         $("status").textContent = text;
         $("status").title = text;
         $("status").classList.toggle("error", error);
+        $("status").classList.toggle("connected", connected && !error);
+      }
+      const estimateTokens = (text) =>
+        Math.max(0, Math.ceil(String(text || "").length / 4));
+      const formatTokens = (value) =>
+        value >= 1000000
+          ? (value / 1000000).toFixed(value >= 10000000 ? 0 : 1) + "M"
+          : value >= 1000
+            ? (value / 1000).toFixed(value >= 10000 ? 0 : 1) + "k"
+            : String(value);
+
+      function showAgentPrompt(node) {
+        if (!node?._promptText) return;
+        $("prompt-text").textContent = node._promptText;
+        $("prompt-stats").textContent =
+          "≈" + formatTokens(node._promptTokens || estimateTokens(node._promptText)) +
+          " input tokens in the Studio prompt";
+        $("prompt-dialog").showModal();
       }
       function controls() {
         $("send").disabled =
@@ -270,12 +310,12 @@
       function renderTimeline() {
         const query = $("memory-search").value.trim().toLowerCase();
         const source = query ? allNotes(state.commits) : state.commits;
-        const notes = source.filter(c => (query || !state.pinned?.has(c.id)) && (query || state.showAll || !["user","answer"].includes(c.kind)) && (!query || c.title.toLowerCase().includes(query)));
-        $("note-count").textContent = allNotes(state.commits).length + " saved";
-        $("timeline").innerHTML = notes.map(query ? noteButton : noteHTML).join("") || '<div class="hint">' + (query ? 'No matching notes.' : (state.commits.length ? 'No notes in this view. Turn on All notes to see saved messages.' : 'No saved notes in this folder yet.')) + '</div>';
+        const durable = allNotes(state.commits).filter(c => !["user","answer"].includes(c.kind) || state.pinned?.has(c.id));
+        const notes = source.filter(c => (query || !state.pinned?.has(c.id)) && !["user","answer"].includes(c.kind) && (!query || c.title.toLowerCase().includes(query)));
+        $("note-count").textContent = durable.length + (durable.length === 1 ? " memory" : " memories");
+        $("timeline").innerHTML = notes.map(query ? noteButton : noteHTML).join("") || '<div class="hint">' + (query ? 'No matching memories.' : (state.commits.length ? 'No durable notes yet.' : 'No saved memories in this folder yet.')) + '</div>';
       }
       $("memory-search").oninput = renderTimeline;
-      $("show-all").onclick = () => { state.showAll = !state.showAll; $("show-all").setAttribute("aria-pressed", state.showAll); renderTimeline(); };
       function toggleMemory(open) { $("app-shell").classList.toggle("memory-open", open); $("memory-toggle").setAttribute("aria-expanded", open); }
       $("memory-toggle").onclick = () => toggleMemory(!$("app-shell").classList.contains("memory-open"));
       $("memory-backdrop").onclick = () => toggleMemory(false);
@@ -346,6 +386,7 @@
         }
         status(
           data.ready ? "Memory connected" : data.hint || "Memory setup needed",
+          false, data.ready,
         );
         controls();
         refreshMemory();
@@ -369,6 +410,16 @@
       };
       $("settings-open").onclick = () => $("settings").showModal();
       $("settings-close").onclick = () => $("settings").close();
+      $("prompt-close").onclick = () => $("prompt-dialog").close();
+      $("prompt-copy").onclick = async () => {
+        try {
+          await navigator.clipboard.writeText($("prompt-text").textContent);
+          $("prompt-copy").textContent = "Copied";
+        } catch (_) {
+          $("prompt-copy").textContent = "Copy failed";
+        }
+        setTimeout(() => { $("prompt-copy").textContent = "Copy prompt"; }, 1200);
+      };
       async function loadModels() {
         try {
           const data = await api("/api/models");
@@ -412,7 +463,7 @@
           if (data.ok) {
             $("key").value = "";
             $("key").placeholder = "Connected for this session";
-            status("Cursor connected");
+            status("Cursor connected", false, true);
             await loadModels();
           }
         } catch (error) {
@@ -427,7 +478,12 @@
         $("welcome")?.remove();
         const node = document.createElement("div");
         node.className = "msg " + role;
-        node.innerHTML = `<div class="who">${role === "user" ? "You" : "Agent"}</div><div class="body"></div>`;
+        node.innerHTML = role === "user"
+          ? '<div class="who">You</div><div class="body"></div>'
+          : '<div class="who"><button type="button" class="agent-prompt" disabled title="The prompt becomes available after Studio sends the request.">Agent</button></div><div class="body"></div>';
+        node.querySelector(".agent-prompt")?.addEventListener("click", () =>
+          showAgentPrompt(node),
+        );
         node.querySelector(".body").textContent = text;
         $("thread").appendChild(node);
         return node.querySelector(".body");
@@ -443,6 +499,7 @@
         addMessage("user", question);
         $("question").value = "";
         const body = addMessage("agent", "");
+        const agentMessage = body.parentElement;
         body.dataset.phase = "Sending request…";
         body.parentElement.classList.add("pending");
         $("activity").textContent = "Starting…";
@@ -451,19 +508,35 @@
         $("thread").scrollTop = $("thread").scrollHeight;
         let answer = "",
           failed = false,
-          ended = false;
+          ended = false,
+          streamProtocol = 1;
         function receive(event) {
+          if (event.stream_protocol) streamProtocol = event.stream_protocol;
           if (event.type === "memory") refreshMemory();
+          if (event.type === "prompt") {
+            agentMessage._promptText = event.text || "";
+            agentMessage._promptTokens = event.prompt_tokens || 0;
+            const promptButton = agentMessage.querySelector(".agent-prompt");
+            if (promptButton) {
+              promptButton.disabled = !agentMessage._promptText;
+              promptButton.title = agentMessage._promptText
+                ? "View the exact prompt Studio sent"
+                : "Prompt unavailable";
+            }
+          }
           if (event.type === "status") {
             const phase = event.text === "Reading the handoff…" ? "Waiting for response…" : event.text || "Waiting for response…";
             $("activity").textContent = phase;
             body.dataset.phase = phase;
           }
           if (event.type === "delta") {
-            answer += event.text || "";
+            const fragment = event.text || "";
+            // Protocol 1 inserted this exact event after every SDK fragment.
+            if (streamProtocol < 2 && fragment === "\n\n") return;
+            answer += fragment;
             if (firstTextAt === null) firstTextAt = performance.now();
             body.parentElement.classList.remove("pending");
-            body.textContent = answer;
+            body.textContent = normalizeFragmentBreaks(answer);
           }
           if (event.type === "error") {
             failed = true;
@@ -479,6 +552,7 @@
             if (!failed)
               status(
                 event.status === "cancelled" ? "Stopped" : "Memory connected",
+                false, event.status !== "cancelled" && state.ready,
               );
             $("activity").textContent =
               event.status === "cancelled"
@@ -588,7 +662,7 @@
           if (session.project === state.project && state.ready !== session.ready) {
             state.ready = session.ready;
             controls();
-            if (!state.busy) status(session.ready ? "Memory connected" : "Memory setup needed");
+            if (!state.busy) status(session.ready ? "Memory connected" : "Memory setup needed", false, session.ready);
           }
           $("standby").dataset.ready = session.standby === "ready";
           $("standby").textContent =

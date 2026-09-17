@@ -1,11 +1,11 @@
-"""Cursor hook entrypoint: durability + state injection + agent identity.
+"""Cursor hook entrypoint: goal setup + state injection + agent identity.
 
 Reads JSON from stdin (Cursor hook protocol). Event comes from
 `hook_event_name` in the payload.
 
 - sessionStart        → instructions + agent id; refresh state rule/canvas
-- beforeSubmitPrompt  → save_user(prompt); refresh alwaysApply MEMORY STATE
-- afterAgentResponse  → auto_save(text) tagged with current agent
+- beforeSubmitPrompt  → create the goal once; refresh MEMORY STATE for prompt
+- afterAgentResponse  → no-op (conversation is not durable memory)
 - subagentStart       → register subagent session name
 - subagentStop        → save subagent summary under that agent name
 
@@ -32,16 +32,19 @@ from agent_memory.identity import (
 )
 
 CURSOR_INSTRUCTIONS = """
-Project memory via agent-memory MCP. Hooks save prompts and answers.
+Project memory via agent-memory MCP. The first request establishes the goal;
+ordinary conversation is not copied into memory.
 Match the current request. Greetings, thanks, and casual small talk need only a
 brief conversational reply. A bare "what's up?" is not a project-status request.
 Do not load skills, search memory, inspect files, narrate checks, recap projects,
 or propose tasks unless the user asks for work or context. An old goal is not a
 new request to resume work.
 
-Call memory_save for useful findings. On a completed milestone, call memory_summarize
-with a verified outcome and key evidence to group its commits. Do not wait for the
-user to request a summary. Keep unfinished work and open questions explicit.
+Call memory_save for durable user constraints, useful findings, decisions, and
+checkpoints. Distill the useful fact; do not copy a raw prompt or answer. On a
+completed milestone, call memory_summarize with a verified outcome and key
+evidence to group its commits. Do not wait for the user to request a summary.
+Keep unfinished work and open questions explicit.
 Do not invent ids.
 Pass agent=<your name> on memory_save / memory_summarize.
 """.strip()
@@ -141,15 +144,22 @@ def handle(event: str, data: dict) -> dict:
         prompt = data.get("prompt") or ""
         entry_id = None
         if isinstance(prompt, str) and prompt.strip():
-            entry_id = memory.save_user(prompt.strip(), agent=USER_AGENT)
-            _refresh_dashboard(memory)
+            entry_id = memory.ensure_goal(prompt.strip(), agent=USER_AGENT)
+            packet = memory.render_packet(prompt.strip())
+            memory.write_state_file(question=prompt.strip())
+            try:
+                memory.write_live_html()
+            except Exception:
+                pass
         else:
             memory.write_state_file()
         # One delivery channel: the alwaysApply rule. The hook only
         # points at it so memory state is delivered once.
         rule_rel = ".cursor/rules/agent-memory-state.mdc"
-        state = memory.render_packet(
-            prompt.strip() if isinstance(prompt, str) else None
+        state = (
+            packet
+            if isinstance(prompt, str) and prompt.strip()
+            else memory.render_packet()
         )
         pointer = (
             f"MEMORY STATE is in the alwaysApply rule `{rule_rel}`."
@@ -187,11 +197,8 @@ def handle(event: str, data: dict) -> dict:
         }
 
     if event == "afterAgentResponse":
-        text = data.get("text") or ""
-        if isinstance(text, str) and text.strip():
-            who = _agent_for_event(memory, data)
-            memory.auto_save(text.strip(), agent=who)
-            _refresh_dashboard(memory)
+        # Finished answers belong to the conversation. Agents explicitly save
+        # only durable knowledge through memory_save / memory_summarize.
         return {}
 
     if event == "subagentStart":

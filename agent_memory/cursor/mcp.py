@@ -1,7 +1,7 @@
 """MCP server: judgment + checkpoint tools for Cursor Agent.
 
-Hooks auto-save at turn boundaries (user prompt / finished answer).
-`memory_save` lets the agent checkpoint mid-turn during long work.
+Hooks establish the initial goal and refresh state. `memory_save` lets the
+agent preserve selected durable knowledge during long work.
 
 Works with mcp SDK v1 (`FastMCP`) and v2 (`MCPServer`).
 """

@@ -96,8 +96,10 @@ class TestWrapper(MemoryTestCase):
 
         self.assertEqual(response.choices[0].message.content, "Done.")
         self.assertEqual(len(fake.requests), 2)
-        self.assertEqual(self.memory.state()[-2].message, "Read the file")
-        self.assertEqual(self.memory.state()[-1].message, "Done.")
+        self.assertEqual(
+            [item.message for item in self.memory.state()],
+            ["Investigate.", "Read the file"],
+        )
 
         first = fake.requests[0]
         self.assertIn("MEMORY STATE", first["messages"][1]["content"])
@@ -205,8 +207,10 @@ class TestWrapper(MemoryTestCase):
         # Everything passes through: 2 tool call chunks + 2 text chunks.
         self.assertEqual(len(chunks), 4)
         self.assertEqual(len(fake.requests), 2)
-        self.assertEqual(self.memory.state()[-2].message, "Moved to Neuchatel")
-        self.assertEqual(self.memory.state()[-1].message, "Got it.")
+        self.assertEqual(
+            [item.message for item in self.memory.state()],
+            ["I moved. Remember this.", "Moved to Neuchatel"],
+        )
         self.assertTrue(fake.requests[1]["stream"])
         self.assertTrue(
             fake.requests[1]["messages"][-1]["content"].startswith("Saved [")
@@ -259,7 +263,7 @@ class TestWrapper(MemoryTestCase):
         self.assertTrue(fake.entered)
         self.assertTrue(fake.exited)
 
-    def test_openai_saves_user_message_once(self):
+    def test_openai_only_uses_first_user_message_as_goal(self):
         fake = FakeClient([reply(content="Done."), reply(content="Again.")])
         client = wrap(fake, self.memory)
 
@@ -269,7 +273,7 @@ class TestWrapper(MemoryTestCase):
         )
         client.chat.completions.create(
             model="gpt-5",
-            messages=[{"role": "user", "content": "Investigate."}],
+            messages=[{"role": "user", "content": "What did we discuss?"}],
         )
 
         users = self.memory.find(payload={"user": True}, k=10)
@@ -501,19 +505,21 @@ class TestWrapper(MemoryTestCase):
 
 
 class TestHandoffPersistence(MemoryTestCase):
-    def test_completed_answer_survives_new_client(self):
+    def test_completed_answer_is_not_promoted_to_memory(self):
         from agent_memory import Memory
         answer = "Patch ready\nNext: pytest tests/test_retry.py"
         wrapped = wrap(FakeClient([reply(answer)]), self.memory)
         wrapped.chat.completions.create(messages=[{"role": "user", "content": "Repair retry"}])
         reader = Memory(self.path)
-        self.assertIn("Next: pytest tests/test_retry.py", reader.render_packet())
+        self.assertNotIn("Next: pytest tests/test_retry.py", reader.render_packet())
+        self.assertEqual([item.message for item in reader.state()], ["Repair retry"])
         reader._catalog.close()
 
-    def test_completed_stream_saves_whole_handoff(self):
+    def test_completed_stream_is_not_promoted_to_memory(self):
         wrapped = wrap(FakeClient([[chunk("Patch ready\n"), chunk("Next: pytest retry.py")]]), self.memory)
         list(wrapped.chat.completions.create(messages=[{"role": "user", "content": "Repair retry"}], stream=True))
-        self.assertIn("Next: pytest retry.py", self.memory.render_packet())
+        self.assertNotIn("Next: pytest retry.py", self.memory.render_packet())
+        self.assertEqual([item.message for item in self.memory.state()], ["Repair retry"])
 
     def test_interrupted_stream_is_not_saved_as_completed(self):
         def broken():
