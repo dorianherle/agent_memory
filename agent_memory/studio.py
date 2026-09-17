@@ -224,6 +224,7 @@ def _open_root(root: Path, key: str, model: str) -> dict:
         SESSION["project"] = str(root)
         SESSION["api_key"] = key or ""
         SESSION["model"] = model
+        SESSION["goal_id"] = ""
     _warm_next()
     ready = project_ready(root)
     return {

@@ -65,9 +65,11 @@ class StudioTests(MemoryTestCase):
         (root / ".cursor").mkdir(parents=True)
         config = root / ".cursor" / "mcp.json"
         config.write_text(json.dumps({"mcpServers": {"existing": {"command": "keep-me"}}}))
+        SESSION["goal_id"] = "deadbeef"
         status, data = self._json("POST", "/api/open", {"project": str(root)})
         self.assertEqual(status, 200)
         self.assertTrue(data["ready"])
+        self.assertEqual(SESSION["goal_id"], "")
         merged = json.loads(config.read_text())["mcpServers"]
         self.assertEqual(merged["existing"], {"command": "keep-me"})
         self.assertIn("agent-memory", merged)
