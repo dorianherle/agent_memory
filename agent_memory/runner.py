@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import json
 import os
 import shutil
 import subprocess
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
@@ -206,15 +208,46 @@ def codex_command(prompt: str, cwd: Path) -> list[str]:
     ]
 
 
+def _codex_bin(*, which=shutil.which) -> str | None:
+    return which("codex")
+
+
+def codex_auth_present(path: str | Path | None = None) -> bool:
+    auth = Path(path or Path.home() / ".codex" / "auth.json")
+    if not auth.is_file():
+        return False
+    try:
+        data = json.loads(auth.read_text())
+    except (OSError, ValueError):
+        return False
+    tokens = data.get("tokens") or {}
+    return bool(
+        data.get("OPENAI_API_KEY")
+        or tokens.get("access_token")
+        or tokens.get("id_token")
+    )
+
+
+def codex_cli_error(*, which=shutil.which, run=subprocess.run) -> str | None:
+    exe = _codex_bin(which=which)
+    if not exe:
+        return "codex is not on PATH. Install Codex CLI, then retry."
+    result = run([exe, "--version"], capture_output=True, text=True)
+    if result.returncode == 0:
+        return None
+    err = (result.stderr or result.stdout or "codex --version failed").strip()
+    return f"Codex CLI is installed but broken: {err[:300]}"
+
+
 def codex_logged_in(*, which=shutil.which, run=subprocess.run) -> bool:
-    if not which("codex"):
+    if codex_cli_error(which=which, run=run):
         return False
     result = run(
         ["codex", "login", "status"],
         capture_output=True,
         text=True,
     )
-    return result.returncode == 0
+    return result.returncode == 0 or codex_auth_present()
 
 
 def detect_worker(
@@ -238,10 +271,38 @@ def cancel_active() -> None:
         proc.terminate()
 
 
-def start_codex_login(*, popen=subprocess.Popen) -> dict:
-    if not shutil.which("codex"):
-        raise RuntimeError("codex is not on PATH. Install Codex CLI, then retry.")
-    popen(["codex", "login"])
+def start_codex_login(
+    *,
+    popen=subprocess.Popen,
+    which=shutil.which,
+    run=subprocess.run,
+    wait=time.sleep,
+) -> dict:
+    broken = codex_cli_error(which=which, run=run)
+    if broken:
+        extra = (
+            " A ChatGPT session is already saved. Reinstall (`npm i -g @openai/codex`) so agents can launch."
+            if codex_auth_present()
+            else " Reinstall with `npm i -g @openai/codex`."
+        )
+        raise RuntimeError(broken + extra)
+    if codex_auth_present():
+        return {"ok": True, "hint": "Already signed in. Close Settings and Run a goal."}
+    proc = popen(
+        ["codex", "login"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    wait(1.0)
+    if proc.poll() is not None:
+        err = ""
+        if proc.stderr:
+            err = proc.stderr.read()
+        raise RuntimeError(
+            "codex login exited without opening a browser: "
+            + (err or f"exit {proc.returncode}").strip()[:400]
+        )
     return {"ok": True, "hint": "Finish ChatGPT login in the browser, then refresh."}
 
 

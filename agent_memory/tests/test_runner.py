@@ -8,6 +8,7 @@ from agent_memory.runner import (
     codex_worker,
     detect_worker,
     run_goal,
+    start_codex_login,
 )
 from agent_memory.tests.helpers import MemoryTestCase
 
@@ -123,3 +124,24 @@ class WorkerDetectTests(MemoryTestCase):
         codex_worker(prompt, cwd, run=fake_run)
         self.assertEqual(seen["command"], command)
         self.assertEqual(seen["cwd"], str(cwd))
+
+    def test_connect_reports_dead_cli(self) -> None:
+        with patch("agent_memory.runner.codex_auth_present", return_value=False):
+            with self.assertRaises(RuntimeError) as ctx:
+                start_codex_login(
+                    which=lambda _: "/usr/bin/codex",
+                    run=lambda *a, **k: SimpleNamespace(
+                        returncode=1, stderr="ENOENT", stdout=""
+                    ),
+                    popen=lambda *a, **k: None,
+                    wait=lambda _: None,
+                )
+        self.assertIn("broken", str(ctx.exception).lower())
+
+    def test_connect_already_signed_in(self) -> None:
+        with patch("agent_memory.runner.codex_auth_present", return_value=True):
+            result = start_codex_login(
+                which=lambda _: "/usr/bin/codex",
+                run=lambda *a, **k: SimpleNamespace(returncode=0, stderr="", stdout="ok"),
+            )
+        self.assertIn("Already signed in", result["hint"])
