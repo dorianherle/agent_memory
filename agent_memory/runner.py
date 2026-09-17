@@ -174,6 +174,41 @@ def run_goal(
     return status
 
 
+CODEX_MODELS_FALLBACK = (
+    {"id": "gpt-6-astra", "name": "GPT-6 Astra"},
+    {"id": "gpt-5.6-sol", "name": "GPT-5.6 Sol"},
+    {"id": "gpt-5.6-terra", "name": "GPT-5.6 Terra"},
+    {"id": "gpt-5.6-luna", "name": "GPT-5.6 Luna"},
+    {"id": "gpt-5.5", "name": "GPT-5.5"},
+    {"id": "gpt-5.2", "name": "GPT-5.2"},
+)
+DEFAULT_CODEX_MODEL = "gpt-5.6-luna"
+
+
+def list_codex_models(*, run=subprocess.run) -> list[dict]:
+    try:
+        result = run(
+            ["codex", "debug", "models", "--bundled"],
+            capture_output=True,
+            text=True,
+            timeout=8,
+        )
+        data = json.loads(result.stdout or "{}")
+        rows = [
+            {
+                "id": item["slug"],
+                "name": item.get("display_name") or item["slug"],
+            }
+            for item in data.get("models") or []
+            if item.get("slug") and item.get("visibility", "list") == "list"
+        ]
+        if rows:
+            return rows
+    except (OSError, ValueError, json.JSONDecodeError, subprocess.TimeoutExpired):
+        pass
+    return [dict(row) for row in CODEX_MODELS_FALLBACK]
+
+
 def cursor_worker(prompt: str, cwd: Path, api_key: str | None = None) -> None:
     key = (api_key or os.environ.get("CURSOR_API_KEY") or "").strip()
     if not key:
@@ -195,17 +230,18 @@ def cursor_worker(prompt: str, cwd: Path, api_key: str | None = None) -> None:
         close_agent(agent)
 
 
-def codex_command(prompt: str, cwd: Path) -> list[str]:
-    return [
+def codex_command(prompt: str, cwd: Path, model: str | None = None) -> list[str]:
+    command = [
         "codex",
         "exec",
         "--skip-git-repo-check",
         "--sandbox",
         "workspace-write",
-        "--cd",
-        str(cwd),
-        prompt,
     ]
+    if model:
+        command += ["--model", model]
+    command += ["--cd", str(cwd), prompt]
+    return command
 
 
 def _codex_bin(*, which=shutil.which) -> str | None:
@@ -306,8 +342,8 @@ def start_codex_login(
     return {"ok": True, "hint": "Finish ChatGPT login in the browser, then refresh."}
 
 
-def codex_worker(prompt: str, cwd: Path, *, run=None) -> None:
-    command = codex_command(prompt, cwd)
+def codex_worker(prompt: str, cwd: Path, *, model: str | None = None, run=None) -> None:
+    command = codex_command(prompt, cwd, model=model)
     if run is not None:
         result = run(command, cwd=str(cwd))
         if getattr(result, "returncode", 0):

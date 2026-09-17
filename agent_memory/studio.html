@@ -86,7 +86,7 @@
                 aria-label="Message"
                 rows="2"
                 placeholder="New goal…"
-              ></textarea><div class="composer-bottom"><select id="model" aria-label="Agent model"><option value="grok-4.5">Grok 4.5 Fast</option></select
+              ></textarea><div class="composer-bottom"><select id="model" aria-label="Agent model"><option value="gpt-5.6-luna">GPT-5.6 Luna</option></select
               ><button id="resume" type="button" hidden>Resume</button
               ><button id="stop" type="button" hidden>Stop</button
               ><button class="primary" id="send" type="submit" disabled>
@@ -94,7 +94,7 @@
               </button></div>
             </form>
             <p class="composer-note" id="composer-note">
-              Open a project and connect Cursor in Settings.
+              Connect Codex or a Cursor key in Settings.
             </p>
           </div>
         </div>
@@ -250,8 +250,8 @@
       }
       function controls() {
         const launch = canLaunch();
-        $("send").disabled =
-          state.busy || !state.project || !state.ready || !launch;
+        $("question").disabled = false;
+        $("send").disabled = state.busy || !launch;
         $("resume").hidden = state.busy || !state.goalId;
         $("resume").disabled = $("send").disabled;
         $("stop").hidden = !state.busy;
@@ -259,13 +259,11 @@
         $("pick").disabled = state.busy;
         $("model").disabled = state.busy;
         $("worker-label").textContent = workerLabel();
-        $("composer-note").textContent = !state.project
-          ? "Open a project to begin."
-          : !state.ready
-            ? "Install memory in this folder: agent-memory cursor install"
-            : !launch
-              ? "Connect Codex or a Cursor key in Settings."
-              : "Enter to run a new goal · Resume continues the selected one";
+        $("composer-note").textContent = !launch
+          ? "Connect Codex or a Cursor key in Settings."
+          : !state.project
+            ? "Type a goal, then Run — you will pick a folder."
+            : "Enter to run a new goal · Resume continues the selected one";
       }
       function tab(name) {
         for (const id of ["chat", "detail"]) {
@@ -493,15 +491,16 @@
       async function loadModels() {
         try {
           const data = await api("/api/models");
-          const current =
-            localStorage.getItem("studio-model-v3") ||
-            $("model").value ||
-            "grok-4.5";
           const models = data.models || [];
+          const current =
+            data.model ||
+            localStorage.getItem("studio-model-v3") ||
+            $("model").value;
           $("model").innerHTML = models
             .map((m) => `<option value="${esc(m.id)}">${esc(m.name)}</option>`)
             .join("");
           if (models.some((m) => m.id === current)) $("model").value = current;
+          else if (models[0]) $("model").value = models[0].id;
         } catch (error) {
           status(error.message, true);
         }
@@ -527,6 +526,11 @@
           const session = await api("/api/session");
           state.worker = session.worker;
           controls();
+          if (session.worker === "codex") {
+            await loadModels();
+            $("settings").close();
+            $("question").focus();
+          }
         } catch (error) {
           $("settings-message").dataset.state = "error";
           $("settings-message").textContent = error.message;
@@ -622,7 +626,7 @@
           const res = await fetch("/api/run", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
+            body: JSON.stringify({ ...payload, model: $("model").value }),
           });
           if (!res.ok || !res.body)
             throw new Error(
@@ -663,9 +667,13 @@
       $("ask").onsubmit = async (event) => {
         event.preventDefault();
         const text = $("question").value.trim();
-        if (!text || $("send").disabled) return;
+        if (!text || state.busy || !canLaunch()) return;
+        if (!state.project) {
+          await openProject("/api/pick");
+          if (!state.project) return;
+        }
         $("question").value = "";
-        await startRun({ text });
+        await startRun({ text, model: $("model").value });
       };
       $("resume").onclick = async () => {
         if (!state.goalId || $("send").disabled) return;
@@ -695,23 +703,24 @@
           state.hasKey = session.has_key;
           state.worker = session.worker || "none";
           state.goalId = session.goal_id || "";
-          if (!localStorage.getItem("studio-model-v3"))
-            localStorage.setItem("studio-model-v3", "grok-4.5");
           $("keybox").classList.toggle("ok", session.has_key);
           let modelsReady = Promise.resolve();
-          if (session.has_key) {
-            $("key").placeholder = "Connected for this session";
-            $("settings-message").textContent = "Connected.";
-            $("settings-message").dataset.state = "success";
+          if (session.worker === "codex" || session.has_key) {
+            if (session.has_key) {
+              $("key").placeholder = "Connected for this session";
+              $("settings-message").textContent = "Connected.";
+              $("settings-message").dataset.state = "success";
+            }
             modelsReady = loadModels();
           }
+          if (session.worker === "codex") $("settings").close();
           if (session.project) applyOpen(session);
           else {
             const last = localStorage.getItem("studio-project");
             if (last) await openProject("/api/open", { project: last });
           }
           await modelsReady;
-          if (state.project && state.hasKey && !session.running && session.model !== $("model").value)
+          if (state.project && canLaunch() && !session.running && session.model !== $("model").value)
             await api("/api/model", { model: $("model").value });
           controls();
         } catch (error) {
@@ -721,7 +730,7 @@
       const welcomeHTML = $("thread").innerHTML;
       init();
       async function refreshStandby() {
-        if (!state.project || !state.hasKey || document.hidden) return;
+        if (!state.project || document.hidden) return;
         try {
           const session = await api("/api/session");
           state.worker = session.worker || state.worker;

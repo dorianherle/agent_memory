@@ -464,6 +464,16 @@ def _run_goal_loop(text: str, goal_id: str, write) -> None:
             write({"type": "error", "message": "Open a project first."})
             return
         name, worker = _studio_worker()
+        if name == "codex" and worker is not None:
+            from functools import partial
+
+            from agent_memory.runner import DEFAULT_CODEX_MODEL
+
+            model = SESSION.get("model") or DEFAULT_CODEX_MODEL
+            if model == DEFAULT_MODEL or str(model).startswith("grok"):
+                model = DEFAULT_CODEX_MODEL
+                SESSION["model"] = model
+            worker = partial(worker, model=model)
         if worker is None:
             write({"type": "error", "message": "Connect Codex or a Cursor API key in Settings."})
             return
@@ -584,6 +594,15 @@ class Handler(BaseHTTPRequestHandler):
                 },
             )
         if path == "/api/models":
+            worker = session_worker_name()
+            if worker == "codex":
+                from agent_memory.runner import DEFAULT_CODEX_MODEL, list_codex_models
+
+                models = list_codex_models()
+                current = SESSION.get("model") or ""
+                if not any(row["id"] == current for row in models):
+                    SESSION["model"] = models[0]["id"] if models else DEFAULT_CODEX_MODEL
+                return self._json(200, {"models": models, "model": SESSION["model"]})
             key = SESSION.get("api_key") or ""
             if not key:
                 return self._json(400, {"error": "Add a Cursor API key."})
@@ -667,6 +686,9 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/run":
             text = str(data.get("text") or data.get("question") or "").strip()
             goal_id = str(data.get("goal_id") or "").strip()
+            model = str(data.get("model") or "").strip()
+            if model:
+                SESSION["model"] = model
             if not text and not goal_id:
                 return self._json(400, {"error": "Type a goal or resume an id."})
             if goal_id:

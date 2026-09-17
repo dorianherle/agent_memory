@@ -84,6 +84,7 @@ class StudioTests(MemoryTestCase):
         conn.close()
         self.assertEqual(response.status, 200)
         self.assertIn("One board", html)
+        self.assertIn("GPT-5.6 Luna", html)
         self.assertIn("Open folder", html)
         self.assertIn("key-ok", html)
         self.assertNotIn('id="token-saved"', html)
@@ -376,6 +377,22 @@ class StudioTests(MemoryTestCase):
         status, session = self._json("GET", "/api/session")
         self.assertEqual(session["worker"], "test")
         self.assertEqual(session["goal_id"], done["result"]["goal_id"])
+
+    def test_models_are_codex_when_logged_in(self) -> None:
+        from unittest.mock import patch
+
+        catalog = [{"id": "gpt-5.6-luna", "name": "GPT-5.6 Luna"}]
+        with patch("agent_memory.runner.codex_logged_in", return_value=True):
+            status, session = self._json("GET", "/api/session")
+            self.assertEqual(status, 200)
+            self.assertEqual(session["worker"], "codex")
+            self.assertFalse(session["has_key"])
+            with patch("agent_memory.runner.list_codex_models", return_value=catalog):
+                status, data = self._json("GET", "/api/models")
+        self.assertEqual(status, 200)
+        self.assertEqual(data["models"], catalog)
+        self.assertEqual(data["model"], "gpt-5.6-luna")
+        self.assertNotIn("grok", str(data).lower())
 
     def test_connect_codex_spawns_login(self) -> None:
         from unittest.mock import patch

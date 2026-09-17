@@ -4,9 +4,11 @@ from unittest.mock import patch
 
 from agent_memory.core import Memory
 from agent_memory.runner import (
+    CODEX_MODELS_FALLBACK,
     codex_command,
     codex_worker,
     detect_worker,
+    list_codex_models,
     run_goal,
     start_codex_login,
 )
@@ -117,13 +119,37 @@ class WorkerDetectTests(MemoryTestCase):
             return SimpleNamespace(returncode=0)
 
         prompt = "write failing tests"
-        command = codex_command(prompt, cwd)
+        command = codex_command(prompt, cwd, model="gpt-5.6-luna")
         self.assertEqual(command[:5], ["codex", "exec", "--skip-git-repo-check", "--sandbox", "workspace-write"])
+        self.assertIn("--model", command)
+        self.assertIn("gpt-5.6-luna", command)
         self.assertIn(str(cwd), command)
         self.assertEqual(command[-1], prompt)
-        codex_worker(prompt, cwd, run=fake_run)
+        codex_worker(prompt, cwd, model="gpt-5.6-luna", run=fake_run)
         self.assertEqual(seen["command"], command)
         self.assertEqual(seen["cwd"], str(cwd))
+
+    def test_list_codex_models_parses_debug_and_falls_back(self) -> None:
+        import json
+
+        payload = json.dumps(
+            {
+                "models": [
+                    {
+                        "slug": "gpt-5.6-luna",
+                        "display_name": "GPT-5.6 Luna",
+                        "visibility": "list",
+                    },
+                    {"slug": "hidden-lab", "visibility": "hidden"},
+                ]
+            }
+        )
+        rows = list_codex_models(
+            run=lambda *a, **k: SimpleNamespace(stdout=payload, returncode=0)
+        )
+        self.assertEqual(rows, [{"id": "gpt-5.6-luna", "name": "GPT-5.6 Luna"}])
+        rows = list_codex_models(run=lambda *a, **k: (_ for _ in ()).throw(OSError("no")))
+        self.assertEqual(rows, [dict(row) for row in CODEX_MODELS_FALLBACK])
 
     def test_connect_reports_dead_cli(self) -> None:
         with patch("agent_memory.runner.codex_auth_present", return_value=False):
