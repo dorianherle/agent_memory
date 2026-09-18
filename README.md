@@ -184,34 +184,21 @@ pip install -e ".[studio,cursor]"
 agent-memory studio
 ```
 
-Open a project folder and connect a Cursor API key in Settings. Install the
-project's memory integration with `agent-memory cursor install` first. Studio
-loads the selected folder’s MCP servers explicitly. It creates a goal from the
-first request and injects fresh memory before each send. Ordinary prompts and
-answers remain conversation; the agent explicitly saves durable knowledge. SDK
-project hooks are disabled so nested folders cannot write to a parent repository’s notebook.
-Keys entered in Settings stay in the running server session.
+Open a project folder and connect Codex (or a Cursor API key) in Settings.
+Install the project's memory integration with `agent-memory cursor install`
+first. `+ Goal` starts the same loop as `agent-memory run`: an isolated tree,
+failing pytests, then new agents until they pass. Resume continues the
+selected goal. Stop cancels the current worker. Keys stay in the running
+server session.
 
-The left overview keeps the goal and open questions visible. Summary commits
-fold completed notes into expandable groups; selecting a note opens its full
-text on the right. The agent creates summaries when milestones are complete;
-MCP save responses prompt it to make that decision. No manual summary step is needed.
-Original commits and snapshots stay retrievable. Summaries are scoped to the
-current memory branch, and later summaries absorb obsolete steering notes.
+The strip is every isolated goal and its pytest one-liner. The board is the
+selected run: agent index, live pytest tail, what the next agent will try
+(handoff), and what is stuck (open questions). Click either line — or More
+notes — for the full text. The notebook timeline stays in `.agent_memory/live/`.
 
-Grok 4.5 Fast is the default (high effort, Fast enabled). Studio prepares one unused agent ahead of the
-next message and replenishes it during each run. A standby has no conversation;
-memory is refreshed before sending. Changing project, key, or model invalidates it.
-The status shows when the next agent is ready. Run timing separates local agent
-wait, send startup, and time to first text; model/network latency still applies.
-Studio does not claim token savings: actual usage and a comparable full-chat
-baseline are not available. Click an **Agent** label
-in the conversation to inspect and copy the exact prompt text Studio sent; the
-provider's separate system prompt and tool schemas are not exposed by the SDK.
-
-Agent activity is separate from answer text. Cursor authentication, model, and
-usage-limit errors appear in the conversation; an accepted key does not guarantee
-remaining model allowance.
+Codex is used when `codex login` has already succeeded. Cursor is the fallback.
+Model and usage-limit errors appear in the header status; an accepted key does
+not guarantee remaining model allowance.
 
 ---
 

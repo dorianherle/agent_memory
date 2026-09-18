@@ -52,7 +52,7 @@ def observe_pytest(workspace: str | Path, extra: list[str] | None = None) -> dic
 
 def bootstrap_prompt(record: dict) -> str:
     return (
-        f"Goal [{record['id']}] {record['title']}\n"
+        f"Goal [{record['id']}] {record.get('goal') or record['title']}\n"
         f"Workspace: {record['workspace']}\n\n"
         "Inspect this repository. Write pytest(s) that encode the goal's "
         "acceptance criteria. Do not implement the feature. The new tests "
@@ -67,8 +67,12 @@ def work_prompt(record: dict, packet: str, pytest_result: dict) -> str:
         f"{packet}\n\n"
         f"Last pytest ({pytest_result.get('summary', '')}):\n"
         f"{pytest_result.get('tail', '')}\n\n"
-        "Make the failing tests pass. Do not retry an approach that produced "
-        "this same failure. Do not weaken the tests."
+        "Treat every explicit requirement in the Goal and latest Steering "
+        "section as required behavior. Before implementation, add a regression "
+        "test for every requirement that is not already covered, and confirm "
+        "that test fails for the "
+        "reported reason. Then make the failing tests pass. Do not retry an "
+        "approach that produced this same failure. Do not weaken the tests."
     )
 
 
@@ -116,10 +120,14 @@ def run_goal(
     """Create or resume a goal, then loop worker → pytest until green or max."""
     project = Path(project).resolve()
     last: dict = {}
+    start_agent = 0
+    pending_steering = None
     if goal_id:
         record = resolve_goal(project, goal_id)
         prior = read_status(project, record["id"])
         last = dict(prior.get("pytest") or {})
+        start_agent = int(prior.get("agent", -1)) + 1
+        pending_steering = prior.get("steering_pending")
         phase = prior.get("phase") or "bootstrap"
         if last.get("ok") is False:
             phase = "work"
@@ -129,7 +137,7 @@ def run_goal(
         record = create_goal(project, text)
         phase = "bootstrap"
     workspace = Path(record["workspace"])
-    for agent in range(max_agents):
+    for agent in range(start_agent, max_agents):
         packet = bind_packet(project, record["id"])
         prompt = (
             bootstrap_prompt(record)
@@ -162,6 +170,11 @@ def run_goal(
             state = "running"
         _save_observe(workspace, agent, last, next_step)
         status = _status_payload(record, agent, max_agents, phase, last, state)
+        if pending_steering:
+            if state == "passed":
+                status["steering_applied"] = pending_steering
+            else:
+                status["steering_pending"] = pending_steering
         write_status(project, record["id"], status)
         if on_observe:
             on_observe(status)

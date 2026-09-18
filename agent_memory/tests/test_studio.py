@@ -89,10 +89,15 @@ class StudioTests(MemoryTestCase):
         self.assertIn("GPT-5.6 Luna", html)
         self.assertIn("Open folder", html)
         self.assertIn("key-ok", html)
+        self.assertIn("+ Goal", html)
+        self.assertIn("Next agent", html)
+        self.assertIn("Steer this goal", html)
         self.assertNotIn('id="token-saved"', html)
         self.assertNotIn('id="show-all"', html)
-        self.assertIn('id="prompt-dialog"', html)
-        self.assertIn("view prompt", html)
+        self.assertNotIn('id="prompt-dialog"', html)
+        self.assertNotIn("view prompt", html)
+        self.assertNotIn('id="chat-tab"', html)
+        self.assertNotIn('id="standby"', html)
         self.assertNotIn("Open a project path", html)
         self.assertIn("Goal", html)
         self.assertNotIn("+ Summary", html)
@@ -135,6 +140,38 @@ class StudioTests(MemoryTestCase):
         status, data = self._json("GET", "/api/session")
         self.assertTrue(data["has_key"])
         self.assertEqual(data["worker"], "cursor")
+
+    def test_steer_selected_goal_updates_goal_memory(self) -> None:
+        from agent_memory.goals import create_goal
+
+        goal = create_goal(self.path, "Keep checkout reliable")
+        status, _ = self._json("POST", "/api/open", {"project": str(self.path)})
+        self.assertEqual(status, 200)
+
+        status, data = self._json(
+            "POST",
+            "/api/steer",
+            {"goal_id": goal["id"], "text": "Keep the public API unchanged"},
+        )
+        self.assertEqual(status, 200)
+        self.assertTrue(data["ok"])
+
+        status, view = self._json("GET", f"/api/memory?goal={goal['id']}")
+        self.assertEqual(status, 200)
+        self.assertIn("Steering", view["packet"])
+        self.assertIn("Keep the public API unchanged", view["packet"])
+        status, goals = self._json("GET", "/api/goals")
+        self.assertEqual(status, 200)
+        saved_status = goals["goals"][0]["status"]
+        self.assertEqual(saved_status["state"], "needs_attention")
+        self.assertEqual(saved_status["steering_pending"]["text"], "Keep the public API unchanged")
+
+    def test_steer_requires_goal_and_text(self) -> None:
+        status, _ = self._json("POST", "/api/open", {"project": str(self.path)})
+        self.assertEqual(status, 200)
+        status, data = self._json("POST", "/api/steer", {"goal_id": "", "text": "Keep it safe"})
+        self.assertEqual(status, 400)
+        self.assertIn("Select a goal", data["error"])
 
     def test_summary_children_and_branch_scope(self):
         goal = self.memory.save_user('Build a reliable notebook')

@@ -73,7 +73,9 @@ def _new_id(existing: set[str]) -> str:
 
 def _title(text: str) -> str:
     head = (text or "").strip().split("\n", 1)[0].strip()
-    return head[:90] or "untitled"
+    if len(head) > 90:
+        head = head[:89].rsplit(" ", 1)[0].rstrip() + "…"
+    return head or "untitled"
 
 
 def _is_git(project: Path) -> bool:
@@ -134,6 +136,7 @@ def create_goal(project: str | Path, text: str) -> dict:
     record = {
         "id": goal_id,
         "title": _title(text),
+        "goal": text,
         "workspace": str(workspace.relative_to(project)),
         "branch": branch,
         "created": datetime.now(timezone.utc).isoformat(),

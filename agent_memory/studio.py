@@ -15,6 +15,7 @@ from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 
 from agent_memory.core import Memory
+from agent_memory.goals import memory_for, read_status, write_status
 from agent_memory.studio_runtime import AgentConfig, DEFAULT_MODEL, StandbyAgent
 from agent_memory.prompt import _goal, _handoff, _headline, split_open_questions
 
@@ -684,6 +685,31 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(200, start_codex_login())
             except Exception as error:
                 return self._json(400, {"error": str(error)})
+        if path == "/api/steer":
+            text = str(data.get("text") or "").strip()
+            goal_id = str(data.get("goal_id") or "").strip()
+            project = SESSION.get("project") or ""
+            if not project:
+                return self._json(400, {"error": "Open a project first."})
+            if not goal_id:
+                return self._json(400, {"error": "Select a goal first."})
+            if not text:
+                return self._json(400, {"error": "Type a steering instruction."})
+            try:
+                memory = memory_for(project, goal_id)
+                try:
+                    item_id = memory.save_user(text)
+                finally:
+                    memory._catalog.close()
+            except (OSError, ValueError, RuntimeError) as error:
+                return self._json(400, {"error": str(error)})
+            current = read_status(project, goal_id)
+            current["steering_pending"] = {"id": item_id, "text": text}
+            current.pop("steering_applied", None)
+            if current.get("state") != "running":
+                current["state"] = "needs_attention"
+            write_status(project, goal_id, current)
+            return self._json(200, {"ok": True, "id": item_id, "text": text})
         if path == "/api/run":
             text = str(data.get("text") or data.get("question") or "").strip()
             goal_id = str(data.get("goal_id") or "").strip()

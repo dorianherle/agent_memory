@@ -24,6 +24,13 @@ def _git_init(path: Path) -> None:
 
 
 class GoalSpaceTests(MemoryTestCase):
+    def test_long_goal_keeps_full_text_and_has_clean_display_title(self) -> None:
+        text = "Implement the crash-safe concurrent ledger while preserving every explicit requirement across compaction"
+        record = create_goal(self.path, text)
+        self.assertEqual(record["goal"], text)
+        self.assertTrue(record["title"].endswith("…"))
+        self.assertFalse(record["title"].endswith(" …"))
+
     def test_create_lists_and_isolates_stores(self) -> None:
         first = create_goal(self.path, "Fix login p95")
         second = create_goal(self.path, "Export invoices")

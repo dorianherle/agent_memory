@@ -21,6 +21,15 @@ def _write(path: Path, text: str) -> None:
 
 
 class RunnerTests(MemoryTestCase):
+    def test_bootstrap_receives_full_goal_not_truncated_title(self) -> None:
+        goal = "Implement ledger. Preserve existing POSIX mode across compaction."
+
+        def worker(prompt: str, cwd: Path) -> None:
+            self.assertIn(goal, prompt)
+            _write(cwd / "tests" / "test_goal.py", "def test_red():\n    assert False\n")
+
+        run_goal(self.path, goal, worker=worker, max_agents=1)
+
     def test_fake_agents_go_red_then_green(self) -> None:
         def worker(prompt: str, cwd: Path) -> None:
             tests = cwd / "tests" / "test_goal.py"
@@ -78,6 +87,36 @@ class RunnerTests(MemoryTestCase):
         self.assertGreaterEqual(calls["n"], 3)
         self.assertEqual(status["state"], "passed")
         self.assertGreaterEqual(status["agent"], 2)
+
+    def test_resume_keeps_cumulative_agent_number_and_applies_steering(self) -> None:
+        calls = {"n": 0}
+
+        def worker(prompt: str, cwd: Path) -> None:
+            calls["n"] += 1
+            self.assertIn(
+                "Treat every explicit requirement in the Goal and latest Steering section",
+                prompt,
+            )
+            (cwd / "app.py").write_text("VALUE = 2\n")
+
+        def bootstrap(prompt: str, cwd: Path) -> None:
+            _write(cwd / "tests" / "test_goal.py", "from app import VALUE\n\ndef test_value():\n    assert VALUE == 2\n")
+            (cwd / "app.py").write_text("VALUE = 1\n")
+
+        first = run_goal(self.path, "VALUE must be 2", worker=bootstrap, max_agents=1)
+        self.assertEqual(first["agent"], 0)
+        memory = Memory(first["workspace"])
+        steering_id = memory.save_user("Keep the API unchanged")
+        first["state"] = "needs_attention"
+        first["steering_pending"] = {"id": steering_id, "text": "Keep the API unchanged"}
+        from agent_memory.goals import write_status
+        write_status(self.path, first["goal_id"], first)
+
+        final = run_goal(self.path, goal_id=first["goal_id"], worker=worker, max_agents=4)
+        self.assertEqual(final["state"], "passed")
+        self.assertEqual(final["agent"], 1)
+        self.assertEqual(final["steering_applied"]["id"], steering_id)
+        self.assertNotIn("steering_pending", final)
 
 
 class WorkerDetectTests(MemoryTestCase):

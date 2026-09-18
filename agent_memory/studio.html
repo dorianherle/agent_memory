@@ -5,8 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Agent Memory Studio</title>
     <style>
-:root{--paper:#f1f3f6;--card:#fff;--ink:#202938;--muted:#6d7788;--line:#e4e8ee;--accent:#3364d6;--soft:#edf3ff;--error:#b43b42;--radius:12px;color-scheme:light}
-*{box-sizing:border-box}body{margin:0;height:100dvh;display:grid;grid-template-rows:68px minmax(0,1fr);background:var(--paper);color:var(--ink);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 12px;transition:background .12s,border-color .12s}button:hover{background:var(--soft);border-color:#c8d5ee}button:disabled{opacity:.45;cursor:default}button.primary{background:var(--accent);border-color:var(--accent);color:white}input,textarea,select{border:1px solid var(--line);border-radius:8px;background:var(--card);padding:9px 11px;min-width:0}button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}header{display:flex;align-items:center;gap:16px;width:min(1540px,calc(100% - 48px));margin:auto}h1{font-size:16px;letter-spacing:-.45px;margin:0;white-space:nowrap}.brand{display:flex;align-items:center;gap:10px}.logo{display:grid;place-items:center;background:#202e48;color:white;width:32px;height:32px;border-radius:10px;font-size:22px;box-shadow:0 3px 8px #14203918}#folder{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:12px;border-left:1px solid #d9dfe8;padding-left:16px}#status{font-size:12px;color:var(--muted);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#status:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#8793a5;margin-right:7px}#status.connected{color:#238254}#status.connected:before{background:#238254}#status.error{color:var(--error)}#status.error:before{background:var(--error)}main{width:min(1540px,calc(100% - 48px));margin:0 auto 24px;display:grid;grid-template-columns:306px minmax(0,1fr);min-height:0;border:1px solid #dde3eb;border-radius:16px;overflow:hidden;box-shadow:0 8px 28px #23395706}.memory{display:flex;flex-direction:column;border-right:1px solid var(--line);min-height:0;background:#f8f9fb;padding:22px 16px 12px}.eyebrow{font-size:10px;font-weight:650;letter-spacing:1.15px;text-transform:uppercase;color:var(--muted);margin:0 0 9px}.context{margin:0 0 14px;padding:14px;background:white;border:1px solid var(--line);border-radius:10px;flex-shrink:0}.context h2{font-size:14px;line-height:1.55;font-weight:600;letter-spacing:-.15px;margin:0;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.context .small{display:block;margin-top:6px}.context.handoff{border-color:#d8e2f6;background:#f3f7ff}.handoff .eyebrow{color:#4970b5}.handoff p:last-child{font-size:12px;margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.muted{color:var(--muted)}.small{font-size:12px}.question{font-size:12px;margin:7px 0;border-left:2px solid #b3c3e3;padding-left:9px}.timeline-head{display:flex;align-items:center;justify-content:space-between;margin:9px 4px}.timeline-head .eyebrow{margin:0}.count{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}.memory-tools{display:flex;gap:6px;margin:0 0 12px}.memory-tools input{width:100%;background:#fff;font-size:12px;padding:8px 10px}#timeline{overflow:auto;min-height:0;flex:1;scrollbar-width:thin;scrollbar-color:#cbd3df transparent}.note{position:relative;margin:1px 0 2px;padding-left:13px}.note:before{content:"";position:absolute;left:3px;top:17px;width:5px;height:5px;background:#b7c2d4;border-radius:50%}.note:after{content:"";position:absolute;left:5px;top:25px;bottom:-5px;width:1px;background:#e0e5ed}.note:last-child:after{display:none}.note-button{display:block;text-align:left;width:100%;background:transparent;border:1px solid transparent;padding:8px 9px;border-radius:8px;overflow-wrap:anywhere}.note-button.selected{background:#e9effa;border-color:#d5e0f3}.note-title{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.5}.meta{display:block;font-size:10px;color:var(--muted);margin-top:4px}.summary>.note-button .note-title{font-weight:650}.summary:before{background:var(--accent);box-shadow:0 0 0 3px #e3ebfc}.summary details>summary{font-size:11px;color:var(--accent);padding:2px 9px 8px;cursor:pointer}.children{margin:0 0 6px 10px;padding-left:5px}.hint{color:var(--muted);font-size:13px;padding:14px 8px}.workspace{display:flex;flex-direction:column;min-height:0;min-width:0;background:white}.workspace-top{display:flex;align-items:center;gap:5px;padding:14px 24px;border-bottom:1px solid var(--line);min-height:59px}.tab{border-color:transparent;border-radius:7px;color:var(--muted);font-size:12px;padding:6px 10px}.tab[aria-selected=true]{background:#f0f3f8;color:var(--ink);font-weight:600}.workspace-top .session-label{margin-left:auto;font-size:11px;color:var(--muted);white-space:nowrap}.session-label:before{content:"";display:inline-block;width:6px;height:6px;background:#528e70;border-radius:50%;margin-right:7px}#chat{display:flex;flex-direction:column;min-height:0;flex:1}#thread{flex:1;overflow:auto;padding:28px max(32px,calc((100% - 760px)/2));scrollbar-width:thin}.empty{max-width:520px;margin:clamp(30px,10vh,160px) auto 32px}.empty .empty-icon{font-size:28px;display:grid;place-items:center;width:52px;height:52px;border:1px solid #dfe5ee;border-radius:16px;margin-bottom:23px;color:#395b95;background:linear-gradient(150deg,#f7faff,#edf2fb)}.empty h2{font-size:34px;line-height:1.2;letter-spacing:-1.2px;font-weight:600;margin:0 0 15px}.empty>p{color:var(--muted);margin:0;max-width:410px;font-size:14px;line-height:1.7}.suggestions{display:flex;gap:8px;flex-wrap:wrap;margin-top:25px}.suggestions button{font-size:12px;padding:9px 12px;color:#4c5b72;background:#fafbfd}.msg{margin:0 0 28px}.who{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:8px}.msg.agent .who:before{content:"≋";display:grid;place-items:center;width:21px;height:21px;border-radius:6px;background:#edf2fa;color:#3d608f;font-size:15px}.agent-prompt{border:0;background:transparent;padding:2px 0;border-radius:4px;color:var(--muted);font-size:11px;font-weight:600}.agent-prompt:not(:disabled):after{content:" · view prompt";font-weight:500;color:var(--accent)}.agent-prompt:not(:disabled):hover{background:transparent;color:var(--ink);text-decoration:underline;text-underline-offset:3px}.msg .body{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8;font-size:14px}.msg.user{margin-left:auto;max-width:88%}.msg.user .who{text-align:right;justify-content:flex-end}.msg.user .body{padding:12px 16px;border-radius:12px 12px 3px 12px;background:#f1f4f9}.msg.pending .body:empty:before{content:attr(data-phase);color:var(--muted);font-size:13px}.msg.pending .who:before{animation:breathe 1.4s ease-in-out infinite}.msg.error{color:var(--error)}.body pre{background:#f5f7fa;border:1px solid var(--line);padding:15px;border-radius:10px;overflow:auto;white-space:pre}.body code{font:12px/1.7 ui-monospace,monospace}.body h3{font-size:16px;margin:16px 0 4px}.body strong{font-weight:650}.run-status{display:flex;align-items:center;gap:10px;max-width:816px;width:100%;margin:0 auto;padding:0 28px;min-height:27px;color:var(--muted);font-size:11px}#activity:empty{display:none}#standby{margin-left:auto;font-size:11px}#standby[data-ready=true]{color:#438061}.composer-wrap{padding:8px 28px 19px;width:100%;max-width:816px;margin:0 auto}.composer{border:1px solid #dbe2ed;padding:9px 10px;border-radius:13px;background:white;box-shadow:0 3px 12px #23395706;transition:border-color .12s,box-shadow .12s}.composer:focus-within{border-color:#94addd;box-shadow:0 0 0 3px #3364d610}.composer textarea{display:block;width:100%;border:none;resize:none;min-height:62px;max-height:170px;background:transparent;padding:8px 6px;line-height:1.6}.composer textarea:focus-visible{outline:none}.composer-bottom{display:flex;align-items:center;gap:8px;padding:3px 3px 0}#model{border:0;padding:5px 2px;color:var(--muted);font-size:11px;max-width:190px;background:transparent}#send{margin-left:auto;border-radius:8px;padding:7px 13px;font-size:12px}#stop{margin-left:auto;color:var(--error);font-size:12px}.composer-note{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:10px;margin:9px 2px 0}#detail{overflow:auto;flex:1;padding:32px max(28px,calc((100% - 760px)/2))}#detail h2{font-size:25px;font-weight:600;letter-spacing:-.6px;line-height:1.4;overflow-wrap:anywhere}#detail .body{white-space:pre-wrap;overflow-wrap:anywhere}dialog{border:1px solid var(--line);border-radius:16px;padding:28px;width:min(490px,calc(100% - 32px));box-shadow:0 24px 80px #17251b22}dialog::backdrop{background:#18243d45;backdrop-filter:blur(3px)}dialog h2{margin:0 0 20px;font-size:21px;letter-spacing:-.5px}dialog label{display:block;font-size:12px;font-weight:600;margin:16px 0 6px}dialog input{width:100%}.dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}.dialog-head h2{margin:0}.prompt-dialog{width:min(840px,calc(100% - 32px));max-height:min(86vh,840px);overflow:auto}.prompt-dialog .prompt-note{margin:8px 0 16px}.prompt-dialog pre{margin:0;max-height:52vh;overflow:auto;border:1px solid var(--line);border-radius:10px;background:#f5f7fa;padding:16px;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace}.prompt-stats{margin:0 0 10px;color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}#keybox{display:flex;align-items:center;gap:8px}#key-ok{color:#438061;display:none}#keybox.ok #key-ok{display:inline}#settings-message{color:var(--muted);font-size:12px;overflow-wrap:anywhere}#settings-message[data-state=success]{color:#238254}#settings-message[data-state=error]{color:var(--error)}#memory-toggle{display:none}#memory-backdrop{display:none}[hidden]{display:none!important}@keyframes breathe{50%{opacity:.4}}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}@media(min-width:1800px){body{grid-template-rows:84px minmax(0,1fr)}main{margin-bottom:40px}}@media(max-width:900px){header{width:calc(100% - 24px);gap:10px}main{width:calc(100% - 24px);margin-bottom:12px;grid-template-columns:270px minmax(0,1fr)}#thread{padding:24px}.empty h2{font-size:28px}.workspace-top{padding:14px 16px}#status{max-width:180px}.composer-wrap{padding:8px 18px 17px}.workspace-top .session-label{display:none}}@media(max-width:700px){body{grid-template-rows:60px minmax(0,1fr)}header{gap:8px}header h1{font-size:14px}.brand{margin-right:auto}#folder{display:none}#status{display:none}header button{padding:7px 9px;font-size:11px}main{display:block;position:relative}#memory-toggle{display:block}.workspace{height:100%}.memory{display:none;position:absolute;top:0;bottom:0;left:0;width:min(300px,86%);z-index:3;box-shadow:15px 0 40px #17274225}main.memory-open .memory{display:flex}main.memory-open #memory-backdrop{display:block;position:absolute;inset:0;border:0;border-radius:0;background:#18243d35;z-index:2}.workspace-top{padding:10px 12px;min-height:55px}.empty{margin:6vh auto 20px}.empty h2{font-size:28px}.empty .empty-icon{margin-bottom:18px}#thread,#detail{padding:22px}.composer-wrap{padding:6px 13px 13px}.run-status{padding:0 18px}.composer-note{font-size:9px}.suggestions{gap:6px}.suggestions button{font-size:11px}.msg.user{max-width:95%}}
+:root{--paper:#f1f3f6;--card:#fff;--ink:#202938;--muted:#6d7788;--line:#e4e8ee;--accent:#3364d6;--soft:#edf3ff;--error:#b43b42;--ok:#238254;--run:#3364d6;color-scheme:light}
+*{box-sizing:border-box}body{margin:0;height:100dvh;display:grid;grid-template-rows:68px minmax(0,1fr);background:var(--paper);color:var(--ink);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 12px;transition:background .12s,border-color .12s}button:hover{background:var(--soft);border-color:#c8d5ee}button:disabled{opacity:.45;cursor:default}button.primary{background:var(--accent);border-color:var(--accent);color:white}
+input,textarea,select{border:1px solid var(--line);border-radius:8px;background:var(--card);padding:9px 11px;min-width:0}
+button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+header{display:flex;align-items:center;gap:16px;width:min(1100px,calc(100% - 48px));margin:auto}
+h1{font-size:16px;letter-spacing:-.45px;margin:0;white-space:nowrap}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{display:grid;place-items:center;background:#202e48;color:white;width:32px;height:32px;border-radius:10px;font-size:22px;box-shadow:0 3px 8px #14203918}
+#folder{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:12px;border-left:1px solid #d9dfe8;padding-left:16px}
+#worker-label{color:var(--muted);font-size:12px;white-space:nowrap}
+#status{margin-left:auto;font-size:12px;color:var(--muted);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#status:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#8793a5;margin-right:7px}
+#status.connected{color:var(--ok)}#status.connected:before{background:var(--ok)}
+#status.error{color:var(--error)}#status.error:before{background:var(--error)}
+main{width:min(1100px,calc(100% - 48px));margin:0 auto 24px;display:flex;flex-direction:column;min-height:0;border:1px solid #dde3eb;border-radius:16px;overflow:hidden;background:white;box-shadow:0 8px 28px #23395706}
+.eyebrow{font-size:10px;font-weight:650;letter-spacing:1.15px;text-transform:uppercase;color:var(--muted);margin:0 0 9px}
+.muted{color:var(--muted)}.small{font-size:12px}.hint{color:var(--muted);font-size:13px;padding:14px 8px}.error{color:var(--error)}
+.strip{display:flex;align-items:stretch;gap:8px;padding:14px 16px;border-bottom:1px solid var(--line);background:#f8f9fb;overflow-x:auto}
+#goals{display:flex;gap:8px;min-width:0;flex:1}
+.chip{flex:0 0 200px;text-align:left;padding:10px 12px;border-radius:10px;background:white}
+.chip.selected{border-color:#c8d5ee;background:#eef3fc;box-shadow:0 0 0 1px #c8d5ee}
+.chip .note-title{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.45;font-weight:600}
+.chip .meta{display:block;font-size:10px;color:var(--muted);margin-top:4px}
+.chip.run{border-color:#c5d4f3}.chip.run .meta{color:var(--run)}
+.chip.ok{border-color:#c9e4d4}.chip.ok .meta{color:var(--ok)}
+.chip.red{border-color:#efc4c6}.chip.red .meta{color:var(--error)}
+#new-goal-open{flex:0 0 auto;align-self:center}
+#stage{display:flex;flex-direction:column;min-height:0;flex:1}
+.empty{max-width:520px;margin:clamp(30px,10vh,120px) auto 32px;padding:0 28px}
+.empty-icon{font-size:28px;display:grid;place-items:center;width:52px;height:52px;border:1px solid #dfe5ee;border-radius:16px;margin-bottom:23px;color:#395b95;background:linear-gradient(150deg,#f7faff,#edf2fb)}
+.empty h2{font-size:34px;line-height:1.2;letter-spacing:-1.2px;font-weight:600;margin:0 0 15px}
+.empty>p{color:var(--muted);margin:0;max-width:410px;font-size:14px;line-height:1.7}
+#board{display:flex;flex-direction:column;min-height:0;flex:1}
+.run-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:22px 28px 8px}
+.run-head h2{font-size:26px;letter-spacing:-.6px;line-height:1.3;margin:4px 0 8px;overflow-wrap:anywhere}
+#run-state{font-size:11px;font-weight:650;letter-spacing:.08em;white-space:nowrap;padding:5px 8px;border-radius:6px;background:#f0f3f8}
+#run-state.run{color:var(--run);background:#edf3ff}#run-state.ok{color:var(--ok);background:#eaf6ef}#run-state.red{color:var(--error);background:#fceeee}
+#run-state.attention{color:#8a5a00;background:#fff4d6}
+#run-pytest{margin:0}#run-workspace{margin:0 0 8px;overflow-wrap:anywhere}
+#run-tail{flex:1;min-height:120px;margin:8px 28px 0;padding:16px;border:1px solid var(--line);border-radius:10px;background:#f5f7fa;overflow:auto;white-space:pre-wrap;font:12px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace}
+#packet{padding:16px 28px 0;display:flex;flex-direction:column;gap:8px}
+.packet-line{text-align:left;width:100%;padding:10px 12px;border-radius:10px}
+.packet-line .eyebrow{margin:0 0 4px}
+.packet-line p,.packet-line span{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin:0;font-size:13px}
+#handoff-card{border-color:#d8e2f6;background:#f3f7ff}
+.question{display:block;width:100%;text-align:left;border:0;background:transparent;padding:6px 0;border-left:2px solid #b3c3e3;padding-left:9px;font-size:12px}
+#more-notes{align-self:flex-start;font-size:12px;color:var(--accent);border:0;background:transparent;padding:4px 0}
+#more-notes:hover{background:transparent;text-decoration:underline}
+.run-actions{display:flex;justify-content:flex-end;gap:8px;padding:16px 28px 22px}
+#steer-open{margin-right:auto;color:var(--accent);border-color:#c8d5ee}
+#stop{color:var(--error)}
+.note-button{display:block;text-align:left;width:100%;background:transparent;border:1px solid transparent;padding:8px 9px;border-radius:8px;overflow-wrap:anywhere}
+.note-button.selected{background:#e9effa;border-color:#d5e0f3}
+.note-title{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.5}
+.meta{display:block;font-size:10px;color:var(--muted);margin-top:4px}
+.note{position:relative;margin:1px 0 2px;padding-left:13px}
+.note:before{content:"";position:absolute;left:3px;top:17px;width:5px;height:5px;background:#b7c2d4;border-radius:50%}
+.note:after{content:"";position:absolute;left:5px;top:25px;bottom:-5px;width:1px;background:#e0e5ed}
+.note:last-child:after{display:none}
+.summary>.note-button .note-title{font-weight:650}
+.summary:before{background:var(--accent);box-shadow:0 0 0 3px #e3ebfc}
+.summary details>summary{font-size:11px;color:var(--accent);padding:2px 9px 8px;cursor:pointer}
+.children{margin:0 0 6px 10px;padding-left:5px}
+.body{white-space:pre-wrap;overflow-wrap:anywhere}.body pre{background:#f5f7fa;border:1px solid var(--line);padding:15px;border-radius:10px;overflow:auto;white-space:pre}.body code{font:12px/1.7 ui-monospace,monospace}.body h3{font-size:16px;margin:16px 0 4px}.body strong{font-weight:650}
+dialog{border:1px solid var(--line);border-radius:16px;padding:28px;width:min(490px,calc(100% - 32px));box-shadow:0 24px 80px #17251b22}
+dialog::backdrop{background:#18243d45;backdrop-filter:blur(3px)}
+dialog h2{margin:0 0 20px;font-size:21px;letter-spacing:-.5px}
+dialog label{display:block;font-size:12px;font-weight:600;margin:16px 0 6px}
+dialog input,dialog textarea,dialog select{width:100%}
+.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+#keybox{display:flex;align-items:center;gap:8px}#key-ok{color:#438061;display:none}#keybox.ok #key-ok{display:inline}
+#settings-message{color:var(--muted);font-size:12px;overflow-wrap:anywhere}
+#settings-message[data-state=success]{color:var(--ok)}#settings-message[data-state=error]{color:var(--error)}
+#new-goal textarea{min-height:90px;resize:vertical}
+#note{width:min(640px,calc(100% - 32px));max-height:min(86vh,840px);overflow:auto}
+#note-body h2{font-size:22px;margin:0 0 8px}
+#timeline{max-height:36vh;overflow:auto;margin-top:8px}
+.memory-tools{margin:18px 0 8px}
+[hidden]{display:none!important}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media(max-width:700px){body{grid-template-rows:60px minmax(0,1fr)}header{width:calc(100% - 24px);gap:8px}header h1{font-size:14px}#folder,#worker-label{display:none}#status{max-width:140px}main{width:calc(100% - 24px);margin-bottom:12px}.run-head,#run-tail,#packet,.run-actions{padding-left:16px;padding-right:16px}.empty h2{font-size:28px}.chip{flex-basis:160px}}
     </style>
   </head>
   <body>
@@ -15,138 +95,111 @@
         <span class="logo" aria-hidden="true">≋</span>
         <h1>Agent Memory</h1>
       </div>
-      <span id="folder">No project open</span
-      ><span id="status" role="status">Open a project to begin</span
-      ><button id="pick">Open folder</button
-      ><button id="settings-open" aria-label="Connection settings">
-        Settings
-      </button>
+      <span id="folder">No project open</span>
+      <span id="worker-label">No agent login</span>
+      <span id="status" role="status">Open a project to begin</span>
+      <button id="pick">Open folder</button>
+      <button id="settings-open" aria-label="Connection settings">Settings</button>
     </header>
     <main id="app-shell">
-      <button id="memory-backdrop" aria-label="Close memory panel" tabindex="-1"></button>
-      <aside class="memory" aria-label="Memory overview">
-        <div class="timeline-head">
-          <p class="eyebrow">Goals</p><span class="count" id="goal-count"></span>
-        </div>
+      <div class="strip" aria-label="Goals">
         <div id="goals"><div class="hint">Open a folder to see its goals.</div></div>
-        <div class="context">
-          <p class="eyebrow">Selected goal</p>
-          <div id="goal">
-            <h2>No goal selected.</h2>
-            <span class="muted small"
-              >Start a goal or pick one to watch pytest.</span
-            >
-          </div>
+        <button id="new-goal-open">+ Goal</button>
+      </div>
+      <section id="stage" aria-label="Selected run">
+        <div class="empty" id="welcome">
+          <div class="empty-icon" aria-hidden="true">≋</div>
+          <h2>One board.<br />Goals that keep running.</h2>
+          <p>Write a goal. The next agent writes failing pytests, then new agents spawn on that tree until they pass.</p>
         </div>
-        <div class="context handoff" id="handoff-card" hidden><p class="eyebrow">Ready for the next agent</p><button class="note-button" id="handoff-text"></button></div>
-        <div class="context" id="questions" hidden></div>
-        <div class="timeline-head">
-          <p class="eyebrow">Memory trail</p><span class="count" id="note-count"></span>
-        </div>
-        <p id="memory-error" class="small" role="alert" hidden></p>
-        <div class="memory-tools"><input id="memory-search" type="search" placeholder="Find a memory…" aria-label="Search memory"></div>
-        <div id="timeline">
-          <div class="hint">Open a folder to browse its memory.</div>
-        </div>
-      </aside>
-      <section class="workspace" aria-label="Conversation and note details">
-        <div class="workspace-top" role="tablist">
-          <button id="memory-toggle" aria-label="Show memory panel" aria-expanded="false">☰</button>
-          <button
-            class="tab"
-            id="chat-tab"
-            role="tab"
-            aria-selected="true"
-            aria-controls="chat"
-          >
-            Board</button
-          ><button
-            class="tab"
-            id="detail-tab"
-            role="tab"
-            aria-selected="false"
-            aria-controls="detail"
-          >
-            Note details</button
-          ><span class="session-label" id="worker-label">No agent login</span>
-        </div>
-        <div id="chat" role="tabpanel">
-          <div id="thread">
-            <div class="empty" id="welcome">
-              <div class="empty-icon" aria-hidden="true">≋</div>
-              <h2>One board.<br>Goals that keep running.</h2>
-              <p>Write a goal. The next agent writes failing pytests, then new agents spawn on that tree until they pass.</p>
+        <div id="board" hidden>
+          <div class="run-head">
+            <div>
+              <p class="eyebrow" id="run-id">Goal</p>
+              <h2 id="run-title"></h2>
+              <p class="muted small" id="run-workspace"></p>
+              <p id="run-pytest"></p>
             </div>
+            <p id="run-state"></p>
           </div>
-          <div class="run-status"><span id="activity" role="status" aria-live="polite"></span><span id="standby"></span></div>
-          <div class="composer-wrap">
-            <form class="composer" id="ask">
-              <textarea
-                id="question"
-                aria-label="Message"
-                rows="2"
-                placeholder="New goal…"
-              ></textarea><div class="composer-bottom"><select id="model" aria-label="Agent model"><option value="gpt-5.6-luna">GPT-5.6 Luna</option></select
-              ><button id="resume" type="button" hidden>Resume</button
-              ><button id="stop" type="button" hidden>Stop</button
-              ><button class="primary" id="send" type="submit" disabled>
-                Run ↑
-              </button></div>
-            </form>
-            <p class="composer-note" id="composer-note">
-              Connect Codex or a Cursor key in Settings.
-            </p>
+          <pre id="run-tail"></pre>
+          <div id="packet">
+            <button type="button" class="packet-line" id="handoff-card" hidden>
+              <p class="eyebrow">Next agent</p>
+              <span id="handoff-text"></span>
+            </button>
+            <div class="packet-line" id="questions" hidden></div>
+            <p id="memory-error" class="small" role="alert" hidden></p>
+            <button type="button" id="more-notes">More notes</button>
           </div>
-        </div>
-        <div id="detail" role="tabpanel" hidden>
-          <p class="muted">
-            Select a note or summary in the overview to read it here.
-          </p>
+          <div class="run-actions">
+            <button id="steer-open" type="button">Steer this goal</button>
+            <button id="resume" type="button" hidden>Resume</button>
+            <button id="stop" type="button" hidden>Stop</button>
+          </div>
         </div>
       </section>
     </main>
     <dialog id="settings">
       <h2>Project & connection</h2>
       <form id="open">
-        <label for="project-path">Project folder</label
-        ><input id="project-path" placeholder="/path/to/your/project" />
+        <label for="project-path">Project folder</label>
+        <input id="project-path" placeholder="/path/to/your/project" />
         <div class="actions"><button type="submit">Open project</button></div>
       </form>
       <p class="small muted" id="worker-hint">Uses Codex if you already ran <code>codex login</code>. Cursor key is the fallback.</p>
       <label for="key">Cursor API key</label>
       <div id="keybox">
-        <input
-          id="key"
-          type="password"
-          placeholder="Cursor API key"
-          autocomplete="off"
-        /><span id="key-ok" aria-label="Connected">✓</span>
+        <input id="key" type="password" placeholder="Cursor API key" autocomplete="off" />
+        <span id="key-ok" aria-label="Connected">✓</span>
       </div>
       <p class="small muted">The key stays in this running server session.</p>
       <p id="settings-message" role="status"></p>
       <div class="actions">
-        <button id="settings-close">Close</button
-        ><button id="connect-codex" type="button">Connect Codex</button
-        ><button id="connect" class="primary">Connect Cursor</button>
+        <button id="settings-close">Close</button>
+        <button id="connect-codex" type="button">Connect Codex</button>
+        <button id="connect" class="primary">Connect Cursor</button>
       </div>
     </dialog>
-    <dialog id="prompt-dialog" class="prompt-dialog">
-      <div class="dialog-head">
-        <div>
-          <p class="eyebrow">Agent input</p>
-          <h2>Prompt sent by Studio</h2>
+    <dialog id="new-goal">
+      <h2>New goal</h2>
+      <form id="ask">
+        <label for="question">What should stay true when this is done?</label>
+        <textarea id="question" rows="3"></textarea>
+        <label for="model">Model</label>
+        <select id="model" aria-label="Agent model">
+          <option value="gpt-5.6-luna">GPT-5.6 Luna</option>
+        </select>
+        <p class="small muted" id="goal-note">Connect Codex or a Cursor key in Settings.</p>
+        <div class="actions">
+          <button id="new-goal-close" type="button">Cancel</button>
+          <button class="primary" id="send" type="submit" disabled>Run</button>
         </div>
-        <button id="prompt-close" aria-label="Close prompt">Close</button>
+      </form>
+    </dialog>
+    <dialog id="steer">
+      <h2>Steer this goal</h2>
+      <form id="steer-form">
+        <label for="steer-text">What should the next agent change or preserve?</label>
+        <textarea id="steer-text" rows="4" placeholder="Example: Keep the public API unchanged. Reproduce the timeout before changing retry logic."></textarea>
+        <p class="small muted">Saved as the latest steering instruction for this goal. The next agent will receive it.</p>
+        <p id="steer-message" class="small" role="status"></p>
+        <div class="actions">
+          <button id="steer-close" type="button">Cancel</button>
+          <button id="steer-save" class="primary" type="submit">Save steering</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="note">
+      <div id="note-body">
+        <p class="muted">Select a note to read it here.</p>
       </div>
-      <p class="small muted prompt-note">
-        Exact text passed to the Cursor SDK. Provider-added system instructions
-        and tool schemas are separate and are not exposed here.
-      </p>
-      <p class="prompt-stats" id="prompt-stats"></p>
-      <pre id="prompt-text"></pre>
-      <div class="actions">
-        <button id="prompt-copy">Copy prompt</button>
+      <div class="memory-tools">
+        <p class="eyebrow">More notes <span id="note-count"></span></p>
+        <input id="memory-search" type="search" placeholder="Find a memory…" aria-label="Search memory" />
       </div>
+      <div id="timeline"></div>
+      <div class="actions"><button id="note-close">Close</button></div>
     </dialog>
     <script>
       const $ = (id) => document.getElementById(id);
@@ -163,9 +216,11 @@
         memoryJSON: "",
         memoryETag: "",
         refreshing: false,
+        startedAt: 0,
         noteCache: new Map(),
       };
       const expanded = new Set();
+      const welcomeHTML = $("welcome").innerHTML;
       const esc = (value) =>
         String(value ?? "").replace(
           /[&<>"']/g,
@@ -219,23 +274,6 @@
         $("status").classList.toggle("error", error);
         $("status").classList.toggle("connected", connected && !error);
       }
-      const estimateTokens = (text) =>
-        Math.max(0, Math.ceil(String(text || "").length / 4));
-      const formatTokens = (value) =>
-        value >= 1000000
-          ? (value / 1000000).toFixed(value >= 10000000 ? 0 : 1) + "M"
-          : value >= 1000
-            ? (value / 1000).toFixed(value >= 10000 ? 0 : 1) + "k"
-            : String(value);
-
-      function showAgentPrompt(node) {
-        if (!node?._promptText) return;
-        $("prompt-text").textContent = node._promptText;
-        $("prompt-stats").textContent =
-          "≈" + formatTokens(node._promptTokens || estimateTokens(node._promptText)) +
-          " input tokens in the Studio prompt";
-        $("prompt-dialog").showModal();
-      }
       function canLaunch() {
         return state.worker === "codex" || state.worker === "cursor" || state.worker === "test" || state.hasKey;
       }
@@ -253,53 +291,78 @@
         $("question").disabled = false;
         $("send").disabled = state.busy || !launch;
         $("resume").hidden = state.busy || !state.goalId;
-        $("resume").disabled = $("send").disabled;
+        $("resume").disabled = !launch;
         $("stop").hidden = !state.busy;
-        $("send").hidden = state.busy;
+        $("new-goal-open").disabled = state.busy;
         $("pick").disabled = state.busy;
         $("model").disabled = state.busy;
         $("worker-label").textContent = workerLabel();
-        $("composer-note").textContent = !launch
+        $("goal-note").textContent = !launch
           ? "Connect Codex or a Cursor key in Settings."
           : !state.project
-            ? "Type a goal, then Run — you will pick a folder."
-            : "Enter to run a new goal · Resume continues the selected one";
+            ? "Run will ask you to pick a folder."
+            : "Enter starts a new isolated goal.";
       }
-      function tab(name) {
-        for (const id of ["chat", "detail"]) {
-          $(id).hidden = id !== name;
-          $(id + "-tab").setAttribute("aria-selected", String(id === name));
-        }
-      }
-      $("chat-tab").onclick = () => tab("chat");
-      $("detail-tab").onclick = () => tab("detail");
       function allNotes(items) {
         return items.flatMap((c) => [c, ...allNotes(c.children || [])]);
       }
+      function tone(status) {
+        const pytest = (status && status.pytest) || {};
+        const running =
+          (status && status.state) === "running" ||
+          (state.busy && status && (status.goal_id || state.goalId) === state.goalId && status.state !== "passed");
+        if (running) return "run";
+        if ((status && status.state) === "needs_attention" || status?.steering_pending) return "attention";
+        if ((status && status.state) === "passed" || pytest.ok === true) return "ok";
+        if (pytest.ok === false || (status && status.state) === "failed") return "red";
+        return "idle";
+      }
+      function runLabel(status) {
+        const name = (status && status.state) || "";
+        if (name === "passed") return "PASSED";
+        if (name === "stopped") return "STOPPED";
+        if (name === "needs_attention" || status?.steering_pending) return "NEEDS VERIFICATION";
+        if (name === "running" || state.busy) return "RUNNING";
+        if (status && status.pytest && status.pytest.ok === false) return "FAILED";
+        return (name || "IDLE").toUpperCase();
+      }
+      function resetStage() {
+        $("welcome").hidden = false;
+        $("welcome").innerHTML = welcomeHTML;
+        $("board").hidden = true;
+        $("handoff-card").hidden = true;
+        $("questions").hidden = true;
+        $("memory-error").hidden = true;
+        $("note-body").innerHTML = '<p class="muted">Select a note to read it here.</p>';
+      }
       async function showNote(id) {
-        let note = allNotes(state.commits).find((c) => c.id === id);
-        if (!note) return;
+        if (!id) {
+          $("note-body").innerHTML = '<p class="muted">Notes for this goal.</p>';
+          $("note").showModal();
+          return;
+        }
         state.selected = id;
-        tab("detail");
-        $("detail").innerHTML = `<p class="eyebrow">Memory note</p><h2>${esc(note.title)}</h2><p class="muted">Loading details…</p>`;
+        $("note").showModal();
+        $("note-body").innerHTML = `<p class="eyebrow">Memory note</p><h2>Loading details…</h2>`;
+        let note = allNotes(state.commits).find((c) => c.id === id) || { id, title: id, kind: "note", at: Date.now(), text: undefined };
         if (note.text === undefined) {
           try {
             const full = state.noteCache.get(id) || await api("/api/note?id=" + encodeURIComponent(id) + (state.goalId ? "&goal=" + encodeURIComponent(state.goalId) : ""));
             state.noteCache.set(id, full);
             if (state.selected !== id) return;
-            note = {...note, ...full};
-          } catch (error) { if (state.selected === id) $("detail").innerHTML = `<p class="error">${esc(error.message)}</p>`; return; }
+            note = { ...note, ...full };
+          } catch (error) {
+            if (state.selected === id) $("note-body").innerHTML = `<p class="error">${esc(error.message)}</p>`;
+            return;
+          }
         }
         const children = note.children || [];
-        $("detail").innerHTML =
-          `<p class="eyebrow">${esc(note.kind === "summary" ? "Summary commit" : note.kind === "user" ? "User note" : "Memory note")}</p><h2>${esc(note.title)}</h2><p class="muted small">${esc(note.id)} · ${esc(new Date(note.at).toLocaleString())}${note.agent ? " · " + esc(note.agent) : ""}</p><div class="body">${rich(note.text.slice(note.title.length).trim())}</div>${children.length ? `<p class="eyebrow" style="margin-top:30px">Grouped commits · ${children.length}</p>` + children.map((c) => noteButton(c)).join("") : ""}`;
-        document
-          .querySelectorAll(".note-button")
-          .forEach((el) =>
-            el.classList.toggle("selected", el.dataset.note === id),
-          );
-        tab("detail");
-        toggleMemory(false);
+        const body = (note.text || "").slice((note.title || "").length).trim();
+        $("note-body").innerHTML =
+          `<p class="eyebrow">${esc(note.kind === "summary" ? "Summary commit" : note.kind === "user" ? "User note" : note.kind === "open_question" ? "Open question" : "Memory note")}</p><h2>${esc(note.title || note.id)}</h2><p class="muted small">${esc(note.id)} · ${esc(note.at ? new Date(note.at).toLocaleString() : "")}${note.agent ? " · " + esc(note.agent) : ""}</p><div class="body">${rich(body)}</div>${children.length ? `<p class="eyebrow" style="margin-top:30px">Grouped commits · ${children.length}</p>` + children.map((c) => noteButton(c)).join("") : ""}`;
+        document.querySelectorAll(".note-button").forEach((el) =>
+          el.classList.toggle("selected", el.dataset.note === id),
+        );
       }
       function noteButton(c) {
         return `<button class="note-button${state.selected === c.id ? " selected" : ""}" data-note="${esc(c.id)}"><span class="note-title">${esc(c.title)}</span><span class="meta">${esc(c.kind === "summary" ? "Summary" : c.kind === "user" ? "You" : c.kind === "answer" ? "Agent" : c.kind === "open_question" ? "Open question" : "Note")} · ${esc(c.id)}</span></button>`;
@@ -310,24 +373,30 @@
       }
       function renderGoals(rows) {
         state.goals = rows || [];
-        $("goal-count").textContent = state.goals.length
-          ? state.goals.length + (state.goals.length === 1 ? " goal" : " goals")
-          : "";
         $("goals").innerHTML = state.goals.length
           ? state.goals.map((g) => {
               const pytest = (g.status && g.status.pytest) || {};
               const line = pytest.summary || g.status?.state || "no run yet";
-              return `<button class="note-button${state.goalId === g.id ? " selected" : ""}" data-goal="${esc(g.id)}"><span class="note-title">${esc(g.title)}</span><span class="meta">${esc(g.id)} · ${esc(line)}</span></button>`;
+              const kind = tone({ ...g.status, goal_id: g.id });
+              return `<button class="chip ${kind}${state.goalId === g.id ? " selected" : ""}" data-goal="${esc(g.id)}"><span class="note-title">${esc(g.title)}</span><span class="meta">${esc(line)}</span></button>`;
             }).join("")
-          : '<div class="hint">No isolated goals yet. Type one below and Run.</div>';
+          : '<div class="hint">No isolated goals yet. Use + Goal to start one.</div>';
       }
-      function showBoard(status) {
-        const pytest = (status && status.pytest) || {};
-        $("welcome")?.remove();
-        const existing = $("board");
-        const html = `<div class="empty" id="board"><p class="eyebrow">Goal [${esc(status.goal_id || state.goalId)}]</p><h2>${esc(status.goal || "Running")}</h2><p class="muted">${esc(status.workspace || "")}</p><p>Agent ${esc(status.agent ?? "—")} · ${esc(pytest.summary || "waiting for pytest")} · ${esc(status.state || "")}</p><pre style="white-space:pre-wrap">${esc(pytest.tail || "")}</pre></div>`;
-        if (existing) existing.outerHTML = html;
-        else $("thread").insertAdjacentHTML("afterbegin", html);
+      function showBoard(payload) {
+        const pytest = (payload && payload.pytest) || {};
+        const kind = tone(payload);
+        $("welcome").hidden = true;
+        $("board").hidden = false;
+        $("run-id").textContent = "Goal [" + (payload.goal_id || state.goalId || "") + "]";
+        $("run-title").textContent = payload.goal || "Running";
+        $("run-workspace").textContent = payload.workspace || "";
+        $("run-pytest").textContent =
+          "Agent " + (payload.agent ?? "—") +
+          (payload.max_agents != null ? "/" + payload.max_agents : "") +
+          " · " + (pytest.summary || "waiting for pytest");
+        $("run-state").textContent = runLabel(payload);
+        $("run-state").className = kind;
+        $("run-tail").textContent = pytest.tail || "";
       }
       function renderMemory(data) {
         $("memory-error").hidden = true;
@@ -335,39 +404,37 @@
         const serial = JSON.stringify(data);
         if (serial === state.memoryJSON) return;
         state.memoryJSON = serial;
-        $("goal").innerHTML = data.goal
-          ? `<button class="note-button" data-note="${esc(data.goal.id)}"><h2>${esc(data.goal.text)}</h2><span class="meta">View goal</span></button>`
-          : '<h2>No goal yet.</h2><span class="muted small">Your first message starts the job.</span>';
         const questions = data.questions || [];
         $("questions").hidden = !questions.length;
         $("questions").innerHTML =
-          '<p class="eyebrow">Open questions</p>' +
+          '<p class="eyebrow">Stuck</p>' +
           questions
-            .map((q) => `<p class="question">${esc(q.text)}</p>`)
+            .map((q) => `<button type="button" class="question" data-note="${esc(q.id)}">${esc(q.text)}</button>`)
             .join("");
         $("handoff-card").hidden = !data.handoff;
         $("handoff-text").textContent = data.handoff?.text || "";
-        $("handoff-text").dataset.note = data.handoff?.id || "";
+        $("handoff-card").dataset.note = data.handoff?.id || "";
         state.pinned = new Set([data.goal?.id, ...questions.map((q) => q.id)]);
         renderTimeline();
       }
       function renderTimeline() {
         const query = $("memory-search").value.trim().toLowerCase();
         const source = query ? allNotes(state.commits) : state.commits;
-        const durable = allNotes(state.commits).filter(c => !["user","answer"].includes(c.kind) || state.pinned?.has(c.id));
-        const notes = source.filter(c => (query || !state.pinned?.has(c.id)) && !["user","answer"].includes(c.kind) && (!query || c.title.toLowerCase().includes(query)));
-        $("note-count").textContent = durable.length + (durable.length === 1 ? " memory" : " memories");
-        $("timeline").innerHTML = notes.map(query ? noteButton : noteHTML).join("") || '<div class="hint">' + (query ? 'No matching memories.' : (state.commits.length ? 'No durable notes yet.' : 'No saved memories in this folder yet.')) + '</div>';
+        const durable = allNotes(state.commits).filter((c) => !["user", "answer"].includes(c.kind) || state.pinned?.has(c.id));
+        const notes = source.filter((c) => (query || !state.pinned?.has(c.id)) && !["user", "answer"].includes(c.kind) && (!query || c.title.toLowerCase().includes(query)));
+        $("note-count").textContent = durable.length ? "(" + durable.length + ")" : "";
+        $("timeline").innerHTML = notes.map(query ? noteButton : noteHTML).join("") || '<div class="hint">' + (query ? "No matching memories." : (state.commits.length ? "No durable notes yet." : "No saved memories in this folder yet.")) + "</div>";
       }
       $("memory-search").oninput = renderTimeline;
-      function toggleMemory(open) { $("app-shell").classList.toggle("memory-open", open); $("memory-toggle").setAttribute("aria-expanded", open); }
-      $("memory-toggle").onclick = () => toggleMemory(!$("app-shell").classList.contains("memory-open"));
-      $("memory-backdrop").onclick = () => toggleMemory(false);
       async function refreshGoals() {
         if (!state.project) return;
         try {
           const data = await api("/api/goals");
           renderGoals(data.goals || []);
+          if (!state.goalId && state.goals.length) {
+            const preferred = state.goals.find((g) => ["running", "needs_attention"].includes(g.status?.state)) || state.goals[state.goals.length - 1];
+            selectGoal(preferred.id);
+          }
         } catch (_) {}
       }
       async function refreshMemory() {
@@ -376,7 +443,7 @@
         state.refreshing = true;
         try {
           const goalQ = state.goalId ? "&goal=" + encodeURIComponent(state.goalId) : "";
-          const response = await fetch("/api/memory?compact=1" + goalQ, {headers: state.memoryETag ? {"If-None-Match": state.memoryETag} : {}});
+          const response = await fetch("/api/memory?compact=1" + goalQ, { headers: state.memoryETag ? { "If-None-Match": state.memoryETag } : {} });
           if (response.status === 304) return;
           const data = await response.json();
           if (!response.ok) throw new Error(data.error || "Memory unavailable");
@@ -387,8 +454,9 @@
         } catch (error) {
           $("memory-error").hidden = false;
           $("memory-error").textContent = "Could not refresh memory: " + error.message;
+        } finally {
+          state.refreshing = false;
         }
-        finally { state.refreshing = false; }
       }
       function selectGoal(id) {
         state.goalId = id;
@@ -402,8 +470,6 @@
         refreshMemory();
       }
       document.addEventListener("click", (event) => {
-        const suggestion = event.target.closest("[data-prompt]");
-        if (suggestion) { $("question").value = suggestion.dataset.prompt; $("question").focus(); }
         const goal = event.target.closest("[data-goal]");
         if (goal) { selectGoal(goal.dataset.goal); return; }
         const button = event.target.closest("[data-note]");
@@ -434,31 +500,18 @@
           state.noteCache.clear();
           state.commits = [];
           state.pinned = new Set();
-          $("goal").innerHTML = '<h2>Loading memory…</h2>';
-          $("timeline").innerHTML = '<div class="hint">Loading saved notes…</div>';
-          $("handoff-card").hidden = true;
-          $("questions").hidden = true;
           state.selected = null;
           expanded.clear();
-          $("activity").textContent = "";
-          $("activity").removeAttribute("title");
           $("question").value = "";
           state.goalId = "";
           state.goals = [];
-          $("thread").innerHTML = welcomeHTML;
-          $("thread").querySelector("h2").textContent = "Ready to run a goal.";
-          $("detail").innerHTML =
-            '<p class="muted">Select a note or summary to read it here.</p>';
-          tab("chat");
+          resetStage();
+          $("goals").innerHTML = '<div class="hint">Loading goals…</div>';
         }
-        status(
-          data.ready ? "Memory connected" : data.hint || "Memory setup needed",
-          false, data.ready,
-        );
+        status(data.ready ? "Ready" : data.hint || "Memory setup needed", false, data.ready);
         controls();
         refreshGoals();
         refreshMemory();
-        refreshStandby();
       }
       async function openProject(url, extra = {}) {
         try {
@@ -478,27 +531,44 @@
       };
       $("settings-open").onclick = () => $("settings").showModal();
       $("settings-close").onclick = () => $("settings").close();
-      $("prompt-close").onclick = () => $("prompt-dialog").close();
-      $("prompt-copy").onclick = async () => {
-        try {
-          await navigator.clipboard.writeText($("prompt-text").textContent);
-          $("prompt-copy").textContent = "Copied";
-        } catch (_) {
-          $("prompt-copy").textContent = "Copy failed";
-        }
-        setTimeout(() => { $("prompt-copy").textContent = "Copy prompt"; }, 1200);
+      $("new-goal-open").onclick = () => { $("new-goal").showModal(); $("question").focus(); };
+      $("new-goal-close").onclick = () => $("new-goal").close();
+      $("steer-open").onclick = () => {
+        $("steer-text").value = "";
+        $("steer-message").textContent = "";
+        $("steer").showModal();
+        $("steer-text").focus();
       };
+      $("steer-close").onclick = () => $("steer").close();
+      $("steer-form").onsubmit = async (event) => {
+        event.preventDefault();
+        const text = $("steer-text").value.trim();
+        if (!text || !state.goalId) return;
+        $("steer-save").disabled = true;
+        $("steer-message").textContent = "Saving…";
+        try {
+          await api("/api/steer", { goal_id: state.goalId, text });
+          $("steer").close();
+          status("Steering saved for the next agent", false, state.ready);
+          state.memoryJSON = "";
+          state.memoryETag = "";
+          await refreshGoals();
+          await refreshMemory();
+        } catch (error) {
+          $("steer-message").textContent = error.message;
+          $("steer-message").className = "small error";
+        } finally {
+          $("steer-save").disabled = false;
+        }
+      };
+      $("note-close").onclick = () => $("note").close();
+      $("more-notes").onclick = () => showNote(null);
       async function loadModels() {
         try {
           const data = await api("/api/models");
           const models = data.models || [];
-          const current =
-            data.model ||
-            localStorage.getItem("studio-model-v3") ||
-            $("model").value;
-          $("model").innerHTML = models
-            .map((m) => `<option value="${esc(m.id)}">${esc(m.name)}</option>`)
-            .join("");
+          const current = data.model || localStorage.getItem("studio-model-v3") || $("model").value;
+          $("model").innerHTML = models.map((m) => `<option value="${esc(m.id)}">${esc(m.name)}</option>`).join("");
           if (models.some((m) => m.id === current)) $("model").value = current;
           else if (models[0]) $("model").value = models[0].id;
         } catch (error) {
@@ -529,7 +599,6 @@
           if (session.worker === "codex") {
             await loadModels();
             $("settings").close();
-            $("question").focus();
           }
         } catch (error) {
           $("settings-message").dataset.state = "error";
@@ -543,15 +612,11 @@
         $("settings-message").textContent = "Connecting…";
         $("settings-message").dataset.state = "pending";
         try {
-          const data = await api("/api/key", {
-            api_key: $("key").value.trim(),
-          });
+          const data = await api("/api/key", { api_key: $("key").value.trim() });
           state.hasKey = data.ok;
           $("settings-message").dataset.state = data.ok ? "success" : "error";
           $("keybox").classList.toggle("ok", data.ok);
-          $("settings-message").textContent = data.ok
-            ? "Connected."
-            : data.error;
+          $("settings-message").textContent = data.ok ? "Connected." : data.error;
           if (data.ok) {
             $("key").value = "";
             $("key").placeholder = "Connected for this session";
@@ -566,41 +631,24 @@
           controls();
         }
       };
-      function addMessage(role, text) {
-        $("welcome")?.remove();
-        const node = document.createElement("div");
-        node.className = "msg " + role;
-        node.innerHTML = role === "user"
-          ? '<div class="who">You</div><div class="body"></div>'
-          : '<div class="who"><button type="button" class="agent-prompt" disabled title="The prompt becomes available after Studio sends the request.">Agent</button></div><div class="body"></div>';
-        node.querySelector(".agent-prompt")?.addEventListener("click", () =>
-          showAgentPrompt(node),
-        );
-        node.querySelector(".body").textContent = text;
-        $("thread").appendChild(node);
-        return node.querySelector(".body");
-      }
       async function startRun(payload) {
         state.busy = true;
-        status("Agent running");
+        state.startedAt = Date.now();
+        status("Agent running · " + $("model").selectedOptions[0].text);
         controls();
-        tab("chat");
-        $("activity").textContent = "Starting…";
-        const startedAt = performance.now();
-        let failed = false,
-          ended = false;
+        $("new-goal").close();
+        let failed = false, ended = false;
         function receive(event) {
           if (event.type === "memory") { refreshMemory(); refreshGoals(); }
-          if (event.type === "status") $("activity").textContent = event.text || "Running…";
+          if (event.type === "status") status(event.text || "Running…");
           if (event.type === "observe") {
             state.goalId = event.goal_id || state.goalId;
             showBoard(event);
-            $("activity").textContent = `[${event.goal_id}] agent ${event.agent} ${event.pytest?.summary || ""}`;
+            status("Agent " + event.agent + " · " + (event.pytest?.summary || "running"));
           }
           if (event.type === "error") {
             failed = true;
             status(event.message, true);
-            $("activity").textContent = event.message;
           }
           if (event.type === "done") {
             ended = true;
@@ -608,58 +656,43 @@
               state.goalId = event.result.goal_id || state.goalId;
               showBoard(event.result);
             }
-            if (!failed)
+            if (!failed) {
+              const stopped = event.status === "cancelled" || event.status === "stopped";
               status(
-                event.status === "cancelled" || event.status === "stopped" ? "Stopped" : "Goal " + (event.status || "done"),
-                false, event.status !== "cancelled" && state.ready,
+                stopped ? "Stopped" : event.status === "error" ? "Run failed." : "Goal " + (event.status || "done"),
+                event.status === "error",
+                !stopped && event.status !== "error" && state.ready,
               );
-            $("activity").textContent =
-              event.status === "cancelled" || event.status === "stopped"
-                ? "Stopped."
-                : event.status === "error"
-                  ? "Run failed."
-                  : "Finished in " + ((performance.now() - startedAt) / 1000).toFixed(1) + "s";
-            refreshStandby();
+            }
           }
         }
         try {
           const res = await fetch("/api/run", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...payload, model: $("model").value }),
+            body: JSON.stringify(payload),
           });
-          if (!res.ok || !res.body)
-            throw new Error(
-              (await res.json()).error || "Could not start agent",
-            );
-          const reader = res.body.getReader(),
-            decoder = new TextDecoder();
+          if (!res.ok || !res.body) throw new Error((await res.json()).error || "Could not start agent");
+          const reader = res.body.getReader(), decoder = new TextDecoder();
           let buf = "";
           while (true) {
             const { value, done } = await reader.read();
-            buf += done
-              ? decoder.decode()
-              : decoder.decode(value, { stream: true });
+            buf += done ? decoder.decode() : decoder.decode(value, { stream: true });
             const lines = buf.split("\n");
             buf = lines.pop() || "";
-            for (const line of lines)
-              if (line.trim()) receive(JSON.parse(line));
-            $("thread").scrollTop = $("thread").scrollHeight;
+            for (const line of lines) if (line.trim()) receive(JSON.parse(line));
             if (ended) { reader.cancel().catch(() => {}); break; }
             if (done) break;
           }
           if (buf.trim()) receive(JSON.parse(buf));
-          if (!ended && !failed)
-            throw new Error("Connection ended before the agent finished.");
+          if (!ended && !failed) throw new Error("Connection ended before the agent finished.");
         } catch (error) {
           failed = true;
           status(error.message, true);
-          $("activity").textContent = error.message;
         } finally {
           state.busy = false;
+          state.startedAt = 0;
           controls();
-          if (failed)
-            $("activity").textContent = "Check the error above and retry.";
           await refreshGoals();
           await refreshMemory();
         }
@@ -676,12 +709,12 @@
         await startRun({ text, model: $("model").value });
       };
       $("resume").onclick = async () => {
-        if (!state.goalId || $("send").disabled) return;
+        if (!state.goalId || !canLaunch() || state.busy) return;
         await startRun({ goal_id: state.goalId });
       };
       $("stop").onclick = async () => {
         $("stop").disabled = true;
-        $("activity").textContent = "Stopping…";
+        status("Stopping…");
         try {
           await api("/api/cancel", {});
         } catch (error) {
@@ -702,7 +735,7 @@
           const session = await api("/api/session");
           state.hasKey = session.has_key;
           state.worker = session.worker || "none";
-          state.goalId = session.goal_id || "";
+          const resumeId = session.goal_id || "";
           $("keybox").classList.toggle("ok", session.has_key);
           let modelsReady = Promise.resolve();
           if (session.worker === "codex" || session.has_key) {
@@ -722,36 +755,38 @@
           await modelsReady;
           if (state.project && canLaunch() && !session.running && session.model !== $("model").value)
             await api("/api/model", { model: $("model").value });
+          if (resumeId) {
+            await refreshGoals();
+            if (state.goals.find((g) => g.id === resumeId)) selectGoal(resumeId);
+          }
           controls();
         } catch (error) {
           status("Studio server unavailable: " + error.message, true);
         }
       }
-      const welcomeHTML = $("thread").innerHTML;
-      init();
-      async function refreshStandby() {
-        if (!state.project || document.hidden) return;
+      async function refreshSession() {
+        if (document.hidden) return;
         try {
           const session = await api("/api/session");
           state.worker = session.worker || state.worker;
+          state.hasKey = session.has_key;
           if (session.project === state.project && state.ready !== session.ready) {
             state.ready = session.ready;
-            controls();
-            if (!state.busy) status(session.ready ? "Memory connected" : "Memory setup needed", false, session.ready);
+            if (!state.busy) status(session.ready ? "Ready" : "Memory setup needed", false, session.ready);
           }
-          $("standby").dataset.ready = session.standby === "ready";
-          $("standby").textContent =
-            session.standby === "ready"
-              ? "Next agent ready"
-              : session.standby === "preparing"
-                ? "Preparing next agent…"
-                : "";
-        } catch (_) { $("standby").textContent = "Connection lost"; $("standby").dataset.ready = "false"; }
+          controls();
+        } catch (_) {}
       }
+      init();
       setInterval(() => {
+        if (state.busy && state.startedAt) {
+          const seconds = Math.floor((Date.now() - state.startedAt) / 1000);
+          const elapsed = seconds < 60 ? seconds + "s" : Math.floor(seconds / 60) + "m " + (seconds % 60) + "s";
+          status("Agent running · " + $("model").selectedOptions[0].text + " · " + elapsed);
+        }
         refreshGoals();
         refreshMemory();
-        refreshStandby();
+        refreshSession();
       }, 4000);
     </script>
   </body>

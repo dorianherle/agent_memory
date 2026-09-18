@@ -53,7 +53,7 @@ def main(argv: list[str] | None = None) -> None:
 
     studio = sub.add_parser(
         "studio",
-        help="Local Cursor SDK chat: fresh agent per question, memory on the side",
+        help="Local goal board: auto-run isolated goals against pytest",
     )
     studio.add_argument("--host", default="127.0.0.1")
     studio.add_argument("--port", type=int, default=8788)
