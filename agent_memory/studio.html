@@ -5,62 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Agent Memory Studio</title>
     <style>
-:root{--paper:#f1f3f6;--card:#fff;--ink:#202938;--muted:#6d7788;--line:#e4e8ee;--accent:#3364d6;--soft:#edf3ff;--error:#b43b42;--ok:#238254;--run:#3364d6;color-scheme:light}
-*{box-sizing:border-box}body{margin:0;height:100dvh;display:grid;grid-template-rows:68px minmax(0,1fr);background:var(--paper);color:var(--ink);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
-button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 12px;transition:background .12s,border-color .12s}button:hover{background:var(--soft);border-color:#c8d5ee}button:disabled{opacity:.45;cursor:default}button.primary{background:var(--accent);border-color:var(--accent);color:white}
+:root{--paper:#eef1f5;--card:#fff;--ink:#1b2430;--muted:#667085;--line:#e2e6ed;--accent:#2f5fdb;--soft:#eef3ff;--error:#b43b42;--ok:#1f7a4d;--run:#2f5fdb;--wait:#8a5a00;color-scheme:light}
+*{box-sizing:border-box}body{margin:0;height:100dvh;display:grid;grid-template-rows:56px minmax(0,1fr);background:var(--paper);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 12px}button:hover{background:var(--soft);border-color:#c8d5ee}button:disabled{opacity:.45;cursor:default}button.primary{background:var(--accent);border-color:var(--accent);color:#fff}button.primary:hover{background:#2754c6}
 input,textarea,select{border:1px solid var(--line);border-radius:8px;background:var(--card);padding:9px 11px;min-width:0}
-button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-header{display:flex;align-items:center;gap:16px;width:min(1100px,calc(100% - 48px));margin:auto}
-h1{font-size:16px;letter-spacing:-.45px;margin:0;white-space:nowrap}
-.brand{display:flex;align-items:center;gap:10px}
-.logo{display:grid;place-items:center;background:#202e48;color:white;width:32px;height:32px;border-radius:10px;font-size:22px;box-shadow:0 3px 8px #14203918}
-#folder{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:12px;border-left:1px solid #d9dfe8;padding-left:16px}
-#worker-label{color:var(--muted);font-size:12px;white-space:nowrap}
-#status{margin-left:auto;font-size:12px;color:var(--muted);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+header{display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid #dde3eb;background:#fff}
+h1{font-size:15px;letter-spacing:-.3px;margin:0;white-space:nowrap}
+.brand{display:flex;align-items:center;gap:8px}
+.logo{display:grid;place-items:center;background:#1b2430;color:#fff;width:28px;height:28px;border-radius:8px;font-size:18px}
+#folder{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:12px}
+#worker-label{color:var(--muted);font-size:12px;white-space:nowrap;margin-left:auto}
+#status{font-size:12px;color:var(--muted);max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #status:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#8793a5;margin-right:7px}
 #status.connected{color:var(--ok)}#status.connected:before{background:var(--ok)}
 #status.error{color:var(--error)}#status.error:before{background:var(--error)}
-main{width:min(1100px,calc(100% - 48px));margin:0 auto 24px;display:flex;flex-direction:column;min-height:0;border:1px solid #dde3eb;border-radius:16px;overflow:hidden;background:white;box-shadow:0 8px 28px #23395706}
-.eyebrow{font-size:10px;font-weight:650;letter-spacing:1.15px;text-transform:uppercase;color:var(--muted);margin:0 0 9px}
+#app-shell{min-height:0;display:grid;grid-template-columns:272px minmax(0,1fr)}
+#app-shell.has-goal{grid-template-columns:272px minmax(0,1fr) 300px}
+aside{display:flex;flex-direction:column;min-height:0;border-right:1px solid #dde3eb;background:#f7f8fb}
+.aside-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 14px 8px}
+#goal-need{font-size:11px;color:var(--muted)}
+#goals{flex:1;min-height:0;overflow:auto;padding:4px 10px 16px;display:flex;flex-direction:column;gap:4px}
+.goal{display:flex;align-items:flex-start;gap:8px;width:100%;text-align:left;padding:9px 10px;border-radius:10px;background:transparent;border-color:transparent}
+.goal:hover{background:#fff;border-color:var(--line)}
+.goal.selected{background:#fff;border-color:#c8d5ee;box-shadow:0 0 0 1px #c8d5ee}
+.pip{width:8px;height:8px;border-radius:50%;margin-top:5px;flex:0 0 auto;background:#c5ccd6}
+.goal.run .pip{background:var(--run)}.goal.ok .pip{background:var(--ok)}
+.goal.red .pip{background:var(--error)}.goal.attention .pip{background:#e3a008}
+.goal .note-title{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px;line-height:1.35;font-weight:600}
+.goal .meta{display:block;font-size:11px;color:var(--muted);margin-top:3px}
+.goal.attention .meta{color:var(--wait)}.goal.run .meta{color:var(--run)}
+.goal.ok .meta{color:var(--ok)}.goal.red .meta{color:var(--error)}
+#new-goal-open{flex:0 0 auto}
+#stage{display:flex;flex-direction:column;min-height:0;background:#fff}
+.eyebrow{font-size:10px;font-weight:650;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
 .muted{color:var(--muted)}.small{font-size:12px}.hint{color:var(--muted);font-size:13px;padding:14px 8px}.error{color:var(--error)}
-.strip{display:flex;align-items:stretch;gap:8px;padding:14px 16px;border-bottom:1px solid var(--line);background:#f8f9fb;overflow-x:auto}
-#goals{display:flex;gap:8px;min-width:0;flex:1}
-.chip{flex:0 0 200px;text-align:left;padding:10px 12px;border-radius:10px;background:white}
-.chip.selected{border-color:#c8d5ee;background:#eef3fc;box-shadow:0 0 0 1px #c8d5ee}
-.chip .note-title{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.45;font-weight:600}
-.chip .meta{display:block;font-size:10px;color:var(--muted);margin-top:4px}
-.chip.run{border-color:#c5d4f3}.chip.run .meta{color:var(--run)}
-.chip.ok{border-color:#c9e4d4}.chip.ok .meta{color:var(--ok)}
-.chip.red{border-color:#efc4c6}.chip.red .meta{color:var(--error)}
-#new-goal-open{flex:0 0 auto;align-self:center}
-#stage{display:flex;flex-direction:column;min-height:0;flex:1}
-.empty{max-width:520px;margin:clamp(30px,10vh,120px) auto 32px;padding:0 28px}
-.empty-icon{font-size:28px;display:grid;place-items:center;width:52px;height:52px;border:1px solid #dfe5ee;border-radius:16px;margin-bottom:23px;color:#395b95;background:linear-gradient(150deg,#f7faff,#edf2fb)}
-.empty h2{font-size:34px;line-height:1.2;letter-spacing:-1.2px;font-weight:600;margin:0 0 15px}
-.empty>p{color:var(--muted);margin:0;max-width:410px;font-size:14px;line-height:1.7}
+.empty{max-width:560px;margin:auto;padding:32px 28px 48px}
+.empty-icon{font-size:24px;display:grid;place-items:center;width:44px;height:44px;border:1px solid #dfe5ee;border-radius:12px;margin-bottom:18px;color:#395b95;background:linear-gradient(150deg,#f7faff,#edf2fb)}
+.empty h2{font-size:28px;line-height:1.2;letter-spacing:-.8px;font-weight:600;margin:0 0 10px}
+.empty>p{color:var(--muted);margin:0 0 22px;max-width:440px;line-height:1.65}
+#ask{display:flex;flex-direction:column;gap:8px}
+#ask textarea{min-height:96px;resize:vertical}
 #board{display:flex;flex-direction:column;min-height:0;flex:1}
-.run-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:22px 28px 8px}
-.run-head h2{font-size:26px;letter-spacing:-.6px;line-height:1.3;margin:4px 0 8px;overflow-wrap:anywhere}
-#run-state{font-size:11px;font-weight:650;letter-spacing:.08em;white-space:nowrap;padding:5px 8px;border-radius:6px;background:#f0f3f8}
-#run-state.run{color:var(--run);background:#edf3ff}#run-state.ok{color:var(--ok);background:#eaf6ef}#run-state.red{color:var(--error);background:#fceeee}
-#run-state.attention{color:#8a5a00;background:#fff4d6}
-#run-pytest{margin:0}#run-workspace{margin:0 0 8px;overflow-wrap:anywhere}
-#run-tail{flex:1;min-height:120px;margin:8px 28px 0;padding:16px;border:1px solid var(--line);border-radius:10px;background:#f5f7fa;overflow:auto;white-space:pre-wrap;font:12px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace}
-#packet{padding:16px 28px 0;display:flex;flex-direction:column;gap:8px}
-.packet-line{text-align:left;width:100%;padding:10px 12px;border-radius:10px}
-.packet-line .eyebrow{margin:0 0 4px}
-.packet-line p,.packet-line span{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin:0;font-size:13px}
-#handoff-card{border-color:#d8e2f6;background:#f3f7ff}
-.question{display:block;width:100%;text-align:left;border:0;background:transparent;padding:6px 0;border-left:2px solid #b3c3e3;padding-left:9px;font-size:12px}
-#more-notes{align-self:flex-start;font-size:12px;color:var(--accent);border:0;background:transparent;padding:4px 0}
-#more-notes:hover{background:transparent;text-decoration:underline}
-.run-actions{display:flex;justify-content:flex-end;gap:8px;padding:16px 28px 22px}
+.run-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:22px 28px 10px}
+.run-head h2{font-size:24px;letter-spacing:-.5px;line-height:1.25;margin:4px 0 8px;overflow-wrap:anywhere}
+#run-state{font-size:11px;font-weight:700;letter-spacing:.04em;white-space:nowrap;padding:5px 8px;border-radius:6px;background:#f0f3f8}
+#run-state.run{color:var(--run);background:#edf3ff}#run-state.ok{color:var(--ok);background:#eaf6ef}
+#run-state.red{color:var(--error);background:#fceeee}#run-state.attention{color:var(--wait);background:#fff4d6}
+#run-workspace{margin:0}
+#attention{margin:0 28px 8px;padding:10px 12px;border-radius:10px;background:#fff4d6;color:#6d4800;font-size:13px}
+#attention.red{background:#fceeee;color:var(--error)}#attention.ok{background:#eaf6ef;color:var(--ok)}
+#packet{padding:4px 28px 0;display:flex;flex-direction:column;gap:8px;overflow:auto}
+.packet-line{text-align:left;width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#fafbfe}
+.packet-line p,.packet-line span{margin:0;font-size:14px;overflow-wrap:anywhere}
+#handoff-card{border-color:#c5d4f3;background:#f3f7ff}
+#handoff-text{display:block;font-size:15px;line-height:1.55;font-weight:550}
+#steering-card{border-color:#ead7a2;background:#fff8e8}
+.question{display:block;width:100%;text-align:left;border:0;background:transparent;padding:6px 0;border-left:2px solid #e3a008;padding-left:9px;font-size:13px}
+#pytest-box{margin:10px 28px 0;border:1px solid var(--line);border-radius:10px;background:#f7f8fb}
+#pytest-box summary{cursor:pointer;padding:10px 12px;font-size:13px}
+#run-tail{margin:0;padding:0 12px 12px;max-height:220px;overflow:auto;white-space:pre-wrap;font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}
+.composer{margin-top:16px;padding:14px 28px 18px;border-top:1px solid var(--line);background:#fbfcfe}
+#steer-form{display:flex;flex-direction:column;gap:8px}
+#steer-text{min-height:64px;resize:vertical}
+.run-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
 #steer-open{margin-right:auto;color:var(--accent);border-color:#c8d5ee}
 #stop{color:var(--error)}
+#notes-pane{display:flex;flex-direction:column;min-height:0;border-left:1px solid #dde3eb;background:#f7f8fb}
+.memory-tools{padding:14px 14px 8px}
+#memory-search{width:100%}
+#timeline{flex:1;min-height:0;overflow:auto;padding:0 10px 16px}
+#note-count{font-weight:500}
 .note-button{display:block;text-align:left;width:100%;background:transparent;border:1px solid transparent;padding:8px 9px;border-radius:8px;overflow-wrap:anywhere}
 .note-button.selected{background:#e9effa;border-color:#d5e0f3}
-.note-title{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.5}
-.meta{display:block;font-size:10px;color:var(--muted);margin-top:4px}
+.note-title{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.45}
+.meta{display:block;font-size:10px;color:var(--muted);margin-top:3px}
 .note{position:relative;margin:1px 0 2px;padding-left:13px}
 .note:before{content:"";position:absolute;left:3px;top:17px;width:5px;height:5px;background:#b7c2d4;border-radius:50%}
 .note:after{content:"";position:absolute;left:5px;top:25px;bottom:-5px;width:1px;background:#e0e5ed}
@@ -79,14 +98,24 @@ dialog input,dialog textarea,dialog select{width:100%}
 #keybox{display:flex;align-items:center;gap:8px}#key-ok{color:#438061;display:none}#keybox.ok #key-ok{display:inline}
 #settings-message{color:var(--muted);font-size:12px;overflow-wrap:anywhere}
 #settings-message[data-state=success]{color:var(--ok)}#settings-message[data-state=error]{color:var(--error)}
-#new-goal textarea{min-height:90px;resize:vertical}
 #note{width:min(640px,calc(100% - 32px));max-height:min(86vh,840px);overflow:auto}
 #note-body h2{font-size:22px;margin:0 0 8px}
-#timeline{max-height:36vh;overflow:auto;margin-top:8px}
-.memory-tools{margin:18px 0 8px}
+#more-notes{align-self:flex-start;font-size:12px;color:var(--accent);border:0;background:transparent;padding:4px 0}
+#more-notes:hover{background:transparent;text-decoration:underline}
 [hidden]{display:none!important}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-@media(max-width:700px){body{grid-template-rows:60px minmax(0,1fr)}header{width:calc(100% - 24px);gap:8px}header h1{font-size:14px}#folder,#worker-label{display:none}#status{max-width:140px}main{width:calc(100% - 24px);margin-bottom:12px}.run-head,#run-tail,#packet,.run-actions{padding-left:16px;padding-right:16px}.empty h2{font-size:28px}.chip{flex-basis:160px}}
+@media(max-width:900px){
+  #app-shell,#app-shell.has-goal{grid-template-columns:1fr}
+  aside{border-right:0;border-bottom:1px solid #dde3eb;max-height:168px}
+  #goals{flex-direction:row;overflow:auto hidden;padding-bottom:10px}
+  .goal{flex:0 0 220px}
+  #notes-pane{border-left:0;border-top:1px solid #dde3eb;max-height:40vh}
+}
+@media(max-width:700px){
+  header{gap:8px}header h1{font-size:14px}#folder,#worker-label{display:none}#status{max-width:140px}
+  .run-head,#packet,.composer,#attention,#pytest-box{padding-left:16px;padding-right:16px}
+  .empty h2{font-size:24px}
+}
     </style>
   </head>
   <body>
@@ -102,15 +131,34 @@ dialog input,dialog textarea,dialog select{width:100%}
       <button id="settings-open" aria-label="Connection settings">Settings</button>
     </header>
     <main id="app-shell">
-      <div class="strip" aria-label="Goals">
+      <aside aria-label="Goals">
+        <div class="aside-head">
+          <div>
+            <p class="eyebrow" style="margin:0">Goals</p>
+            <p id="goal-need" class="small muted"></p>
+          </div>
+          <button id="new-goal-open">+ Goal</button>
+        </div>
         <div id="goals"><div class="hint">Open a folder to see its goals.</div></div>
-        <button id="new-goal-open">+ Goal</button>
-      </div>
+      </aside>
       <section id="stage" aria-label="Selected run">
         <div class="empty" id="welcome">
           <div class="empty-icon" aria-hidden="true">≋</div>
-          <h2>One board.<br />Goals that keep running.</h2>
-          <p>Write a goal. The next agent writes failing pytests, then new agents spawn on that tree until they pass.</p>
+          <h2>One board for goals that keep running.</h2>
+          <p>Write what must stay true. Agents write failing pytests and respawn until they pass. You only jump in when something is off.</p>
+          <form id="ask">
+            <label class="eyebrow" for="question">New goal</label>
+            <textarea id="question" rows="3" placeholder="What should stay true when this is done?"></textarea>
+            <label class="eyebrow" for="model">Model</label>
+            <select id="model" aria-label="Agent model">
+              <option value="gpt-5.6-luna">GPT-5.6 Luna</option>
+            </select>
+            <p class="small muted" id="goal-note">Connect Codex or a Cursor key in Settings.</p>
+            <div class="run-actions">
+              <button id="new-goal-close" type="button" hidden>Cancel</button>
+              <button class="primary" id="send" type="submit" disabled>Run</button>
+            </div>
+          </form>
         </div>
         <div id="board" hidden>
           <div class="run-head">
@@ -118,25 +166,49 @@ dialog input,dialog textarea,dialog select{width:100%}
               <p class="eyebrow" id="run-id">Goal</p>
               <h2 id="run-title"></h2>
               <p class="muted small" id="run-workspace"></p>
-              <p id="run-pytest"></p>
             </div>
             <p id="run-state"></p>
           </div>
-          <pre id="run-tail"></pre>
+          <p id="attention" hidden></p>
           <div id="packet">
             <button type="button" class="packet-line" id="handoff-card" hidden>
-              <p class="eyebrow">Next agent</p>
+              <p class="eyebrow" id="handoff-label">Next agent</p>
               <span id="handoff-text"></span>
+            </button>
+            <button type="button" class="packet-line" id="steering-card" hidden>
+              <p class="eyebrow">Your steering</p>
+              <span id="steering-text"></span>
             </button>
             <div class="packet-line" id="questions" hidden></div>
             <p id="memory-error" class="small" role="alert" hidden></p>
-            <button type="button" id="more-notes">More notes</button>
           </div>
-          <div class="run-actions">
-            <button id="steer-open" type="button">Steer this goal</button>
-            <button id="resume" type="button" hidden>Resume</button>
-            <button id="stop" type="button" hidden>Stop</button>
+          <details id="pytest-box">
+            <summary id="run-pytest"></summary>
+            <pre id="run-tail"></pre>
+          </details>
+          <div class="composer">
+            <form id="steer-form">
+              <label class="eyebrow" for="steer-text">Steer this goal</label>
+              <textarea id="steer-text" rows="3" placeholder="Tell the next agent what to change or preserve."></textarea>
+              <p id="steer-message" class="small" role="status"></p>
+              <div class="run-actions">
+                <button id="steer-open" type="button" hidden>Steer this goal</button>
+                <button id="steer-save" class="primary" type="submit">Save steering</button>
+                <button id="resume" type="button" hidden>Resume</button>
+                <button id="stop" type="button" hidden>Stop</button>
+              </div>
+            </form>
           </div>
+        </div>
+      </section>
+      <section id="notes-pane" hidden aria-label="Memory notes">
+        <div class="memory-tools">
+          <p class="eyebrow">Notes <span id="note-count"></span></p>
+          <input id="memory-search" type="search" placeholder="Find a memory…" aria-label="Search memory" />
+        </div>
+        <div id="timeline"></div>
+        <div style="padding:0 14px 14px">
+          <button type="button" id="more-notes">Open selected note</button>
         </div>
       </section>
     </main>
@@ -161,44 +233,10 @@ dialog input,dialog textarea,dialog select{width:100%}
         <button id="connect" class="primary">Connect Cursor</button>
       </div>
     </dialog>
-    <dialog id="new-goal">
-      <h2>New goal</h2>
-      <form id="ask">
-        <label for="question">What should stay true when this is done?</label>
-        <textarea id="question" rows="3"></textarea>
-        <label for="model">Model</label>
-        <select id="model" aria-label="Agent model">
-          <option value="gpt-5.6-luna">GPT-5.6 Luna</option>
-        </select>
-        <p class="small muted" id="goal-note">Connect Codex or a Cursor key in Settings.</p>
-        <div class="actions">
-          <button id="new-goal-close" type="button">Cancel</button>
-          <button class="primary" id="send" type="submit" disabled>Run</button>
-        </div>
-      </form>
-    </dialog>
-    <dialog id="steer">
-      <h2>Steer this goal</h2>
-      <form id="steer-form">
-        <label for="steer-text">What should the next agent change or preserve?</label>
-        <textarea id="steer-text" rows="4" placeholder="Example: Keep the public API unchanged. Reproduce the timeout before changing retry logic."></textarea>
-        <p class="small muted">Saved as the latest steering instruction for this goal. The next agent will receive it.</p>
-        <p id="steer-message" class="small" role="status"></p>
-        <div class="actions">
-          <button id="steer-close" type="button">Cancel</button>
-          <button id="steer-save" class="primary" type="submit">Save steering</button>
-        </div>
-      </form>
-    </dialog>
     <dialog id="note">
       <div id="note-body">
         <p class="muted">Select a note to read it here.</p>
       </div>
-      <div class="memory-tools">
-        <p class="eyebrow">More notes <span id="note-count"></span></p>
-        <input id="memory-search" type="search" placeholder="Find a memory…" aria-label="Search memory" />
-      </div>
-      <div id="timeline"></div>
       <div class="actions"><button id="note-close">Close</button></div>
     </dialog>
     <script>
@@ -217,10 +255,10 @@ dialog input,dialog textarea,dialog select{width:100%}
         memoryETag: "",
         refreshing: false,
         startedAt: 0,
+        compose: false,
         noteCache: new Map(),
       };
       const expanded = new Set();
-      const welcomeHTML = $("welcome").innerHTML;
       const esc = (value) =>
         String(value ?? "").replace(
           /[&<>"']/g,
@@ -296,12 +334,15 @@ dialog input,dialog textarea,dialog select{width:100%}
         $("new-goal-open").disabled = state.busy;
         $("pick").disabled = state.busy;
         $("model").disabled = state.busy;
+        $("steer-save").disabled = !state.goalId || state.busy;
+        $("steer-text").disabled = !state.goalId;
         $("worker-label").textContent = workerLabel();
         $("goal-note").textContent = !launch
           ? "Connect Codex or a Cursor key in Settings."
           : !state.project
             ? "Run will ask you to pick a folder."
             : "Enter starts a new isolated goal.";
+        $("new-goal-close").hidden = !state.compose || !state.goals.length;
       }
       function allNotes(items) {
         return items.flatMap((c) => [c, ...allNotes(c.children || [])]);
@@ -319,26 +360,63 @@ dialog input,dialog textarea,dialog select{width:100%}
       }
       function runLabel(status) {
         const name = (status && status.state) || "";
-        if (name === "passed") return "PASSED";
-        if (name === "stopped") return "STOPPED";
-        if (name === "needs_attention" || status?.steering_pending) return "NEEDS VERIFICATION";
-        if (name === "running" || state.busy) return "RUNNING";
-        if (status && status.pytest && status.pytest.ok === false) return "FAILED";
-        return (name || "IDLE").toUpperCase();
+        if (name === "passed") return "Passed";
+        if (name === "stopped") return "Stopped";
+        if (name === "needs_attention" || status?.steering_pending) return "Needs you";
+        if (name === "running" || state.busy) return "Running";
+        if (status && status.pytest && status.pytest.ok === false) return "Failed";
+        return name ? name.replace(/_/g, " ") : "Waiting";
+      }
+      function ago(iso) {
+        const ms = Date.parse(iso || "");
+        if (!ms) return "";
+        const seconds = Math.max(0, Math.floor((Date.now() - ms) / 1000));
+        if (seconds < 45) return "just now";
+        if (seconds < 3600) return Math.floor(seconds / 60) + "m ago";
+        if (seconds < 86400) return Math.floor(seconds / 3600) + "h ago";
+        return Math.floor(seconds / 86400) + "d ago";
+      }
+      function shortPath(path) {
+        const parts = String(path || "").split("/").filter(Boolean);
+        return parts.slice(-2).join("/") || path || "";
+      }
+      function rankGoal(goal) {
+        return { attention: 0, run: 1, red: 2, idle: 3, ok: 4 }[tone({ ...goal.status, goal_id: goal.id })] ?? 3;
+      }
+      function showCreate() {
+        state.compose = true;
+        $("welcome").hidden = false;
+        $("board").hidden = true;
+        $("notes-pane").hidden = true;
+        $("app-shell").classList.remove("has-goal");
+        controls();
+        $("question").focus();
+      }
+      function hideCreate() {
+        state.compose = false;
+        const open = Boolean(state.goalId);
+        $("welcome").hidden = open;
+        $("board").hidden = !open;
+        $("notes-pane").hidden = !open;
+        $("app-shell").classList.toggle("has-goal", open);
+        controls();
       }
       function resetStage() {
+        state.compose = false;
         $("welcome").hidden = false;
-        $("welcome").innerHTML = welcomeHTML;
         $("board").hidden = true;
+        $("notes-pane").hidden = true;
+        $("app-shell").classList.remove("has-goal");
         $("handoff-card").hidden = true;
+        $("steering-card").hidden = true;
         $("questions").hidden = true;
         $("memory-error").hidden = true;
+        $("attention").hidden = true;
         $("note-body").innerHTML = '<p class="muted">Select a note to read it here.</p>';
       }
       async function showNote(id) {
         if (!id) {
-          $("note-body").innerHTML = '<p class="muted">Notes for this goal.</p>';
-          $("note").showModal();
+          $("memory-search").focus();
           return;
         }
         state.selected = id;
@@ -373,30 +451,64 @@ dialog input,dialog textarea,dialog select{width:100%}
       }
       function renderGoals(rows) {
         state.goals = rows || [];
-        $("goals").innerHTML = state.goals.length
-          ? state.goals.map((g) => {
+        const sorted = state.goals.slice().sort((a, b) => {
+          const rank = rankGoal(a) - rankGoal(b);
+          if (rank) return rank;
+          return String(b.status?.updated || "").localeCompare(String(a.status?.updated || ""));
+        });
+        const hot = sorted.filter((g) => ["attention", "run", "red"].includes(tone({ ...g.status, goal_id: g.id }))).length;
+        $("goal-need").textContent = hot
+          ? hot + (hot === 1 ? " needs you" : " need you")
+          : state.goals.length
+            ? state.goals.length + (state.goals.length === 1 ? " goal" : " goals")
+            : "";
+        $("goals").innerHTML = sorted.length
+          ? sorted.map((g) => {
               const pytest = (g.status && g.status.pytest) || {};
-              const line = pytest.summary || g.status?.state || "no run yet";
               const kind = tone({ ...g.status, goal_id: g.id });
-              return `<button class="chip ${kind}${state.goalId === g.id ? " selected" : ""}" data-goal="${esc(g.id)}"><span class="note-title">${esc(g.title)}</span><span class="meta">${esc(line)}</span></button>`;
+              const line = [runLabel(g.status), pytest.summary || g.status?.state || "no run yet", ago(g.status?.updated)].filter(Boolean).join(" · ");
+              return `<button class="goal ${kind}${state.goalId === g.id ? " selected" : ""}" data-goal="${esc(g.id)}"><span class="pip" aria-hidden="true"></span><span><span class="note-title">${esc(g.title)}</span><span class="meta">${esc(line)}</span></span></button>`;
             }).join("")
           : '<div class="hint">No isolated goals yet. Use + Goal to start one.</div>';
       }
       function showBoard(payload) {
         const pytest = (payload && payload.pytest) || {};
         const kind = tone(payload);
+        const pending = payload.steering_pending || payload.steering_applied;
+        hideCreate();
         $("welcome").hidden = true;
         $("board").hidden = false;
+        $("notes-pane").hidden = false;
+        $("app-shell").classList.add("has-goal");
         $("run-id").textContent = "Goal [" + (payload.goal_id || state.goalId || "") + "]";
         $("run-title").textContent = payload.goal || "Running";
-        $("run-workspace").textContent = payload.workspace || "";
+        $("run-workspace").textContent = shortPath(payload.workspace);
+        $("run-workspace").title = payload.workspace || "";
         $("run-pytest").textContent =
-          "Agent " + (payload.agent ?? "—") +
-          (payload.max_agents != null ? "/" + payload.max_agents : "") +
-          " · " + (pytest.summary || "waiting for pytest");
+          "Tests · " +
+          (pytest.summary || "waiting for pytest") +
+          " · agent " + (payload.agent ?? "—") +
+          (payload.max_agents != null ? "/" + payload.max_agents : "");
         $("run-state").textContent = runLabel(payload);
         $("run-state").className = kind;
         $("run-tail").textContent = pytest.tail || "";
+        if (kind === "red") $("pytest-box").open = true;
+        if (pending) {
+          $("steering-card").hidden = false;
+          $("steering-text").textContent = pending.text || "";
+          $("steering-card").dataset.note = pending.id || "";
+        }
+        const ask =
+          kind === "attention"
+            ? "You left a note for the next agent. Resume when you want it picked up."
+            : kind === "red"
+              ? "Tests failed. Steer if the approach is wrong, or resume to try again."
+              : kind === "ok"
+                ? "Passed. This goal is done."
+                : "";
+        $("attention").hidden = !ask;
+        $("attention").textContent = ask;
+        $("attention").className = kind === "red" || kind === "ok" ? kind : "";
       }
       function renderMemory(data) {
         $("memory-error").hidden = true;
@@ -414,7 +526,16 @@ dialog input,dialog textarea,dialog select{width:100%}
         $("handoff-card").hidden = !data.handoff;
         $("handoff-text").textContent = data.handoff?.text || "";
         $("handoff-card").dataset.note = data.handoff?.id || "";
-        state.pinned = new Set([data.goal?.id, ...questions.map((q) => q.id)]);
+        const passed = state.goals.find((g) => g.id === state.goalId)?.status?.state === "passed";
+        $("handoff-label").textContent = passed ? "Last handoff" : "Next agent";
+        $("steering-card").hidden = !data.steering;
+        $("steering-text").textContent = data.steering?.text || "";
+        $("steering-card").dataset.note = data.steering?.id || "";
+        if (!data.handoff && questions.length && !$("attention").textContent) {
+          $("attention").hidden = false;
+          $("attention").textContent = "The last agent left a question. Answer it here, then resume.";
+        }
+        state.pinned = new Set([data.goal?.id, data.steering?.id, data.handoff?.id, ...questions.map((q) => q.id)]);
         renderTimeline();
       }
       function renderTimeline() {
@@ -423,7 +544,7 @@ dialog input,dialog textarea,dialog select{width:100%}
         const durable = allNotes(state.commits).filter((c) => !["user", "answer"].includes(c.kind) || state.pinned?.has(c.id));
         const notes = source.filter((c) => (query || !state.pinned?.has(c.id)) && !["user", "answer"].includes(c.kind) && (!query || c.title.toLowerCase().includes(query)));
         $("note-count").textContent = durable.length ? "(" + durable.length + ")" : "";
-        $("timeline").innerHTML = notes.map(query ? noteButton : noteHTML).join("") || '<div class="hint">' + (query ? "No matching memories." : (state.commits.length ? "No durable notes yet." : "No saved memories in this folder yet.")) + "</div>";
+        $("timeline").innerHTML = notes.map(query ? noteButton : noteHTML).join("") || '<div class="hint">' + (query ? "No matching memories." : (state.commits.length ? "No extra notes yet." : "No saved memories in this folder yet.")) + "</div>";
       }
       $("memory-search").oninput = renderTimeline;
       async function refreshGoals() {
@@ -431,7 +552,7 @@ dialog input,dialog textarea,dialog select{width:100%}
         try {
           const data = await api("/api/goals");
           renderGoals(data.goals || []);
-          if (!state.goalId && state.goals.length) {
+          if (!state.goalId && !state.compose && state.goals.length) {
             const preferred = state.goals.find((g) => ["running", "needs_attention"].includes(g.status?.state)) || state.goals[state.goals.length - 1];
             selectGoal(preferred.id);
           }
@@ -531,24 +652,20 @@ dialog input,dialog textarea,dialog select{width:100%}
       };
       $("settings-open").onclick = () => $("settings").showModal();
       $("settings-close").onclick = () => $("settings").close();
-      $("new-goal-open").onclick = () => { $("new-goal").showModal(); $("question").focus(); };
-      $("new-goal-close").onclick = () => $("new-goal").close();
-      $("steer-open").onclick = () => {
-        $("steer-text").value = "";
-        $("steer-message").textContent = "";
-        $("steer").showModal();
-        $("steer-text").focus();
-      };
-      $("steer-close").onclick = () => $("steer").close();
+      $("new-goal-open").onclick = showCreate;
+      $("new-goal-close").onclick = hideCreate;
+      $("steer-open").onclick = () => $("steer-text").focus();
       $("steer-form").onsubmit = async (event) => {
         event.preventDefault();
         const text = $("steer-text").value.trim();
         if (!text || !state.goalId) return;
         $("steer-save").disabled = true;
         $("steer-message").textContent = "Saving…";
+        $("steer-message").className = "small";
         try {
           await api("/api/steer", { goal_id: state.goalId, text });
-          $("steer").close();
+          $("steer-text").value = "";
+          $("steer-message").textContent = "Saved for the next agent.";
           status("Steering saved for the next agent", false, state.ready);
           state.memoryJSON = "";
           state.memoryETag = "";
@@ -562,7 +679,7 @@ dialog input,dialog textarea,dialog select{width:100%}
         }
       };
       $("note-close").onclick = () => $("note").close();
-      $("more-notes").onclick = () => showNote(null);
+      $("more-notes").onclick = () => showNote(state.selected);
       async function loadModels() {
         try {
           const data = await api("/api/models");
@@ -636,7 +753,7 @@ dialog input,dialog textarea,dialog select{width:100%}
         state.startedAt = Date.now();
         status("Agent running · " + $("model").selectedOptions[0].text);
         controls();
-        $("new-goal").close();
+        hideCreate();
         let failed = false, ended = false;
         function receive(event) {
           if (event.type === "memory") { refreshMemory(); refreshGoals(); }
@@ -727,6 +844,12 @@ dialog input,dialog textarea,dialog select{width:100%}
         if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
           event.preventDefault();
           $("ask").requestSubmit();
+        }
+      };
+      $("steer-text").onkeydown = (event) => {
+        if (event.key === "Enter" && (event.metaKey || event.ctrlKey) && !event.isComposing) {
+          event.preventDefault();
+          $("steer-form").requestSubmit();
         }
       };
       async function init() {

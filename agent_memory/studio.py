@@ -17,7 +17,7 @@ from urllib.parse import urlparse, parse_qs
 from agent_memory.core import Memory
 from agent_memory.goals import memory_for, read_status, write_status
 from agent_memory.studio_runtime import AgentConfig, DEFAULT_MODEL, StandbyAgent
-from agent_memory.prompt import _goal, _handoff, _headline, split_open_questions
+from agent_memory.prompt import _goal, _handoff, _headline, _steering, split_open_questions
 
 PAGE = Path(__file__).with_name("studio.html")
 SESSION: dict = {
@@ -119,6 +119,7 @@ def memory_view(root: str, *, compact: bool = False) -> dict:
     items = memory.state()
     goal = _goal(items)
     handoff = _handoff(items)
+    steering = _steering(items, goal)
     # Scope folding to this branch. The all-branch graph can hide a shared
     # ancestor because an unrelated branch summarized it.
     history = memory.history()
@@ -143,7 +144,7 @@ def memory_view(root: str, *, compact: bool = False) -> dict:
 
     result = {
         **({} if compact else {"packet": memory.render_packet()}),
-        "goal": _item(goal), "handoff": _item(handoff),
+        "goal": _item(goal), "steering": _item(steering), "handoff": _item(handoff),
         "questions": [_item(item) for item in split_open_questions(items)],
         "commits": [entry(item) for item in reversed(items)],
         "branches": [{"name": row["name"], "current": row["current"]}

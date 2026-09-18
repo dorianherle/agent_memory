@@ -160,6 +160,7 @@ class StudioTests(MemoryTestCase):
         self.assertEqual(status, 200)
         self.assertIn("Steering", view["packet"])
         self.assertIn("Keep the public API unchanged", view["packet"])
+        self.assertEqual((view.get("steering") or {}).get("text"), "Keep the public API unchanged")
         status, goals = self._json("GET", "/api/goals")
         self.assertEqual(status, 200)
         saved_status = goals["goals"][0]["status"]
