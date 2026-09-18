@@ -32,6 +32,8 @@ class StudioTests(MemoryTestCase):
                 "api_key": "",
                 "project": "",
                 "model": "composer-2.5",
+                "thinker_model": "",
+                "coder_model": "",
                 "agent": None,
                 "run": None,
                 "cancel": False,
@@ -405,8 +407,13 @@ class StudioTests(MemoryTestCase):
         self.assertEqual(status, 200)
         observes = [e for e in events if e.get("type") == "observe"]
         self.assertTrue(observes)
+        lives = [e for e in events if e.get("type") == "live"]
+        self.assertTrue(any("Thinker" in (e.get("text") or "") for e in lives))
+        self.assertTrue(any(e.get("role") == "coder" for e in lives))
         done = events[-1]
         self.assertEqual(done["type"], "done")
+        self.assertEqual(done["result"]["turns"][0]["role"], "thinker")
+        self.assertEqual(done["result"]["turns"][1]["role"], "coder")
         self.assertEqual(done["status"], "passed")
         self.assertEqual(done["result"]["agent"], 1)
         self.assertTrue(done["result"]["pytest"]["ok"])
@@ -432,7 +439,24 @@ class StudioTests(MemoryTestCase):
         self.assertEqual(status, 200)
         self.assertEqual(data["models"], catalog)
         self.assertEqual(data["model"], "gpt-5.6-luna")
+        self.assertEqual(data["thinker_model"], "gpt-5.6-luna")
+        self.assertEqual(data["coder_model"], "gpt-5.6-luna")
         self.assertNotIn("grok", str(data).lower())
+
+        catalog = [
+            {"id": "gpt-6-astra", "name": "GPT-6 Astra"},
+            {"id": "gpt-5.6-luna", "name": "GPT-5.6 Luna"},
+        ]
+        SESSION["model"] = "missing-model"
+        SESSION["thinker_model"] = ""
+        SESSION["coder_model"] = ""
+        with patch("agent_memory.runner.codex_logged_in", return_value=True):
+            with patch("agent_memory.runner.list_codex_models", return_value=catalog):
+                status, data = self._json("GET", "/api/models")
+        self.assertEqual(status, 200)
+        self.assertEqual(data["model"], "gpt-5.6-luna")
+        self.assertEqual(data["thinker_model"], "gpt-5.6-luna")
+        self.assertNotEqual(data["model"], "gpt-6-astra")
 
     def test_connect_codex_spawns_login(self) -> None:
         from unittest.mock import patch

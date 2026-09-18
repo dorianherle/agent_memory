@@ -191,12 +191,11 @@ failing pytests, then new agents until they pass. Resume continues the
 selected goal. Stop cancels the current worker. Keys stay in the running
 server session.
 
-The left rail is every isolated goal, sorted so anything that needs you
-comes first. The board is the selected run as a briefing: what to do now,
-what the next agent will try (handoff), your latest steering, and what is
-stuck. Pytest is evidence under the briefing, not the page. Notes sit in
-the right rail. Type a correction on the board, then resume. The notebook
-timeline also stays in `.agent_memory/live/`.
+The left rail is every isolated goal, urgent first. The board is a live
+shift: Thinker and Coder models ping-pong (tests, then implementation),
+a Now strip for the current turn, and a chain of who already ran. Pytest
+is evidence under that chain. Type a correction on the board, then resume.
+The notebook timeline also stays in `.agent_memory/live/`.
 
 Codex is used when `codex login` has already succeeded. Cursor is the fallback.
 Model and usage-limit errors appear in the header status; an accepted key does

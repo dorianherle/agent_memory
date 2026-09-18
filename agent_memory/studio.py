@@ -24,6 +24,8 @@ SESSION: dict = {
     "api_key": os.environ.get("CURSOR_API_KEY", "").strip(),
     "project": "",
     "model": DEFAULT_MODEL,
+    "thinker_model": "",
+    "coder_model": "",
     "agent": None,
     "run": None,
     "cancel": False,
@@ -226,6 +228,8 @@ def _open_root(root: Path, key: str, model: str) -> dict:
         SESSION["project"] = str(root)
         SESSION["api_key"] = key or ""
         SESSION["model"] = model
+        SESSION["thinker_model"] = SESSION.get("thinker_model") or model
+        SESSION["coder_model"] = SESSION.get("coder_model") or model
         SESSION["goal_id"] = ""
     _warm_next()
     ready = project_ready(root)
@@ -455,8 +459,17 @@ def _studio_worker():
     return detect_worker(SESSION.get("api_key"))
 
 
+def _codex_slot(value: str) -> str:
+    from agent_memory.runner import DEFAULT_CODEX_MODEL
+
+    value = (value or "").strip()
+    if not value or value == DEFAULT_MODEL or value.startswith("grok"):
+        return DEFAULT_CODEX_MODEL
+    return value
+
+
 def _run_goal_loop(text: str, goal_id: str, write) -> None:
-    from agent_memory.runner import run_goal
+    from agent_memory.runner import DEFAULT_CODEX_MODEL, codex_worker, cursor_worker, run_goal
 
     if not RUN_LOCK.acquire(blocking=False):
         write({"type": "error", "message": "An agent is already running."})
@@ -466,17 +479,23 @@ def _run_goal_loop(text: str, goal_id: str, write) -> None:
         if not project:
             write({"type": "error", "message": "Open a project first."})
             return
-        name, worker = _studio_worker()
-        if name == "codex" and worker is not None:
-            from functools import partial
-
-            from agent_memory.runner import DEFAULT_CODEX_MODEL
-
-            model = SESSION.get("model") or DEFAULT_CODEX_MODEL
-            if model == DEFAULT_MODEL or str(model).startswith("grok"):
-                model = DEFAULT_CODEX_MODEL
-                SESSION["model"] = model
-            worker = partial(worker, model=model)
+        name, base = _studio_worker()
+        thinker = _codex_slot(SESSION.get("thinker_model") or SESSION.get("model") or DEFAULT_CODEX_MODEL)
+        coder = _codex_slot(SESSION.get("coder_model") or thinker)
+        if name == "codex":
+            worker = codex_worker
+            SESSION["thinker_model"] = thinker
+            SESSION["coder_model"] = coder
+            SESSION["model"] = thinker
+        elif name == "cursor":
+            def worker(prompt, cwd, model=None, on_line=None):
+                return cursor_worker(
+                    prompt, cwd, api_key=SESSION.get("api_key"), model=model, on_line=on_line
+                )
+        elif name == "test":
+            worker = base
+        else:
+            worker = None
         if worker is None:
             write({"type": "error", "message": "Connect Codex or a Cursor API key in Settings."})
             return
@@ -490,13 +509,34 @@ def _run_goal_loop(text: str, goal_id: str, write) -> None:
             write({"type": "observe", **status})
             write({"type": "memory"})
 
+        def on_turn(info: dict) -> None:
+            verb = (
+                "Writing failing tests" if info.get("phase") == "bootstrap"
+                else "Reviewing the failure" if info.get("role") == "thinker"
+                else "Making tests pass"
+            )
+            model = info.get("model") or thinker
+            write({
+                "type": "live",
+                "text": f"{(info.get('role') or 'thinker').title()} · {model} · {verb}",
+                **info,
+            })
+
+        def on_live(event: dict) -> None:
+            write(event)
+
         result = run_goal(
             project,
             text or None,
             goal_id=goal_id or None,
             worker=worker,
             on_observe=observe,
+            on_turn=on_turn,
+            on_live=on_live,
             cancelled=lambda: bool(SESSION.get("cancel")),
+            thinker_model=thinker,
+            coder_model=coder,
+            worker_name=name,
         )
         with LOCK:
             SESSION["goal_id"] = result.get("goal_id") or SESSION.get("goal_id")
@@ -587,6 +627,8 @@ class Handler(BaseHTTPRequestHandler):
                     "project": project,
                     "has_key": bool(SESSION.get("api_key")),
                     "model": SESSION.get("model"),
+                    "thinker_model": SESSION.get("thinker_model") or SESSION.get("model"),
+                    "coder_model": SESSION.get("coder_model") or SESSION.get("thinker_model") or SESSION.get("model"),
                     "standby": STANDBY.status(),
                     "running": RUN_LOCK.locked(),
                     "ready": bool(
@@ -602,10 +644,22 @@ class Handler(BaseHTTPRequestHandler):
                 from agent_memory.runner import DEFAULT_CODEX_MODEL, list_codex_models
 
                 models = list_codex_models()
-                current = SESSION.get("model") or ""
-                if not any(row["id"] == current for row in models):
-                    SESSION["model"] = models[0]["id"] if models else DEFAULT_CODEX_MODEL
-                return self._json(200, {"models": models, "model": SESSION["model"]})
+                ids = {row["id"] for row in models}
+                def pin(value):
+                    if value in ids:
+                        return value
+                    return DEFAULT_CODEX_MODEL
+                thinker = pin(SESSION.get("thinker_model") or SESSION.get("model") or "")
+                coder = pin(SESSION.get("coder_model") or thinker)
+                SESSION["thinker_model"] = thinker
+                SESSION["coder_model"] = coder
+                SESSION["model"] = thinker
+                return self._json(200, {
+                    "models": models,
+                    "model": thinker,
+                    "thinker_model": thinker,
+                    "coder_model": coder,
+                })
             key = SESSION.get("api_key") or ""
             if not key:
                 return self._json(400, {"error": "Add a Cursor API key."})
@@ -639,11 +693,19 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/model":
             if RUN_LOCK.locked():
                 return self._json(409, {"error": "Stop the running agent first."})
-            model = str(data.get("model") or DEFAULT_MODEL).strip()
+            model = str(data.get("thinker_model") or data.get("model") or DEFAULT_MODEL).strip()
+            coder = str(data.get("coder_model") or SESSION.get("coder_model") or model).strip()
             with LOCK:
                 SESSION["model"] = model
+                SESSION["thinker_model"] = model
+                SESSION["coder_model"] = coder
             _warm_next()
-            return self._json(200, {"model": model, "standby": STANDBY.status()})
+            return self._json(200, {
+                "model": model,
+                "thinker_model": model,
+                "coder_model": coder,
+                "standby": STANDBY.status(),
+            })
         if path == "/api/open":
             project = str(data.get("project") or "").strip()
             key = str(data.get("api_key") or "").strip() or SESSION.get("api_key")
@@ -714,9 +776,13 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/run":
             text = str(data.get("text") or data.get("question") or "").strip()
             goal_id = str(data.get("goal_id") or "").strip()
-            model = str(data.get("model") or "").strip()
+            model = str(data.get("thinker_model") or data.get("model") or "").strip()
+            coder = str(data.get("coder_model") or "").strip()
             if model:
                 SESSION["model"] = model
+                SESSION["thinker_model"] = model
+            if coder:
+                SESSION["coder_model"] = coder
             if not text and not goal_id:
                 return self._json(400, {"error": "Type a goal or resume an id."})
             if goal_id:

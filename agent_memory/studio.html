@@ -5,130 +5,163 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Agent Memory Studio</title>
     <style>
-:root{--paper:#eef1f5;--card:#fff;--ink:#1b2430;--muted:#667085;--line:#e2e6ed;--accent:#2f5fdb;--soft:#eef3ff;--error:#b43b42;--ok:#1f7a4d;--run:#2f5fdb;--wait:#8a5a00;color-scheme:light}
-*{box-sizing:border-box}body{margin:0;height:100dvh;display:grid;grid-template-rows:56px minmax(0,1fr);background:var(--paper);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
-button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 12px}button:hover{background:var(--soft);border-color:#c8d5ee}button:disabled{opacity:.45;cursor:default}button.primary{background:var(--accent);border-color:var(--accent);color:#fff}button.primary:hover{background:#2754c6}
-input,textarea,select{border:1px solid var(--line);border-radius:8px;background:var(--card);padding:9px 11px;min-width:0}
+:root{--bg:#0c0c0c;--panel:#141414;--elevated:#1a1a1a;--ink:#f2f2f2;--muted:#a0a0a0;--faint:#6b6b6b;--line:#2a2a2a;--strong:#3a3a3a;--accent:#6ea8fe;--coder:#5bc0be;--error:#e88a9a;--ok:#7dcea0;--wait:#e8a54b;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;height:100dvh;display:grid;grid-template-rows:52px minmax(0,1fr);background:var(--bg);color:var(--ink);font:14px/1.45 ui-sans-serif,system-ui,-apple-system,sans-serif}
+button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer;border:1px solid var(--strong);background:var(--elevated);border-radius:8px;padding:7px 11px}button:hover{border-color:var(--accent);background:#1e2430}button:disabled{opacity:.4;cursor:default}button.primary{background:var(--accent);border-color:var(--accent);color:#0b1220}button.primary:hover{filter:brightness(1.08)}
+input,textarea,select{border:1px solid var(--strong);border-radius:8px;background:#101010;padding:8px 10px;min-width:0}
 button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-header{display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid #dde3eb;background:#fff}
+.ico{width:16px;height:16px;display:inline-block;vertical-align:-3px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+button .ico{margin-right:6px}
+header{display:flex;align-items:center;gap:12px;padding:0 14px;border-bottom:1px solid var(--line);background:var(--panel)}
 h1{font-size:15px;letter-spacing:-.3px;margin:0;white-space:nowrap}
 .brand{display:flex;align-items:center;gap:8px}
-.logo{display:grid;place-items:center;background:#1b2430;color:#fff;width:28px;height:28px;border-radius:8px;font-size:18px}
+.logo{display:grid;place-items:center;color:var(--accent)}
+.logo .ico{width:20px;height:20px;margin:0}
 #folder{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:12px}
 #worker-label{color:var(--muted);font-size:12px;white-space:nowrap;margin-left:auto}
 #status{font-size:12px;color:var(--muted);max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#status:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#8793a5;margin-right:7px}
+#status:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--faint);margin-right:7px}
 #status.connected{color:var(--ok)}#status.connected:before{background:var(--ok)}
 #status.error{color:var(--error)}#status.error:before{background:var(--error)}
-#app-shell{min-height:0;display:grid;grid-template-columns:272px minmax(0,1fr)}
-#app-shell.has-goal{grid-template-columns:272px minmax(0,1fr) 300px}
-aside{display:flex;flex-direction:column;min-height:0;border-right:1px solid #dde3eb;background:#f7f8fb}
-.aside-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 14px 8px}
+#app-shell{min-height:0;display:grid;grid-template-columns:260px minmax(0,1fr)}
+aside{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line);background:#101010}
+.aside-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 12px 8px}
 #goal-need{font-size:11px;color:var(--muted)}
-#goals{flex:1;min-height:0;overflow:auto;padding:4px 10px 16px;display:flex;flex-direction:column;gap:4px}
-.goal{display:flex;align-items:flex-start;gap:8px;width:100%;text-align:left;padding:9px 10px;border-radius:10px;background:transparent;border-color:transparent}
-.goal:hover{background:#fff;border-color:var(--line)}
-.goal.selected{background:#fff;border-color:#c8d5ee;box-shadow:0 0 0 1px #c8d5ee}
-.pip{width:8px;height:8px;border-radius:50%;margin-top:5px;flex:0 0 auto;background:#c5ccd6}
-.goal.run .pip{background:var(--run)}.goal.ok .pip{background:var(--ok)}
-.goal.red .pip{background:var(--error)}.goal.attention .pip{background:#e3a008}
+#goals{flex:1;min-height:0;overflow:auto;padding:4px 8px 16px;display:flex;flex-direction:column;gap:4px}
+.goal{display:flex;align-items:flex-start;gap:8px;width:100%;text-align:left;padding:8px 9px;border-radius:10px;background:transparent;border-color:transparent}
+.goal:hover{background:var(--elevated);border-color:var(--line)}
+.goal.selected{background:var(--elevated);border-color:#35558c;box-shadow:0 0 0 1px #35558c}
+.pip{width:8px;height:8px;border-radius:50%;margin-top:5px;flex:0 0 auto;background:var(--faint)}
+.goal.run .pip{background:var(--accent);box-shadow:0 0 0 4px #6ea8fe22}.goal.ok .pip{background:var(--ok)}
+.goal.red .pip{background:var(--error)}.goal.attention .pip{background:var(--wait)}
+.goal.run .pip{animation:pulse 1.4s ease-in-out infinite}
 .goal .note-title{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px;line-height:1.35;font-weight:600}
 .goal .meta{display:block;font-size:11px;color:var(--muted);margin-top:3px}
-.goal.attention .meta{color:var(--wait)}.goal.run .meta{color:var(--run)}
-.goal.ok .meta{color:var(--ok)}.goal.red .meta{color:var(--error)}
-#new-goal-open{flex:0 0 auto}
-#stage{display:flex;flex-direction:column;min-height:0;background:#fff}
-.eyebrow{font-size:10px;font-weight:650;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+#stage{display:flex;flex-direction:column;min-height:0;background:var(--bg);overflow:auto}
+.eyebrow{font-size:10px;font-weight:650;letter-spacing:1.1px;text-transform:uppercase;color:var(--faint);margin:0 0 6px}
 .muted{color:var(--muted)}.small{font-size:12px}.hint{color:var(--muted);font-size:13px;padding:14px 8px}.error{color:var(--error)}
 .empty{max-width:560px;margin:auto;padding:32px 28px 48px}
-.empty-icon{font-size:24px;display:grid;place-items:center;width:44px;height:44px;border:1px solid #dfe5ee;border-radius:12px;margin-bottom:18px;color:#395b95;background:linear-gradient(150deg,#f7faff,#edf2fb)}
 .empty h2{font-size:28px;line-height:1.2;letter-spacing:-.8px;font-weight:600;margin:0 0 10px}
 .empty>p{color:var(--muted);margin:0 0 22px;max-width:440px;line-height:1.65}
 #ask{display:flex;flex-direction:column;gap:8px}
-#ask textarea{min-height:96px;resize:vertical}
+#ask textarea{min-height:88px;resize:vertical}
+.model-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 #board{display:flex;flex-direction:column;min-height:0;flex:1}
-.run-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:22px 28px 10px}
-.run-head h2{font-size:24px;letter-spacing:-.5px;line-height:1.25;margin:4px 0 8px;overflow-wrap:anywhere}
-#run-state{font-size:11px;font-weight:700;letter-spacing:.04em;white-space:nowrap;padding:5px 8px;border-radius:6px;background:#f0f3f8}
-#run-state.run{color:var(--run);background:#edf3ff}#run-state.ok{color:var(--ok);background:#eaf6ef}
-#run-state.red{color:var(--error);background:#fceeee}#run-state.attention{color:var(--wait);background:#fff4d6}
-#run-workspace{margin:0}
-#attention{margin:0 28px 8px;padding:10px 12px;border-radius:10px;background:#fff4d6;color:#6d4800;font-size:13px}
-#attention.red{background:#fceeee;color:var(--error)}#attention.ok{background:#eaf6ef;color:var(--ok)}
-#packet{padding:4px 28px 0;display:flex;flex-direction:column;gap:8px;overflow:auto}
-.packet-line{text-align:left;width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#fafbfe}
-.packet-line p,.packet-line span{margin:0;font-size:14px;overflow-wrap:anywhere}
-#handoff-card{border-color:#c5d4f3;background:#f3f7ff}
-#handoff-text{display:block;font-size:15px;line-height:1.55;font-weight:550}
-#steering-card{border-color:#ead7a2;background:#fff8e8}
-.question{display:block;width:100%;text-align:left;border:0;background:transparent;padding:6px 0;border-left:2px solid #e3a008;padding-left:9px;font-size:13px}
-#pytest-box{margin:10px 28px 0;border:1px solid var(--line);border-radius:10px;background:#f7f8fb}
-#pytest-box summary{cursor:pointer;padding:10px 12px;font-size:13px}
-#run-tail{margin:0;padding:0 12px 12px;max-height:220px;overflow:auto;white-space:pre-wrap;font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}
-.composer{margin-top:16px;padding:14px 28px 18px;border-top:1px solid var(--line);background:#fbfcfe}
-#steer-form{display:flex;flex-direction:column;gap:8px}
-#steer-text{min-height:64px;resize:vertical}
-.run-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
-#steer-open{margin-right:auto;color:var(--accent);border-color:#c8d5ee}
+.run-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:18px 24px 4px}
+.run-head h2{font-size:20px;letter-spacing:-.4px;line-height:1.25;margin:2px 0 4px;overflow-wrap:anywhere}
+#run-state{font-size:11px;font-weight:700;letter-spacing:.04em;white-space:nowrap;padding:5px 8px;border-radius:6px;background:var(--elevated)}
+#run-state.run{color:var(--accent)}#run-state.ok{color:var(--ok)}#run-state.red{color:var(--error)}#run-state.attention{color:var(--wait)}
+#run-workspace{display:none;margin:0}
+#now{display:none;margin:0 24px 10px;padding:10px 12px;border:1px solid #35558c;border-radius:10px;background:var(--panel)}
+#now.live{display:block}
+#now-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px}
+#now-role{font-weight:650}
+#now-role.thinker{color:var(--accent)}#now-role.coder{color:var(--coder)}
+#now-log{display:none;margin:8px 0 0;max-height:140px;overflow:auto;white-space:pre-wrap;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:#c8d0dc}
+#now.live #now-log.has-lines{display:block}
+#chain{display:flex;align-items:center;gap:0;padding:2px 24px 10px;overflow-x:auto}
+#chain:empty{display:none;padding:0}
+#handoff-text,#steering-text{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.chain-node{flex:0 0 auto;text-align:left;padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:var(--panel);font-size:12px}
+.chain-node strong{font-weight:650;margin-right:6px}
+.chain-node.thinker{color:var(--accent)}
+.chain-node.coder{color:var(--coder)}
+.chain-node.ok{border-color:#2f5a40}
+.chain-node.red{border-color:#5a3038}
+.chain-node.live{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.chain-node .meta{display:inline;margin:0;font-size:11px}
+.chain-join{width:16px;flex:0 0 16px;height:1px;background:var(--strong)}
+#packet{padding:0 24px;display:flex;flex-direction:column;gap:6px}
+.packet-line{text-align:left;width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel)}
+.packet-line p,.packet-line span{margin:0;font-size:13px;overflow-wrap:anywhere}
+#handoff-card{border-color:#35558c}
+#steering-card{border-color:#5a4a24;background:#1a160c}
+.question{display:block;width:100%;text-align:left;border:0;background:transparent;padding:6px 0;border-left:2px solid var(--wait);padding-left:9px;font-size:13px}
+#drawers{display:flex;gap:8px;margin:0 24px 6px}
+#drawers:not(:has(details:not([hidden]))){display:none}
+#pytest-box,#notes-box{flex:1;min-width:0;margin:0;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+#pytest-box summary,#notes-box summary{cursor:pointer;padding:8px 10px;font-size:13px}
+#run-tail{margin:0;padding:0 12px 12px;max-height:180px;overflow:auto;white-space:pre-wrap;font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}
+.composer{margin-top:auto;padding:12px 24px;border-top:1px solid var(--line);background:#101010}
+#steer-form{display:flex;flex-direction:column;gap:6px}
+#steer-row{display:flex;gap:8px;align-items:center}
+#steer-text{min-height:0;height:38px;resize:none;flex:1}
+.run-actions{display:flex;gap:8px;flex-wrap:wrap}
+#steer-open{margin-right:auto}
 #stop{color:var(--error)}
-#notes-pane{display:flex;flex-direction:column;min-height:0;border-left:1px solid #dde3eb;background:#f7f8fb}
-.memory-tools{padding:14px 14px 8px}
+.memory-tools{padding:0 10px 8px}
 #memory-search{width:100%}
-#timeline{flex:1;min-height:0;overflow:auto;padding:0 10px 16px}
+#timeline{padding:0 6px 10px;max-height:220px;overflow:auto}
 #note-count{font-weight:500}
 .note-button{display:block;text-align:left;width:100%;background:transparent;border:1px solid transparent;padding:8px 9px;border-radius:8px;overflow-wrap:anywhere}
-.note-button.selected{background:#e9effa;border-color:#d5e0f3}
+.note-button.selected{background:#1a2436;border-color:#35558c}
 .note-title{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.45}
 .meta{display:block;font-size:10px;color:var(--muted);margin-top:3px}
 .note{position:relative;margin:1px 0 2px;padding-left:13px}
-.note:before{content:"";position:absolute;left:3px;top:17px;width:5px;height:5px;background:#b7c2d4;border-radius:50%}
-.note:after{content:"";position:absolute;left:5px;top:25px;bottom:-5px;width:1px;background:#e0e5ed}
+.note:before{content:"";position:absolute;left:3px;top:17px;width:5px;height:5px;background:var(--faint);border-radius:50%}
+.note:after{content:"";position:absolute;left:5px;top:25px;bottom:-5px;width:1px;background:var(--line)}
 .note:last-child:after{display:none}
 .summary>.note-button .note-title{font-weight:650}
-.summary:before{background:var(--accent);box-shadow:0 0 0 3px #e3ebfc}
+.summary:before{background:var(--accent)}
 .summary details>summary{font-size:11px;color:var(--accent);padding:2px 9px 8px;cursor:pointer}
 .children{margin:0 0 6px 10px;padding-left:5px}
-.body{white-space:pre-wrap;overflow-wrap:anywhere}.body pre{background:#f5f7fa;border:1px solid var(--line);padding:15px;border-radius:10px;overflow:auto;white-space:pre}.body code{font:12px/1.7 ui-monospace,monospace}.body h3{font-size:16px;margin:16px 0 4px}.body strong{font-weight:650}
-dialog{border:1px solid var(--line);border-radius:16px;padding:28px;width:min(490px,calc(100% - 32px));box-shadow:0 24px 80px #17251b22}
-dialog::backdrop{background:#18243d45;backdrop-filter:blur(3px)}
+.body{white-space:pre-wrap;overflow-wrap:anywhere}.body pre{background:#101010;border:1px solid var(--line);padding:15px;border-radius:10px;overflow:auto;white-space:pre}.body code{font:12px/1.7 ui-monospace,monospace}.body h3{font-size:16px;margin:16px 0 4px}.body strong{font-weight:650}
+dialog{border:1px solid var(--line);border-radius:16px;padding:28px;width:min(490px,calc(100% - 32px));background:var(--panel);color:var(--ink);box-shadow:0 24px 80px #0008}
+dialog::backdrop{background:#0008}
 dialog h2{margin:0 0 20px;font-size:21px;letter-spacing:-.5px}
 dialog label{display:block;font-size:12px;font-weight:600;margin:16px 0 6px}
 dialog input,dialog textarea,dialog select{width:100%}
 .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
-#keybox{display:flex;align-items:center;gap:8px}#key-ok{color:#438061;display:none}#keybox.ok #key-ok{display:inline}
+#keybox{display:flex;align-items:center;gap:8px}#key-ok{color:var(--ok);display:none}#keybox.ok #key-ok{display:inline}
 #settings-message{color:var(--muted);font-size:12px;overflow-wrap:anywhere}
 #settings-message[data-state=success]{color:var(--ok)}#settings-message[data-state=error]{color:var(--error)}
 #note{width:min(640px,calc(100% - 32px));max-height:min(86vh,840px);overflow:auto}
 #note-body h2{font-size:22px;margin:0 0 8px}
 #more-notes{align-self:flex-start;font-size:12px;color:var(--accent);border:0;background:transparent;padding:4px 0}
-#more-notes:hover{background:transparent;text-decoration:underline}
+#attention{display:none}
+@keyframes pulse{50%{opacity:.45}}
 [hidden]{display:none!important}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-@media(max-width:900px){
-  #app-shell,#app-shell.has-goal{grid-template-columns:1fr}
-  aside{border-right:0;border-bottom:1px solid #dde3eb;max-height:168px}
-  #goals{flex-direction:row;overflow:auto hidden;padding-bottom:10px}
+@media(max-width:800px){
+  #app-shell{grid-template-columns:1fr}
+  aside{border-right:0;border-bottom:1px solid var(--line);max-height:168px}
+  #goals{flex-direction:row;overflow:auto hidden}
   .goal{flex:0 0 220px}
-  #notes-pane{border-left:0;border-top:1px solid #dde3eb;max-height:40vh}
+  .model-row{grid-template-columns:1fr}
 }
 @media(max-width:700px){
-  header{gap:8px}header h1{font-size:14px}#folder,#worker-label{display:none}#status{max-width:140px}
-  .run-head,#packet,.composer,#attention,#pytest-box{padding-left:16px;padding-right:16px}
-  .empty h2{font-size:24px}
+  header h1{font-size:14px}#folder,#worker-label{display:none}#status{max-width:140px}
+  #drawers{flex-direction:column;margin-left:16px;margin-right:16px}
+  .run-head,#packet,.composer,#now,#chain,.memory-tools{padding-left:16px;padding-right:16px}
 }
     </style>
   </head>
   <body>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+      <symbol id="i-logo" viewBox="0 0 24 24"><path d="M5 16c2-6 4-9 7-9s5 3 7 9"/><circle cx="12" cy="6" r="2"/><path d="M8 20h8"/></symbol>
+      <symbol id="i-thinker" viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M8 10a4 4 0 1 1 8 0c0 1.7-1 2.6-2 3.5H10c-1-.9-2-1.8-2-3.5z"/><path d="M12 2v2M5.5 5.5 7 7M18.5 5.5 17 7"/></symbol>
+      <symbol id="i-coder" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/><path d="m13 6-2 12"/></symbol>
+      <symbol id="i-live" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/></symbol>
+      <symbol id="i-ok" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+      <symbol id="i-fail" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+      <symbol id="i-wait" viewBox="0 0 24 24"><path d="m12 3 9 16H3z"/><path d="M12 9v5M12 17h.01"/></symbol>
+      <symbol id="i-steer" viewBox="0 0 24 24"><path d="M4 12h12"/><path d="m12 6 6 6-6 6"/><path d="M20 5v14"/></symbol>
+      <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 12 7-12 7z"/></symbol>
+      <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3z"/><path d="M3 7V5h6l2 2"/></symbol>
+      <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 8h10M18 8h2M4 16h2M10 16h10"/><circle cx="16" cy="8" r="2"/><circle cx="8" cy="16" r="2"/></symbol>
+    </svg>
     <header>
       <div class="brand">
-        <span class="logo" aria-hidden="true">≋</span>
+        <span class="logo" aria-hidden="true"><svg class="ico"><use href="#i-logo"></use></svg></span>
         <h1>Agent Memory</h1>
       </div>
       <span id="folder">No project open</span>
       <span id="worker-label">No agent login</span>
       <span id="status" role="status">Open a project to begin</span>
-      <button id="pick">Open folder</button>
-      <button id="settings-open" aria-label="Connection settings">Settings</button>
+      <button id="pick"><svg class="ico"><use href="#i-folder"></use></svg>Open folder</button>
+      <button id="settings-open" aria-label="Connection settings"><svg class="ico"><use href="#i-settings"></use></svg>Settings</button>
     </header>
     <main id="app-shell">
       <aside aria-label="Goals">
@@ -137,26 +170,35 @@ dialog input,dialog textarea,dialog select{width:100%}
             <p class="eyebrow" style="margin:0">Goals</p>
             <p id="goal-need" class="small muted"></p>
           </div>
-          <button id="new-goal-open">+ Goal</button>
+          <button id="new-goal-open"><svg class="ico"><use href="#i-plus"></use></svg>+ Goal</button>
         </div>
         <div id="goals"><div class="hint">Open a folder to see its goals.</div></div>
       </aside>
       <section id="stage" aria-label="Selected run">
         <div class="empty" id="welcome">
-          <div class="empty-icon" aria-hidden="true">≋</div>
           <h2>One board for goals that keep running.</h2>
-          <p>Write what must stay true. Agents write failing pytests and respawn until they pass. You only jump in when something is off.</p>
+          <p>Thinker writes the failing tests. Coder makes them pass. Then they trade places until the suite is green.</p>
           <form id="ask">
             <label class="eyebrow" for="question">New goal</label>
             <textarea id="question" rows="3" placeholder="What should stay true when this is done?"></textarea>
-            <label class="eyebrow" for="model">Model</label>
-            <select id="model" aria-label="Agent model">
-              <option value="gpt-5.6-luna">GPT-5.6 Luna</option>
-            </select>
+            <div class="model-row">
+              <div>
+                <label class="eyebrow" for="model"><svg class="ico"><use href="#i-thinker"></use></svg> Thinker</label>
+                <select id="model" aria-label="Thinker model">
+                  <option value="gpt-5.6-luna">GPT-5.6 Luna</option>
+                </select>
+              </div>
+              <div>
+                <label class="eyebrow" for="coder-model"><svg class="ico"><use href="#i-coder"></use></svg> Coder</label>
+                <select id="coder-model" aria-label="Coder model">
+                  <option value="gpt-5.6-luna">GPT-5.6 Luna</option>
+                </select>
+              </div>
+            </div>
             <p class="small muted" id="goal-note">Connect Codex or a Cursor key in Settings.</p>
             <div class="run-actions">
               <button id="new-goal-close" type="button" hidden>Cancel</button>
-              <button class="primary" id="send" type="submit" disabled>Run</button>
+              <button class="primary" id="send" type="submit" disabled><svg class="ico"><use href="#i-play"></use></svg>Run</button>
             </div>
           </form>
         </div>
@@ -170,6 +212,17 @@ dialog input,dialog textarea,dialog select{width:100%}
             <p id="run-state"></p>
           </div>
           <p id="attention" hidden></p>
+          <div id="now">
+            <div id="now-head">
+              <svg class="ico" id="now-icon"><use href="#i-live"></use></svg>
+              <span id="now-role">Waiting</span>
+              <span id="now-model" class="muted small"></span>
+              <span id="now-verb" class="muted"></span>
+              <span id="now-elapsed" class="muted small"></span>
+            </div>
+            <pre id="now-log"></pre>
+          </div>
+          <div id="chain" aria-label="Thinker to coder chain"></div>
           <div id="packet">
             <button type="button" class="packet-line" id="handoff-card" hidden>
               <p class="eyebrow" id="handoff-label">Next agent</p>
@@ -182,33 +235,35 @@ dialog input,dialog textarea,dialog select{width:100%}
             <div class="packet-line" id="questions" hidden></div>
             <p id="memory-error" class="small" role="alert" hidden></p>
           </div>
-          <details id="pytest-box">
-            <summary id="run-pytest"></summary>
-            <pre id="run-tail"></pre>
-          </details>
+          <div id="drawers">
+            <details id="pytest-box">
+              <summary id="run-pytest"></summary>
+              <pre id="run-tail"></pre>
+            </details>
+            <details id="notes-box">
+              <summary>Notes <span id="note-count"></span></summary>
+              <div class="memory-tools">
+                <input id="memory-search" type="search" placeholder="Find a memory…" aria-label="Search memory" />
+              </div>
+              <div id="timeline"></div>
+              <button type="button" id="more-notes" hidden>Open selected note</button>
+            </details>
+          </div>
           <div class="composer">
             <form id="steer-form">
               <label class="eyebrow" for="steer-text">Steer this goal</label>
-              <textarea id="steer-text" rows="3" placeholder="Tell the next agent what to change or preserve."></textarea>
-              <p id="steer-message" class="small" role="status"></p>
-              <div class="run-actions">
-                <button id="steer-open" type="button" hidden>Steer this goal</button>
-                <button id="steer-save" class="primary" type="submit">Save steering</button>
-                <button id="resume" type="button" hidden>Resume</button>
-                <button id="stop" type="button" hidden>Stop</button>
+              <div id="steer-row">
+                <textarea id="steer-text" rows="1" placeholder="Tell the next agent what to change or preserve."></textarea>
+                <div class="run-actions">
+                  <button id="steer-open" type="button" hidden>Steer this goal</button>
+                  <button id="steer-save" type="submit"><svg class="ico"><use href="#i-steer"></use></svg>Save</button>
+                  <button id="resume" class="primary" type="button" hidden><svg class="ico"><use href="#i-play"></use></svg>Resume</button>
+                  <button id="stop" type="button" hidden><svg class="ico"><use href="#i-stop"></use></svg>Stop</button>
+                </div>
               </div>
+              <p id="steer-message" class="small" role="status"></p>
             </form>
           </div>
-        </div>
-      </section>
-      <section id="notes-pane" hidden aria-label="Memory notes">
-        <div class="memory-tools">
-          <p class="eyebrow">Notes <span id="note-count"></span></p>
-          <input id="memory-search" type="search" placeholder="Find a memory…" aria-label="Search memory" />
-        </div>
-        <div id="timeline"></div>
-        <div style="padding:0 14px 14px">
-          <button type="button" id="more-notes">Open selected note</button>
         </div>
       </section>
     </main>
@@ -241,6 +296,7 @@ dialog input,dialog textarea,dialog select{width:100%}
     </dialog>
     <script>
       const $ = (id) => document.getElementById(id);
+      const LUNA = "gpt-5.6-luna";
       const state = {
         busy: false,
         project: "",
@@ -256,21 +312,14 @@ dialog input,dialog textarea,dialog select{width:100%}
         refreshing: false,
         startedAt: 0,
         compose: false,
+        turns: [],
+        liveAgent: null,
         noteCache: new Map(),
       };
       const expanded = new Set();
+      const icon = (name) => `<svg class="ico" aria-hidden="true"><use href="#i-${name}"></use></svg>`;
       const esc = (value) =>
-        String(value ?? "").replace(
-          /[&<>"']/g,
-          (c) =>
-            ({
-              "&": "&amp;",
-              "<": "&lt;",
-              ">": "&gt;",
-              '"': "&quot;",
-              "'": "&#39;",
-            })[c],
-        );
+        String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
       const normalizeFragmentBreaks = (text) =>
         String(text || "")
           .replace(/\n\n(?=[ \t]|[.,!?;:)\]}`])/g, "")
@@ -281,27 +330,13 @@ dialog input,dialog textarea,dialog select{width:100%}
           .split(/(```[\s\S]*?```)/g)
           .map((part) =>
             part.startsWith("```")
-              ? "<pre><code>" +
-                esc(part.replace(/^```[^\n]*\n?/, "").replace(/```$/, "")) +
-                "</code></pre>"
-              : esc(part)
-                  .replace(/`([^`\n]+)`/g, "<code>$1</code>")
-                  .replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>")
-                  .replace(/^#{1,4} (.+)$/gm, "<h3>$1</h3>"),
+              ? "<pre><code>" + esc(part.replace(/^```[^\n]*\n?/, "").replace(/```$/, "")) + "</code></pre>"
+              : esc(part).replace(/`([^`\n]+)`/g, "<code>$1</code>").replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>").replace(/^#{1,4} (.+)$/gm, "<h3>$1</h3>"),
           )
           .join("");
       }
       async function api(url, data) {
-        const res = await fetch(
-          url,
-          data === undefined
-            ? {}
-            : {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
-              },
-        );
+        const res = await fetch(url, data === undefined ? {} : { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
         const body = await res.json();
         if (!res.ok) throw new Error(body.error || "Request failed");
         return body;
@@ -316,13 +351,11 @@ dialog input,dialog textarea,dialog select{width:100%}
         return state.worker === "codex" || state.worker === "cursor" || state.worker === "test" || state.hasKey;
       }
       function workerLabel() {
-        return state.worker === "codex"
-          ? "Codex · logged in"
-          : state.worker === "cursor" || state.hasKey
-            ? "Cursor · key"
-            : state.worker === "test"
-              ? "Test worker"
-              : "No agent login";
+        return state.worker === "codex" ? "Codex · logged in" : state.worker === "cursor" || state.hasKey ? "Cursor · key" : state.worker === "test" ? "Test worker" : "No agent login";
+      }
+      function modelName(id) {
+        const opt = [...$("model").options].find((o) => o.value === id);
+        return (opt && opt.textContent) || id || "";
       }
       function controls() {
         const launch = canLaunch();
@@ -334,14 +367,11 @@ dialog input,dialog textarea,dialog select{width:100%}
         $("new-goal-open").disabled = state.busy;
         $("pick").disabled = state.busy;
         $("model").disabled = state.busy;
+        $("coder-model").disabled = state.busy;
         $("steer-save").disabled = !state.goalId || state.busy;
         $("steer-text").disabled = !state.goalId;
         $("worker-label").textContent = workerLabel();
-        $("goal-note").textContent = !launch
-          ? "Connect Codex or a Cursor key in Settings."
-          : !state.project
-            ? "Run will ask you to pick a folder."
-            : "Enter starts a new isolated goal.";
+        $("goal-note").textContent = !launch ? "Connect Codex or a Cursor key in Settings." : !state.project ? "Run will ask you to pick a folder." : "Enter starts a new isolated goal.";
         $("new-goal-close").hidden = !state.compose || !state.goals.length;
       }
       function allNotes(items) {
@@ -349,9 +379,7 @@ dialog input,dialog textarea,dialog select{width:100%}
       }
       function tone(status) {
         const pytest = (status && status.pytest) || {};
-        const running =
-          (status && status.state) === "running" ||
-          (state.busy && status && (status.goal_id || state.goalId) === state.goalId && status.state !== "passed");
+        const running = (status && status.state) === "running" || (state.busy && status && (status.goal_id || state.goalId) === state.goalId && status.state !== "passed");
         if (running) return "run";
         if ((status && status.state) === "needs_attention" || status?.steering_pending) return "attention";
         if ((status && status.state) === "passed" || pytest.ok === true) return "ok";
@@ -383,12 +411,49 @@ dialog input,dialog textarea,dialog select{width:100%}
       function rankGoal(goal) {
         return { attention: 0, run: 1, red: 2, idle: 3, ok: 4 }[tone({ ...goal.status, goal_id: goal.id })] ?? 3;
       }
+      function deriveTurns(commits) {
+        return allNotes(commits || [])
+          .map((c) => {
+            const match = /Agent (\d+) pytest (pass|fail)/i.exec(c.title || "");
+            if (!match) return null;
+            const agent = Number(match[1]);
+            return { agent, role: agent % 2 === 0 ? "thinker" : "coder", ok: match[2].toLowerCase() === "pass", summary: c.title, id: c.id, model: "" };
+          })
+          .filter(Boolean)
+          .sort((a, b) => a.agent - b.agent);
+      }
+      function setNow(role, model, verb, live) {
+        $("now-role").textContent = role ? role[0].toUpperCase() + role.slice(1) : "Waiting";
+        $("now-role").className = role || "";
+        $("now-model").textContent = modelName(model) || model || "";
+        $("now-verb").textContent = verb || "";
+        $("now").classList.toggle("live", Boolean(live));
+        $("now-icon").innerHTML = `<use href="#i-${live ? "live" : role === "coder" ? "coder" : role === "thinker" ? "thinker" : "live"}"></use>`;
+        tidyBoard();
+      }
+      function tidyBoard() {
+        $("packet").hidden = ["handoff-card", "steering-card", "questions", "memory-error"].every((id) => $(id).hidden);
+      }
+      function renderChain(turns, liveAgent) {
+        state.turns = turns || [];
+        if (!state.turns.length && liveAgent != null) {
+          state.turns = [{ agent: liveAgent, role: "thinker", live: true, model: $("model").value }];
+        } else if (liveAgent != null && !state.turns.some((t) => t.agent === liveAgent)) {
+          state.turns = state.turns.concat([{ agent: liveAgent, role: liveAgent % 2 ? "coder" : "thinker", live: true, model: liveAgent % 2 ? $("coder-model").value : $("model").value }]);
+        }
+        $("chain").innerHTML = state.turns.map((t, i) => {
+          const role = t.role || (t.agent % 2 ? "coder" : "thinker");
+          const kind = t.live || t.agent === liveAgent ? "live" : t.ok === true ? "ok" : t.ok === false ? "red" : "";
+          const mark = t.ok === true ? "ok" : t.ok === false ? "fail" : role === "coder" ? "coder" : "thinker";
+          const extra = [modelName(t.model) || t.model, t.ok === true ? "pass" : t.ok === false ? "fail" : ""].filter(Boolean).join(" · ");
+          const body = `<button type="button" class="chain-node ${role} ${kind}" data-note="${esc(t.id || "")}" data-agent="${t.agent}">${icon(mark)} <strong>${role === "coder" ? "Coder" : "Thinker"}</strong>${extra ? `<span class="meta">${esc(extra)}</span>` : ""}</button>`;
+          return i ? `<span class="chain-join" aria-hidden="true"></span>${body}` : body;
+        }).join("");
+      }
       function showCreate() {
         state.compose = true;
         $("welcome").hidden = false;
         $("board").hidden = true;
-        $("notes-pane").hidden = true;
-        $("app-shell").classList.remove("has-goal");
         controls();
         $("question").focus();
       }
@@ -397,21 +462,21 @@ dialog input,dialog textarea,dialog select{width:100%}
         const open = Boolean(state.goalId);
         $("welcome").hidden = open;
         $("board").hidden = !open;
-        $("notes-pane").hidden = !open;
-        $("app-shell").classList.toggle("has-goal", open);
         controls();
       }
       function resetStage() {
         state.compose = false;
+        state.turns = [];
+        state.liveAgent = null;
         $("welcome").hidden = false;
         $("board").hidden = true;
-        $("notes-pane").hidden = true;
-        $("app-shell").classList.remove("has-goal");
         $("handoff-card").hidden = true;
         $("steering-card").hidden = true;
         $("questions").hidden = true;
         $("memory-error").hidden = true;
-        $("attention").hidden = true;
+        $("now-log").textContent = "";
+        $("now-log").classList.remove("has-lines");
+        setNow("", "", "", false);
         $("note-body").innerHTML = '<p class="muted">Select a note to read it here.</p>';
       }
       async function showNote(id) {
@@ -438,9 +503,7 @@ dialog input,dialog textarea,dialog select{width:100%}
         const body = (note.text || "").slice((note.title || "").length).trim();
         $("note-body").innerHTML =
           `<p class="eyebrow">${esc(note.kind === "summary" ? "Summary commit" : note.kind === "user" ? "User note" : note.kind === "open_question" ? "Open question" : "Memory note")}</p><h2>${esc(note.title || note.id)}</h2><p class="muted small">${esc(note.id)} · ${esc(note.at ? new Date(note.at).toLocaleString() : "")}${note.agent ? " · " + esc(note.agent) : ""}</p><div class="body">${rich(body)}</div>${children.length ? `<p class="eyebrow" style="margin-top:30px">Grouped commits · ${children.length}</p>` + children.map((c) => noteButton(c)).join("") : ""}`;
-        document.querySelectorAll(".note-button").forEach((el) =>
-          el.classList.toggle("selected", el.dataset.note === id),
-        );
+        document.querySelectorAll(".note-button").forEach((el) => el.classList.toggle("selected", el.dataset.note === id));
       }
       function noteButton(c) {
         return `<button class="note-button${state.selected === c.id ? " selected" : ""}" data-note="${esc(c.id)}"><span class="note-title">${esc(c.title)}</span><span class="meta">${esc(c.kind === "summary" ? "Summary" : c.kind === "user" ? "You" : c.kind === "answer" ? "Agent" : c.kind === "open_question" ? "Open question" : "Note")} · ${esc(c.id)}</span></button>`;
@@ -457,11 +520,7 @@ dialog input,dialog textarea,dialog select{width:100%}
           return String(b.status?.updated || "").localeCompare(String(a.status?.updated || ""));
         });
         const hot = sorted.filter((g) => ["attention", "run", "red"].includes(tone({ ...g.status, goal_id: g.id }))).length;
-        $("goal-need").textContent = hot
-          ? hot + (hot === 1 ? " needs you" : " need you")
-          : state.goals.length
-            ? state.goals.length + (state.goals.length === 1 ? " goal" : " goals")
-            : "";
+        $("goal-need").textContent = hot ? hot + (hot === 1 ? " needs you" : " need you") : state.goals.length ? state.goals.length + (state.goals.length === 1 ? " goal" : " goals") : "";
         $("goals").innerHTML = sorted.length
           ? sorted.map((g) => {
               const pytest = (g.status && g.status.pytest) || {};
@@ -478,37 +537,39 @@ dialog input,dialog textarea,dialog select{width:100%}
         hideCreate();
         $("welcome").hidden = true;
         $("board").hidden = false;
-        $("notes-pane").hidden = false;
-        $("app-shell").classList.add("has-goal");
         $("run-id").textContent = "Goal [" + (payload.goal_id || state.goalId || "") + "]";
+        $("run-id").title = payload.workspace || "";
         $("run-title").textContent = payload.goal || "Running";
         $("run-workspace").textContent = shortPath(payload.workspace);
         $("run-workspace").title = payload.workspace || "";
-        $("run-pytest").textContent =
-          "Tests · " +
-          (pytest.summary || "waiting for pytest") +
-          " · agent " + (payload.agent ?? "—") +
-          (payload.max_agents != null ? "/" + payload.max_agents : "");
+        $("run-pytest").textContent = "Tests · " + (pytest.summary || "waiting for pytest") + " · agent " + (payload.agent ?? "—") + (payload.max_agents != null ? "/" + payload.max_agents : "");
         $("run-state").textContent = runLabel(payload);
         $("run-state").className = kind;
         $("run-tail").textContent = pytest.tail || "";
-        if (kind === "red") $("pytest-box").open = true;
+        $("pytest-box").hidden = !pytest.summary && !pytest.tail;
+        $("pytest-box").open = kind === "red" && Boolean(pytest.tail);
         if (pending) {
           $("steering-card").hidden = false;
           $("steering-text").textContent = pending.text || "";
           $("steering-card").dataset.note = pending.id || "";
         }
-        const ask =
-          kind === "attention"
-            ? "You left a note for the next agent. Resume when you want it picked up."
+        const turns = payload.turns || state.turns;
+        if (payload.turns) state.turns = payload.turns;
+        const live = kind === "run" ? payload.agent : null;
+        state.liveAgent = live;
+        renderChain(turns, live);
+        const last = (turns || [])[(turns || []).length - 1] || {};
+        const role = payload.role || last.role || "";
+        const verb = kind === "run"
+          ? (payload.phase === "bootstrap" ? "Writing failing tests" : role === "thinker" ? "Reviewing the failure" : "Making tests pass")
+          : kind === "ok"
+            ? (turns || []).length
+              ? "Passed after " + turns.length + (turns.length === 1 ? " agent" : " agents")
+              : "Passed"
             : kind === "red"
-              ? "Tests failed. Steer if the approach is wrong, or resume to try again."
-              : kind === "ok"
-                ? "Passed. This goal is done."
-                : "";
-        $("attention").hidden = !ask;
-        $("attention").textContent = ask;
-        $("attention").className = kind === "red" || kind === "ok" ? kind : "";
+              ? "Tests failed"
+              : "";
+        setNow(role || (kind === "ok" ? "thinker" : ""), payload.model || last.model || "", verb, kind === "run");
       }
       function renderMemory(data) {
         $("memory-error").hidden = true;
@@ -518,12 +579,9 @@ dialog input,dialog textarea,dialog select{width:100%}
         state.memoryJSON = serial;
         const questions = data.questions || [];
         $("questions").hidden = !questions.length;
-        $("questions").innerHTML =
-          '<p class="eyebrow">Stuck</p>' +
-          questions
-            .map((q) => `<button type="button" class="question" data-note="${esc(q.id)}">${esc(q.text)}</button>`)
-            .join("");
-        $("handoff-card").hidden = !data.handoff;
+        $("questions").innerHTML = '<p class="eyebrow">Stuck</p>' + questions.map((q) => `<button type="button" class="question" data-note="${esc(q.id)}">${esc(q.text)}</button>`).join("");
+        const handoffDup = /Agent \d+ pytest/i.test(data.handoff?.text || "");
+        $("handoff-card").hidden = !data.handoff || handoffDup;
         $("handoff-text").textContent = data.handoff?.text || "";
         $("handoff-card").dataset.note = data.handoff?.id || "";
         const passed = state.goals.find((g) => g.id === state.goalId)?.status?.state === "passed";
@@ -531,12 +589,13 @@ dialog input,dialog textarea,dialog select{width:100%}
         $("steering-card").hidden = !data.steering;
         $("steering-text").textContent = data.steering?.text || "";
         $("steering-card").dataset.note = data.steering?.id || "";
-        if (!data.handoff && questions.length && !$("attention").textContent) {
-          $("attention").hidden = false;
-          $("attention").textContent = "The last agent left a question. Answer it here, then resume.";
+        if (!state.turns.length) {
+          const derived = deriveTurns(state.commits);
+          renderChain(derived, state.liveAgent);
         }
         state.pinned = new Set([data.goal?.id, data.steering?.id, data.handoff?.id, ...questions.map((q) => q.id)]);
         renderTimeline();
+        tidyBoard();
       }
       function renderTimeline() {
         const query = $("memory-search").value.trim().toLowerCase();
@@ -544,6 +603,7 @@ dialog input,dialog textarea,dialog select{width:100%}
         const durable = allNotes(state.commits).filter((c) => !["user", "answer"].includes(c.kind) || state.pinned?.has(c.id));
         const notes = source.filter((c) => (query || !state.pinned?.has(c.id)) && !["user", "answer"].includes(c.kind) && (!query || c.title.toLowerCase().includes(query)));
         $("note-count").textContent = durable.length ? "(" + durable.length + ")" : "";
+        $("notes-box").hidden = !durable.length && !query;
         $("timeline").innerHTML = notes.map(query ? noteButton : noteHTML).join("") || '<div class="hint">' + (query ? "No matching memories." : (state.commits.length ? "No extra notes yet." : "No saved memories in this folder yet.")) + "</div>";
       }
       $("memory-search").oninput = renderTimeline;
@@ -574,7 +634,7 @@ dialog input,dialog textarea,dialog select{width:100%}
           }
         } catch (error) {
           $("memory-error").hidden = false;
-          $("memory-error").textContent = "Could not refresh memory: " + error.message;
+          $("memory-error").textContent = "Reconnecting…";
         } finally {
           state.refreshing = false;
         }
@@ -584,6 +644,7 @@ dialog input,dialog textarea,dialog select{width:100%}
         state.memoryJSON = "";
         state.memoryETag = "";
         state.noteCache.clear();
+        state.turns = [];
         const row = state.goals.find((g) => g.id === id);
         if (row) showBoard({ goal_id: row.id, goal: row.title, workspace: row.workspace, ...(row.status || {}) });
         renderGoals(state.goals);
@@ -594,19 +655,15 @@ dialog input,dialog textarea,dialog select{width:100%}
         const goal = event.target.closest("[data-goal]");
         if (goal) { selectGoal(goal.dataset.goal); return; }
         const button = event.target.closest("[data-note]");
-        if (button) showNote(button.dataset.note);
+        if (button && button.dataset.note) showNote(button.dataset.note);
       });
-      $("timeline").addEventListener(
-        "toggle",
-        (event) => {
-          const id = event.target.dataset.group;
-          if (id) {
-            if (event.target.open) expanded.add(id);
-            else expanded.delete(id);
-          }
-        },
-        true,
-      );
+      $("timeline").addEventListener("toggle", (event) => {
+        const id = event.target.dataset.group;
+        if (id) {
+          if (event.target.open) expanded.add(id);
+          else expanded.delete(id);
+        }
+      }, true);
       function applyOpen(data) {
         const changed = state.project !== data.project;
         state.project = data.project;
@@ -622,6 +679,7 @@ dialog input,dialog textarea,dialog select{width:100%}
           state.commits = [];
           state.pinned = new Set();
           state.selected = null;
+          state.turns = [];
           expanded.clear();
           $("question").value = "";
           state.goalId = "";
@@ -632,7 +690,6 @@ dialog input,dialog textarea,dialog select{width:100%}
         status(data.ready ? "Ready" : data.hint || "Memory setup needed", false, data.ready);
         controls();
         refreshGoals();
-        refreshMemory();
       }
       async function openProject(url, extra = {}) {
         try {
@@ -646,10 +703,7 @@ dialog input,dialog textarea,dialog select{width:100%}
         }
       }
       $("pick").onclick = () => openProject("/api/pick");
-      $("open").onsubmit = (event) => {
-        event.preventDefault();
-        openProject("/api/open", { project: $("project-path").value });
-      };
+      $("open").onsubmit = (event) => { event.preventDefault(); openProject("/api/open", { project: $("project-path").value }); };
       $("settings-open").onclick = () => $("settings").showModal();
       $("settings-close").onclick = () => $("settings").close();
       $("new-goal-open").onclick = showCreate;
@@ -680,28 +734,33 @@ dialog input,dialog textarea,dialog select{width:100%}
       };
       $("note-close").onclick = () => $("note").close();
       $("more-notes").onclick = () => showNote(state.selected);
+      function fillSelect(el, models, current) {
+        el.innerHTML = models.map((m) => `<option value="${esc(m.id)}">${esc(m.name)}</option>`).join("");
+        const pick = models.some((m) => m.id === current) ? current : models.some((m) => m.id === LUNA) ? LUNA : LUNA;
+        if ([...el.options].some((o) => o.value === pick)) el.value = pick;
+      }
       async function loadModels() {
         try {
           const data = await api("/api/models");
           const models = data.models || [];
-          const current = data.model || localStorage.getItem("studio-model-v3") || $("model").value;
-          $("model").innerHTML = models.map((m) => `<option value="${esc(m.id)}">${esc(m.name)}</option>`).join("");
-          if (models.some((m) => m.id === current)) $("model").value = current;
-          else if (models[0]) $("model").value = models[0].id;
+          fillSelect($("model"), models, data.thinker_model || data.model || localStorage.getItem("studio-thinker") || LUNA);
+          fillSelect($("coder-model"), models, data.coder_model || localStorage.getItem("studio-coder") || LUNA);
         } catch (error) {
           status(error.message, true);
         }
       }
-      $("model").onchange = async () => {
+      async function saveModels() {
+        localStorage.setItem("studio-thinker", $("model").value);
+        localStorage.setItem("studio-coder", $("coder-model").value);
         localStorage.setItem("studio-model-v3", $("model").value);
         try {
-          await api("/api/model", { model: $("model").value });
+          await api("/api/model", { thinker_model: $("model").value, coder_model: $("coder-model").value, model: $("model").value });
         } catch (error) {
           status(error.message, true);
-          const session = await api("/api/session").catch(() => null);
-          if (session) { $("model").value = session.model; localStorage.setItem("studio-model-v3", session.model); }
         }
-      };
+      }
+      $("model").onchange = saveModels;
+      $("coder-model").onchange = saveModels;
       $("connect-codex").onclick = async () => {
         $("connect-codex").disabled = true;
         $("settings-message").textContent = "Opening Codex login…";
@@ -748,20 +807,38 @@ dialog input,dialog textarea,dialog select{width:100%}
           controls();
         }
       };
+      function appendLive(text) {
+        if (!text) return;
+        const log = $("now-log");
+        log.textContent = (log.textContent ? log.textContent + "\n" : "") + text;
+        log.classList.add("has-lines");
+        const lines = log.textContent.split("\n");
+        if (lines.length > 12) log.textContent = lines.slice(-12).join("\n");
+        log.scrollTop = log.scrollHeight;
+      }
       async function startRun(payload) {
         state.busy = true;
         state.startedAt = Date.now();
         status("Agent running · " + $("model").selectedOptions[0].text);
         controls();
         hideCreate();
+        $("now-log").textContent = "";
+        $("now-log").classList.remove("has-lines");
         let failed = false, ended = false;
         function receive(event) {
           if (event.type === "memory") { refreshMemory(); refreshGoals(); }
           if (event.type === "status") status(event.text || "Running…");
+          if (event.type === "live") {
+            state.liveAgent = event.agent;
+            appendLive(event.text);
+            setNow(event.role, event.model, event.phase === "bootstrap" ? "Writing failing tests" : event.role === "thinker" ? "Reviewing the failure" : event.role === "coder" ? "Making tests pass" : event.text, true);
+            renderChain(state.turns, event.agent);
+            if (event.goal) showBoard({ ...event, turns: state.turns, state: "running" });
+          }
           if (event.type === "observe") {
             state.goalId = event.goal_id || state.goalId;
             showBoard(event);
-            status("Agent " + event.agent + " · " + (event.pytest?.summary || "running"));
+            status((event.role || "Agent") + " " + event.agent + " · " + (event.pytest?.summary || "running"));
           }
           if (event.type === "error") {
             failed = true;
@@ -775,11 +852,7 @@ dialog input,dialog textarea,dialog select{width:100%}
             }
             if (!failed) {
               const stopped = event.status === "cancelled" || event.status === "stopped";
-              status(
-                stopped ? "Stopped" : event.status === "error" ? "Run failed." : "Goal " + (event.status || "done"),
-                event.status === "error",
-                !stopped && event.status !== "error" && state.ready,
-              );
+              status(stopped ? "Stopped" : event.status === "error" ? "Run failed." : "Goal " + (event.status || "done"), event.status === "error", !stopped && event.status !== "error" && state.ready);
             }
           }
         }
@@ -823,33 +896,22 @@ dialog input,dialog textarea,dialog select{width:100%}
           if (!state.project) return;
         }
         $("question").value = "";
-        await startRun({ text, model: $("model").value });
+        await startRun({ text, model: $("model").value, thinker_model: $("model").value, coder_model: $("coder-model").value });
       };
       $("resume").onclick = async () => {
         if (!state.goalId || !canLaunch() || state.busy) return;
-        await startRun({ goal_id: state.goalId });
+        await startRun({ goal_id: state.goalId, thinker_model: $("model").value, coder_model: $("coder-model").value });
       };
       $("stop").onclick = async () => {
         $("stop").disabled = true;
         status("Stopping…");
-        try {
-          await api("/api/cancel", {});
-        } catch (error) {
-          status(error.message, true);
-        } finally {
-          $("stop").disabled = false;
-        }
+        try { await api("/api/cancel", {}); } catch (error) { status(error.message, true); }
+        finally { $("stop").disabled = false; }
       };
       $("question").onkeydown = (event) => {
         if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
           event.preventDefault();
           $("ask").requestSubmit();
-        }
-      };
-      $("steer-text").onkeydown = (event) => {
-        if (event.key === "Enter" && (event.metaKey || event.ctrlKey) && !event.isComposing) {
-          event.preventDefault();
-          $("steer-form").requestSubmit();
         }
       };
       async function init() {
@@ -876,8 +938,8 @@ dialog input,dialog textarea,dialog select{width:100%}
             if (last) await openProject("/api/open", { project: last });
           }
           await modelsReady;
-          if (state.project && canLaunch() && !session.running && session.model !== $("model").value)
-            await api("/api/model", { model: $("model").value });
+          if (state.project && canLaunch() && !session.running)
+            await api("/api/model", { model: $("model").value, thinker_model: $("model").value, coder_model: $("coder-model").value });
           if (resumeId) {
             await refreshGoals();
             if (state.goals.find((g) => g.id === resumeId)) selectGoal(resumeId);
@@ -905,6 +967,7 @@ dialog input,dialog textarea,dialog select{width:100%}
         if (state.busy && state.startedAt) {
           const seconds = Math.floor((Date.now() - state.startedAt) / 1000);
           const elapsed = seconds < 60 ? seconds + "s" : Math.floor(seconds / 60) + "m " + (seconds % 60) + "s";
+          $("now-elapsed").textContent = elapsed;
           status("Agent running · " + $("model").selectedOptions[0].text + " · " + elapsed);
         }
         refreshGoals();

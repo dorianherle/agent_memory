@@ -118,6 +118,55 @@ class RunnerTests(MemoryTestCase):
         self.assertEqual(final["steering_applied"]["id"], steering_id)
         self.assertNotIn("steering_pending", final)
 
+    def test_thinker_coder_alternates_and_records_models(self) -> None:
+        seen = []
+
+        def worker(prompt: str, cwd: Path) -> None:
+            seen.append("thinker" if "acceptance criteria" in prompt or "You are the Thinker" in prompt else "coder")
+            tests = cwd / "tests" / "test_goal.py"
+            app = cwd / "app.py"
+            if seen[-1] == "thinker" and len(seen) == 1:
+                app.write_text("VALUE = 1\n")
+                _write(tests, "from app import VALUE\n\ndef test_value():\n    assert VALUE == 2\n")
+            elif seen[-1] == "coder" and len(seen) == 2:
+                pass
+            elif seen[-1] == "thinker":
+                _write(tests, "from app import VALUE\n\ndef test_value():\n    assert VALUE == 2\n")
+            else:
+                app.write_text("VALUE = 2\n")
+
+        status = run_goal(
+            self.path,
+            "VALUE must be 2",
+            worker=worker,
+            max_agents=4,
+            thinker_model="gpt-5.6-luna",
+            coder_model="gpt-5.5",
+            worker_name="test",
+        )
+        self.assertEqual(status["state"], "passed")
+        self.assertGreaterEqual(len(status["turns"]), 3)
+        self.assertEqual(status["turns"][0]["role"], "thinker")
+        self.assertEqual(status["turns"][0]["model"], "gpt-5.6-luna")
+        self.assertEqual(status["turns"][1]["role"], "coder")
+        self.assertEqual(status["turns"][1]["model"], "gpt-5.5")
+        self.assertEqual(status["turns"][2]["role"], "thinker")
+        self.assertEqual(seen[:3], ["thinker", "coder", "thinker"])
+
+    def test_codex_worker_streams_stdout_lines(self) -> None:
+        lines = []
+
+        class FakeProc:
+            stdout = iter(["editing tests/test_goal.py\n", "\n", "done\n"])
+            def wait(self):
+                return 0
+            def poll(self):
+                return 0
+
+        with patch("agent_memory.runner.subprocess.Popen", return_value=FakeProc()):
+            codex_worker("go", self.path, model="gpt-5.6-luna", on_line=lines.append)
+        self.assertEqual(lines, ["editing tests/test_goal.py", "done"])
+
 
 class WorkerDetectTests(MemoryTestCase):
     def test_prefers_codex_when_logged_in(self) -> None:
