@@ -37,52 +37,58 @@ aside{display:flex;flex-direction:column;min-height:0;border-right:1px solid var
 .goal.run .pip{animation:pulse 1.4s ease-in-out infinite}
 .goal .note-title{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px;line-height:1.35;font-weight:600}
 .goal .meta{display:block;font-size:11px;color:var(--muted);margin-top:3px}
-#stage{display:flex;flex-direction:column;min-height:0;background:var(--bg);overflow:auto}
+#stage{display:flex;flex-direction:column;min-height:0;background:var(--bg);overflow:hidden}
 .eyebrow{font-size:10px;font-weight:650;letter-spacing:1.1px;text-transform:uppercase;color:var(--faint);margin:0 0 6px}
 .muted{color:var(--muted)}.small{font-size:12px}.hint{color:var(--muted);font-size:13px;padding:14px 8px}.error{color:var(--error)}
-.empty{max-width:560px;margin:auto;padding:32px 28px 48px}
+.empty{max-width:560px;margin:auto;padding:32px 28px 48px;overflow:auto}
 .empty h2{font-size:28px;line-height:1.2;letter-spacing:-.8px;font-weight:600;margin:0 0 10px}
 .empty>p{color:var(--muted);margin:0 0 22px;max-width:440px;line-height:1.65}
 #ask{display:flex;flex-direction:column;gap:8px}
 #ask textarea{min-height:88px;resize:vertical}
 .model-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-#board{display:flex;flex-direction:column;min-height:0;flex:1}
-.run-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:18px 24px 4px}
-.run-head h2{font-size:20px;letter-spacing:-.4px;line-height:1.25;margin:2px 0 4px;overflow-wrap:anywhere}
+#board{display:flex;flex-direction:column;min-height:0;flex:1;overflow:hidden}
+.run-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 24px;border-bottom:1px solid var(--line)}
+.run-head h2{font-size:15px;letter-spacing:-.2px;line-height:1.3;margin:2px 0 0;overflow-wrap:anywhere}
 #run-state{font-size:11px;font-weight:700;letter-spacing:.04em;white-space:nowrap;padding:5px 8px;border-radius:6px;background:var(--elevated)}
 #run-state.run{color:var(--accent)}#run-state.ok{color:var(--ok)}#run-state.red{color:var(--error)}#run-state.attention{color:var(--wait)}
 #run-workspace{display:none;margin:0}
-#now{display:none;margin:0 24px 10px;padding:10px 12px;border:1px solid #35558c;border-radius:10px;background:var(--panel)}
-#now.live{display:block}
-#now-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px}
-#now-role{font-weight:650}
-#now-role.thinker{color:var(--accent)}#now-role.coder{color:var(--coder)}
+#thread{flex:1;min-height:0;overflow:auto;padding:18px 24px 12px;display:flex;flex-direction:column;gap:16px}
+.msg{display:flex;gap:10px;align-items:flex-start;width:min(680px,100%);border:0;background:transparent;padding:0;text-align:left}
+button.msg:hover{border-color:transparent;background:transparent}
+.msg.you{align-self:flex-end;flex-direction:row-reverse}
+.msg.sys{align-self:center;width:auto}
+.bot{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;flex:0 0 34px;background:#101010;border:1px solid var(--line)}
+.bot .ico{width:18px;height:18px;margin:0}
+.msg.thinker .bot{color:var(--accent);border-color:#3d5a8c}
+.msg.coder .bot{color:var(--coder);border-color:#2a5554}
+.msg.you .bot{color:var(--ink);background:#1a2436;border-color:#35558c}
+.msg.live .bot{animation:pulse 1.2s ease-in-out infinite;box-shadow:0 0 0 5px #6ea8fe22}
+.bubble{flex:1;min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:4px 16px 16px 16px;padding:10px 12px}
+.msg.you .bubble{border-radius:16px 4px 16px 16px;background:#1a2436;border-color:#35558c}
+.who{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:12px;font-weight:650;margin:0 0 4px}
+.msg.thinker .who{color:var(--accent)}
+.msg.coder .who{color:var(--coder)}
+.say{margin:0;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
 #now-log{display:none;margin:8px 0 0;max-height:140px;overflow:auto;white-space:pre-wrap;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:#c8d0dc}
-#now.live #now-log.has-lines{display:block}
-#chain{display:flex;align-items:center;gap:0;padding:2px 24px 10px;overflow-x:auto}
-#chain:empty{display:none;padding:0}
+.msg.live #now-log.has-lines{display:block}
+.typing{display:inline-flex;gap:4px;padding:6px 0 2px}
+.typing i{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.35;animation:pulse 1s ease-in-out infinite}
+.typing i:nth-child(2){animation-delay:.15s}
+.typing i:nth-child(3){animation-delay:.3s}
 #handoff-text,#steering-text{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.chain-node{flex:0 0 auto;text-align:left;padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:var(--panel);font-size:12px}
-.chain-node strong{font-weight:650;margin-right:6px}
-.chain-node.thinker{color:var(--accent)}
-.chain-node.coder{color:var(--coder)}
-.chain-node.ok{border-color:#2f5a40}
-.chain-node.red{border-color:#5a3038}
-.chain-node.live{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
-.chain-node .meta{display:inline;margin:0;font-size:11px}
-.chain-join{width:16px;flex:0 0 16px;height:1px;background:var(--strong)}
-#packet{padding:0 24px;display:flex;flex-direction:column;gap:6px}
+#packet{padding:0 24px 8px;display:flex;flex-direction:column;gap:6px}
 .packet-line{text-align:left;width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel)}
 .packet-line p,.packet-line span{margin:0;font-size:13px;overflow-wrap:anywhere}
 #handoff-card{border-color:#35558c}
 #steering-card{border-color:#5a4a24;background:#1a160c}
 .question{display:block;width:100%;text-align:left;border:0;background:transparent;padding:6px 0;border-left:2px solid var(--wait);padding-left:9px;font-size:13px}
-#drawers{display:flex;gap:8px;margin:0 24px 6px}
+#drawers{display:flex;gap:8px;margin:0;padding:8px 24px;border-bottom:1px solid var(--line)}
 #drawers:not(:has(details:not([hidden]))){display:none}
 #pytest-box,#notes-box{flex:1;min-width:0;margin:0;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
 #pytest-box summary,#notes-box summary{cursor:pointer;padding:8px 10px;font-size:13px}
 #run-tail{margin:0;padding:0 12px 12px;max-height:180px;overflow:auto;white-space:pre-wrap;font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}
-.composer{margin-top:auto;padding:12px 24px;border-top:1px solid var(--line);background:#101010}
+.composer{margin-top:0;padding:12px 24px;border-top:1px solid var(--line);background:#101010}
+#steer-form .eyebrow{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
 #steer-form{display:flex;flex-direction:column;gap:6px}
 #steer-row{display:flex;gap:8px;align-items:center}
 #steer-text{min-height:0;height:38px;resize:none;flex:1}
@@ -131,8 +137,8 @@ dialog input,dialog textarea,dialog select{width:100%}
 }
 @media(max-width:700px){
   header h1{font-size:14px}#folder,#worker-label{display:none}#status{max-width:140px}
-  #drawers{flex-direction:column;margin-left:16px;margin-right:16px}
-  .run-head,#packet,.composer,#now,#chain,.memory-tools{padding-left:16px;padding-right:16px}
+  #drawers,#thread,.run-head,#packet,.composer,.memory-tools{padding-left:16px;padding-right:16px}
+  #drawers{flex-direction:column}
 }
     </style>
   </head>
@@ -151,6 +157,7 @@ dialog input,dialog textarea,dialog select{width:100%}
       <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
       <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3z"/><path d="M3 7V5h6l2 2"/></symbol>
       <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 8h10M18 8h2M4 16h2M10 16h10"/><circle cx="16" cy="8" r="2"/><circle cx="8" cy="16" r="2"/></symbol>
+      <symbol id="i-you" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 19c1.5-3 4-5 7-5s5.5 2 7 5"/></symbol>
     </svg>
     <header>
       <div class="brand">
@@ -212,29 +219,6 @@ dialog input,dialog textarea,dialog select{width:100%}
             <p id="run-state"></p>
           </div>
           <p id="attention" hidden></p>
-          <div id="now">
-            <div id="now-head">
-              <svg class="ico" id="now-icon"><use href="#i-live"></use></svg>
-              <span id="now-role">Waiting</span>
-              <span id="now-model" class="muted small"></span>
-              <span id="now-verb" class="muted"></span>
-              <span id="now-elapsed" class="muted small"></span>
-            </div>
-            <pre id="now-log"></pre>
-          </div>
-          <div id="chain" aria-label="Thinker to coder chain"></div>
-          <div id="packet">
-            <button type="button" class="packet-line" id="handoff-card" hidden>
-              <p class="eyebrow" id="handoff-label">Next agent</p>
-              <span id="handoff-text"></span>
-            </button>
-            <button type="button" class="packet-line" id="steering-card" hidden>
-              <p class="eyebrow">Your steering</p>
-              <span id="steering-text"></span>
-            </button>
-            <div class="packet-line" id="questions" hidden></div>
-            <p id="memory-error" class="small" role="alert" hidden></p>
-          </div>
           <div id="drawers">
             <details id="pytest-box">
               <summary id="run-pytest"></summary>
@@ -249,11 +233,24 @@ dialog input,dialog textarea,dialog select{width:100%}
               <button type="button" id="more-notes" hidden>Open selected note</button>
             </details>
           </div>
+          <div id="thread" aria-label="Thinker to coder chain"></div>
+          <div id="packet">
+            <button type="button" class="packet-line" id="handoff-card" hidden>
+              <p class="eyebrow" id="handoff-label">Next agent</p>
+              <span id="handoff-text"></span>
+            </button>
+            <button type="button" class="packet-line" id="steering-card" hidden>
+              <p class="eyebrow">Your steering</p>
+              <span id="steering-text"></span>
+            </button>
+            <div class="packet-line" id="questions" hidden></div>
+            <p id="memory-error" class="small" role="alert" hidden></p>
+          </div>
           <div class="composer">
             <form id="steer-form">
               <label class="eyebrow" for="steer-text">Steer this goal</label>
               <div id="steer-row">
-                <textarea id="steer-text" rows="1" placeholder="Tell the next agent what to change or preserve."></textarea>
+                <textarea id="steer-text" rows="1" placeholder="Message the next agent…"></textarea>
                 <div class="run-actions">
                   <button id="steer-open" type="button" hidden>Steer this goal</button>
                   <button id="steer-save" type="submit"><svg class="ico"><use href="#i-steer"></use></svg>Save</button>
@@ -314,6 +311,13 @@ dialog input,dialog textarea,dialog select{width:100%}
         compose: false,
         turns: [],
         liveAgent: null,
+        liveText: "",
+        nowRole: "",
+        nowModel: "",
+        nowVerb: "",
+        steeringText: "",
+        steeringId: "",
+        questions: [],
         noteCache: new Map(),
       };
       const expanded = new Set();
@@ -422,33 +426,66 @@ dialog input,dialog textarea,dialog select{width:100%}
           .filter(Boolean)
           .sort((a, b) => a.agent - b.agent);
       }
+      function shortFail(summary) {
+        const hit = String(summary || "").match(/(\d+) failed/);
+        return hit ? hit[1] + " tests failed." : "Tests failed.";
+      }
       function setNow(role, model, verb, live) {
-        $("now-role").textContent = role ? role[0].toUpperCase() + role.slice(1) : "Waiting";
-        $("now-role").className = role || "";
-        $("now-model").textContent = modelName(model) || model || "";
-        $("now-verb").textContent = verb || "";
-        $("now").classList.toggle("live", Boolean(live));
-        $("now-icon").innerHTML = `<use href="#i-${live ? "live" : role === "coder" ? "coder" : role === "thinker" ? "thinker" : "live"}"></use>`;
+        state.nowRole = role || "";
+        state.nowModel = model || "";
+        state.nowVerb = verb || "";
+        if (!live) state.liveText = "";
+        renderThread(state.turns, live ? state.liveAgent : null);
         tidyBoard();
       }
       function tidyBoard() {
         $("packet").hidden = ["handoff-card", "steering-card", "questions", "memory-error"].every((id) => $(id).hidden);
       }
-      function renderChain(turns, liveAgent) {
+      function msgYou(text) {
+        return `<div class="msg you"><div class="bot" aria-hidden="true">${icon("you")}</div><div class="bubble"><p class="who">You</p><p class="say">${esc(text)}</p></div></div>`;
+      }
+      function msgBot(t, live) {
+        const role = t.role || (t.agent % 2 ? "coder" : "thinker");
+        const name = role === "coder" ? "Coder" : "Thinker";
+        const mark = live ? role : t.ok === true ? "ok" : t.ok === false ? "fail" : role;
+        const model = modelName(t.model) || t.model || "";
+        const verb = live
+          ? (state.nowVerb || (role === "thinker" ? "Writing failing tests…" : "Making tests pass…"))
+          : t.ok === true
+            ? (role === "coder" ? "Made the tests pass." : "Tests are green.")
+            : t.ok === false
+              ? shortFail(t.summary)
+              : (t.summary || "Working…");
+        const clock = live ? `<span class="muted small" id="now-elapsed"></span>` : "";
+        const body = live
+          ? `<p class="say">${esc(verb)}</p>${state.liveText ? "" : '<span class="typing" aria-label="typing"><i></i><i></i><i></i></span>'}<pre id="now-log"></pre>`
+          : `<p class="say">${esc(verb)}</p>`;
+        return `<button type="button" class="msg ${role}${live ? " live" : t.ok === true ? " ok" : t.ok === false ? " red" : ""}" data-note="${esc(t.id || "")}" data-agent="${t.agent}"><div class="bot">${icon(mark)}</div><div class="bubble"><p class="who">${name}${model ? ` <span class="muted">${esc(model)}</span>` : ""}${clock}</p>${body}</div></button>`;
+      }
+      function renderThread(turns, liveAgent) {
         state.turns = turns || [];
         if (!state.turns.length && liveAgent != null) {
-          state.turns = [{ agent: liveAgent, role: "thinker", live: true, model: $("model").value }];
+          state.turns = [{ agent: liveAgent, role: state.nowRole || "thinker", live: true, model: state.nowModel || $("model").value }];
         } else if (liveAgent != null && !state.turns.some((t) => t.agent === liveAgent)) {
-          state.turns = state.turns.concat([{ agent: liveAgent, role: liveAgent % 2 ? "coder" : "thinker", live: true, model: liveAgent % 2 ? $("coder-model").value : $("model").value }]);
+          const role = liveAgent % 2 ? "coder" : "thinker";
+          state.turns = state.turns.concat([{ agent: liveAgent, role, live: true, model: role === "coder" ? $("coder-model").value : $("model").value }]);
         }
-        $("chain").innerHTML = state.turns.map((t, i) => {
-          const role = t.role || (t.agent % 2 ? "coder" : "thinker");
-          const kind = t.live || t.agent === liveAgent ? "live" : t.ok === true ? "ok" : t.ok === false ? "red" : "";
-          const mark = t.ok === true ? "ok" : t.ok === false ? "fail" : role === "coder" ? "coder" : "thinker";
-          const extra = [modelName(t.model) || t.model, t.ok === true ? "pass" : t.ok === false ? "fail" : ""].filter(Boolean).join(" · ");
-          const body = `<button type="button" class="chain-node ${role} ${kind}" data-note="${esc(t.id || "")}" data-agent="${t.agent}">${icon(mark)} <strong>${role === "coder" ? "Coder" : "Thinker"}</strong>${extra ? `<span class="meta">${esc(extra)}</span>` : ""}</button>`;
-          return i ? `<span class="chain-join" aria-hidden="true"></span>${body}` : body;
-        }).join("");
+        const rows = [];
+        const goal = $("run-title").textContent;
+        if (goal) rows.push(msgYou(goal));
+        if (state.steeringText) rows.push(msgYou(state.steeringText));
+        for (const t of state.turns) rows.push(msgBot(t, Boolean(t.live || t.agent === liveAgent)));
+        for (const q of state.questions || []) {
+          rows.push(`<div class="msg sys"><button type="button" class="question" data-note="${esc(q.id)}">${esc(q.text)}</button></div>`);
+        }
+        $("thread").innerHTML = rows.join("");
+        const log = $("now-log");
+        if (log) {
+          log.textContent = state.liveText || "";
+          log.classList.toggle("has-lines", Boolean(state.liveText));
+          log.scrollTop = log.scrollHeight;
+        }
+        $("thread").scrollTop = $("thread").scrollHeight;
       }
       function showCreate() {
         state.compose = true;
@@ -468,14 +505,16 @@ dialog input,dialog textarea,dialog select{width:100%}
         state.compose = false;
         state.turns = [];
         state.liveAgent = null;
+        state.liveText = "";
+        state.steeringText = "";
+        state.questions = [];
         $("welcome").hidden = false;
         $("board").hidden = true;
         $("handoff-card").hidden = true;
         $("steering-card").hidden = true;
         $("questions").hidden = true;
         $("memory-error").hidden = true;
-        $("now-log").textContent = "";
-        $("now-log").classList.remove("has-lines");
+        $("thread").innerHTML = "";
         setNow("", "", "", false);
         $("note-body").innerHTML = '<p class="muted">Select a note to read it here.</p>';
       }
@@ -549,7 +588,9 @@ dialog input,dialog textarea,dialog select{width:100%}
         $("pytest-box").hidden = !pytest.summary && !pytest.tail;
         $("pytest-box").open = kind === "red" && Boolean(pytest.tail);
         if (pending) {
-          $("steering-card").hidden = false;
+          state.steeringText = pending.text || state.steeringText;
+          state.steeringId = pending.id || "";
+          $("steering-card").hidden = true;
           $("steering-text").textContent = pending.text || "";
           $("steering-card").dataset.note = pending.id || "";
         }
@@ -557,7 +598,7 @@ dialog input,dialog textarea,dialog select{width:100%}
         if (payload.turns) state.turns = payload.turns;
         const live = kind === "run" ? payload.agent : null;
         state.liveAgent = live;
-        renderChain(turns, live);
+        renderThread(turns, live);
         const last = (turns || [])[(turns || []).length - 1] || {};
         const role = payload.role || last.role || "";
         const verb = kind === "run"
@@ -578,7 +619,7 @@ dialog input,dialog textarea,dialog select{width:100%}
         if (serial === state.memoryJSON) return;
         state.memoryJSON = serial;
         const questions = data.questions || [];
-        $("questions").hidden = !questions.length;
+        $("questions").hidden = true;
         $("questions").innerHTML = '<p class="eyebrow">Stuck</p>' + questions.map((q) => `<button type="button" class="question" data-note="${esc(q.id)}">${esc(q.text)}</button>`).join("");
         const handoffDup = /Agent \d+ pytest/i.test(data.handoff?.text || "");
         $("handoff-card").hidden = !data.handoff || handoffDup;
@@ -586,13 +627,14 @@ dialog input,dialog textarea,dialog select{width:100%}
         $("handoff-card").dataset.note = data.handoff?.id || "";
         const passed = state.goals.find((g) => g.id === state.goalId)?.status?.state === "passed";
         $("handoff-label").textContent = passed ? "Last handoff" : "Next agent";
-        $("steering-card").hidden = !data.steering;
+        $("steering-card").hidden = true;
         $("steering-text").textContent = data.steering?.text || "";
         $("steering-card").dataset.note = data.steering?.id || "";
-        if (!state.turns.length) {
-          const derived = deriveTurns(state.commits);
-          renderChain(derived, state.liveAgent);
-        }
+        state.steeringText = data.steering?.text || "";
+        state.steeringId = data.steering?.id || "";
+        state.questions = questions;
+        if (!state.turns.length) state.turns = deriveTurns(state.commits);
+        renderThread(state.turns, state.liveAgent);
         state.pinned = new Set([data.goal?.id, data.steering?.id, data.handoff?.id, ...questions.map((q) => q.id)]);
         renderTimeline();
         tidyBoard();
@@ -809,12 +851,22 @@ dialog input,dialog textarea,dialog select{width:100%}
       };
       function appendLive(text) {
         if (!text) return;
+        const line = String(text).trim();
+        if (!line || line.length > 240 || /Write pytest|Do not implement|Memory tools here|session id:|approval: never|sandbox:/.test(line)) return;
+        state.liveText = (state.liveText ? state.liveText + "\n" : "") + line;
+        const lines = state.liveText.split("\n");
+        if (lines.length > 12) state.liveText = lines.slice(-12).join("\n");
         const log = $("now-log");
-        log.textContent = (log.textContent ? log.textContent + "\n" : "") + text;
-        log.classList.add("has-lines");
-        const lines = log.textContent.split("\n");
-        if (lines.length > 12) log.textContent = lines.slice(-12).join("\n");
-        log.scrollTop = log.scrollHeight;
+        const dots = document.querySelector("#thread .typing");
+        if (dots) dots.remove();
+        if (log) {
+          log.textContent = state.liveText;
+          log.classList.add("has-lines");
+          log.scrollTop = log.scrollHeight;
+          $("thread").scrollTop = $("thread").scrollHeight;
+        } else {
+          renderThread(state.turns, state.liveAgent);
+        }
       }
       async function startRun(payload) {
         state.busy = true;
@@ -822,20 +874,20 @@ dialog input,dialog textarea,dialog select{width:100%}
         status("Agent running · " + $("model").selectedOptions[0].text);
         controls();
         hideCreate();
-        $("now-log").textContent = "";
-        $("now-log").classList.remove("has-lines");
+        state.liveText = "";
         let failed = false, ended = false;
         function receive(event) {
           if (event.type === "memory") { refreshMemory(); refreshGoals(); }
           if (event.type === "status") status(event.text || "Running…");
           if (event.type === "live") {
+            if (state.liveAgent !== event.agent) state.liveText = "";
             state.liveAgent = event.agent;
             appendLive(event.text);
-            setNow(event.role, event.model, event.phase === "bootstrap" ? "Writing failing tests" : event.role === "thinker" ? "Reviewing the failure" : event.role === "coder" ? "Making tests pass" : event.text, true);
-            renderChain(state.turns, event.agent);
+            setNow(event.role, event.model, event.phase === "bootstrap" ? "Writing failing tests…" : event.role === "thinker" ? "Reviewing the failure…" : event.role === "coder" ? "Making tests pass…" : event.text, true);
             if (event.goal) showBoard({ ...event, turns: state.turns, state: "running" });
           }
           if (event.type === "observe") {
+            state.liveText = "";
             state.goalId = event.goal_id || state.goalId;
             showBoard(event);
             status((event.role || "Agent") + " " + event.agent + " · " + (event.pytest?.summary || "running"));
@@ -967,7 +1019,8 @@ dialog input,dialog textarea,dialog select{width:100%}
         if (state.busy && state.startedAt) {
           const seconds = Math.floor((Date.now() - state.startedAt) / 1000);
           const elapsed = seconds < 60 ? seconds + "s" : Math.floor(seconds / 60) + "m " + (seconds % 60) + "s";
-          $("now-elapsed").textContent = elapsed;
+          const clock = $("now-elapsed");
+          if (clock) clock.textContent = elapsed;
           status("Agent running · " + $("model").selectedOptions[0].text + " · " + elapsed);
         }
         refreshGoals();
