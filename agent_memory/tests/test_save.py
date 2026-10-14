@@ -14,8 +14,6 @@ class TestSave(MemoryTestCase):
             path.write_text("old generated state")
             self.memory._run("add", "-f", "--", name)
         self.memory._run("commit", "-m", "Previously tracked generated state")
-        self.memory.write_state_file()
-        self.memory.write_state_rule()
         snapshot = self.memory.save("Current source and notes")
         names = self.memory._run("ls-tree", "-r", "--name-only", snapshot).splitlines()
         for name in GENERATED_STATE_FILES:

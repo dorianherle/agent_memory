@@ -5,8 +5,6 @@ from agent_memory.prompt import (
     _transcript,
     render_find,
     render_timeline,
-    save_hygiene,
-    summary_guidance,
 )
 
 ACTIONS = (
@@ -22,13 +20,6 @@ ACTIONS = (
     "goal_create",
     "goal_list",
     "goal_use",
-    "model_get",
-    "model_propose",
-    "model_check",
-    "model_accept",
-    "model_reduce",
-    "model_predict",
-    "model_handoff",
 )
 GOAL_ACTIONS = ("goal_create", "goal_list", "goal_use")
 
@@ -44,14 +35,6 @@ MEMORY_TOOL = {
             "(restores files; inspect_done to return); "
             "goal_create / goal_list / goal_use (isolated goal id + tree). "
             "Pass goal= to target a goal workspace; omit it for this project notebook."
-            " Task models: model_get; model_propose (payload=model, id=base); "
-            "model_check / model_accept (id=proposal); model_reduce; "
-            "model_predict (payload=inputs, name=target); model_handoff "
-            "(payload=model or null to reuse, id=base) checks, accepts, reduces, "
-            "and records a challenge prediction. Rules accept 1-line formulas "
-            "(e.g. when=\"x in ['a','b']\", then=\"before != after\"). "
-            "payload={observations:[cases], residuals:[rules]} assimilates new "
-            "observations and exception rules into the active model without copying it."
         ),
         "parameters": {
             "type": "object",
@@ -72,8 +55,7 @@ MEMORY_TOOL = {
                     "type": ["object", "null"],
                     "description": (
                         "save: optional metadata to filter on later. "
-                        "find: match saved metadata. model_propose: model definition. "
-                        "model_predict: input values."
+                        "find: match saved metadata."
                     ),
                     "additionalProperties": True,
                 },
@@ -87,9 +69,9 @@ MEMORY_TOOL = {
                     "type": ["array", "null"],
                     "items": {"type": "string"},
                     "description": (
-                        "find / delete / open_questions: entry ids as "
-                        "shown in MEMORY STATE. open_questions: notes "
-                        "the question stands on, or questions to close."
+                        "find / delete / open_questions: entry ids. "
+                        "open_questions: notes the question stands on, "
+                        "or questions to close."
                     ),
                 },
                 "query": {
@@ -116,13 +98,12 @@ MEMORY_TOOL = {
                 "id": {
                     "type": ["string", "null"],
                     "description": (
-                        "branch / inspect: entry id. model_get/check/accept: model id. "
-                        "model_propose: current active model id (base)."
+                        "branch / inspect / goal_use: entry or goal id."
                     ),
                 },
                 "name": {
                     "type": ["string", "null"],
-                    "description": "branch: new branch name. model_predict: prediction target.",
+                    "description": "branch: new branch name.",
                 },
                 "label": {
                     "type": ["string", "null"],
@@ -179,7 +160,7 @@ MEMORY_TOOLS = [MEMORY_TOOL]
 MEMORY_TOOL_NAME = "memory"
 
 
-# Shown on the live page. Reads that fire constantly (history, model_get) stay off it.
+# Shown on the live page. Reads that fire constantly (history) stay off it.
 _LOGGED_ACTIONS = {
     "find",
     "save",
@@ -191,11 +172,6 @@ _LOGGED_ACTIONS = {
     "open_questions",
     "goal_create",
     "goal_use",
-    "model_propose",
-    "model_accept",
-    "model_handoff",
-    "model_reduce",
-    "model_predict",
 }
 
 
@@ -305,40 +281,6 @@ def _run_action(memory: Memory, arguments: dict) -> str:
         _require(arguments, "text")
         record = create_goal(host_project(memory._path), arguments["text"])
         return format_created(record, bind_packet(record["project"], record["id"]))
-    if action.startswith("model_"):
-        import json
-        if action == "model_get":
-            result = memory.model_get(arguments.get("id"), full=bool(arguments.get("full")))
-        elif action == "model_check":
-            result = memory.model_check(arguments.get("id"))
-            if not arguments.get("full"):
-                from agent_memory.models import compact_checks
-                result = compact_checks(result)
-        elif action == "model_propose":
-            _require(arguments, "payload")
-            note_id = memory.model_propose(arguments["payload"], base=arguments.get("id"),
-                                           agent=arguments.get("agent"))
-            result = {"status": "proposed", "id": note_id, "next": "model_check, then model_accept"}
-        elif action == "model_accept":
-            _require(arguments, "id")
-            result = {"status": "accepted", "id": memory.model_accept(arguments["id"], agent=arguments.get("agent"))}
-        elif action == "model_handoff":
-            result = memory.model_handoff(arguments.get("payload"), base=arguments.get("id"),
-                                          agent=arguments.get("agent"))
-            if not arguments.get("full"):
-                from agent_memory.models import compact_handoff
-                result = compact_handoff(result)
-        elif action == "model_reduce":
-            result = memory.model_reduce(agent=arguments.get("agent"))
-            if "checks" in result and not arguments.get("full"):
-                from agent_memory.models import compact_checks
-                result["checks"] = compact_checks(result["checks"])
-        else:
-            _require(arguments, "name")
-            if arguments.get("payload") is None:
-                raise ValueError("model_predict requires input values in payload")
-            result = memory.model_predict(arguments["payload"], arguments["name"], id=arguments.get("id"))
-        return json.dumps(result, ensure_ascii=True, allow_nan=False)
     if action == "goal_list":
         from agent_memory.goals import format_goal_list, host_project
 
@@ -358,11 +300,7 @@ def _run_action(memory: Memory, arguments: dict) -> str:
             summary=bool(arguments.get("summary") or False),
             agent=agent,
         )
-        result = f"Saved [{item_id[:8]}]."
-        if not arguments.get("summary"):
-            result += "\n" + summary_guidance("memory(action=save, summary=true)")
-        warn = save_hygiene(arguments["text"])
-        return f"{result}\n{warn}" if warn else result
+        return f"Saved [{item_id[:8]}]."
     if action == "find":
         branch = None if arguments.get("all_branches") else "current"
         queried = bool(arguments.get("query"))

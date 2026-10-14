@@ -9,7 +9,6 @@ Works with mcp SDK v1 (`FastMCP`) and v2 (`MCPServer`).
 from __future__ import annotations
 
 from agent_memory.cursor.common import get_memory
-from agent_memory.prompt import save_hygiene, summary_guidance
 from agent_memory.tools import call_tool
 
 
@@ -56,32 +55,6 @@ def _build_server():
         )
 
     @mcp.tool()
-    def memory_model(
-        operation: str = "get",
-        data: dict | None = None,
-        id: str | None = None,
-        base: str | None = None,
-        target: str | None = None,
-        agent: str | None = None,
-        goal: str | None = None,
-        full: bool = False,
-    ) -> str:
-        """Task model: get (full=True adds fixtures), propose(data=model, base=active id), check(id), accept(id), reduce, predict(data=inputs, target), handoff(data=model or {observations:[cases], residuals:[rules]} or null to reuse, base=active id). Rules accept 1-line formulas (when="x in ['a','b']", then="before != after"); specific rules override broader defaults. Handoff checks, accepts, reduces, and records a challenge prediction."""
-        memory = get_memory(goal)
-        result = call_tool(memory, "memory", {
-            "action": "model_" + operation, "payload": data,
-            "id": base if operation in ("propose", "handoff") else id,
-            "name": target, "agent": agent, "full": full,
-        })
-        if operation in ("propose", "accept", "reduce", "handoff") and not result.startswith("Error:"):
-            memory.write_state_file()
-            try:
-                memory.write_live_html()
-            except Exception:
-                pass
-        return result
-
-    @mcp.tool()
     def memory_find(
         query: str | None = None,
         text: str | None = None,
@@ -106,7 +79,7 @@ def _build_server():
 
     @mcp.tool()
     def memory_save(text: str, agent: str | None = None, goal: str | None = None) -> str:
-        """Save a finding. After a completed milestone, call memory_summarize to fold its commits."""
+        """Save a finding, dead end, decision, or checkpoint."""
         memory = get_memory(goal)
         item_id = memory.save(text, agent=agent)
         try:
@@ -115,7 +88,6 @@ def _build_server():
             record_action(memory, "save", text.split("\n", 1)[0][:120])
         except Exception:
             pass
-        memory.write_state_file()
         try:
             memory.write_live_html()
         except Exception:
@@ -124,9 +96,7 @@ def _build_server():
         from agent_memory.identity import DEFAULT_AGENT
 
         label = who[0].payload.get("agent", DEFAULT_AGENT) if who else DEFAULT_AGENT
-        result = f"Saved [{item_id[:8]}] @{label}.\n{summary_guidance()}"
-        warn = save_hygiene(text)
-        return f"{result}\n{warn}" if warn else result
+        return f"Saved [{item_id[:8]}] @{label}."
 
     @mcp.tool()
     def memory_summarize(text: str, agent: str | None = None, goal: str | None = None) -> str:
@@ -139,7 +109,6 @@ def _build_server():
             record_action(memory, "summarize", text.split("\n", 1)[0][:120])
         except Exception:
             pass
-        memory.write_state_file()
         try:
             memory.write_live_html()
         except Exception:
@@ -148,9 +117,7 @@ def _build_server():
         from agent_memory.identity import DEFAULT_AGENT
 
         label = who[0].payload.get("agent", DEFAULT_AGENT) if who else DEFAULT_AGENT
-        result = f"Summarized [{item_id[:8]}] @{label}."
-        warn = save_hygiene(text)
-        return f"{result}\n{warn}" if warn else result
+        return f"Summarized [{item_id[:8]}] @{label}."
 
     @mcp.tool()
     def memory_delete(ids: list[str], goal: str | None = None) -> str:
@@ -161,7 +128,6 @@ def _build_server():
             "memory",
             {"action": "delete", "ids": ids},
         )
-        memory.write_state_file()
         try:
             memory.write_live_html()
         except Exception:
@@ -186,7 +152,6 @@ def _build_server():
                 "ids": depends_on or ids,
             },
         )
-        memory.write_state_file()
         try:
             memory.write_live_html()
         except Exception:
@@ -209,7 +174,6 @@ def _build_server():
             "memory",
             {"action": "branch", "id": id, "name": name, "label": label},
         )
-        memory.write_state_file()
         try:
             memory.write_live_html()
         except Exception:
@@ -226,7 +190,6 @@ def _build_server():
         """Leave inspect; restore the branch."""
         memory = get_memory(goal)
         result = call_tool(memory, "memory", {"action": "inspect_done"})
-        memory.write_state_file()
         return result
 
     return mcp

@@ -121,13 +121,6 @@ class TestWrapper(MemoryTestCase):
                 "goal_create",
                 "goal_list",
                 "goal_use",
-                "model_get",
-                "model_propose",
-                "model_check",
-                "model_accept",
-                "model_reduce",
-                "model_predict",
-                "model_handoff",
             ],
         )
 

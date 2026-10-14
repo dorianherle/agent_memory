@@ -10,15 +10,12 @@ from pathlib import Path
 
 SERVER_NAME = "agent-memory"
 RULE_NAME = "agent-memory.mdc"
-STATE_RULE_NAME = "agent-memory-state.mdc"
 SDK_GUIDE_NAME = "agent-memory-sdk.md"
 SKILL_NAME = "agent-memory"
 SKILL_SOURCE = Path(__file__).resolve().parent / "skill"
 CREDENTIALS_NAME = "credentials.env"
 GITIGNORE_LINES = (
     ".agent_memory/",
-    ".cursor/MEMORY_STATE.md",
-    f".cursor/rules/{STATE_RULE_NAME}",
 )
 
 PROVIDER_GEMINI = "agent_memory.providers.gemini:GeminiProvider"
@@ -32,7 +29,7 @@ HOOK_EVENTS = (
 )
 
 RULE_BODY = """---
-description: Long-term agent memory (MCP + selective durability)
+description: Long-term agent memory (on-demand MCP + shadow-git snapshots)
 alwaysApply: true
 ---
 
@@ -45,17 +42,15 @@ or propose tasks unless the user asks for work or context. An old goal is not a
 new request to resume work.
 
 The first request establishes the goal. Ordinary conversation is not memory.
-Use `memory_save` for distilled constraints, findings, decisions, and checkpoints;
-never copy raw prompts or answers. Do not invent ids.
-Pass `agent` on save/summarize. MEMORY STATE is `agent-memory-state.mdc`.
+Query `memory_find` or `memory_history` on demand when investigating prior context,
+decisions, or dead ends. Use `memory_save` for dead ends, non-obvious decisions,
+user constraints, and checkpoints before risky edits; never copy raw prompts or
+answers. Do not invent ids. Pass `agent` on save/summarize.
 
 - `memory_find` — headlines; `ids=` for bodies
-- `memory_summarize` / `memory_delete` / `memory_open_questions`
+- `memory_save` / `memory_summarize` / `memory_delete` / `memory_open_questions`
 - `memory_history` — work notes, not the chat transcript
-- `memory_model` — get the active model; propose, check, accept, reduce, handoff, or predict
-- Write rules as 1-line formulas (`when="x in ['a','b']"`, `then="before != after"`).
-- Consecutive compression: pass `data={"observations": [...], "residuals": [...]}` to assimilate anomalies and factor shared laws.
-- `memory_branch` / `memory_inspect` — restore a snapshot
+- `memory_branch` / `memory_inspect` / `memory_inspect_done` — restore a snapshot
 - Live: `.agent_memory/live/index.html`
 """
 
@@ -473,8 +468,7 @@ def install_cursor(
 
     from agent_memory.core import Memory
 
-    memory = Memory(root)
-    written["state"] = memory.write_state_file()
+    Memory(root)
 
     cred_path = credentials_path(root)
     if provider_env:

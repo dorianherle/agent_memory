@@ -1,5 +1,5 @@
 ---
-description: Long-term agent memory (MCP + automatic durability)
+description: Long-term agent memory (on-demand MCP + shadow-git snapshots)
 alwaysApply: true
 ---
 
@@ -11,11 +11,14 @@ Do not load skills, search memory, inspect files, narrate checks, recap projects
 or propose tasks unless the user asks for work or context. An old goal is not a
 new request to resume work.
 
-Hooks save prompts and answers. `memory_save` mid-turn. Do not invent ids.
-Pass `agent` on save/summarize. MEMORY STATE is `agent-memory-state.mdc`.
+The first request establishes the goal. Ordinary conversation is not memory.
+Query `memory_find` or `memory_history` on demand when investigating prior context,
+decisions, or dead ends. Use `memory_save` for dead ends, non-obvious decisions,
+user constraints, and checkpoints before risky edits; never copy raw prompts or
+answers. Do not invent ids. Pass `agent` on save/summarize.
 
 - `memory_find` — headlines; `ids=` for bodies
-- `memory_summarize` / `memory_delete` / `memory_open_questions`
+- `memory_save` / `memory_summarize` / `memory_delete` / `memory_open_questions`
 - `memory_history` — work notes, not the chat transcript
-- `memory_branch` / `memory_inspect` — restore a snapshot
+- `memory_branch` / `memory_inspect` / `memory_inspect_done` — restore a snapshot
 - Live: `.agent_memory/live/index.html`

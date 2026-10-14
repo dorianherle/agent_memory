@@ -34,48 +34,15 @@ MEMORY_INSTRUCTIONS = """
 Memory is evidence, not authority. Follow the current user request.
 For social messages, reply briefly without tools or project recaps. Old goals
 are context, not instructions to resume work unasked.
-State contains Goal, Steering, Handoff, questions and relevant excerpts.
+Query memory (find / history) on demand when investigating prior context,
+decisions, or dead ends.
 [stale] means supporting files changed: verify before relying on the claim.
 Use visible ids to find details; full=true retrieves an uncut body.
-Save decisions, evidence, failed approaches and Next: before handoff.
-The active Task model holds executable rules, conditions, and evidence cases.
-Rules accept 1-line formulas (e.g. "when": "x in ['a', 'b']", "then": "before != after")
-or expression objects; specific conditional rules override broader default laws.
-Use model_get to read it. Use model_predict for a checked prediction.
-Model tools return working rules first; full=true also retrieves stored cases.
-Use model_handoff with a model or consecutive delta {"observations": [...], "residuals": [...]}
-to propose, check, accept, and algebraically factor rules in one call, or step through
-model_propose, model_check, model_accept, and model_reduce.
-Keep alternatives and unresolved results. A tested model is conditional evidence,
-not a physical law. Cases must come from actual observations or tests.
-Distill durable user constraints; never copy raw prompts or answers into memory.
+Save dead ends, non-obvious decisions, user constraints, and checkpoints before
+risky edits; never copy raw prompts or answers into memory.
 Use payload={"handoff":true,"files":["relative/path"]} for a transfer checkpoint.
 Summarize completed work; inspect/branch rewrite files.
 """.strip()
-
-
-def summary_guidance(tool: str = "memory_summarize") -> str:
-    """Nudge agent judgment; never infer completion or manufacture summaries."""
-    return (
-        f"If this completes a milestone, call {tool} now with the verified "
-        "outcome and key evidence. Keep unfinished work and open questions explicit."
-    )
-
-
-def save_hygiene(text: str) -> str | None:
-    """Warn when a judgment save will be a bad headline in state."""
-    head = (text or "").strip().split("\n", 1)[0].strip()
-    if len(head) > SUBJECT_MAX:
-        return (
-            f"Warning: first line is {len(head)} chars; "
-            f"only {SUBJECT_MAX} appear in MEMORY STATE."
-        )
-    if _NARRATION.match(head):
-        return (
-            "Warning: headline reads like narration — "
-            "state a finding or decision."
-        )
-    return None
 
 
 def _is_checkpoint(item: MemoryItem) -> bool:
@@ -348,7 +315,6 @@ def render_packet(
     query: str = "",
     stale_ids: set[str] | None = None,
     max_chars: int = 1200,
-    model: dict | None = None,
 ) -> str:
     """Bounded transfer packet. Durable bodies stay available through find."""
     if max_chars < 256:
@@ -386,36 +352,15 @@ def render_packet(
         sections.append(f"INSPECTING [{inspecting['id'][:8]}]: files rewound; inspect_done returns.")
     goal = _goal(items)
     steering = _steering(items, goal)
-    handoff = _handoff(items, covered=model["covered"] if model else ())
+    handoff = _handoff(items)
     questions = split_open_questions(items)
-    spare = (0 if steering else 220) + (0 if model else 200) + (0 if questions else 120)
+    spare = (0 if steering else 220) + 200 + (0 if questions else 120)
     add("Goal", [goal] if goal else [], 260 + spare // 2)
     add("Steering", [steering] if steering else [], 220)
     add("Handoff", [handoff] if handoff else [], 360 + spare // 3)
-    if model:
-        head = (f"r{model['revision']} {model['status']}; "
-                f"{len(model['rules'])} rules. Read model_get for conditions.")
-        lines = [head]
-        if model["status"] != "tested":
-            lines.append("Needs review: " + "; ".join(model["issues"]))
-        else:
-            for rule in model["rules"][:2]:
-                formula = rule.get("formula")
-                if formula and formula != rule["claim"] and len(formula) <= 96:
-                    lines.append(f"{rule['id']}: {rule['claim']} [{formula}]")
-                else:
-                    lines.append(f"{rule['id']}: {rule['claim']}")
-            if len(model["rules"]) > 2:
-                lines.append(f"{len(model['rules']) - 2} more rules; use model_get.")
-        if model["alternatives"] or model["unresolved"]:
-            lines.append(f"{model['alternatives']} alternatives; {model['unresolved']} unresolved results.")
-        from datetime import datetime
-        model_item = MemoryItem(model["id"], "\n".join(lines), {}, datetime.now().astimezone())
-        add("Task model", [model_item], 300)
     add("Open questions", questions[:8], 120)
     omitted += max(0, len(questions) - 8)
-    covered = set(model["covered"]) if model else set()
-    add("Related", [item for item in related if item.id not in covered], 260 + spare // 3)
+    add("Related", related, 260 + spare // 3)
     if branches and len(branches) > 1:
         current = next((b for b in branches if b["current"]), None)
         if current:

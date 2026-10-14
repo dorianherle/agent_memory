@@ -53,8 +53,6 @@ class McpServerTests(MemoryTestCase):
             result = tool.fn(text="mid-turn finding: auth in src/auth.ts", agent="agent")
         self.assertIn("Saved [", result)
         self.assertIn("@agent", result)
-        self.assertIn("If this completes a milestone, call memory_summarize", result)
-        self.assertIn("Keep unfinished work and open questions explicit", result)
         last = Memory(self.path).state()[-1]
         self.assertIn("auth in src/auth.ts", last.message)
         self.assertFalse(last.payload.get("auto"))
@@ -339,20 +337,6 @@ class AutoSaveTests(MemoryTestCase):
         self.assertEqual(history[-1].id, summary_id)
         self.assertEqual(len(history[-1].payload["covers"]), 2)
 
-    def test_write_state_file(self) -> None:
-        self.memory.save("note")
-        path = self.memory.write_state_file()
-        self.assertTrue(path.exists())
-        content = path.read_text()
-        self.assertIn("note", content)
-        self.assertIn("Handoff", content)
-        rule = self.path / ".cursor" / "rules" / "agent-memory-state.mdc"
-        self.assertTrue(rule.exists())
-        rule_text = rule.read_text()
-        self.assertIn("alwaysApply: true", rule_text)
-        self.assertIn("note", rule_text)
-        self.assertIn("# MEMORY STATE", rule_text)
-
 
 class HookTests(MemoryTestCase):
     def setUp(self) -> None:
@@ -371,14 +355,11 @@ class HookTests(MemoryTestCase):
         items = Memory(self.path).find(payload={"user": True}, k=1)
         self.assertEqual(items[0].message, "why double charge?")
 
-    def test_before_submit_refreshes_state_rule(self) -> None:
+    def test_before_submit_does_not_write_state_rule(self) -> None:
         out = handle("beforeSubmitPrompt", {"prompt": "why double charge?"})
         rule = self.path / ".cursor" / "rules" / "agent-memory-state.mdc"
-        self.assertTrue(rule.exists())
-        self.assertIn("why double charge?", rule.read_text())
-        self.assertIn("additional_context", out)
-        self.assertIn("alwaysApply rule", out["additional_context"])
-        self.assertNotIn("why double charge?", out["additional_context"])
+        self.assertFalse(rule.exists())
+        self.assertNotIn("additional_context", out)
         self.assertTrue(out.get("continue"))
 
     def test_before_submit_records_full_prompt_packet(self) -> None:
@@ -396,7 +377,6 @@ class HookTests(MemoryTestCase):
         data_js = (live / "data.js").read_text()
         turns = (live / "turn_prompts.json").read_text()
         self.assertIn("exact goal for live html", turns)
-        self.assertIn("MEMORY STATE", turns)
         self.assertIn("memory_save", turns)
         self.assertIn("MEMORY INSTRUCTIONS", turns)
         self.assertIn("ALWAYS-APPLY RULE", turns)
@@ -406,9 +386,7 @@ class HookTests(MemoryTestCase):
         self.assertIn('"rule"', data_js)
         self.assertIn('"mcp_tools"', data_js)
         self.assertIn('"packet"', data_js)
-        self.assertIn("alwaysApply rule", out["additional_context"])
-        self.assertNotIn("exact goal for live html", out["additional_context"])
-        self.assertNotIn("## Goal", out["additional_context"])
+        self.assertNotIn("additional_context", out)
 
     def test_after_response_does_not_save_conversation(self) -> None:
         handle("afterAgentResponse", {"text": "fixed the webhook retry"})
@@ -427,12 +405,9 @@ class HookTests(MemoryTestCase):
         self.assertIn("additional_context", out)
         self.assertIn("@agent", out["additional_context"])
         self.assertIn("memory_save", out["additional_context"])
-        self.assertIn("agent-memory-state.mdc", out["additional_context"])
         self.assertEqual(out.get("env", {}).get("AGENT_MEMORY_AGENT"), "agent")
-        self.assertTrue((self.path / ".cursor" / "MEMORY_STATE.md").exists())
-        rule = self.path / ".cursor" / "rules" / "agent-memory-state.mdc"
-        self.assertTrue(rule.exists())
-        self.assertIn("prior work", rule.read_text())
+        self.assertFalse((self.path / ".cursor" / "MEMORY_STATE.md").exists())
+        self.assertFalse((self.path / ".cursor" / "rules" / "agent-memory-state.mdc").exists())
 
     def test_subagent_start_and_stop_tag_agents(self) -> None:
         handle(
@@ -535,7 +510,7 @@ class InstallTests(MemoryTestCase):
         guide = written["sdk_guide"].read_text()
         self.assertIn('setting_sources=["project"]', guide)
         self.assertIn("settingSources", guide)
-        self.assertTrue(written["state"].exists())
+        self.assertNotIn("state", written)
         self.assertTrue((self.path / ".gitignore").exists())
         self.assertIn(".agent_memory/", (self.path / ".gitignore").read_text())
         self.assertEqual(

@@ -250,24 +250,3 @@ class TestFind(MemoryTestCase):
         )
         self.assertIn("Fixed matrix", result)
         self.assertNotIn(SUBSTRING_FALLBACK, result)
-
-    def test_save_hygiene_warns_on_long_headline(self):
-        from agent_memory import call_tool
-
-        result = call_tool(
-            self.memory,
-            "memory",
-            {"action": "save", "text": "x" * 140},
-        )
-        self.assertTrue(result.startswith("Saved ["))
-        self.assertIn("Warning: first line is 140 chars", result)
-
-    def test_save_hygiene_warns_on_narration(self):
-        from agent_memory import call_tool
-
-        result = call_tool(
-            self.memory,
-            "memory",
-            {"action": "save", "text": "Investigated the hook file"},
-        )
-        self.assertIn("Warning: headline reads like narration", result)

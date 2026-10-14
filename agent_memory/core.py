@@ -371,8 +371,6 @@ class Memory:
         from agent_memory.identity import DEFAULT_AGENT, ensure_agent_payload
 
         payload = payload or {}
-        if not _model_record and ({"model_event", "task_model"} & payload.keys()):
-            raise ValueError("Use model_propose and model_accept to write task models")
         if OPERATION_KEY in payload:
             raise ValueError(f"{OPERATION_KEY!r} is reserved")
         stored_payload = ensure_agent_payload(
@@ -875,48 +873,14 @@ class Memory:
             stale_ids=stale_ids,
         )
         payload["injected"] = text
-        from agent_memory.models import TaskModels
-        model = TaskModels(self).view(items=items)
-        payload["model"] = model
         payload["packet"] = self.render_packet()
-        if model:
-            payload["injected"] = payload["packet"]
         return payload
 
     def render_state(self) -> str:
         """Compact MEMORY STATE for SDK / tests (Goal, Steering, Recent)."""
         return self.prompt_payload()["injected"]
 
-    def model_get(self, id: str | None = None, *, full: bool = True) -> dict | None:
-        from agent_memory.models import TaskModels
-        service = TaskModels(self)
-        return service.get(id=id) if full else service.export(id=id)
-
-    def model_propose(self, model: dict, *, base: str | None = None, agent: str | None = None) -> str:
-        from agent_memory.models import TaskModels
-        return TaskModels(self).propose(model, base=base, agent=agent)
-
-    def model_check(self, id: str | None = None) -> dict:
-        from agent_memory.models import TaskModels
-        return TaskModels(self).check(id=id)
-
-    def model_accept(self, id: str, *, agent: str | None = None) -> str:
-        from agent_memory.models import TaskModels
-        return TaskModels(self).accept(id, agent=agent)
-
-    def model_reduce(self, *, agent: str | None = None) -> dict:
-        from agent_memory.models import TaskModels
-        return TaskModels(self).reduce(agent=agent)
-
-    def model_predict(self, inputs: dict, target: str, *, id: str | None = None) -> dict:
-        from agent_memory.models import TaskModels
-        return TaskModels(self).predict(inputs, target, id=id)
-
-    def model_handoff(self, model: dict | None = None, *, base: str | None = None, agent: str | None = None) -> dict:
-        from agent_memory.models import TaskModels
-        return TaskModels(self).handoff(model, base=base, agent=agent)
-
-    def related_notes(self, question: str, *, k: int | None = None, _state=None, _covered=()) -> list:
+    def related_notes(self, question: str, *, k: int | None = None, _state=None) -> list:
         """Work notes matching the question via FTS. Skips transcript and Goal."""
         from agent_memory.prompt import (
             RELATED_CAP,
@@ -931,12 +895,10 @@ class Memory:
         cap = RELATED_CAP if k is None else k
         state = self.state() if _state is None else _state
         skip = {item.id for item in (_goal(state), _handoff(state)) if item}
-        skip.update(_covered)
         limit = max(cap * 3, 8)
         while True:
             items = self.find(query=question, k=limit, branch="current")
-            related = [item for item in items if item.id not in skip and not _transcript(item)
-                       and not item.payload.get("model_event")]
+            related = [item for item in items if item.id not in skip and not _transcript(item)]
             if len(related) >= cap or len(items) < limit:
                 return related[:cap]
             # Transcript hits must not crowd useful work out of the result set.

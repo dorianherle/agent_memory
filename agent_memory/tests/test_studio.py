@@ -76,7 +76,6 @@ class StudioTests(MemoryTestCase):
         self.assertEqual(merged["existing"], {"command": "keep-me"})
         self.assertIn("agent-memory", merged)
         self.assertTrue((root / ".cursor" / "hooks.json").exists())
-        self.assertTrue((root / ".cursor" / "MEMORY_STATE.md").exists())
         status, again = self._json("POST", "/api/open", {"project": str(root)})
         self.assertTrue(again["ready"])
 
