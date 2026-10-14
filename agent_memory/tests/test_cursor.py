@@ -525,6 +525,46 @@ class InstallTests(MemoryTestCase):
         self.assertTrue(written["state"].exists())
         self.assertTrue((self.path / ".gitignore").exists())
         self.assertIn(".agent_memory/", (self.path / ".gitignore").read_text())
+        self.assertEqual(
+            Path(mcp["mcpServers"]["agent-memory"]["command"]).resolve(),
+            Path(sys.executable).resolve(),
+        )
+
+    def test_user_mcp_collision_warns_on_other_product(self) -> None:
+        from agent_memory.cursor.install import user_mcp_collision
+
+        user = self.path / "user-mcp.json"
+        user.write_text(
+            json.dumps(
+                {
+                    "mcpServers": {
+                        "agent-memory": {"command": "/opt/old-agent-memory", "args": ["mcp"]}
+                    }
+                }
+            )
+        )
+        msg = user_mcp_collision(user_mcp=user)
+        self.assertIsNotNone(msg)
+        self.assertIn("repo-bound", msg)
+        self.assertIn("/opt/old-agent-memory", msg)
+
+    def test_user_mcp_collision_ignores_same_product(self) -> None:
+        from agent_memory.cursor.install import user_mcp_collision
+
+        user = self.path / "user-mcp.json"
+        user.write_text(
+            json.dumps(
+                {
+                    "mcpServers": {
+                        "agent-memory": {
+                            "command": sys.executable,
+                            "args": ["-m", "agent_memory.cursor.mcp", "--root", str(self.path)],
+                        }
+                    }
+                }
+            )
+        )
+        self.assertIsNone(user_mcp_collision(user_mcp=user))
 
     def test_install_wires_gemini_env(self) -> None:
         written = install_cursor(

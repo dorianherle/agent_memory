@@ -168,8 +168,31 @@ def _write_json(path: Path, data) -> None:
     path.write_text(json.dumps(data, indent=2) + "\n")
 
 
+def _resolved_python(python: str | None) -> str:
+    return str(Path(python or sys.executable).expanduser().resolve())
+
+
 def _hook_command(python: str) -> str:
     return f"{python} -m agent_memory.cursor.hook"
+
+
+def user_mcp_collision(user_mcp: Path | None = None) -> str | None:
+    """Warn when ~/.cursor/mcp.json shadows this repo's agent-memory server."""
+    path = user_mcp if user_mcp is not None else Path.home() / ".cursor" / "mcp.json"
+    if not path.is_file():
+        return None
+    server = (_read_json(path, {}).get("mcpServers") or {}).get(SERVER_NAME)
+    if not isinstance(server, dict):
+        return None
+    command = str(server.get("command") or "")
+    args = " ".join(str(part) for part in (server.get("args") or []))
+    if "agent_memory.cursor.mcp" in f"{command} {args}":
+        return None
+    return (
+        f"Warning: {path} defines MCP server {SERVER_NAME!r} as {command!r}. "
+        "Cursor attaches that user server and skips this repo's .cursor/mcp.json. "
+        "Remove the user entry so MCP stays repo-bound."
+    )
 
 
 def credentials_path(root: Path) -> Path:
@@ -377,7 +400,7 @@ def install_cursor(
     root = Path(project).resolve()
     cursor = root / ".cursor"
     cursor.mkdir(parents=True, exist_ok=True)
-    py = python or sys.executable
+    py = _resolved_python(python)
     command = _hook_command(py)
     written: dict[str, Path] = {}
 
@@ -416,6 +439,9 @@ def install_cursor(
     servers[SERVER_NAME] = server
     _write_json(mcp_path, mcp)
     written["mcp"] = mcp_path
+    warning = user_mcp_collision()
+    if warning:
+        print(warning)
 
     hooks_path = cursor / "hooks.json"
     hooks_doc = _read_json(hooks_path, {"version": 1, "hooks": {}})

@@ -79,7 +79,7 @@ That is how AI assistants work across sessions today. To bridge the gap, people 
   \node[draw=amred,fill=amred!8,rounded corners=3pt,align=center,text width=5.6cm,inner sep=5pt] at (3.0,-1.45)
     {\textbf{Fixed-slice search (RAG)}\\ Retrieves the formula for $c_0$, but loses the setup $\sigma=4$};
   \node[draw=amgreen,fill=amgreen!8,rounded corners=3pt,align=center,text width=5.6cm,inner sep=5pt] at (9.8,-1.45)
-    {\textbf{Agent Memory}\\ Keeps the whole note intact and pins the setup};
+    {\textbf{Agent Memory}\\ Keeps the whole note intact\\ and pins the setup};
 \end{tikzpicture}
 \caption{Why fixed-size chunking fails on math and code: slicing text every few hundred characters separates a formula from the definitions required to evaluate it.}
 \label{fig:problem}
@@ -92,68 +92,64 @@ Scientists and engineers solved this problem long ago with a structured lab note
 
 \begin{figure}[H]
 \centering
-\resizebox{\textwidth}{!}{%
+\makebox[\textwidth][c]{%
 \begin{tikzpicture}[
-  box/.style={draw,rounded corners=3.5pt,align=left,inner sep=6pt,font=\footnotesize},
-  lane/.style={draw=gray!40,fill=gray!4,rounded corners=5pt},
-  arr/.style={-{Stealth[length=2.5mm]},thick,gray!80!black},
-  darr/.style={-{Stealth[length=2.5mm]},thick,dashed,amblue!85!black}]
+  box/.style={draw,rounded corners=3.5pt,align=flush left,inner sep=5pt,font=\scriptsize},
+  lane/.style={draw=gray!45,fill=gray!4,rounded corners=4pt},
+  hd/.style={anchor=north west,font=\scriptsize\bfseries,inner sep=1pt,align=flush left},
+  arr/.style={-{Stealth[length=2.2mm]},thick,gray!80!black}]
 
-  % Lane A: Write path
-  \draw[lane] (0,4.9) rectangle (15.4,7.55);
-  \node[anchor=north west,font=\footnotesize\bfseries,text=amorange!90!black] at (0.25,7.4)
-    {LANE A --- WRITE \& COMPRESS PATH (During / End of Session)};
-
-  \node[box,fill=amorange!8,draw=amorange,text width=6.7cm,anchor=north west] (w1) at (0.25,6.85)
-    {\textbf{Step 1: Save or Compress Note}\\
+  % Lane A. Arrows stay in the gaps between cards and between lanes.
+  \draw[lane] (0,9.15) rectangle (17.6,12.35);
+  \node[hd,text=amorange!90!black] at (0.28,12.12)
+    {LANE A --- WRITE \& COMPRESS (during / end of session)};
+  \node[box,fill=amorange!8,draw=amorange,text width=7.7cm,anchor=north west] (w1) at (0.28,11.55)
+    {\textbf{Step 1: Save or compress a note}\\
      \texttt{memory\_save(text, payload=\{"handoff":true\})}\\
      or \texttt{memory\_summarize(ids)} / \texttt{memory\_model(...)}};
+  \node[box,fill=amorange!8,draw=amorange,text width=7.9cm,anchor=north west] (w2) at (9.15,11.55)
+    {\textbf{Step 2: Dual commit to disk}\\
+     $\bullet$ \textbf{Git} (\texttt{.agent\_memory/git/}): note + working files\\
+     $\bullet$ \textbf{Catalog} (\texttt{catalog.db}): tokens $\mathcal{T}(d)$ in FTS5 + HNSW};
+  \draw[arr] ($(w1.north east)+(0,-0.42)$) -- ($(w2.north west)+(0,-0.42)$);
+  \draw[arr] (8.8,9.15) -- (8.8,8.48);
 
-  \node[box,fill=amorange!8,draw=amorange,text width=7.1cm,anchor=north west] (w2) at (7.8,6.85)
-    {\textbf{Step 2: Dual Commit to Disk}\\
-     $\bullet$ \textbf{Git store (\texttt{.agent\_memory/git/}):} commits note + working files.\\
-     $\bullet$ \textbf{Catalog (\texttt{catalog.db}):} indexes tokens $\mathcal{T}(d)$ in FTS5 + HNSW.};
+  % Lane B
+  \draw[lane] (0,3.55) rectangle (17.6,8.48);
+  \node[hd,text=amteal!90!black] at (0.28,8.26)
+    {LANE B --- RENDER-TIME CHEAT SHEET\\
+     \texttt{render\_packet(q)} before every turn \textbullet\ 0 AI calls \textbullet\ under 1\,ms};
+  \node[box,fill=amteal!8,draw=amteal,text width=5.05cm,minimum height=3.15cm,anchor=north west] (r1) at (0.28,7.42)
+    {\textbf{Step 3: Pick notes and check Git}\\
+     $\bullet$ Goal, Steer, Handoff, Model, OpenQ\\
+     $\bullet$ Top-3 Related via FTS5+RRF\\
+     $\bullet$ \texttt{git diff} $\to$ \texttt{[stale]}};
+  \node[box,fill=amteal!8,draw=amteal,text width=5.05cm,minimum height=3.15cm,anchor=north west] (r2) at (6.15,7.42)
+    {\textbf{Step 4: Reclaim unused budget}\\
+     $\bullet$ Cap $B_{\max}=1{,}200$ characters\\
+     $\bullet$ Spare pool $B_{\text{spare}}\in[0,540]$\\
+     $\bullet$ Goal $+\lfloor B_{\text{spare}}/2\rfloor$\\
+     $\bullet$ Handoff and Related $+\lfloor B_{\text{spare}}/3\rfloor$};
+  \node[box,fill=amgreen!8,draw=amgreen,text width=5.05cm,minimum height=3.15cm,anchor=north west] (r3) at (12.02,7.42)
+    {\textbf{Step 5: Pack whole lines}\\
+     $\bullet$ Pin headline $L_0$ + \texttt{[id[:8]]}\\
+     $\bullet$ Score $L_i$ by $\text{Key}(L_i,q)$\\
+     $\bullet$ Keep whole lines $\le b_S-9$\\
+     $\bullet$ Restore order, add \texttt{... [more]}\\
+     $\bullet$ Inject \texttt{\# MEMORY STATE}};
+  \draw[arr] ($(r1.north east)+(0,-0.42)$) -- ($(r2.north west)+(0,-0.42)$);
+  \draw[arr] ($(r2.north east)+(0,-0.42)$) -- ($(r3.north west)+(0,-0.42)$);
+  \draw[arr,dashed,amblue!85!black] (8.8,3.55) -- (8.8,2.88);
 
-  \draw[arr] (w1.east) -- (w2.west);
-
-  % Lane B: Render path
-  \draw[lane] (0,0.4) rectangle (15.4,4.35);
-  \node[anchor=north west,font=\footnotesize\bfseries,text=amteal!90!black] at (0.25,4.2)
-    {LANE B --- RENDER-TIME PIPELINE (\texttt{render\_packet(q)} --- Automatic Before Every Turn, 0 AI Calls, $<1\text{ ms}$)};
-
-  \node[box,fill=amteal!8,draw=amteal,text width=4.45cm,anchor=north west] (r1) at (0.25,3.6)
-    {\textbf{Step 3: Pick Notes \& Check Git}\\
-     $\bullet$ Pick \texttt{Goal}, \texttt{Steer}, \texttt{Handoff} (3-tier ladder), \texttt{Model}, \texttt{OpenQ}.\\
-     $\bullet$ Fetch top-3 \texttt{Related} via FTS5+RRF.\\
-     $\bullet$ Run \texttt{git diff} on $\mathcal{F}_{\text{note}} \to$ \texttt{[stale]}.};
-
-  \node[box,fill=amteal!8,draw=amteal,text width=4.45cm,anchor=north west] (r2) at (5.35,3.6)
-    {\textbf{Step 4: Reclaim Unused Budget}\\
-     $\bullet$ Total cap $B_{\max}=1{,}200$ chars.\\
-     $\bullet$ Pool unused optional quotas into $B_{\text{spare}} \in [0,540]$.\\
-     $\bullet$ Boost \texttt{Goal} ($+\lfloor B_{\text{spare}}/2\rfloor$), \texttt{Handoff} \& \texttt{Related} ($+\lfloor B_{\text{spare}}/3\rfloor$).};
-
-  \node[box,fill=amgreen!8,draw=amgreen,text width=4.45cm,anchor=north west] (r3) at (10.45,3.6)
-    {\textbf{Step 5: Deterministic Line Pack}\\
-     $\bullet$ Pin headline $L_0$ + \texttt{[id[:8]]}.\\
-     $\bullet$ Score lines $L_i$ by $\text{Key}(L_i,q)$.\\
-     $\bullet$ Pack whole lines $\le b_S - 9$, restore order $i$, add \texttt{... [more]}.\\
-     $\bullet$ Inject \texttt{\# MEMORY STATE}.};
-
-  \draw[arr] (r1.east) -- (r2.west);
-  \draw[arr] (r2.east) -- (r3.west);
-  \draw[arr] (w2.south) -- ++(0,-0.32) -| (r1.north);
-
-  % Lane C: On-demand full lookup
-  \draw[lane] (0,-1.85) rectangle (15.4,-0.15);
-  \node[anchor=north west,font=\footnotesize\bfseries,text=amblue] at (0.25,-0.28)
-    {LANE C --- ON-DEMAND DEEP LOOKUP (1 Tool Call When Cheat Sheet Shows \texttt{... [more]} or \texttt{[stale]})};
-
-  \node[box,fill=amblue!8,draw=amblue,text width=14.6cm,anchor=north west] (l1) at (0.25,-0.82)
-    {\textbf{Step 6: Uncut Retrieval or Snapshot Rewind:}
-     \texttt{memory\_find(query=q, full=True)} returns \textbf{100\% uncut note bodies} + pinned \texttt{Goal} setup in one call; \texttt{memory\_inspect(id)} checks out the exact Git working-tree snapshot from commit \texttt{id}.};
-
-  \draw[darr] (r3.south) -- ++(0,-0.32) -| (l1.north);
+  % Lane C
+  \draw[lane] (0,0.15) rectangle (17.6,2.88);
+  \node[hd,text=amblue] at (0.28,2.66)
+    {LANE C --- ON-DEMAND LOOKUP\\
+     One call when the cheat sheet shows \texttt{... [more]} or \texttt{[stale]}};
+  \node[box,fill=amblue!8,draw=amblue,text width=16.7cm,anchor=north west] at (0.28,1.95)
+    {\textbf{Step 6: Uncut retrieval or snapshot rewind.}
+     \texttt{memory\_find(query=q, full=True)} returns the full note bodies and the pinned Goal.
+     \texttt{memory\_inspect(id)} checks out that commit's working tree.};
 \end{tikzpicture}%
 }
 \caption{Complete six-step schematic block diagram of Agent Memory across saving (Lane A), deterministic render-time prompt compilation (Lane B), and on-demand full lookup (Lane C).}
@@ -388,7 +384,7 @@ Before running an AI solver, we checked all 66 dependent steps ($t \ge 2$) acros
 \node[anchor=west,font=\footnotesize\bfseries,text=amgray!90!black] at (axis cs:38.0,r2) {37.0\% \normalfont\scriptsize(187 toks)};
 \node[anchor=west,font=\footnotesize\bfseries,text=amgray!90!black] at (axis cs:55.0,r3) {53.9\% \normalfont\scriptsize(374 toks)};
 \node[anchor=west,font=\footnotesize\bfseries,text=amgreen!75!black] at (axis cs:53.5,r4) {52.5\% \normalfont\scriptsize(338 toks)};
-\node[anchor=west,font=\footnotesize\bfseries,text=amblue] at (axis cs:101.0,r5) {100.0\% \normalfont\scriptsize(1,565 toks)};
+\node[anchor=east,font=\scriptsize\bfseries,text=white] at (axis cs:98,r5) {100.0\% \ (1,565 toks)};
 \end{axis}
 \end{tikzpicture}
 \caption{Equation retention across all 20 physics papers (66 dependent subtasks). Short summaries lose nearly two-thirds of the math (37.0\% kept). Fixed-slice search loses nearly half (53.9\%). Agent Memory's 1{,}200-character cheat sheet matches slice search with \emph{zero} lookups (52.5\%, green bar), and adding a single full lookup keeps \textbf{100.0\%} of needed equations (blue bar).}
@@ -405,19 +401,19 @@ On Step 1 alone---before any memory system is even used---\texttt{gpt-5-mini} on
 \centering
 \begin{tikzpicture}
 \begin{axis}[
-  ybar,width=0.88\textwidth,height=6.0cm,bar width=20pt,bar shift=0pt,
-  ymin=0,ymax=14.2,ylabel={Problems finished out of 20 (SR)},
+  ybar,width=0.92\textwidth,height=8.0cm,bar width=16pt,bar shift=0pt,
+  ymin=0,ymax=16,clip=false,ylabel={Problems finished out of 20 (SR)},
   symbolic x coords={m1,m2,m3,m4,m5,m6},
   xtick={m1,m2,m3,m4,m5,m6},
   xticklabels={
     {No memory},
-    {Short summaries},
-    {Slice search},
-    {MemGPT (ICML '26)},
-    {\textbf{Cheat sheet (0 calls)}},
-    {\textbf{Full lookup (1 call)}}
+    {Short\\summaries},
+    {Slice\\search},
+    {MemGPT\\ICML '26},
+    {Cheat sheet\\0 calls},
+    {Full lookup\\1 call}
   },
-  x tick label style={font=\footnotesize,align=center,text width=2.1cm},
+  x tick label style={font=\footnotesize,align=center},
   label style={font=\small\bfseries},
   ymajorgrids,grid style={gray!25}]
 \addplot[fill=amred!75,draw=none] coordinates {(m1,1)};
@@ -426,14 +422,14 @@ On Step 1 alone---before any memory system is even used---\texttt{gpt-5-mini} on
 \addplot[fill=amblue,draw=none] coordinates {(m6,10)};
 
 \draw[amorange,very thick,dashed] (axis cs:m1,12) -- (axis cs:m6,12);
-\node[anchor=south west,font=\scriptsize\bfseries,text=amorange] at (axis cs:m1,12.15) {\texttt{gpt-5-mini} Step-1 math ceiling: 12 / 20 problems (60.0\%)};
+\node[anchor=south west,font=\scriptsize\bfseries,text=amorange,inner sep=1pt] at (axis cs:m1,12.4) {\texttt{gpt-5-mini} Step-1 ceiling: 12/20 (60\%)};
 
-\node[anchor=south,font=\footnotesize\bfseries,align=center,text=amred!85!black] at (axis cs:m1,1) {1/20\\\scriptsize(32.2\% PS)};
-\node[anchor=south,font=\footnotesize\bfseries,align=center,text=amgray!90!black] at (axis cs:m2,3) {3/20\\\scriptsize(38.9\% PS)};
-\node[anchor=south,font=\footnotesize\bfseries,align=center,text=amgray!90!black] at (axis cs:m3,5) {5/20\\\scriptsize(50.5\% PS)};
-\node[anchor=south,font=\footnotesize\bfseries,align=center,text=amgray!90!black] at (axis cs:m4,9) {9/20\\\scriptsize(56.6\% PS)};
-\node[anchor=south,font=\footnotesize\bfseries,align=center,text=amgreen!75!black] at (axis cs:m5,10) {10/20\\\scriptsize(56.9\% PS)};
-\node[anchor=south,font=\footnotesize\bfseries,align=center,text=amblue] at (axis cs:m6,10) {10/20\\\scriptsize(60.2\% PS)};
+\node[anchor=south,font=\scriptsize\bfseries,align=center,text=amred!85!black] at (axis cs:m1,1.2) {1/20\\(32.2\% PS)};
+\node[anchor=south,font=\scriptsize\bfseries,align=center,text=amgray!90!black] at (axis cs:m2,3.2) {3/20\\(38.9\% PS)};
+\node[anchor=south,font=\scriptsize\bfseries,align=center,text=amgray!90!black] at (axis cs:m3,5.2) {5/20\\(50.5\% PS)};
+\node[anchor=south,font=\scriptsize\bfseries,align=center,text=amgray!90!black] at (axis cs:m4,9.2) {9/20\\(56.6\% PS)};
+\node[anchor=south,font=\scriptsize\bfseries,align=center,text=amgreen!45!black,inner sep=0pt] at (axis cs:m5,10.25) {10/20\\[-1pt]56.9\% PS};
+\node[anchor=south,font=\scriptsize\bfseries,align=center,text=amblue,inner sep=0pt] at (axis cs:m6,10.25) {10/20\\[-1pt]60.2\% PS};
 \end{axis}
 \end{tikzpicture}
 \caption{Results across all 20 papers using the official \texttt{gpt-5-mini} solver + LLM judge. Without memory, performance collapses from 12/20 on Step 1 down to 1/20 at the end. Agent Memory finishes \textbf{10 of the 12 solvable problems (50.0\% SR; 56.9\% PS for cheat sheet only in green, 60.2\% PS for full lookup in blue)}, beating all published external memory systems.}
