@@ -87,9 +87,6 @@ def work_prompt(record: dict, packet: str, pytest_result: dict) -> str:
         "that test fails for the "
         "reported reason. Then make the failing tests pass. Do not retry an "
         "approach that produced this same failure. Do not weaken the tests."
-        " Read the active task model with memory_model(get). Use actual test "
-        "results to propose a better model at handoff. Check the proposal before "
-        "accepting it. Keep earlier cases and unresolved alternatives."
     )
 
 

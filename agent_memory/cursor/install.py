@@ -167,7 +167,14 @@ def _resolved_python(python: str | None) -> str:
     return str(Path(python or sys.executable).expanduser().resolve())
 
 
-def _hook_command(python: str) -> str:
+def _hook_command(python: str, root: Path | None = None) -> str:
+    import shlex
+
+    if root is not None:
+        return (
+            f"{shlex.quote(python)} -m agent_memory.cursor.hook "
+            f"--root {shlex.quote(str(root))}"
+        )
     return f"{python} -m agent_memory.cursor.hook"
 
 
@@ -396,7 +403,7 @@ def install_cursor(
     cursor = root / ".cursor"
     cursor.mkdir(parents=True, exist_ok=True)
     py = _resolved_python(python)
-    command = _hook_command(py)
+    command = _hook_command(py, root)
     written: dict[str, Path] = {}
 
     if interactive is None:

@@ -107,3 +107,43 @@ class ExactNoteStorageTests(MemoryTestCase):
         text = 'Unicode: café 漢字 \ufffe \uffff \ufdd0 😀\n'
         target = self.memory.save(text)
         self.assertEqual(self.memory.find(ids=target)[0].message, text)
+
+    def test_find_tool_promotes_covering_summary_and_marks_stale(self):
+        cfg = self.path / 'config.py'
+        cfg.write_text('TTL = 3600\n')
+        old_id = self.memory.save('Auth token TTL is 3600s in config.py', {'files': ['config.py']})
+        cfg.write_text('TTL = 86400\n')
+        self.memory.save('Dead end: 3600s dropped sessions; changed TTL to 86400s in config.py', {'files': ['config.py']})
+        sum_id = self.memory.summarize('Verified: Auth token TTL is 86400s in config.py')
+        cfg.write_text('TTL = 172800\n')
+        out = self.memory.call('memory', {'action': 'find', 'query': 'Auth token TTL config.py', 'k': 1})
+        self.assertTrue(out.splitlines()[0].startswith(f'[{sum_id[:8]}] [stale]'))
+        self.assertIn(old_id[:8], out)
+
+    def test_session_start_injects_packet_and_turn_two_updates_query(self):
+        import os
+        from unittest.mock import patch
+        from agent_memory.cursor.hook import handle
+
+        with patch.dict(os.environ, {'AGENT_MEMORY_ROOT': str(self.path)}):
+            handle('beforeSubmitPrompt', {'prompt': 'Initial setup of monorepo'})
+            self.memory.save('Stripe webhook signature uses HMAC-SHA256 in billing/webhook.py')
+            self.memory.save('Logger uses JSON formatter')
+            handle('beforeSubmitPrompt', {'prompt': 'Fix the Stripe webhook HMAC signature bug'})
+            started = handle('sessionStart', {'session_id': 's1'})
+            self.assertIn('# MEMORY STATE', started['additional_context'])
+            self.assertIn('Stripe webhook', started['additional_context'])
+
+    def test_save_does_not_fail_when_provider_env_lacks_api_key(self):
+        import os
+        from unittest.mock import patch
+
+        with patch.dict(
+            os.environ,
+            {'AGENT_MEMORY_PROVIDER': 'agent_memory.providers.gemini:GeminiProvider'},
+            clear=False,
+        ):
+            os.environ.pop('GEMINI_API_KEY', None)
+            item_id = self.memory.save('Saved offline without API key')
+            self.assertTrue(item_id)
+

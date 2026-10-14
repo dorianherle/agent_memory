@@ -307,25 +307,41 @@ def _run_action(memory: Memory, arguments: dict) -> str:
         explicit = bool(arguments.get("ids"))
         raw_k = arguments.get("limit") or arguments.get("k")
         k = int(raw_k) if raw_k is not None else (50 if explicit else FIND_DEFAULT_K)
+        pool_k = k if explicit else max(k * 4, FIND_DEFAULT_K)
         items = memory.find(
             arguments.get("query"),
             ids=arguments.get("ids"),
             text=arguments.get("text"),
             payload=arguments.get("payload"),
-            k=k,
+            k=pool_k,
             branch=branch,
         )
         used_substring = memory._find_used_substring
         if not explicit:
             items = [item for item in items if not _transcript(item)]
+            covered_by = {}
+            if branch == "current":
+                for state_item in memory.state():
+                    for cid in state_item.payload.get("covers", []):
+                        covered_by[cid] = state_item
+            for item in items:
+                for cid in item.payload.get("covers", []):
+                    covered_by.setdefault(cid, item)
+            if covered_by:
+                folded = []
+                seen_ids = set()
+                for item in items:
+                    target = covered_by.get(item.id, item)
+                    if target.id not in seen_ids:
+                        seen_ids.add(target.id)
+                        folded.append(target)
+                items = folded
+            items = items[:k]
         cover_ids = [
             child_id
             for item in items
             for child_id in item.payload.get("covers", [])
         ]
-        if not explicit and cover_ids:
-            covered_set = set(cover_ids)
-            items = [item for item in items if item.id not in covered_set]
         kids = (
             memory.find(ids=cover_ids, k=len(cover_ids), branch=branch)
             if cover_ids
@@ -341,11 +357,13 @@ def _run_action(memory: Memory, arguments: dict) -> str:
             for item in items
             if item.payload.get("covers")
         }
+        stale_ids = memory._stale_ids(items) if branch == "current" else set()
         result = render_find(
             items,
             full_ids={item.id for item in items} if explicit else set(),
             children=children,
             full=bool(arguments.get("full")),
+            stale_ids=stale_ids,
         )
         if queried and used_substring:
             result = f"{result}\n\n{SUBSTRING_FALLBACK}"
@@ -364,8 +382,11 @@ def _run_action(memory: Memory, arguments: dict) -> str:
             hidden.append(target[:8])
         return "Deleted [" + "], [".join(hidden) + "]."
     if action == "history":
+        hist = memory.history()
         return render_timeline(
-            memory.history(), full=bool(arguments.get("full"))
+            hist,
+            full=bool(arguments.get("full")),
+            stale_ids=memory._stale_ids(hist),
         )
     if action == "open_questions":
         if not (arguments.get("text") or "").strip():

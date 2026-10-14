@@ -187,12 +187,8 @@ class Memory:
 
     def _ensure_exclude(self, path: Path) -> None:
         """Keep info/exclude up to date (merge, never wipe user lines)."""
-        existing: list[str] = []
-        if path.exists():
-            existing = [
-                line.rstrip("\n")
-                for line in path.read_text().splitlines()
-            ]
+        raw = path.read_text() if path.exists() else ""
+        existing = [line.rstrip("\n") for line in raw.splitlines()]
         known = {line.strip() for line in existing if line.strip()}
         lines = list(existing)
         for entry in EXCLUDE_ENTRIES:
@@ -202,7 +198,9 @@ class Memory:
             if entry not in known:
                 lines.append(entry)
                 known.add(entry)
-        path.write_text("\n".join(lines).rstrip() + "\n")
+        updated = "\n".join(lines).rstrip() + "\n"
+        if updated != raw:
+            path.write_text(updated)
 
     def _nested_repo_excludes(self) -> list[str]:
         """Paths of nested git checkouts to keep out of ``git add -A``.
@@ -213,25 +211,36 @@ class Memory:
         """
         found: list[str] = []
         root = self._path
-        skip_roots = {self._git_dir.resolve()}
-        for meta in root.rglob(".git"):
-            try:
-                resolved = meta.resolve()
-            except OSError:
+        skip_dirs = {
+            HIDDEN_DIR,
+            ".git",
+            ".svn",
+            ".hg",
+            "__pycache__",
+            ".pytest_cache",
+            "node_modules",
+            ".venv",
+            "venv",
+            ".tox",
+            ".mypy_cache",
+            ".ruff_cache",
+            ".next",
+        }
+        for dirpath, dirs, files in os.walk(root):
+            current = Path(dirpath)
+            if current != root and (".git" in dirs or ".git" in files):
+                try:
+                    rel = current.relative_to(root).as_posix().rstrip("/") + "/"
+                    found.append(rel)
+                except ValueError:
+                    pass
+                dirs.clear()
                 continue
-            if any(
-                resolved == skip or skip in resolved.parents
-                for skip in skip_roots
-            ):
-                continue
-            parent = meta.parent if meta.name == ".git" else meta
-            if parent.resolve() == root.resolve():
-                continue
-            try:
-                rel = parent.relative_to(root).as_posix().rstrip("/") + "/"
-            except ValueError:
-                continue
-            found.append(rel)
+            dirs[:] = [
+                d
+                for d in dirs
+                if d not in skip_dirs and not d.startswith(ARCHIVE_PREFIX)
+            ]
         return sorted(set(found))
 
     @contextmanager
@@ -377,10 +386,13 @@ class Memory:
             return
         row = self._catalog.get(item_id)
         if row["kind"] != "delete":
-            self._searcher().queue_document(
-                row["content_hash"],
-                row["document"],
-            )
+            try:
+                self._searcher().queue_document(
+                    row["content_hash"],
+                    row["document"],
+                )
+            except Exception:
+                pass
 
     def save(
         self,
@@ -709,6 +721,7 @@ class Memory:
         text = text.strip()
         if not text:
             return None
+        self._remember_query(text)
         latest = self.find(payload={"user": True}, k=1)
         if latest and latest[0].message == text:
             return None
@@ -721,6 +734,27 @@ class Memory:
             agent=agent or USER_AGENT,
         )
 
+    def _remember_query(self, text: str) -> None:
+        cleaned = (text or "").strip()
+        if cleaned and not _SMALL_TALK_RE.match(cleaned):
+            try:
+                (self._git_dir / "LAST_QUERY").write_text(cleaned, encoding="utf-8")
+            except OSError:
+                pass
+
+    def _active_query(self, items: list[MemoryItem]) -> str:
+        from agent_memory.prompt import _latest_user_text
+
+        path = self._git_dir / "LAST_QUERY"
+        if path.exists():
+            try:
+                stored = path.read_text(encoding="utf-8").strip()
+                if stored:
+                    return stored
+            except OSError:
+                pass
+        return _latest_user_text(items)
+
     def ensure_goal(self, text: str, *, agent: str | None = None) -> str | None:
         """Create the initial goal from the first request, but no chat log.
 
@@ -730,6 +764,7 @@ class Memory:
         cleaned = (text or "").strip()
         if not cleaned:
             return None
+        self._remember_query(cleaned)
         if split_goals(self.state()):
             if _STEERING_PROMPT_RE.search(cleaned):
                 return self.save_user(cleaned, agent=agent)
@@ -952,7 +987,7 @@ class Memory:
             sample.append(steer)
         questions = split_open_questions(items)
         sample.extend(questions)
-        query = _latest_user_text(items)
+        query = self._active_query(items)
         related = self.related_notes(query, _state=items) if query else []
         handoff = _handoff(items)
         all_candidates = list(sample)
@@ -1019,10 +1054,10 @@ class Memory:
 
     def render_packet(self, question: str | None = None, *, max_chars: int = 1200) -> str:
         """Goal / Handoff / questions / Related for this question."""
-        from agent_memory.prompt import _latest_user_text, _goal, _steering, _handoff, render_packet
+        from agent_memory.prompt import _goal, _steering, _handoff, render_packet
 
         items = self.state()
-        query = (question or "").strip() or _latest_user_text(items)
+        query = (question or "").strip() or self._active_query(items)
         related = self.related_notes(query, _state=items) if query else []
         # Check only candidates that can enter the bounded packet, not all history.
         goal = _goal(items)

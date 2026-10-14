@@ -176,7 +176,7 @@ def _subject(
     return f"[{item.id[:8]}] {mark}{who}{prefix}{head}"
 
 
-def _line(item: MemoryItem) -> str:
+def _line(item: MemoryItem, stale: bool = False) -> str:
     """Full message line (for timelines / expanded views)."""
     from agent_memory.identity import DEFAULT_AGENT, USER_AGENT
 
@@ -188,7 +188,8 @@ def _line(item: MemoryItem) -> str:
         prefix = "user: "
         agent = USER_AGENT
     who = "" if agent in (USER_AGENT, "") else f"@{agent} "
-    return f"[{item.id[:8]}] {who}{prefix}{item.message}"
+    mark = "[stale] " if stale else ""
+    return f"[{item.id[:8]}] {mark}{who}{prefix}{item.message}"
 
 
 def _transcript(item: MemoryItem) -> bool:
@@ -200,29 +201,46 @@ def _transcript(item: MemoryItem) -> bool:
     )
 
 
-def _capped_line(item: MemoryItem, limit: int = FIND_BODY_MAX) -> str:
-    text = _line(item)
+def _capped_line(
+    item: MemoryItem,
+    limit: int = FIND_BODY_MAX,
+    stale: bool = False,
+) -> str:
+    text = _line(item, stale=stale)
     if len(text) <= limit:
         return text
     extra = len(text) - limit + 1
     return text[: limit - 1].rstrip() + f"… ({extra} more)"
 
 
-def _child_lines(kids: list[MemoryItem]) -> list[str]:
+def _child_lines(
+    kids: list[MemoryItem],
+    stale_ids: set[str] | None = None,
+) -> list[str]:
+    stale_ids = stale_ids or set()
     visible = kids[:FIND_CHILD_CAP]
-    lines = [f"    {_subject(child)}" for child in visible]
+    lines = [
+        f"    {_subject(child, stale=child.id in stale_ids)}"
+        for child in visible
+    ]
     hidden = len(kids) - len(visible)
     if hidden:
         lines.append(f"    (+{hidden} more)")
     return lines
 
 
-def render_timeline(items: list[MemoryItem], *, full: bool = False) -> str:
+def render_timeline(
+    items: list[MemoryItem],
+    *,
+    full: bool = False,
+    stale_ids: set[str] | None = None,
+) -> str:
     """History: work notes, oldest first.
 
     Default skips chat transcript (user/auto) and folded children.
     full=True keeps every body, including folded steps.
     """
+    stale_ids = stale_ids or set()
     fmt = _line if full else _subject
     by_id = {item.id: item for item in items}
     covered = {c for item in items for c in item.payload.get("covers", [])}
@@ -241,7 +259,7 @@ def render_timeline(items: list[MemoryItem], *, full: bool = False) -> str:
         )
         kept = kept[-HISTORY_CAP:]
     for item in kept:
-        lines.append(fmt(item))
+        lines.append(fmt(item, stale=item.id in stale_ids))
         if full:
             for child_id in item.payload.get("covers", []):
                 child = by_id.get(child_id)
@@ -356,13 +374,13 @@ def render_packet(
     steering = _steering(items, goal)
     handoff = _handoff(items)
     questions = split_open_questions(items)
-    spare = (0 if steering else 220) + 200 + (0 if questions else 120)
-    add("Goal", [goal] if goal else [], 260 + spare // 2)
+    spare = (0 if steering else 220) + (0 if questions else 120)
+    add("Goal", [goal] if goal else [], 360 + spare // 2)
     add("Steering", [steering] if steering else [], 220)
-    add("Handoff", [handoff] if handoff else [], 360 + spare // 3)
+    add("Handoff", [handoff] if handoff else [], 426 + spare // 3)
     add("Open questions", questions[:8], 120)
     omitted += max(0, len(questions) - 8)
-    add("Related", related, 260 + spare // 3)
+    add("Related", related, 326 + spare // 3)
     if branches and len(branches) > 1:
         current = next((b for b in branches if b["current"]), None)
         if current:
@@ -380,6 +398,7 @@ def render_find(
     full_ids: set[str] | None = None,
     children: dict[str, list[MemoryItem]] | None = None,
     full: bool = False,
+    stale_ids: set[str] | None = None,
 ) -> str:
     """Search hits. Full body when full=True or explicit ids; others are subjects.
 
@@ -387,12 +406,18 @@ def render_find(
     """
     full_ids = full_ids or set()
     children = children or {}
+    stale_ids = stale_ids or set()
     lines = []
     for item in items:
+        stale = item.id in stale_ids
         if full or item.id in full_ids:
-            lines.append(_line(item) if full else _capped_line(item))
+            lines.append(
+                _line(item, stale=stale)
+                if full
+                else _capped_line(item, stale=stale)
+            )
         else:
-            lines.append(_subject(item))
+            lines.append(_subject(item, stale=stale))
         lines.extend(_child_lines(children.get(item.id, [])))
     return "\n".join(lines) or "Nothing found."
 

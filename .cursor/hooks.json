@@ -3,27 +3,27 @@
   "hooks": {
     "sessionStart": [
       {
-        "command": "/Users/dorianherle/Documents/Personal/agent_memory/.venv/bin/python -m agent_memory.cursor.hook"
+        "command": "/Users/dorianherle/Documents/Personal/agent_memory/.venv/bin/python -m agent_memory.cursor.hook --root /Users/dorianherle/Documents/Personal/agent_memory"
       }
     ],
     "beforeSubmitPrompt": [
       {
-        "command": "/Users/dorianherle/Documents/Personal/agent_memory/.venv/bin/python -m agent_memory.cursor.hook"
+        "command": "/Users/dorianherle/Documents/Personal/agent_memory/.venv/bin/python -m agent_memory.cursor.hook --root /Users/dorianherle/Documents/Personal/agent_memory"
       }
     ],
     "afterAgentResponse": [
       {
-        "command": "/Users/dorianherle/Documents/Personal/agent_memory/.venv/bin/python -m agent_memory.cursor.hook"
+        "command": "/Users/dorianherle/Documents/Personal/agent_memory/.venv/bin/python -m agent_memory.cursor.hook --root /Users/dorianherle/Documents/Personal/agent_memory"
       }
     ],
     "subagentStart": [
       {
-        "command": "/Users/dorianherle/Documents/Personal/agent_memory/.venv/bin/python -m agent_memory.cursor.hook"
+        "command": "/Users/dorianherle/Documents/Personal/agent_memory/.venv/bin/python -m agent_memory.cursor.hook --root /Users/dorianherle/Documents/Personal/agent_memory"
       }
     ],
     "subagentStop": [
       {
-        "command": "/Users/dorianherle/Documents/Personal/agent_memory/.venv/bin/python -m agent_memory.cursor.hook"
+        "command": "/Users/dorianherle/Documents/Personal/agent_memory/.venv/bin/python -m agent_memory.cursor.hook --root /Users/dorianherle/Documents/Personal/agent_memory"
       }
     ]
   }

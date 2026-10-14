@@ -118,11 +118,20 @@ def handle(event: str, data: dict) -> dict:
             )
         except Exception:
             pass
+        state_block = ""
+        try:
+            if memory._git_dir.exists() and memory.state():
+                packet = memory.render_packet()
+                if packet.strip():
+                    state_block = f"\n\n# MEMORY STATE\n{packet}"
+        except Exception:
+            pass
         context = (
             f"{CURSOR_INSTRUCTIONS}\n\n"
             f"Your memory agent name: @{agent}\n"
             f"Pass agent={agent!r} on memory_save / memory_summarize when possible."
             f"{html_note}"
+            f"{state_block}"
         )
         return {
             "additional_context": context,
@@ -163,7 +172,7 @@ def handle(event: str, data: dict) -> dict:
                     default_live_dir(memory),
                     entry_id,
                     goal=prompt.strip(),
-                    memory_state="",
+                    memory_state=memory.render_packet(prompt.strip()),
                     instructions=instructions,
                     rule=_memory_rule_text(memory),
                     mcp_tools=mcp_tools_catalog(),
@@ -255,6 +264,11 @@ def handle(event: str, data: dict) -> dict:
 
 
 def main() -> None:
+    from agent_memory.cursor.common import remember_root
+    from agent_memory.cursor.mcp import _strip_root_argv
+
+    remember_root()
+    _strip_root_argv()
     data = _read_payload()
     event = str(data.get("hook_event_name") or "").strip()
     if not event and len(sys.argv) > 1:
