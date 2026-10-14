@@ -1,0 +1,64 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "model_predict",
+      "query": "needs_review",
+      "payload": {
+        "request": {
+          "declared": [
+            "\u00e9.json",
+            "a.json",
+            "\u00e9.json"
+          ],
+          "saved": {
+            "\u00e9.json": {
+              "kind": "file",
+              "metadata": {
+                "z": 1,
+                "a": [
+                  true,
+                  1
+                ]
+              }
+            },
+            "a.json": {
+              "kind": "missing"
+            }
+          },
+          "current": {
+            "\u00e9.json": {
+              "metadata": {
+                "a": [
+                  true,
+                  1
+                ],
+                "z": 1
+              },
+              "kind": "file"
+            }
+          }
+        },
+        "policy": {
+          "ignored": []
+        },
+        "evidence": []
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 32212,
+    "output_tokens": 922,
+    "cached_input_tokens": 22016,
+    "reasoning_output_tokens": 674
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 26.123807833064348,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

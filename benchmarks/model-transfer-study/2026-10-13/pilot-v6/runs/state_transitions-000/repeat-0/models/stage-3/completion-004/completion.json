@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "memory",
+          "arguments": {
+            "action": "save",
+            "text": "Stage 3 verified against current policy.json and requests.json: work.py blocks missing edges, checks edge role before retry validation, rejects bool/non-integer/out-of-range attempts on retry edges, returns the requested destination on success, and does not mutate inputs. report.json matches actual evaluate results for both current requests.",
+            "payload": {
+              "files": [
+                "work.py",
+                "policy.json",
+                "requests.json",
+                "report.json"
+              ]
+            }
+          }
+        },
+        {
+          "action": "memory",
+          "arguments": {
+            "action": "save",
+            "text": "Unresolved limits: behavior for malformed non-object request/policy/edge values is outside the contract and was not tested; evidence.json is absent. Non-boolean truthy edge retry markers were not independently specified or tested.",
+            "payload": {
+              "files": [
+                "work.py",
+                "policy.json"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 12442,
+    "output_tokens": 503,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 307
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 14.567532083019614,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

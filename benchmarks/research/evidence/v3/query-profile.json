@@ -1,0 +1,292 @@
+{
+  "question_id": "1cea1afa",
+  "repetitions": 20,
+  "source_changed": false,
+  "git_calls_per_query": [
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+  ],
+  "median_query_ms": 66.37645850423723,
+  "median_git_ms": 28.16256252117455,
+  "limit": "One repeated query during the concurrent full test. Diagnostic only; no production latency claim.",
+  "rows": [
+    {
+      "query_ms": 65.53204194642603,
+      "git_calls": [
+        {
+          "command": "for-each-ref",
+          "elapsed_ms": 13.480499852448702
+        },
+        {
+          "command": "branch",
+          "elapsed_ms": 13.746500015258789
+        }
+      ]
+    },
+    {
+      "query_ms": 65.32225012779236,
+      "git_calls": [
+        {
+          "command": "for-each-ref",
+          "elapsed_ms": 14.48162505403161
+        },
+        {
+          "command": "branch",
+          "elapsed_ms": 14.201000100001693
+        }
+      ]
+    },
+    {
+      "query_ms": 66.48866715840995,
+      "git_calls": [
+        {
+          "command": "for-each-ref",
+          "elapsed_ms": 14.742415864020586
+        },
+        {
+          "command": "branch",
+          "elapsed_ms": 13.11899977736175
+        }
+      ]
+    },
+    {
+      "query_ms": 68.90466692857444,
+      "git_calls": [
+        {
+          "command": "for-each-ref",
+          "elapsed_ms": 14.903457835316658
+        },
+        {
+          "command": "branch",
+          "elapsed_ms": 13.689624844118953
+        }
+      ]
+    },
+    {
+      "query_ms": 68.83729109540582,
+      "git_calls": [
+        {
+          "command": "for-each-ref",
+          "elapsed_ms": 14.575292123481631
+        },
+        {
+          "command": "branch",
+          "elapsed_ms": 13.975125038996339
+        }
+      ]
+    },
+    {
+      "query_ms": 66.21945812366903,
+      "git_calls": [
+        {
+          "command": "for-each-ref",
+          "elapsed_ms": 15.055333962664008
+        },
+        {
+          "command": "branch",
+          "elapsed_ms": 14.279583003371954
+        }
+      ]
+    },
+    {
+      "query_ms": 70.67787484265864,
+      "git_calls": [
+        {
+          "command": "for-each-ref",
+          "elapsed_ms": 15.071208123117685
+        },
+        {
+          "command": "branch",
+          "elapsed_ms": 13.712666230276227
+        }
+      ]
+    },
+    {
+      "query_ms": 68.96004197187722,
+      "git_calls": [
+        {
+          "command": "for-each-ref",
+          "elapsed_ms": 14.165374916046858
+        },
+        {
+          "command": "branch",
+          "elapsed_ms": 13.957499992102385
+        }
+      ]
+    },
+    {
+      "query_ms": 64.63095801882446,
+      "git_calls": [
+        {
+          "command": "for-each-ref",
+          "elapsed_ms": 14.39037499949336
+        },
+        {
+          "command": "branch",
+          "elapsed_ms": 13.313124887645245
+        }
+      ]
+    },
+    {
+      "query_ms": 67.13329209014773,
+      "git_calls": [
+        {
+          "command": "for-each-ref",
+          "elapsed_ms": 14.825250022113323
+        },
+        {
+          "command": "branch",
+          "elapsed_ms": 14.333582948893309
+        }
+      ]
+    },
+    {
+      "query_ms": 90.06229089573026,
+      "git_calls": [
+        {
+          "command": "for-each-ref",
+          "elapsed_ms": 14.396124985069036
+        },
+        {
+          "command": "branch",
+          "elapsed_ms": 22.928416030481458
+        }
+      ]
+    },
+    {
+      "query_ms": 188.6249592062086,
+      "git_calls": [
+        {
+          "command": "for-each-ref",
+          "elapsed_ms": 64.65658289380372
+        },
+        {
+          "command": "branch",
+          "elapsed_ms": 41.12370917573571
+        }
+      ]
+    },
+    {
+      "query_ms": 77.58758286945522,
+      "git_calls": [
+        {
+          "command": "for-each-ref",
+          "elapsed_ms": 24.86979099921882
+        },
+        {
+          "command": "branch",
+          "elapsed_ms": 14.737125020474195
+        }
+      ]
+    },
+    {
+      "query_ms": 66.19104091078043,
+      "git_calls": [
+        {
+          "command": "for-each-ref",
+          "elapsed_ms": 13.993415981531143
+        },
+        {
+          "command": "branch",
+          "elapsed_ms": 14.17108392342925
+        }
+      ]
+    },
+    {
+      "query_ms": 65.10462495498359,
+      "git_calls": [
+        {
+          "command": "for-each-ref",
+          "elapsed_ms": 13.955499976873398
+        },
+        {
+          "command": "branch",
+          "elapsed_ms": 13.213791884481907
+        }
+      ]
+    },
+    {
+      "query_ms": 64.46641613729298,
+      "git_calls": [
+        {
+          "command": "for-each-ref",
+          "elapsed_ms": 13.820666121318936
+        },
+        {
+          "command": "branch",
+          "elapsed_ms": 13.909915927797556
+        }
+      ]
+    },
+    {
+      "query_ms": 67.15995795093477,
+      "git_calls": [
+        {
+          "command": "for-each-ref",
+          "elapsed_ms": 13.883042149245739
+        },
+        {
+          "command": "branch",
+          "elapsed_ms": 14.277582988142967
+        }
+      ]
+    },
+    {
+      "query_ms": 64.76187496446073,
+      "git_calls": [
+        {
+          "command": "for-each-ref",
+          "elapsed_ms": 14.221999794244766
+        },
+        {
+          "command": "branch",
+          "elapsed_ms": 13.146167155355215
+        }
+      ]
+    },
+    {
+      "query_ms": 64.79974999092519,
+      "git_calls": [
+        {
+          "command": "for-each-ref",
+          "elapsed_ms": 14.101792126893997
+        },
+        {
+          "command": "branch",
+          "elapsed_ms": 12.866583187133074
+        }
+      ]
+    },
+    {
+      "query_ms": 66.26424985006452,
+      "git_calls": [
+        {
+          "command": "for-each-ref",
+          "elapsed_ms": 14.639291912317276
+        },
+        {
+          "command": "branch",
+          "elapsed_ms": 13.457583030685782
+        }
+      ]
+    }
+  ]
+}

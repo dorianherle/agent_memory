@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy, json\nfrom work import evaluate\n\ndef chk(req, ev, pol, expected):\n    before = copy.deepcopy((req, ev, pol))\n    got = evaluate(req, ev, pol)\n    assert got == expected, (got, expected)\n    assert (req, ev, pol) == before\n\n# Current fixtures and report.\nrequests=json.load(open('requests.json'))\nevidence=json.load(open('evidence.json'))\npolicy=json.load(open('policy.json'))\nreport=json.load(open('report.json'))\nassert report == [evaluate(r,evidence,policy) for r in requests]\n# Missing conditions are sorted and stop evidence use.\nchk({'claim':'c','conditions':{}}, [], {'required_conditions':['z','a']}, {'status':'unknown','value':None,'sources':[],'unknowns':['a','z']})\n# Verification, withdrawal, and exact required-condition matching.\nchk({'claim':'c','conditions':{'k':1}}, [\n {'source':'wrong','claim':'x','value':1,'conditions':{'k':1},'verified':True},\n {'source':'withdrawn','claim':'c','value':1,'conditions':{'k':1},'verified':True,'withdrawn':True},\n {'source':'unverified','claim':'c','value':1,'conditions':{'k':1}},\n {'source':'mismatch','claim':'c','value':1,'conditions':{'k':2},'verified':True}],\n {'required_conditions':['k'],'require_verified':True}, {'status':'unknown','value':None,'sources':[],'unknowns':['no matching evidence']})\n# Canonical object agreement, sorted/deduplicated sources, and supersession.\nchk({'claim':'c','conditions':{'k':1}}, [\n {'source':'old','claim':'c','value':0,'conditions':{'k':1}},\n {'source':'b','claim':'c','value':{'y':2,'x':1},'conditions':{'k':1},'supersedes':['old']},\n {'source':'a','claim':'c','value':{'x':1,'y':2},'conditions':{'k':1}},\n {'source':'a','claim':'c','value':{'y':2,'x':1},'conditions':{'k':1}}],\n {'required_conditions':['k']}, {'status':'supported','value':{'y':2,'x':1},'sources':['a','b'],'unknowns':[]})\n# Counts do not decide disagreement.\nchk({'claim':'c','conditions':{}}, [\n {'source':'a','claim':'c','value':1,'conditions':{}},\n {'source':'b','claim':'c','value':1,'conditions':{}},\n {'source':'c','claim':'c','value':2,'conditions':{}}],\n {'required_conditions':[]}, {'status':'conflict','value':None,'sources':['a','b','c'],'unknowns':['source disagreement']})\n# Only literal Boolean false is unsupported; absent value remains supported null.\nchk({'claim':'c','conditions':{}}, [{'source':'f','claim':'c','value':False,'conditions':{}}], {'required_conditions':[]}, {'status':'unsupported','value':False,'sources':['f'],'unknowns':[]})\nchk({'claim':'c','conditions':{}}, [{'source':'n','claim':'c','conditions':{}}], {'required_conditions':[]}, {'status':'supported','value':None,'sources':['n'],'unknowns':[]})\nprint('all checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 25269,
+    "output_tokens": 1208,
+    "cached_input_tokens": 18816,
+    "reasoning_output_tokens": 331
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 22.026071165921167,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

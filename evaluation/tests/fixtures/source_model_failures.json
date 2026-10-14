@@ -1,0 +1,324 @@
+{
+  "origin": "Previously observed pilot failures. Regression data, not independent performance evidence.",
+  "cases": [
+    {
+      "inputs": {
+        "request": {
+          "declared": [
+            "worker_0.py",
+            "worker_0.py"
+          ],
+          "saved": {
+            "worker_0.py": {
+              "kind": "file",
+              "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "current": {
+            "worker_0.py": {
+              "kind": "file",
+              "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "irrelevant": {
+              "kind": "file",
+              "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          }
+        },
+        "policy": {
+          "variant": 0,
+          "ignored": []
+        }
+      },
+      "expected": false
+    },
+    {
+      "inputs": {
+        "request": {
+          "declared": [
+            "worker_0.py",
+            "worker_0.py"
+          ],
+          "saved": {
+            "worker_0.py": {
+              "kind": "missing"
+            }
+          },
+          "current": {
+            "worker_0.py": {
+              "kind": "missing"
+            },
+            "irrelevant": {
+              "kind": "file",
+              "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          }
+        },
+        "policy": {
+          "variant": 0,
+          "ignored": []
+        }
+      },
+      "expected": false
+    },
+    {
+      "inputs": {
+        "request": {
+          "declared": [
+            "recipe_0.json",
+            "recipe_0.json"
+          ],
+          "saved": {
+            "recipe_0.json": {
+              "kind": "file",
+              "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "current": {
+            "recipe_0.json": {
+              "kind": "file",
+              "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "irrelevant": {
+              "kind": "file",
+              "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          }
+        },
+        "policy": {
+          "variant": 0,
+          "ignored": []
+        }
+      },
+      "expected": false
+    },
+    {
+      "inputs": {
+        "request": {
+          "declared": [
+            "recipe_0.json",
+            "recipe_0.json"
+          ],
+          "saved": {
+            "recipe_0.json": {
+              "kind": "missing"
+            }
+          },
+          "current": {
+            "recipe_0.json": {
+              "kind": "missing"
+            },
+            "irrelevant": {
+              "kind": "file",
+              "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          }
+        },
+        "policy": {
+          "variant": 0,
+          "ignored": []
+        }
+      },
+      "expected": false
+    },
+    {
+      "inputs": {
+        "request": {
+          "declared": [
+            "new_0.json",
+            "new_0.json"
+          ],
+          "saved": {
+            "new_0.json": {
+              "kind": "file",
+              "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "current": {
+            "new_0.json": {
+              "kind": "file",
+              "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "irrelevant": {
+              "kind": "file",
+              "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          }
+        },
+        "policy": {
+          "variant": 0,
+          "ignored": []
+        }
+      },
+      "expected": false
+    },
+    {
+      "inputs": {
+        "request": {
+          "declared": [
+            "new_0.json",
+            "new_0.json"
+          ],
+          "saved": {
+            "new_0.json": {
+              "kind": "missing"
+            }
+          },
+          "current": {
+            "new_0.json": {
+              "kind": "missing"
+            },
+            "irrelevant": {
+              "kind": "file",
+              "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          }
+        },
+        "policy": {
+          "variant": 0,
+          "ignored": []
+        }
+      },
+      "expected": false
+    },
+    {
+      "inputs": {
+        "request": {
+          "declared": [
+            "unseen_0.cfg",
+            "unseen_0.cfg"
+          ],
+          "saved": {
+            "unseen_0.cfg": {
+              "kind": "file",
+              "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "current": {
+            "unseen_0.cfg": {
+              "kind": "file",
+              "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "irrelevant": {
+              "kind": "file",
+              "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          }
+        },
+        "policy": {
+          "variant": 0,
+          "ignored": []
+        }
+      },
+      "expected": false
+    },
+    {
+      "inputs": {
+        "request": {
+          "declared": [
+            "unseen_0.cfg",
+            "unseen_0.cfg"
+          ],
+          "saved": {
+            "unseen_0.cfg": {
+              "kind": "missing"
+            }
+          },
+          "current": {
+            "unseen_0.cfg": {
+              "kind": "missing"
+            },
+            "irrelevant": {
+              "kind": "file",
+              "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          }
+        },
+        "policy": {
+          "variant": 0,
+          "ignored": []
+        }
+      },
+      "expected": false
+    },
+    {
+      "inputs": {
+        "request": {
+          "declared": [
+            "scratch_0.txt",
+            "scratch_0.txt"
+          ],
+          "saved": {
+            "scratch_0.txt": {
+              "kind": "file",
+              "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "current": {
+            "scratch_0.txt": {
+              "kind": "file",
+              "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "irrelevant": {
+              "kind": "file",
+              "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          }
+        },
+        "policy": {
+          "variant": 0,
+          "ignored": []
+        }
+      },
+      "expected": false
+    },
+    {
+      "inputs": {
+        "request": {
+          "declared": [
+            "scratch_0.txt",
+            "scratch_0.txt"
+          ],
+          "saved": {
+            "scratch_0.txt": {
+              "kind": "missing"
+            }
+          },
+          "current": {
+            "scratch_0.txt": {
+              "kind": "missing"
+            },
+            "irrelevant": {
+              "kind": "file",
+              "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          }
+        },
+        "policy": {
+          "variant": 0,
+          "ignored": []
+        }
+      },
+      "expected": false
+    },
+    {
+      "inputs": {
+        "request": {
+          "declared": [],
+          "saved": {},
+          "current": {
+            "worker_0.py": {
+              "kind": "file",
+              "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          }
+        },
+        "policy": {
+          "variant": 0,
+          "ignored": []
+        }
+      },
+      "expected": false
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a135a9-aca8-7c90-ad75-76f0ad5d5c8f"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"action\":\"run\",\"arguments_json\":\"{\\\"command\\\":[\\\"git\\\",\\\"log\\\",\\\"--oneline\\\",\\\"--all\\\",\\\"--decorate\\\",\\\"-10\\\"]}\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":9040,"cached_input_tokens":7808,"cache_write_input_tokens":0,"output_tokens":111,"reasoning_output_tokens":67}}

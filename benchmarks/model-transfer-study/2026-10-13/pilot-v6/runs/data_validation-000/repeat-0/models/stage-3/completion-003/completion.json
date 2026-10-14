@@ -1,0 +1,44 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy,json,math; from work import evaluate\n\ndef check(req,pol,expected):\n rb=copy.deepcopy(req); pb=copy.deepcopy(pol); got=evaluate(req,pol); assert got==expected,(got,expected); assert req==rb and pol==pb\np={'base_unit':'m','units':{'m':1,'cm':0.01},'unique':True}\ncheck({'rows':[{'id':'a','amount':2,'unit':'cm'},{'id':'b','amount':0}]},p,{'ok':True,'records':[{'id':'a','amount':0.02,'unit':'m'},{'id':'b','amount':0,'unit':'m'}],'errors':[]})\ncheck({'rows':[{'id':0,'amount':False,'unit':'bad'},{'id':'a','amount':False,'unit':'bad'},{'id':'b','amount':1,'unit':'bad'},{'id':'b','amount':2}]},p,{'ok':False,'records':[],'errors':[{'row':0,'cause':'id'},{'row':1,'cause':'amount'},{'row':2,'cause':'unit'},{'row':3,'cause':'duplicate'}]})\ncheck({'rows':[{'id':'x','amount':float('inf')},{'id':'y','amount':float('nan')},{'id':'z','amount':-1}]},{'base_unit':'m','units':{'m':1},'unique':False},{'ok':False,'records':[],'errors':[{'row':0,'cause':'amount'},{'row':1,'cause':'amount'},{'row':2,'cause':'amount'}]})\npolicy=json.load(open('policy.json')); requests=json.load(open('requests.json')); actual=[evaluate(r,policy) for r in requests]; expected=json.load(open('report.json')); assert actual==expected,(actual,expected); print(json.dumps(actual,sort_keys=True)); print('boundary checks passed')"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "status",
+              "--short"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 26655,
+    "output_tokens": 1111,
+    "cached_input_tokens": 19328,
+    "reasoning_output_tokens": 590
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 23.908486834028736,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

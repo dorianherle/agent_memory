@@ -1,0 +1,87 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "show",
+              "6663ea1:TASK.md"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "show",
+              "6663ea1:requests.json"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "show",
+              "6663ea1:policy.json"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "show",
+              "1a34b15:work.py"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "status",
+              "--short"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "diff",
+              "HEAD",
+              "--",
+              "work.py",
+              "report.json"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 27786,
+    "output_tokens": 569,
+    "cached_input_tokens": 22144,
+    "reasoning_output_tokens": 235
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 17.101782999932766,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

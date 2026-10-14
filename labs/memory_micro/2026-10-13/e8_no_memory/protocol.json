@@ -1,0 +1,222 @@
+{
+  "experiment": "E8 no-memory diagnostic",
+  "adaptive_control": true,
+  "independent_test": false,
+  "hypothesis": "The release receiver reproduces every frozen E2 expected label with no supplied memory. A pass detects that this E2 fixture does not require the transferred packet for this receiver.",
+  "design": "Reuse E2's exact receiver instruction and question text. Replace only the MEMORY field with an empty string. Make one isolated call for each of its two datasets. No history, packet, expected answer, generator, or new guessing instruction reaches the model.",
+  "frozen_prompts": {
+    "release": "You are a fresh receiver. Use only the supplied memory and each question. Answer usable, unusable, or unknown. Use unknown when the memory does not support a conclusion. New objects in the questions use the same workflow. Do not use tools. Return a JSON object whose keys are question IDs and whose values are those exact labels. Do not include explanations.\nMEMORY:\n\nQUESTIONS:\n[{\"id\": \"T1\", \"split\": \"observed\", \"question\": \"Atlas was built from map=m1 and style=s1. Output exists. Current map=m1 and style=s2. Is it usable?\"}, {\"id\": \"T2\", \"split\": \"observed\", \"question\": \"Atlas was built from map=m1 and style=s1. Output exists. Style changed to s2 and then returned to s1. Current map=m1 and style=s1. Is it usable?\"}, {\"id\": \"T3\", \"split\": \"observed\", \"question\": \"Beacon was rebuilt from scene=c8 and lighting=l2. Output exists. Only the README changed. Scene=c8 and lighting=l2 remain. Is it usable?\"}, {\"id\": \"U1\", \"split\": \"unseen\", \"question\": \"In the same release workflow, delta was built from graph=g3 and theme=t8. Output exists. Both inputs retain those tokens. An unrelated log changed. Is delta usable?\"}, {\"id\": \"U2\", \"split\": \"unseen\", \"question\": \"Delta was built from graph=g3 and theme=t8. Output exists. Current graph=g4 and theme=t8. Is delta usable?\"}, {\"id\": \"U3\", \"split\": \"unseen\", \"question\": \"Echo was built from audio=a1, captions=b2, and timing=d4. Output exists. Current audio=a1 and timing=d4, but captions are absent. Is echo usable?\"}, {\"id\": \"U4\", \"split\": \"unseen\", \"question\": \"Echo was built from audio=a1, captions=b2, and timing=d4. Output exists. All three inputs changed and then each returned to its recorded token. No rebuild occurred. Is echo usable?\"}, {\"id\": \"U5\", \"split\": \"unseen\", \"question\": \"Foxtrot was built from source=h6. Source still has h6. The output file is absent. Is foxtrot usable?\"}, {\"id\": \"U6\", \"split\": \"unseen\", \"question\": \"Gamma was built from data=d1 and config=k1. Both changed. Gamma was then rebuilt from data=d2 and config=k2. Output exists. Current data=d2 and config=k2. Is gamma usable?\"}, {\"id\": \"U7\", \"split\": \"unseen\", \"question\": \"Gamma was rebuilt from data=d2 and config=k2. Output exists. Current data=d1 and config=k1. Those are the tokens from its earlier build. Is gamma usable?\"}, {\"id\": \"U8\", \"split\": \"unseen\", \"question\": \"Hotel was built from three inputs: alpha=x1, beta=x2, gamma=x3. Output exists. Alpha changed to x4 and then returned to x1. Beta changed to x5 and still has x5. Gamma remains x3. Is hotel usable?\"}]",
+    "independent": "You are a fresh receiver. Use only the supplied memory and each question. Answer usable, unusable, or unknown. Use unknown when the memory does not support a conclusion. New objects in the questions use the same workflow. Do not use tools. Return a JSON object whose keys are question IDs and whose values are those exact labels. Do not include explanations.\nMEMORY:\n\nQUESTIONS:\n[{\"id\": \"T1\", \"split\": \"observed\", \"question\": \"Tool n17 converts CSV with operator blue. Is the result usable?\"}, {\"id\": \"T2\", \"split\": \"observed\", \"question\": \"Tool m42 converts CSV with operator blue. Is the result usable?\"}, {\"id\": \"T3\", \"split\": \"observed\", \"question\": \"Tool p09 converts XML with operator red. Is the result usable?\"}, {\"id\": \"U1\", \"split\": \"unseen\", \"question\": \"Tool n17 converts CSV with operator green. Is the result usable?\"}, {\"id\": \"U2\", \"split\": \"unseen\", \"question\": \"Tool m42 converts JSON with operator blue. Is the result usable?\"}, {\"id\": \"U3\", \"split\": \"unseen\", \"question\": \"Tool p09 converts JSON with operator red. Is the result usable?\"}, {\"id\": \"U4\", \"split\": \"unseen\", \"question\": \"A new tool z88 converts CSV with operator blue. Is the result usable?\"}]"
+  },
+  "questions": {
+    "release": [
+      {
+        "id": "T1",
+        "split": "observed",
+        "question": "Atlas was built from map=m1 and style=s1. Output exists. Current map=m1 and style=s2. Is it usable?"
+      },
+      {
+        "id": "T2",
+        "split": "observed",
+        "question": "Atlas was built from map=m1 and style=s1. Output exists. Style changed to s2 and then returned to s1. Current map=m1 and style=s1. Is it usable?"
+      },
+      {
+        "id": "T3",
+        "split": "observed",
+        "question": "Beacon was rebuilt from scene=c8 and lighting=l2. Output exists. Only the README changed. Scene=c8 and lighting=l2 remain. Is it usable?"
+      },
+      {
+        "id": "U1",
+        "split": "unseen",
+        "question": "In the same release workflow, delta was built from graph=g3 and theme=t8. Output exists. Both inputs retain those tokens. An unrelated log changed. Is delta usable?"
+      },
+      {
+        "id": "U2",
+        "split": "unseen",
+        "question": "Delta was built from graph=g3 and theme=t8. Output exists. Current graph=g4 and theme=t8. Is delta usable?"
+      },
+      {
+        "id": "U3",
+        "split": "unseen",
+        "question": "Echo was built from audio=a1, captions=b2, and timing=d4. Output exists. Current audio=a1 and timing=d4, but captions are absent. Is echo usable?"
+      },
+      {
+        "id": "U4",
+        "split": "unseen",
+        "question": "Echo was built from audio=a1, captions=b2, and timing=d4. Output exists. All three inputs changed and then each returned to its recorded token. No rebuild occurred. Is echo usable?"
+      },
+      {
+        "id": "U5",
+        "split": "unseen",
+        "question": "Foxtrot was built from source=h6. Source still has h6. The output file is absent. Is foxtrot usable?"
+      },
+      {
+        "id": "U6",
+        "split": "unseen",
+        "question": "Gamma was built from data=d1 and config=k1. Both changed. Gamma was then rebuilt from data=d2 and config=k2. Output exists. Current data=d2 and config=k2. Is gamma usable?"
+      },
+      {
+        "id": "U7",
+        "split": "unseen",
+        "question": "Gamma was rebuilt from data=d2 and config=k2. Output exists. Current data=d1 and config=k1. Those are the tokens from its earlier build. Is gamma usable?"
+      },
+      {
+        "id": "U8",
+        "split": "unseen",
+        "question": "Hotel was built from three inputs: alpha=x1, beta=x2, gamma=x3. Output exists. Alpha changed to x4 and then returned to x1. Beta changed to x5 and still has x5. Gamma remains x3. Is hotel usable?"
+      }
+    ],
+    "independent": [
+      {
+        "id": "T1",
+        "split": "observed",
+        "question": "Tool n17 converts CSV with operator blue. Is the result usable?"
+      },
+      {
+        "id": "T2",
+        "split": "observed",
+        "question": "Tool m42 converts CSV with operator blue. Is the result usable?"
+      },
+      {
+        "id": "T3",
+        "split": "observed",
+        "question": "Tool p09 converts XML with operator red. Is the result usable?"
+      },
+      {
+        "id": "U1",
+        "split": "unseen",
+        "question": "Tool n17 converts CSV with operator green. Is the result usable?"
+      },
+      {
+        "id": "U2",
+        "split": "unseen",
+        "question": "Tool m42 converts JSON with operator blue. Is the result usable?"
+      },
+      {
+        "id": "U3",
+        "split": "unseen",
+        "question": "Tool p09 converts JSON with operator red. Is the result usable?"
+      },
+      {
+        "id": "U4",
+        "split": "unseen",
+        "question": "A new tool z88 converts CSV with operator blue. Is the result usable?"
+      }
+    ]
+  },
+  "expected_hidden_from_calls": {
+    "release": {
+      "T1": "unusable",
+      "T2": "usable",
+      "T3": "usable",
+      "U1": "usable",
+      "U2": "unusable",
+      "U3": "unusable",
+      "U4": "usable",
+      "U5": "unusable",
+      "U6": "usable",
+      "U7": "unusable",
+      "U8": "unusable"
+    },
+    "independent": {
+      "T1": "usable",
+      "T2": "unusable",
+      "T3": "usable",
+      "U1": "unknown",
+      "U2": "unknown",
+      "U3": "unknown",
+      "U4": "unknown"
+    }
+  },
+  "existing_E2_scores": {
+    "release": {
+      "full": {
+        "observed": {
+          "correct": 3,
+          "total": 3
+        },
+        "unseen": {
+          "correct": 8,
+          "total": 8
+        }
+      },
+      "summary": {
+        "observed": {
+          "correct": 3,
+          "total": 3
+        },
+        "unseen": {
+          "correct": 8,
+          "total": 8
+        }
+      },
+      "rules": {
+        "observed": {
+          "correct": 3,
+          "total": 3
+        },
+        "unseen": {
+          "correct": 8,
+          "total": 8
+        }
+      }
+    },
+    "independent": {
+      "full": {
+        "observed": {
+          "correct": 3,
+          "total": 3
+        },
+        "unseen": {
+          "correct": 4,
+          "total": 4
+        }
+      },
+      "summary": {
+        "observed": {
+          "correct": 3,
+          "total": 3
+        },
+        "unseen": {
+          "correct": 4,
+          "total": 4
+        }
+      },
+      "rules": {
+        "observed": {
+          "correct": 3,
+          "total": 3
+        },
+        "unseen": {
+          "correct": 4,
+          "total": 4
+        }
+      }
+    }
+  },
+  "source_file_sha256": {
+    "/Users/dorianherle/Documents/Personal/agent_memory/labs/memory_micro/2026-10-13/e2_abstraction/calls/release_rules_read/prompt.txt": "73565e674936c1855e0229c858b257a8191beb34f810c162b0a71c5079b4402e",
+    "/Users/dorianherle/Documents/Personal/agent_memory/labs/memory_micro/2026-10-13/e2_abstraction/calls/independent_rules_read/prompt.txt": "e07cf77fb90a24c4c52a711b7c566e44e8445ec0e8728bb96c13fed81f99ad79",
+    "/Users/dorianherle/Documents/Personal/agent_memory/labs/memory_micro/2026-10-13/e2_abstraction/script.py": "80fdd3b4410b9c8477be80f4210d38b0e719c3b4c981646041d9618ac6f4df0b",
+    "/Users/dorianherle/Documents/Personal/agent_memory/labs/memory_micro/2026-10-13/e2_abstraction/protocol.json": "9f92c3fcf022d6e7488b97b9e1f61fbcddb45156edcee949c2508ae5e03edeab",
+    "/Users/dorianherle/Documents/Personal/agent_memory/labs/memory_micro/2026-10-13/e2_abstraction/results.json": "bdf4861674a628e9ac63b313954854d401b92949e571bb3a95bec03d7a1393c2"
+  },
+  "pass_rule": "Pass the stated hypothesis if release observed and unseen labels all match the frozen expected labels. Fail it if any release label differs. Inconclusive if a call fails or output cannot be scored. Report the independent dataset and each split separately. Correct independent unseen unknowns alone do not show knowledge transfer.",
+  "resource_cap": {
+    "maximum_model_calls": 2,
+    "maximum_wall_seconds": 120,
+    "per_call_timeout_seconds": 65,
+    "model": "gpt-5.6-sol",
+    "reasoning": "low"
+  },
+  "limits": [
+    "Adaptive control on a known constructed fixture.",
+    "One call per dataset. No confidence interval.",
+    "Low no-memory scores do not prove that E2 learned solely from the source history.",
+    "Questions can supply state information. Model prior knowledge can still contribute."
+  ],
+  "frozen_prompt_sha256": {
+    "release": "ff74716c5d7b6812e863a4052a87e3d057e86368146313dcc8215be245d4f1ea",
+    "independent": "147d53143cba9cb1189e33086d152a3165fb4e700013f40c05563d49ce1d3b68"
+  }
+}

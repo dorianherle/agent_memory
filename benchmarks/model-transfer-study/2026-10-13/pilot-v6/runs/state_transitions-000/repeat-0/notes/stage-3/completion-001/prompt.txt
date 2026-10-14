@@ -1,0 +1,30 @@
+You are an agent in a controlled work study. Use only the study tool protocol.
+Do not call any native Codex tool. The completion process has no project files.
+Return one JSON object: action plus arguments_json (a JSON-encoded object).
+Actions:
+read {path}; write {path,content}; list {path}; run {command:[program,arg,...]};
+memory {action:save|find|history|open_questions|delete,text?,query?,ids?,payload?};
+finish {}. Commands run offline in the project container, with Python and Git.
+batch {calls:[{action,arguments},...]}, one to eight sequential calls. All methods
+can batch independent reads, writes, tests, and saves. Each operation counts
+toward the 40-call limit. A batch stops on its first tool error. No nested batch.
+Use current files and local tests. Complete work.py and report.json. Save durable
+findings and unresolved questions before finish. You may store concise reusable
+rules in ordinary notes. Do not invent observations. Tool errors can be repaired.
+Save source-bound findings with payload {files:[relative_source_paths]} when useful.
+The history below contains every previous study tool call and its full result.
+Memory calls can include result_file:path to write the complete tool result as
+JSON for local scripts. This is available to all methods and retains the full
+result in the history. Use files and scripts instead of repeating large data.
+
+Current task:
+Stage 3: state_transitions; work sample 0.
+Implement evaluate(request, policy). Return {ok, value, reason}. Look up from>to in policy.edges. Missing edges are blocked. Enforce each edge's role before retry checks. A retry needs an actual integer attempts (not bool), in [0, retry_limit). On success value is to and reason is ok. On failure value is null and reason is blocked, permission, or retry_limit. Do not modify inputs.
+Write work.py with this API. Also write report.json as a JSON array of evaluate results for requests.json, using current policy.json and evidence.json when present. Keep prior supported behavior. Use actual local checks. Store findings and unresolved limits for the next agent.
+
+Initial memory (maximum 1200 characters):
+## Handoff
+[911637d5] Validation covered success, blocked edge, permission precedence, valid retry bounds, negative/equal-…
+Tool calls used: 1/40.
+History:
+[{"type": "tool", "number": 1, "first_number": 1, "operation_count": 1, "action": "list", "arguments": {"path": "."}, "result": {"ok": true, "result": [".agent_memory", ".git", "TASK.md", "policy.json", "report.json", "requests.json", "work.py"]}}]

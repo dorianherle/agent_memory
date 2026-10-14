@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "finish",
+    "arguments": {}
+  },
+  "usage": {
+    "input_tokens": 14874,
+    "output_tokens": 159,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 137
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 7.144041165942326,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

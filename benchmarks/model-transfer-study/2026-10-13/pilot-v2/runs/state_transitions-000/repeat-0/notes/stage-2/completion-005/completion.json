@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import json, copy, work\nwith open('policy.json') as f: p=json.load(f)\nwith open('requests.json') as f: rs=json.load(f)\nprint(json.dumps([work.evaluate(r,p) for r in rs]))\n# Behavioral and immutability checks\ncases=[({'from':'x','to':'y'},p,{'ok':False,'value':None,'reason':'blocked'}),({'from':'ready','to':'running','role':'bad'},p,{'ok':False,'value':None,'reason':'permission'}),({'from':'failed','to':'ready','retry':True,'attempts':0},p,{'ok':True,'value':'ready','reason':'ok'}),({'from':'failed','to':'ready','retry':True,'attempts':True},p,{'ok':False,'value':None,'reason':'retry_limit'}),({'from':'failed','to':'ready','retry':True,'attempts':2},p,{'ok':False,'value':None,'reason':'retry_limit'})]\nfor r,pol,want in cases:\n rb,pb=copy.deepcopy(r),copy.deepcopy(pol); got=work.evaluate(r,pol); assert got==want,(r,got,want); assert r==rb and pol==pb\nprint('checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 18582,
+    "output_tokens": 465,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 117
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 14.497852999949828,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

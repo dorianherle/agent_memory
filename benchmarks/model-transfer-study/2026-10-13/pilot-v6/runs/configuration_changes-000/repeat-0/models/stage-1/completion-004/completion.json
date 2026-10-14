@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import json\nfrom work import evaluate\nbase={'defaults':{'enabled':True,'retries':3,'label':'x'},'types':{'enabled':'boolean','retries':'integer','label':'string'},'null_resets':False,'environment':False}\ncases=[\n({'layers':[{'enabled':False},{'retries':0,'label':''}]},base),\n({'layers':[{'other':1}]},base),\n({'layers':[{'retries':None}]},base),\n({'layers':[{'retries':None}]},{**base,'null_resets':True}),\n({'layers':[{'retries':True}]},base),\n({'environment':{'retries':'-12','enabled':'false','label':''}},{**base,'environment':True}),\n({'environment':{'retries':' 2'}},{**base,'environment':True}),\n({'environment':{'enabled':'False'}},{**base,'environment':True}),\n({'environment':{'other':'1'}},{**base,'environment':True}),\n({'environment':{'retries':'2'}},base),\n]\nprint(json.dumps([evaluate(*c) for c in cases],indent=2))"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 11799,
+    "output_tokens": 393,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 99
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 12.738844291772693,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

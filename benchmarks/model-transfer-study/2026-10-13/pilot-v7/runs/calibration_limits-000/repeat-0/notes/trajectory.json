@@ -1,0 +1,676 @@
+{
+  "task": "calibration_limits-000",
+  "domain": "research",
+  "family": "calibration_limits",
+  "repeat": 0,
+  "arm": "notes",
+  "comparison": "main",
+  "complete": true,
+  "isolated": true,
+  "run_valid": true,
+  "model_transfer_complete": true,
+  "every_stage_passed": true,
+  "usage_complete": true,
+  "tokens": 324491,
+  "known_tokens": 324491,
+  "stages": [
+    {
+      "stop": "finished",
+      "tool_calls": 12,
+      "elapsed_seconds": 143.61998741608113,
+      "usage_complete": true,
+      "tokens": 117122,
+      "known_tokens": 117122,
+      "input_tokens": 111332,
+      "output_tokens": 5790,
+      "cached_input_tokens": 68352,
+      "reasoning_output_tokens": 2219,
+      "stage": 1,
+      "grade": {
+        "full_pass": true,
+        "passed": 23,
+        "total": 23,
+        "checks": [
+          {
+            "check": "case_0",
+            "passed": true
+          },
+          {
+            "check": "case_1",
+            "passed": true
+          },
+          {
+            "check": "case_2",
+            "passed": true
+          },
+          {
+            "check": "case_3",
+            "passed": true
+          },
+          {
+            "check": "case_4",
+            "passed": true
+          },
+          {
+            "check": "case_5",
+            "passed": true
+          },
+          {
+            "check": "case_6",
+            "passed": true
+          },
+          {
+            "check": "case_7",
+            "passed": true
+          },
+          {
+            "check": "case_8",
+            "passed": true
+          },
+          {
+            "check": "case_9",
+            "passed": true
+          },
+          {
+            "check": "case_10",
+            "passed": true
+          },
+          {
+            "check": "case_11",
+            "passed": true
+          },
+          {
+            "check": "case_12",
+            "passed": true
+          },
+          {
+            "check": "case_13",
+            "passed": true
+          },
+          {
+            "check": "case_14",
+            "passed": true
+          },
+          {
+            "check": "case_15",
+            "passed": true
+          },
+          {
+            "check": "case_16",
+            "passed": true
+          },
+          {
+            "check": "case_17",
+            "passed": true
+          },
+          {
+            "check": "case_18",
+            "passed": true
+          },
+          {
+            "check": "case_19",
+            "passed": true
+          },
+          {
+            "check": "case_20",
+            "passed": true
+          },
+          {
+            "check": "all_cases_returned",
+            "passed": true
+          },
+          {
+            "check": "current_source_report",
+            "passed": true
+          }
+        ],
+        "unsupported_conclusions": 0,
+        "missed_source_changes": 0
+      },
+      "memory": {
+        "ok": true,
+        "result": {
+          "notes": 1,
+          "model": null,
+          "checks": {
+            "status": "absent"
+          },
+          "evidence": [
+            {
+              "id": "d4c967c8e1218f91475867fe2443943a8bdd015c",
+              "text": "Implemented and locally verified evaluate(request, evidence, policy): filters by claim, withdrawal, verification policy, and exact required-condition values; reports sorted missing conditions; applies eligible-record supersession; compares canonical JSON values; distinguishes Boolean false as unsupported; preserves inputs; and uses caller arguments. report.json equals evaluation of current requests.json against current evidence.json and policy.json and conforms to OUTPUT_SCHEMA.json. No unresolved limits observed in the specified valid-JSON input domain.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py",
+                  "report.json",
+                  "OUTPUT_SCHEMA.json",
+                  "requests.json",
+                  "evidence.json",
+                  "policy.json"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stop": "finished",
+      "tool_calls": 11,
+      "elapsed_seconds": 70.11253454210237,
+      "usage_complete": true,
+      "tokens": 76167,
+      "known_tokens": 76167,
+      "input_tokens": 74179,
+      "output_tokens": 1988,
+      "cached_input_tokens": 56320,
+      "reasoning_output_tokens": 822,
+      "stage": 2,
+      "grade": {
+        "full_pass": true,
+        "passed": 23,
+        "total": 23,
+        "checks": [
+          {
+            "check": "case_0",
+            "passed": true
+          },
+          {
+            "check": "case_1",
+            "passed": true
+          },
+          {
+            "check": "case_2",
+            "passed": true
+          },
+          {
+            "check": "case_3",
+            "passed": true
+          },
+          {
+            "check": "case_4",
+            "passed": true
+          },
+          {
+            "check": "case_5",
+            "passed": true
+          },
+          {
+            "check": "case_6",
+            "passed": true
+          },
+          {
+            "check": "case_7",
+            "passed": true
+          },
+          {
+            "check": "case_8",
+            "passed": true
+          },
+          {
+            "check": "case_9",
+            "passed": true
+          },
+          {
+            "check": "case_10",
+            "passed": true
+          },
+          {
+            "check": "case_11",
+            "passed": true
+          },
+          {
+            "check": "case_12",
+            "passed": true
+          },
+          {
+            "check": "case_13",
+            "passed": true
+          },
+          {
+            "check": "case_14",
+            "passed": true
+          },
+          {
+            "check": "case_15",
+            "passed": true
+          },
+          {
+            "check": "case_16",
+            "passed": true
+          },
+          {
+            "check": "case_17",
+            "passed": true
+          },
+          {
+            "check": "case_18",
+            "passed": true
+          },
+          {
+            "check": "case_19",
+            "passed": true
+          },
+          {
+            "check": "case_20",
+            "passed": true
+          },
+          {
+            "check": "all_cases_returned",
+            "passed": true
+          },
+          {
+            "check": "current_source_report",
+            "passed": true
+          }
+        ],
+        "unsupported_conclusions": 0,
+        "missed_source_changes": 0
+      },
+      "memory": {
+        "ok": true,
+        "result": {
+          "notes": 2,
+          "model": null,
+          "checks": {
+            "status": "absent"
+          },
+          "evidence": [
+            {
+              "id": "d4c967c8e1218f91475867fe2443943a8bdd015c",
+              "text": "Implemented and locally verified evaluate(request, evidence, policy): filters by claim, withdrawal, verification policy, and exact required-condition values; reports sorted missing conditions; applies eligible-record supersession; compares canonical JSON values; distinguishes Boolean false as unsupported; preserves inputs; and uses caller arguments. report.json equals evaluation of current requests.json against current evidence.json and policy.json and conforms to OUTPUT_SCHEMA.json. No unresolved limits observed in the specified valid-JSON input domain.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py",
+                  "report.json",
+                  "OUTPUT_SCHEMA.json",
+                  "requests.json",
+                  "evidence.json",
+                  "policy.json"
+                ]
+              }
+            },
+            {
+              "id": "4e2434405b637f941eedc650b52c50b1f759dcb1",
+              "text": "Stage 2 work sample 0 is implemented and locally verified. work.py evaluates only caller-supplied request/evidence/policy; checks sorted missing required conditions; filters claim, withdrawn, verification, and exact required-condition values; removes eligible superseded source IDs; compares canonical JSON values; returns schema-exact unknown/conflict/supported/unsupported results without mutating inputs. report.json equals evaluation of every current request using current evidence.json and policy.json. Actual checks passed, including missing conditions, supersession, structured canonical agreement, Boolean false, 0-vs-false conflict, no evidence, input immutability, exact fields, and report regeneration. Unresolved limits: none identified for the specified JSON inputs.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py",
+                  "report.json",
+                  "OUTPUT_SCHEMA.json",
+                  "requests.json",
+                  "policy.json",
+                  "evidence.json"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stop": "finished",
+      "tool_calls": 20,
+      "elapsed_seconds": 135.79258362506516,
+      "usage_complete": true,
+      "tokens": 131202,
+      "known_tokens": 131202,
+      "input_tokens": 127621,
+      "output_tokens": 3581,
+      "cached_input_tokens": 91136,
+      "reasoning_output_tokens": 1514,
+      "stage": 3,
+      "grade": {
+        "full_pass": true,
+        "passed": 65,
+        "total": 65,
+        "checks": [
+          {
+            "check": "case_0",
+            "passed": true
+          },
+          {
+            "check": "case_1",
+            "passed": true
+          },
+          {
+            "check": "case_2",
+            "passed": true
+          },
+          {
+            "check": "case_3",
+            "passed": true
+          },
+          {
+            "check": "case_4",
+            "passed": true
+          },
+          {
+            "check": "case_5",
+            "passed": true
+          },
+          {
+            "check": "case_6",
+            "passed": true
+          },
+          {
+            "check": "case_7",
+            "passed": true
+          },
+          {
+            "check": "case_8",
+            "passed": true
+          },
+          {
+            "check": "case_9",
+            "passed": true
+          },
+          {
+            "check": "case_10",
+            "passed": true
+          },
+          {
+            "check": "case_11",
+            "passed": true
+          },
+          {
+            "check": "case_12",
+            "passed": true
+          },
+          {
+            "check": "case_13",
+            "passed": true
+          },
+          {
+            "check": "case_14",
+            "passed": true
+          },
+          {
+            "check": "case_15",
+            "passed": true
+          },
+          {
+            "check": "case_16",
+            "passed": true
+          },
+          {
+            "check": "case_17",
+            "passed": true
+          },
+          {
+            "check": "case_18",
+            "passed": true
+          },
+          {
+            "check": "case_19",
+            "passed": true
+          },
+          {
+            "check": "case_20",
+            "passed": true
+          },
+          {
+            "check": "case_21",
+            "passed": true
+          },
+          {
+            "check": "case_22",
+            "passed": true
+          },
+          {
+            "check": "case_23",
+            "passed": true
+          },
+          {
+            "check": "case_24",
+            "passed": true
+          },
+          {
+            "check": "case_25",
+            "passed": true
+          },
+          {
+            "check": "case_26",
+            "passed": true
+          },
+          {
+            "check": "case_27",
+            "passed": true
+          },
+          {
+            "check": "case_28",
+            "passed": true
+          },
+          {
+            "check": "case_29",
+            "passed": true
+          },
+          {
+            "check": "case_30",
+            "passed": true
+          },
+          {
+            "check": "case_31",
+            "passed": true
+          },
+          {
+            "check": "case_32",
+            "passed": true
+          },
+          {
+            "check": "case_33",
+            "passed": true
+          },
+          {
+            "check": "case_34",
+            "passed": true
+          },
+          {
+            "check": "case_35",
+            "passed": true
+          },
+          {
+            "check": "case_36",
+            "passed": true
+          },
+          {
+            "check": "case_37",
+            "passed": true
+          },
+          {
+            "check": "case_38",
+            "passed": true
+          },
+          {
+            "check": "case_39",
+            "passed": true
+          },
+          {
+            "check": "case_40",
+            "passed": true
+          },
+          {
+            "check": "case_41",
+            "passed": true
+          },
+          {
+            "check": "case_42",
+            "passed": true
+          },
+          {
+            "check": "case_43",
+            "passed": true
+          },
+          {
+            "check": "case_44",
+            "passed": true
+          },
+          {
+            "check": "case_45",
+            "passed": true
+          },
+          {
+            "check": "case_46",
+            "passed": true
+          },
+          {
+            "check": "case_47",
+            "passed": true
+          },
+          {
+            "check": "case_48",
+            "passed": true
+          },
+          {
+            "check": "case_49",
+            "passed": true
+          },
+          {
+            "check": "case_50",
+            "passed": true
+          },
+          {
+            "check": "case_51",
+            "passed": true
+          },
+          {
+            "check": "case_52",
+            "passed": true
+          },
+          {
+            "check": "case_53",
+            "passed": true
+          },
+          {
+            "check": "case_54",
+            "passed": true
+          },
+          {
+            "check": "case_55",
+            "passed": true
+          },
+          {
+            "check": "case_56",
+            "passed": true
+          },
+          {
+            "check": "case_57",
+            "passed": true
+          },
+          {
+            "check": "case_58",
+            "passed": true
+          },
+          {
+            "check": "case_59",
+            "passed": true
+          },
+          {
+            "check": "case_60",
+            "passed": true
+          },
+          {
+            "check": "case_61",
+            "passed": true
+          },
+          {
+            "check": "case_62",
+            "passed": true
+          },
+          {
+            "check": "all_cases_returned",
+            "passed": true
+          },
+          {
+            "check": "current_source_report",
+            "passed": true
+          }
+        ],
+        "unsupported_conclusions": 0,
+        "missed_source_changes": 0
+      },
+      "memory": {
+        "ok": true,
+        "result": {
+          "notes": 5,
+          "model": null,
+          "checks": {
+            "status": "absent"
+          },
+          "evidence": [
+            {
+              "id": "d4c967c8e1218f91475867fe2443943a8bdd015c",
+              "text": "Implemented and locally verified evaluate(request, evidence, policy): filters by claim, withdrawal, verification policy, and exact required-condition values; reports sorted missing conditions; applies eligible-record supersession; compares canonical JSON values; distinguishes Boolean false as unsupported; preserves inputs; and uses caller arguments. report.json equals evaluation of current requests.json against current evidence.json and policy.json and conforms to OUTPUT_SCHEMA.json. No unresolved limits observed in the specified valid-JSON input domain.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py",
+                  "report.json",
+                  "OUTPUT_SCHEMA.json",
+                  "requests.json",
+                  "evidence.json",
+                  "policy.json"
+                ]
+              }
+            },
+            {
+              "id": "4e2434405b637f941eedc650b52c50b1f759dcb1",
+              "text": "Stage 2 work sample 0 is implemented and locally verified. work.py evaluates only caller-supplied request/evidence/policy; checks sorted missing required conditions; filters claim, withdrawn, verification, and exact required-condition values; removes eligible superseded source IDs; compares canonical JSON values; returns schema-exact unknown/conflict/supported/unsupported results without mutating inputs. report.json equals evaluation of every current request using current evidence.json and policy.json. Actual checks passed, including missing conditions, supersession, structured canonical agreement, Boolean false, 0-vs-false conflict, no evidence, input immutability, exact fields, and report regeneration. Unresolved limits: none identified for the specified JSON inputs.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py",
+                  "report.json",
+                  "OUTPUT_SCHEMA.json",
+                  "requests.json",
+                  "policy.json",
+                  "evidence.json"
+                ]
+              }
+            },
+            {
+              "id": "b3a84bef976532db6ad05babbf5395e4fedd1251",
+              "text": "Stage 3 work sample 0 is complete and locally verified. work.py uses only evaluate(request, evidence, policy) arguments; reports missing sorted required conditions; filters claim, withdrawn, required-condition equality, and verified status; removes source IDs superseded by other eligible records; distinguishes no evidence, canonical-value conflict, Boolean-false unsupported, and supported values without mutating inputs. report.json equals evaluation of current requests.json against current evidence.json and policy.json. Targeted checks cover withdrawn evidence, eligible/ineligible supersession, missing calibration, null, and numeric zero.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py",
+                  "report.json",
+                  "OUTPUT_SCHEMA.json",
+                  "requests.json",
+                  "evidence.json",
+                  "policy.json"
+                ]
+              }
+            },
+            {
+              "id": "04b3597db7fabddd65325dffae10a7fdfe4c6e33",
+              "text": "No unresolved limits or open questions remain for Stage 3 work sample 0.",
+              "payload": {
+                "agent": "agent"
+              }
+            },
+            {
+              "id": "bac795355b98be1f98e4bb6d4ae9280ce4f75679",
+              "text": "Stage 3 work sample 0 complete: work.py and report.json satisfy the requested calibration-limit behavior and passed syntax, targeted edge-case, input-immutability, exact-field, and current-report consistency checks. No unresolved questions remain.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py",
+                  "report.json"
+                ],
+                "summary": true
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "repeated_identical_file_reads": 8,
+  "file_reads": 22,
+  "elapsed_seconds": 349.52510558324866
+}

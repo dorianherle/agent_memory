@@ -1,0 +1,67 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-m",
+              "py_compile",
+              "work.py"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy,json\nfrom work import evaluate\n\ncases=[\n ({'from':'a','to':'b'},{'edges':{'a>b':{}},'retry_limit':0},{'ok':True,'value':'b','reason':'ok'}),\n ({'from':'a','to':'b','attempts':0},{'edges':{'a>b':{}},'retry_limit':0},{'ok':False,'value':None,'reason':'retry_limit'}),\n ({'from':'a','to':'b','role':'wrong','attempts':0},{'edges':{'a>b':{'role':'right'}},'retry_limit':0},{'ok':False,'value':None,'reason':'permission'}),\n ({'from':'a','to':'b','attempts':True},{'edges':{'a>b':{}},'retry_limit':2},{'ok':False,'value':None,'reason':'retry_limit'}),\n ({'from':'a','to':'b','attempts':1},{'edges':{'a>b':{}},'retry_limit':2},{'ok':True,'value':'b','reason':'ok'}),\n ({'from':'a','to':'b','attempts':2},{'edges':{'a>b':{}},'retry_limit':2},{'ok':False,'value':None,'reason':'retry_limit'}),\n]\nfor req,policy,expected in cases:\n before=(copy.deepcopy(req),copy.deepcopy(policy)); got=evaluate(req,policy)\n assert got==expected,(got,expected)\n assert (req,policy)==before\n assert set(got)=={'ok','value','reason'} and len(got)==3\nprint('independent boundary checks passed:',len(cases))"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import json\nfrom work import evaluate\nschema=json.load(open('OUTPUT_SCHEMA.json'))\nrequests=json.load(open('requests.json')); policy=json.load(open('policy.json')); report=json.load(open('report.json'))\nassert report==[evaluate(r,policy) for r in requests]\nallowed=set(schema['properties']); required=set(schema['required']); reasons=set(schema['properties']['reason']['enum'])\nfor item in report:\n assert set(item)==allowed==required\n assert type(item['ok']) is bool\n assert item['value'] is None or type(item['value']) is str\n assert item['reason'] in reasons\nprint('report/schema checks passed:',len(report))"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "diff",
+              "--",
+              "work.py",
+              "report.json"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 24213,
+    "output_tokens": 1050,
+    "cached_input_tokens": 18304,
+    "reasoning_output_tokens": 378
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 23.644741833908483,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

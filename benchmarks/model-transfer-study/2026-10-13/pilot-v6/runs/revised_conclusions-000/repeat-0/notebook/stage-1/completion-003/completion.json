@@ -1,0 +1,57 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "status",
+              "--short"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "log",
+              "--oneline",
+              "--all",
+              "-10"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "diff",
+              "--",
+              "work.py"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 21749,
+    "output_tokens": 575,
+    "cached_input_tokens": 18304,
+    "reasoning_output_tokens": 440
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 17.823232875205576,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

@@ -1,0 +1,441 @@
+{
+  "experiment": "E7 isolated retrieval diagnostic",
+  "protocol_sha256": "d3b151fef42f4f99a6d747d4e1e71811c9f141d3fac6cbcc1c9a2b9e7b81b938",
+  "classification": "Adaptive diagnostic on the known E4 fixture. Not an independent confirmation or abstraction test.",
+  "status": "completed",
+  "calls": [
+    {
+      "arm": "global",
+      "id": "quarry_correction",
+      "query": "For Quarry etch, what is the current chuck temperature setpoint?",
+      "expected_answer": "135 C",
+      "expected_source": "Q08",
+      "memory_tokens": 164,
+      "memory_target_breach": false,
+      "retrieved_records": null,
+      "assigned_sources": null,
+      "ok": true,
+      "response": {
+        "answer": "135 °C",
+        "source": "Q08"
+      },
+      "exact_text": "{\"answer\":\"135 °C\",\"source\":\"Q08\"}",
+      "semantic_answer_pass": true,
+      "source_pass": true,
+      "native_usage": {
+        "input_tokens": 13309,
+        "output_tokens": 27
+      },
+      "elapsed_seconds": 9.414254083996639,
+      "native_tools": [],
+      "joint_pass": true
+    },
+    {
+      "arm": "global",
+      "id": "quarry_rare_lateral",
+      "query": "For Quarry etch, can I assume that the lateral etch rate is zero?",
+      "expected_answer": "No; unknown",
+      "expected_source": "Q09",
+      "memory_tokens": 164,
+      "memory_target_breach": false,
+      "retrieved_records": null,
+      "assigned_sources": null,
+      "ok": true,
+      "response": {
+        "answer": "No; unknown.",
+        "source": "Q01-Q24"
+      },
+      "exact_text": "{\"answer\":\"No; unknown.\",\"source\":\"Q01-Q24\"}",
+      "semantic_answer_pass": true,
+      "source_pass": false,
+      "native_usage": {
+        "input_tokens": 13314,
+        "output_tokens": 31
+      },
+      "elapsed_seconds": 9.977358333999291,
+      "native_tools": [],
+      "joint_pass": false
+    },
+    {
+      "arm": "global",
+      "id": "quarry_tail",
+      "query": "For Quarry etch, what is the cooling hold duration?",
+      "expected_answer": "11 minutes",
+      "expected_source": "Q21",
+      "memory_tokens": 164,
+      "memory_target_breach": false,
+      "retrieved_records": null,
+      "assigned_sources": null,
+      "ok": true,
+      "response": {
+        "answer": "UNKNOWN",
+        "source": "NONE"
+      },
+      "exact_text": "{\"answer\":\"UNKNOWN\",\"source\":\"NONE\"}",
+      "semantic_answer_pass": false,
+      "source_pass": false,
+      "native_usage": {
+        "input_tokens": 13311,
+        "output_tokens": 24
+      },
+      "elapsed_seconds": 10.61465804092586,
+      "native_tools": [],
+      "joint_pass": false
+    },
+    {
+      "arm": "global",
+      "id": "quarry_absent",
+      "query": "What is the release date of Quarry etch?",
+      "expected_answer": "UNKNOWN",
+      "expected_source": "NONE",
+      "memory_tokens": 164,
+      "memory_target_breach": false,
+      "retrieved_records": null,
+      "assigned_sources": null,
+      "ok": true,
+      "response": {
+        "answer": "UNKNOWN",
+        "source": "NONE"
+      },
+      "exact_text": "{\"answer\":\"UNKNOWN\",\"source\":\"NONE\"}",
+      "semantic_answer_pass": true,
+      "source_pass": true,
+      "native_usage": {
+        "input_tokens": 13320,
+        "output_tokens": 24
+      },
+      "elapsed_seconds": 11.36954087484628,
+      "native_tools": [],
+      "joint_pass": true
+    },
+    {
+      "arm": "retrieval",
+      "id": "quarry_rare_lateral",
+      "query": "For Quarry etch, can I assume that the lateral etch rate is zero?",
+      "expected_answer": "No; unknown",
+      "expected_source": "Q09",
+      "memory_tokens": 175,
+      "memory_target_breach": false,
+      "retrieved_records": 10,
+      "assigned_sources": [
+        "Q09",
+        "Q24",
+        "Q23",
+        "Q22",
+        "Q21",
+        "Q20",
+        "Q19",
+        "Q18",
+        "Q17",
+        "Q16"
+      ],
+      "ok": true,
+      "response": {
+        "answer": "No; unknown.",
+        "source": "Q09"
+      },
+      "exact_text": "{\"answer\":\"No; unknown.\",\"source\":\"Q09\"}",
+      "semantic_answer_pass": true,
+      "source_pass": true,
+      "native_usage": {
+        "input_tokens": 9963,
+        "output_tokens": 29
+      },
+      "elapsed_seconds": 5.09263545810245,
+      "native_tools": [],
+      "joint_pass": true
+    },
+    {
+      "arm": "retrieval",
+      "id": "quarry_tail",
+      "query": "For Quarry etch, what is the cooling hold duration?",
+      "expected_answer": "11 minutes",
+      "expected_source": "Q21",
+      "memory_tokens": 180,
+      "memory_target_breach": false,
+      "retrieved_records": 11,
+      "assigned_sources": [
+        "Q21",
+        "Q11",
+        "Q24",
+        "Q23",
+        "Q22",
+        "Q20",
+        "Q19",
+        "Q18",
+        "Q17",
+        "Q16",
+        "Q05"
+      ],
+      "ok": true,
+      "response": {
+        "answer": "11 minutes",
+        "source": "Q21"
+      },
+      "exact_text": "{\"answer\":\"11 minutes\",\"source\":\"Q21\"}",
+      "semantic_answer_pass": true,
+      "source_pass": true,
+      "native_usage": {
+        "input_tokens": 10171,
+        "output_tokens": 26
+      },
+      "elapsed_seconds": 4.733760542003438,
+      "native_tools": [],
+      "joint_pass": true
+    },
+    {
+      "arm": "retrieval",
+      "id": "quarry_correction",
+      "query": "For Quarry etch, what is the current chuck temperature setpoint?",
+      "expected_answer": "135 C",
+      "expected_source": "Q08",
+      "memory_tokens": 180,
+      "memory_target_breach": false,
+      "retrieved_records": 10,
+      "assigned_sources": [
+        "Q08",
+        "Q02",
+        "Q24",
+        "Q23",
+        "Q22",
+        "Q21",
+        "Q20",
+        "Q19",
+        "Q18",
+        "Q06"
+      ],
+      "ok": true,
+      "response": {
+        "answer": "135 C",
+        "source": "Q08"
+      },
+      "exact_text": "{\"answer\":\"135 C\",\"source\":\"Q08\"}",
+      "semantic_answer_pass": true,
+      "source_pass": true,
+      "native_usage": {
+        "input_tokens": 10173,
+        "output_tokens": 26
+      },
+      "elapsed_seconds": 6.043072917032987,
+      "native_tools": [],
+      "joint_pass": true
+    },
+    {
+      "arm": "retrieval",
+      "id": "quarry_absent",
+      "query": "What is the release date of Quarry etch?",
+      "expected_answer": "UNKNOWN",
+      "expected_source": "NONE",
+      "memory_tokens": 180,
+      "memory_target_breach": false,
+      "retrieved_records": 11,
+      "assigned_sources": [
+        "Q24",
+        "Q23",
+        "Q22",
+        "Q21",
+        "Q20",
+        "Q19",
+        "Q18",
+        "Q17",
+        "Q16",
+        "Q15",
+        "Q05"
+      ],
+      "ok": true,
+      "response": {
+        "answer": "UNKNOWN",
+        "source": "NONE"
+      },
+      "exact_text": "{\"answer\":\"UNKNOWN\",\"source\":\"NONE\"}",
+      "semantic_answer_pass": true,
+      "source_pass": true,
+      "native_usage": {
+        "input_tokens": 9959,
+        "output_tokens": 24
+      },
+      "elapsed_seconds": 4.925698833074421,
+      "native_tools": [],
+      "joint_pass": true
+    },
+    {
+      "arm": "full_history",
+      "id": "quarry_correction",
+      "query": "For Quarry etch, what is the current chuck temperature setpoint?",
+      "expected_answer": "135 C",
+      "expected_source": "Q08",
+      "memory_tokens": 1013,
+      "memory_target_breach": null,
+      "retrieved_records": null,
+      "assigned_sources": null,
+      "ok": true,
+      "response": {
+        "answer": "135 C",
+        "source": "Q08"
+      },
+      "exact_text": "{\"answer\":\"135 C\",\"source\":\"Q08\"}",
+      "semantic_answer_pass": true,
+      "source_pass": true,
+      "native_usage": {
+        "input_tokens": 14156,
+        "output_tokens": 26
+      },
+      "elapsed_seconds": 9.594774417113513,
+      "native_tools": [],
+      "joint_pass": true
+    },
+    {
+      "arm": "full_history",
+      "id": "quarry_tail",
+      "query": "For Quarry etch, what is the cooling hold duration?",
+      "expected_answer": "11 minutes",
+      "expected_source": "Q21",
+      "memory_tokens": 1013,
+      "memory_target_breach": null,
+      "retrieved_records": null,
+      "assigned_sources": null,
+      "ok": true,
+      "response": {
+        "answer": "11 minutes",
+        "source": "Q21"
+      },
+      "exact_text": "{\"answer\":\"11 minutes\",\"source\":\"Q21\"}",
+      "semantic_answer_pass": true,
+      "source_pass": true,
+      "native_usage": {
+        "input_tokens": 14156,
+        "output_tokens": 26
+      },
+      "elapsed_seconds": 9.69426183286123,
+      "native_tools": [],
+      "joint_pass": true
+    },
+    {
+      "arm": "full_history",
+      "id": "quarry_absent",
+      "query": "What is the release date of Quarry etch?",
+      "expected_answer": "UNKNOWN",
+      "expected_source": "NONE",
+      "memory_tokens": 1013,
+      "memory_target_breach": null,
+      "retrieved_records": null,
+      "assigned_sources": null,
+      "ok": true,
+      "response": {
+        "answer": "UNKNOWN",
+        "source": "NONE"
+      },
+      "exact_text": "{\"answer\":\"UNKNOWN\",\"source\":\"NONE\"}",
+      "semantic_answer_pass": true,
+      "source_pass": true,
+      "native_usage": {
+        "input_tokens": 14156,
+        "output_tokens": 24
+      },
+      "elapsed_seconds": 9.004326000111178,
+      "native_tools": [],
+      "joint_pass": true
+    },
+    {
+      "arm": "full_history",
+      "id": "quarry_rare_lateral",
+      "query": "For Quarry etch, can I assume that the lateral etch rate is zero?",
+      "expected_answer": "No; unknown",
+      "expected_source": "Q09",
+      "memory_tokens": 1013,
+      "memory_target_breach": null,
+      "retrieved_records": null,
+      "assigned_sources": null,
+      "ok": true,
+      "response": {
+        "answer": "No; unknown.",
+        "source": "Q09"
+      },
+      "exact_text": "{\"answer\":\"No; unknown.\",\"source\":\"Q09\"}",
+      "semantic_answer_pass": true,
+      "source_pass": true,
+      "native_usage": {
+        "input_tokens": 14165,
+        "output_tokens": 29
+      },
+      "elapsed_seconds": 11.483514291932806,
+      "native_tools": [],
+      "joint_pass": true
+    }
+  ],
+  "normalization_map": {
+    "135 °c": "135 c",
+    "135°c": "135 c",
+    "135 degrees c": "135 c",
+    "135 degrees celsius": "135 c",
+    "135 celsius": "135 c",
+    "11 min": "11 minutes",
+    "11 mins": "11 minutes",
+    "11 minute": "11 minutes",
+    "660 s": "11 minutes",
+    "660 seconds": "11 minutes",
+    "no; unknown.": "no; unknown",
+    "unknown.": "unknown",
+    "not specified": "unknown",
+    "not set": "unknown",
+    "not known": "unknown"
+  },
+  "blind_spots": [
+    "Known fixture selected after E4 outcomes",
+    "Four questions",
+    "One model",
+    "One repetition",
+    "Fixed project-name lexical retrieval",
+    "Global packet produced by an earlier adaptive writer",
+    "No new writer or training",
+    "No native task continuation",
+    "No fundamental-rule discovery",
+    "No statistical confirmation"
+  ],
+  "arms": {
+    "global": {
+      "semantic_answers": 3,
+      "exact_sources": 2,
+      "joint": 2,
+      "total": 4,
+      "total_memory_tokens": 656,
+      "largest_memory_tokens": 164,
+      "native_usage": {
+        "input_tokens": 53254,
+        "output_tokens": 106
+      }
+    },
+    "retrieval": {
+      "semantic_answers": 4,
+      "exact_sources": 4,
+      "joint": 4,
+      "total": 4,
+      "total_memory_tokens": 715,
+      "largest_memory_tokens": 180,
+      "native_usage": {
+        "input_tokens": 40266,
+        "output_tokens": 105
+      }
+    },
+    "full_history": {
+      "semantic_answers": 4,
+      "exact_sources": 4,
+      "joint": 4,
+      "total": 4,
+      "total_memory_tokens": 4052,
+      "largest_memory_tokens": 1013,
+      "native_usage": {
+        "input_tokens": 56633,
+        "output_tokens": 105
+      }
+    }
+  },
+  "native_usage_total": {
+    "input_tokens": 150153,
+    "output_tokens": 316
+  },
+  "native_usage_complete": true,
+  "protocol_unchanged": true,
+  "e4_sources_unchanged": true,
+  "elapsed_seconds": 26.992465374991298
+}

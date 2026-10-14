@@ -128,12 +128,14 @@ class Memory:
             command,
             cwd=self._path,
             capture_output=True,
-            text=True,
         )
+        # Text mode converts CR and CRLF to LF, which changes saved notes.
+        stdout = result.stdout.decode("utf-8")
+        stderr = result.stderr.decode("utf-8")
         if check and result.returncode:
-            detail = (result.stderr or result.stdout).strip()
+            detail = (stderr or stdout).strip()
             raise RuntimeError(f"git {' '.join(args)} failed: {detail}")
-        return result.stdout.strip()
+        return stdout.strip()
 
     def _init(self) -> None:
         self._path.mkdir(parents=True, exist_ok=True)
@@ -253,11 +255,14 @@ class Memory:
             message, payload = body, {}
         payload = dict(payload)
         operation = payload.pop(OPERATION_KEY, {})
+        message_format = operation.get("message_format")
+        if message_format == "json-v1":
+            message = json.loads(message)
         return {
             "id": item_id.strip(),
             "parents": parents.split(),
             "datetime": datetime.fromisoformat(timestamp),
-            "message": message.strip(),
+            "message": message if message_format in ("verbatim-v1", "json-v1") else message.strip(),
             "payload": payload,
             "kind": operation.get("operation", "put"),
             "target_id": operation.get("target"),
@@ -279,11 +284,21 @@ class Memory:
         if old_tips:
             arguments.extend(["--not", *old_tips])
         raw = self._run(*arguments)
-        return [
-            self._parse_record(record)
-            for record in raw.split(RECORD_SEPARATOR)
-            if record.strip()
-        ]
+        try:
+            return [
+                self._parse_record(record)
+                for record in raw.split(RECORD_SEPARATOR)
+                if record.strip()
+            ]
+        except ValueError:
+            # Older notes can contain the stream separator. Read those commits
+            # individually so existing stores remain readable after the fix.
+            id_arguments = list(arguments)
+            id_arguments[2] = "--format=%H"
+            ids = self._run(*id_arguments).splitlines()
+            return [self._parse_record(self._run(
+                "show", "--no-patch", "--format=%H%x00%P%x00%cI%x00%B", item_id
+            )) for item_id in ids]
 
     def _sync_catalog(self) -> None:
         refs = self._refs()
@@ -343,6 +358,8 @@ class Memory:
         summary: bool = False,
         _operation: dict | None = None,
         agent: str | None = None,
+        _expected_head: str | None = None,
+        _model_record: bool = False,
     ) -> str:
         if self.inspecting() is not None:
             raise RuntimeError(
@@ -351,6 +368,8 @@ class Memory:
         from agent_memory.identity import DEFAULT_AGENT, ensure_agent_payload
 
         payload = payload or {}
+        if not _model_record and ({"model_event", "task_model"} & payload.keys()):
+            raise ValueError("Use model_propose and model_accept to write task models")
         if OPERATION_KEY in payload:
             raise ValueError(f"{OPERATION_KEY!r} is reserved")
         stored_payload = ensure_agent_payload(
@@ -378,18 +397,24 @@ class Memory:
             ]
             if recent:
                 stored_payload["covers"] = [item.id for item in recent]
-        if _operation is not None:
-            stored_payload[OPERATION_KEY] = _operation
-        body = f"{message}\n\n{PAYLOAD_PREFIX}{json.dumps(stored_payload)}"
+        operation = dict(_operation or {})
+        # ASCII JSON protects exact text from Git cleanup, encoding repair,
+        # newline conversion, and characters used by the log framing.
+        operation["message_format"] = "json-v1"
+        stored_payload[OPERATION_KEY] = operation
+        stored_message = json.dumps(message, ensure_ascii=True)
+        body = f"{stored_message}\n\n{PAYLOAD_PREFIX}{json.dumps(stored_payload)}"
         with self._lock():
             if self.inspecting() is not None:
                 raise RuntimeError("cannot save while inspecting; call inspect_done first")
+            if _expected_head is not None and self._run("rev-parse", "HEAD") != _expected_head:
+                raise ValueError("Memory changed during model checks; check the proposal again")
             # Refresh excludes each save: nested clones may appear mid-session.
             self._ensure_exclude(self._git_dir / "info" / "exclude")
             # Also untrack state already captured by older saves; keep local files.
             self._run("rm", "--cached", "--ignore-unmatch", "--", *GENERATED_STATE_FILES)
             self._run("add", "-A")
-            arguments = ["commit"]
+            arguments = ["commit", "--cleanup=verbatim"]
             if allow_empty:
                 arguments.append("--allow-empty")
             self._run(*arguments, "-m", body)
@@ -526,7 +551,11 @@ class Memory:
         include_historical: bool,
         k: int,
     ) -> list[MemoryItem]:
-        hits = self._catalog.fts(query, max(k * 4, 16))
+        hits = self._catalog.fts(
+            query, max(k * 4, 16), branch=branch, ids=ids, text=text,
+            payload=payload, since=since, until=until,
+            include_historical=include_historical,
+        )
         if not hits:
             return []
         ordered = [memory_id for memory_id, _score in hits]
@@ -771,6 +800,13 @@ class Memory:
         head = self._run("rev-parse", "HEAD", check=False)
         if not head:
             return stale
+        declared = sorted({name for item in items for name in item.payload.get("files", [])})
+        untracked = set()
+        if declared:
+            # Include ignored paths when the caller explicitly declares them.
+            # Git diff alone does not report newly created untracked evidence.
+            untracked = set(self._run("ls-files", "--others", "-z", "--", *declared,
+                                      check=False).split("\0"))
         for item in {entry.id: entry for entry in items}.values():
             names = self._run(
                 "show", "--pretty=format:", "--name-only", item.id, check=False
@@ -786,7 +822,7 @@ class Memory:
                 ).splitlines()
                 if name.strip()
             }
-            if files & later:
+            if files & (later | untracked):
                 stale.add(item.id)
         return stale
 
@@ -828,13 +864,47 @@ class Memory:
             stale_ids=stale_ids,
         )
         payload["injected"] = text
+        from agent_memory.models import TaskModels
+        model = TaskModels(self).view(items=items)
+        payload["model"] = model
+        if model:
+            payload["injected"] = self.render_packet()
         return payload
 
     def render_state(self) -> str:
         """Compact MEMORY STATE for SDK / tests (Goal, Steering, Recent)."""
         return self.prompt_payload()["injected"]
 
-    def related_notes(self, question: str, *, k: int | None = None, _state=None) -> list:
+    def model_get(self, id: str | None = None, *, full: bool = True) -> dict | None:
+        from agent_memory.models import TaskModels
+        service = TaskModels(self)
+        return service.get(id=id) if full else service.export(id=id)
+
+    def model_propose(self, model: dict, *, base: str | None = None, agent: str | None = None) -> str:
+        from agent_memory.models import TaskModels
+        return TaskModels(self).propose(model, base=base, agent=agent)
+
+    def model_check(self, id: str | None = None) -> dict:
+        from agent_memory.models import TaskModels
+        return TaskModels(self).check(id=id)
+
+    def model_accept(self, id: str, *, agent: str | None = None) -> str:
+        from agent_memory.models import TaskModels
+        return TaskModels(self).accept(id, agent=agent)
+
+    def model_reduce(self, *, agent: str | None = None) -> dict:
+        from agent_memory.models import TaskModels
+        return TaskModels(self).reduce(agent=agent)
+
+    def model_predict(self, inputs: dict, target: str, *, id: str | None = None) -> dict:
+        from agent_memory.models import TaskModels
+        return TaskModels(self).predict(inputs, target, id=id)
+
+    def model_handoff(self, model: dict | None = None, *, base: str | None = None, agent: str | None = None) -> dict:
+        from agent_memory.models import TaskModels
+        return TaskModels(self).handoff(model, base=base, agent=agent)
+
+    def related_notes(self, question: str, *, k: int | None = None, _state=None, _covered=()) -> list:
         """Work notes matching the question via FTS. Skips transcript and Goal."""
         from agent_memory.prompt import (
             RELATED_CAP,
@@ -849,10 +919,12 @@ class Memory:
         cap = RELATED_CAP if k is None else k
         state = self.state() if _state is None else _state
         skip = {item.id for item in (_goal(state), _handoff(state)) if item}
+        skip.update(_covered)
         limit = max(cap * 3, 8)
         while True:
             items = self.find(query=question, k=limit, branch="current")
-            related = [item for item in items if item.id not in skip and not _transcript(item)]
+            related = [item for item in items if item.id not in skip and not _transcript(item)
+                       and not item.payload.get("model_event")]
             if len(related) >= cap or len(items) < limit:
                 return related[:cap]
             # Transcript hits must not crowd useful work out of the result set.
@@ -865,10 +937,13 @@ class Memory:
 
         items = self.state()
         query = (question or "").strip() or _latest_user_text(items)
-        related = self.related_notes(query, _state=items) if query else []
+        from agent_memory.models import TaskModels
+        model = TaskModels(self).view(items=items)
+        covered = model["covered"] if model else ()
+        related = self.related_notes(query, _state=items, _covered=covered) if query else []
         # Check only candidates that can enter the bounded packet, not all history.
         goal = _goal(items)
-        candidates = [entry for entry in (goal, _steering(items, goal), _handoff(items)) if entry]
+        candidates = [entry for entry in (goal, _steering(items, goal), _handoff(items, covered=covered)) if entry]
         candidates += split_open_questions(items)[:8] + related
         return render_packet(
             items,
@@ -878,6 +953,7 @@ class Memory:
             query=query,
             stale_ids=self._stale_ids(candidates),
             max_chars=max_chars,
+            model=model,
         )
 
     def write_state_rule(

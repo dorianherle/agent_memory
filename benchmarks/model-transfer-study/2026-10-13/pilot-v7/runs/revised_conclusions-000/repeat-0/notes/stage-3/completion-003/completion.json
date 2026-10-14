@@ -1,0 +1,54 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "status",
+              "--short"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import json; from work import evaluate; e=json.load(open('evidence.json')); p=json.load(open('policy.json')); r=json.load(open('requests.json')); print(json.dumps([evaluate(x,e,p) for x in r],sort_keys=True))"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "from work import evaluate\n# focused Stage 3 checks\np={'required_conditions':['b','a'],'require_verified':True}\nassert evaluate({'claim':'x','conditions':{'a':1}},[],p)=={'status':'unknown','value':None,'sources':[],'unknowns':['b']}\ne=[{'source':'A','claim':'x','value':1,'conditions':{'a':1,'b':2},'verified':True},{'source':'B','claim':'x','value':2,'conditions':{'a':1,'b':2},'verified':True,'supersedes':['A']}]\nr={'claim':'x','conditions':{'a':1,'b':2}}\nassert evaluate(r,e,p)=={'status':'supported','value':2,'sources':['B'],'unknowns':[]}\ne.append({'source':'C','claim':'x','value':3,'conditions':{'a':1,'b':2},'verified':True})\nassert evaluate(r,e,p)=={'status':'conflict','value':None,'sources':['B','C'],'unknowns':['source disagreement']}\nassert evaluate({'claim':'none','conditions':{'a':1,'b':2}},e,p)=={'status':'unknown','value':None,'sources':[],'unknowns':['no matching evidence']}\nprint('focused checks passed')"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 11142,
+    "output_tokens": 581,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 160
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 12.855290832929313,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

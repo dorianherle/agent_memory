@@ -1,0 +1,12 @@
+{
+  "stop": "metering_or_access_failure",
+  "tool_calls": 31,
+  "elapsed_seconds": 600.7031290838495,
+  "usage_complete": false,
+  "tokens": null,
+  "known_tokens": 637363,
+  "input_tokens": 616007,
+  "output_tokens": 21356,
+  "cached_input_tokens": null,
+  "reasoning_output_tokens": null
+}

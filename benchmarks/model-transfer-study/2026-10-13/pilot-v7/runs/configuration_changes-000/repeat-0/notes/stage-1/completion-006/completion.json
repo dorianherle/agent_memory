@@ -1,0 +1,56 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "diff",
+              "--",
+              "work.py",
+              "report.json"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "status",
+              "--short"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "from work import evaluate\nbase={'defaults':{'b':True,'i':3,'s':'x'},'types':{'b':'boolean','i':'integer','s':'string'},'null_resets':False,'environment':True}\ntests=[\n({'layers':[{'i':None}]},base,{'ok':False,'config':{},'error':'type'}),\n({'layers':[{'i':'bad'}],'environment':{'i':'4'}},base,{'ok':True,'config':{'b':True,'i':4,'s':'x'},'error':None}),\n({'layers':[{'unknown':1},{'i':'bad'}]},base,{'ok':False,'config':{},'error':'unknown_key'}),\n({'environment':{'unknown':'1'}},base,{'ok':False,'config':{},'error':'unknown_key'}),\n({'environment':{'i':'1.0'}},base,{'ok':False,'config':{},'error':'environment'}),\n({'environment':{'i':'1e2'}},base,{'ok':False,'config':{},'error':'environment'}),\n({'environment':{'i':'\u0661'}},base,{'ok':False,'config':{},'error':'environment'}),\n]\nfor request,policy,want in tests:\n got=evaluate(request,policy)\n assert got==want,(request,got,want)\nprint('additional precedence and parsing checks passed')"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 12480,
+    "output_tokens": 512,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 106
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 17.521071000024676,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

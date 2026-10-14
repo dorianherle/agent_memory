@@ -1,0 +1,65 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-m",
+              "py_compile",
+              "work.py"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy,json; from work import evaluate; cases=[({'claim':'c','conditions':{}},[],{'required_conditions':['z','a']},{'status':'unknown','value':None,'sources':[],'unknowns':['a','z']}),({'claim':'c','conditions':{'x':1}},[],{'required_conditions':['x']},{'status':'unknown','value':None,'sources':[],'unknowns':['no matching evidence']}),({'claim':'c','conditions':{'x':1}},[{'source':'a','claim':'c','conditions':{'x':1},'value':False},{'source':'b','claim':'c','conditions':{'x':1},'value':False}],{'required_conditions':['x']},{'status':'unsupported','value':False,'sources':['a','b'],'unknowns':[]}),({'claim':'c','conditions':{'x':1}},[{'source':'a','claim':'c','conditions':{'x':1},'value':None},{'source':'b','claim':'c','conditions':{'x':1},'value':0}],{'required_conditions':['x']},{'status':'conflict','value':None,'sources':['a','b'],'unknowns':['source disagreement']})];\nfor req,ev,pol,want in cases:\n before=copy.deepcopy((req,ev,pol)); assert evaluate(req,ev,pol)==want; assert (req,ev,pol)==before\nprint('edge checks passed')"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "diff",
+              "--check"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "status",
+              "--short"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 26169,
+    "output_tokens": 712,
+    "cached_input_tokens": 19328,
+    "reasoning_output_tokens": 254
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 31.583204000024125,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

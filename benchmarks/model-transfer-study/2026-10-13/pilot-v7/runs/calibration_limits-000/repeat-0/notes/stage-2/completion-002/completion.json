@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import json\nfrom work import evaluate\n\ndef expected(req, ev, pol, want):\n    before=json.dumps([req,ev,pol],sort_keys=True)\n    got=evaluate(req,ev,pol)\n    assert got==want,(got,want)\n    assert json.dumps([req,ev,pol],sort_keys=True)==before\n    assert set(got)=={'status','value','sources','unknowns'}\n\np={'required_conditions':['b','a'],'require_verified':True}\nexpected({'claim':'c','conditions':{'a':1}},[],p,{'status':'unknown','value':None,'sources':[],'unknowns':['b']})\nbase={'claim':'c','conditions':{'a':1,'b':{'x':[2,3]}}}\nev=[\n {'source':'old','claim':'c','value':{'z':1,'a':2},'conditions':{'a':1,'b':{'x':[2,3]}},'verified':True},\n {'source':'new','claim':'c','value':{'a':2,'z':1},'conditions':{'a':1,'b':{'x':[2,3]}},'verified':True,'supersedes':['old']},\n {'source':'wrong','claim':'c','value':9,'conditions':{'a':2,'b':{'x':[2,3]}},'verified':True},\n {'source':'unverified','claim':'c','value':9,'conditions':{'a':1,'b':{'x':[2,3]}},'verified':False},\n {'source':'withdrawn','claim':'c','value':9,'conditions':{'a':1,'b':{'x':[2,3]}},'verified':True,'withdrawn':True},\n]\nexpected(base,ev,p,{'status':'supported','value':{'a':2,'z':1},'sources':['new'],'unknowns':[]})\nexpected(base,[{'source':'n','claim':'c','value':False,'conditions':base['conditions'],'verified':True}],p,{'status':'unsupported','value':False,'sources':['n'],'unknowns':[]})\nexpected(base,[{'source':'a','claim':'c','value':0,'conditions':base['conditions'],'verified':True},{'source':'b','claim':'c','value':False,'conditions':base['conditions'],'verified':True}],p,{'status':'conflict','value':None,'sources':['a','b'],'unknowns':['source disagreement']})\nexpected(base,[],p,{'status':'unknown','value':None,'sources':[],'unknowns':['no matching evidence']})\nwith open('requests.json') as f: reqs=json.load(f)\nwith open('evidence.json') as f: evidence=json.load(f)\nwith open('policy.json') as f: policy=json.load(f)\nwith open('report.json') as f: report=json.load(f)\nassert report==[evaluate(r,evidence,policy) for r in reqs]\nprint('all checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 21852,
+    "output_tokens": 1134,
+    "cached_input_tokens": 17024,
+    "reasoning_output_tokens": 385
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 25.083304499974474,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

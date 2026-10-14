@@ -1,0 +1,18 @@
+E1: Five recursive handoffs.
+Hypothesis: inconclusive.
+The history is constructed. This result applies only to this run.
+prose: 9 of 9 question groups passed.
+ledger: 8 of 9 question groups passed.
+full_history_control: 9 of 9 question groups passed.
+prose packet-size estimates (o200k_base): 157, 166, 248, 263, 274.
+ledger packet-size estimates (o200k_base): 161, 225, 256, 318, 332.
+Submitted calls: 13. Calls with results: 13.
+Native input tokens: 143067. Native output tokens: 3931.
+Native usage includes a large fixed CLI context. Packet sizes are o200k_base estimates, not total model-call token use.
+Elapsed time: 81.4 s.
+One history and two method variants were run. A second independent history would exceed the call cap.
+No general claim is supported by this small experiment.
+Observed loss: the final ledger omitted the rule against replacing an unknown quantity with zero. The receiver answered UNKNOWN for Q9. The source answer is false in H3.
+The prose receiver passed all groups. The ledger receiver failed Q9. This observation does not satisfy the hypothesis.
+The frozen budget rule makes the final conclusion inconclusive. Both final packets exceeded the 260-token estimated maximum.
+The ledger omitted this rule at handoff 3, when H3 first introduced it. This was an extraction loss, not loss of a previously retained ledger fact.

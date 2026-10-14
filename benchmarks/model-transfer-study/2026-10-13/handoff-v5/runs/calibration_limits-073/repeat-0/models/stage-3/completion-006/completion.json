@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import json\nwith open('stored-model.json') as f: stored=json.load(f)\nm=stored['model']\nrequest={'claim':'limit','conditions':{'mode':'x','calibration':None}}\nevidence=[{'source':'z-old','claim':'limit','value':9,'conditions':{'mode':'x','calibration':None},'verified':True},{'source':'b-new','claim':'limit','value':2,'conditions':{'mode':'x','calibration':None},'verified':True,'supersedes':['z-old']},{'source':'a-1','claim':'limit','value':1,'conditions':{'mode':'x','calibration':None},'verified':True},{'source':'a-2','claim':'limit','value':1,'conditions':{'mode':'x','calibration':None},'verified':True},{'source':'u','claim':'limit','value':2,'conditions':{'mode':'x','calibration':None},'verified':False,'supersedes':['a-1']},{'source':'w','claim':'limit','value':2,'conditions':{'mode':'x','calibration':None},'verified':True,'withdrawn':True}]\npolicy={'required_conditions':['mode','calibration'],'require_verified':True}\nwhen={'op':'and','args':[{'op':'eq','args':[{'var':'request'},{'value':request}]},{'op':'eq','args':[{'var':'evidence'},{'value':evidence}]},{'op':'eq','args':[{'var':'policy'},{'value':policy}]}]}\nm['title']='Stage 3 calibration-limits evaluator observations'\nm['rules'].append({'id':'stage3_eligible_supersession_conflict','target':'status','claim':'For the independently checked Stage 3 boundary, eligibility filtering precedes supersession; an unverified record cannot supersede a verified source, while an eligible record removes the source it supersedes, and remaining disagreeing canonical values conflict regardless of source counts.','when':when,'then':{'value':'conflict'},'evidence':['9adaa84b'],'dependencies':['work.py','TASK.md','requests.json','evidence.json','policy.json','report.json']})\nm['cases'].append({'id':'stage3_independent_eligibility_supersession_conflict','target':'status','inputs':{'request':request,'evidence':evidence,'policy':policy},'expected':'conflict','evidence':['9adaa84b'],'challenge':True})\nextra='Stage 3 independently tests combined verification, withdrawal, supersession, canonical disagreement, sorted-source, and input-immutability behavior only for the recorded boundary; broader malformed-input behavior remains unspecified.'\nif extra not in m['unresolved']: m['unresolved'].append(extra)\nwith open('model-stage3.json','w') as f: json.dump(m,f,ensure_ascii=False,sort_keys=True,separators=(',',':'))\nprint(json.dumps({'rules':len(m['rules']),'cases':len(m['cases']),'challenge':m['cases'][-1]['id']}))"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 39323,
+    "output_tokens": 1417,
+    "cached_input_tokens": 25600,
+    "reasoning_output_tokens": 687
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 43.872948749922216,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

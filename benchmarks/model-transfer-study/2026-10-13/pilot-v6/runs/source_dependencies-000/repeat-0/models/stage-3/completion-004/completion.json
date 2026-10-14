@@ -1,0 +1,109 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "memory",
+          "arguments": {
+            "action": "model_predict",
+            "name": "needs_review",
+            "payload": {
+              "request": {
+                "declared": [
+                  "dup",
+                  "dup",
+                  "gone",
+                  "ignored",
+                  "stable"
+                ],
+                "saved": {
+                  "dup": {
+                    "kind": "file",
+                    "hash": "x",
+                    "meta": {
+                      "a": 1
+                    }
+                  },
+                  "gone": {
+                    "kind": "file",
+                    "hash": "g"
+                  },
+                  "ignored": {
+                    "kind": "file",
+                    "hash": "old"
+                  },
+                  "stable": {
+                    "kind": "bundle",
+                    "items": [
+                      1,
+                      {
+                        "x": 2
+                      }
+                    ]
+                  }
+                },
+                "current": {
+                  "dup": {
+                    "meta": {
+                      "a": 1
+                    },
+                    "hash": "x",
+                    "kind": "file"
+                  },
+                  "ignored": {
+                    "kind": "file",
+                    "hash": "new"
+                  },
+                  "stable": {
+                    "items": [
+                      1,
+                      {
+                        "x": 2
+                      }
+                    ],
+                    "kind": "bundle"
+                  },
+                  "unrelated": {
+                    "kind": "file",
+                    "hash": "u"
+                  }
+                }
+              },
+              "policy": {
+                "ignored": [
+                  "ignored"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy\nfrom work import evaluate\nrequest={'declared':['dup','dup','gone','ignored','stable'],'saved':{'dup':{'kind':'file','hash':'x','meta':{'a':1}},'gone':{'kind':'file','hash':'g'},'ignored':{'kind':'file','hash':'old'},'stable':{'kind':'bundle','items':[1,{'x':2}]}},'current':{'dup':{'meta':{'a':1},'hash':'x','kind':'file'},'ignored':{'kind':'file','hash':'new'},'stable':{'items':[1,{'x':2}],'kind':'bundle'},'unrelated':{'kind':'file','hash':'u'}}}\npolicy={'ignored':['ignored']}\nbefore=(copy.deepcopy(request),copy.deepcopy(policy))\nactual=evaluate(request,policy)\nassert actual=={'needs_review':True,'changed':['gone']},actual\nassert (request,policy)==before\nprint(actual)"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 12304,
+    "output_tokens": 1091,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 655
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 20.691403208998963,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

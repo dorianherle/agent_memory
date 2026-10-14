@@ -1,0 +1,170 @@
+[
+  {
+    "task": "state_transitions-000",
+    "stage": 1,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "state_transitions-000",
+    "stage": 2,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "state_transitions-000",
+    "stage": 3,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "source_dependencies-000",
+    "stage": 1,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "source_dependencies-000",
+    "stage": 2,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "source_dependencies-000",
+    "stage": 3,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "configuration_changes-000",
+    "stage": 1,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "configuration_changes-000",
+    "stage": 2,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "configuration_changes-000",
+    "stage": 3,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "data_validation-000",
+    "stage": 1,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "data_validation-000",
+    "stage": 2,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "data_validation-000",
+    "stage": 3,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "source_comparison-000",
+    "stage": 1,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "source_comparison-000",
+    "stage": 2,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "source_comparison-000",
+    "stage": 3,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "calibration_limits-000",
+    "stage": 1,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "calibration_limits-000",
+    "stage": 2,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "calibration_limits-000",
+    "stage": 3,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "conflicting_evidence-000",
+    "stage": 1,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "conflicting_evidence-000",
+    "stage": 2,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "conflicting_evidence-000",
+    "stage": 3,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "revised_conclusions-000",
+    "stage": 1,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "revised_conclusions-000",
+    "stage": 2,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "revised_conclusions-000",
+    "stage": 3,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  }
+]

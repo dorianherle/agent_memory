@@ -1,0 +1,258 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "model_handoff",
+      "id": null,
+      "payload": {
+        "schema": 1,
+        "title": "Calibration evidence evaluation: singleton Boolean-false boundary",
+        "inputs": {
+          "request": "object",
+          "policy": "object",
+          "evidence": "array"
+        },
+        "rules": [
+          {
+            "id": "singleton_false_is_unsupported",
+            "target": "status",
+            "claim": "A sole eligible matching record with canonical JSON Boolean false yields unsupported.",
+            "when": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "eq",
+                  "args": [
+                    {
+                      "op": "len",
+                      "args": [
+                        {
+                          "var": "evidence"
+                        }
+                      ]
+                    },
+                    {
+                      "value": 1
+                    }
+                  ]
+                },
+                {
+                  "op": "eq",
+                  "args": [
+                    {
+                      "var": "evidence.0.claim"
+                    },
+                    {
+                      "var": "request.claim"
+                    }
+                  ]
+                },
+                {
+                  "op": "ne",
+                  "args": [
+                    {
+                      "op": "get",
+                      "args": [
+                        {
+                          "var": "evidence.0"
+                        },
+                        {
+                          "value": "withdrawn"
+                        },
+                        {
+                          "value": false
+                        }
+                      ]
+                    },
+                    {
+                      "value": true
+                    }
+                  ]
+                },
+                {
+                  "op": "or",
+                  "args": [
+                    {
+                      "op": "eq",
+                      "args": [
+                        {
+                          "op": "get",
+                          "args": [
+                            {
+                              "var": "policy"
+                            },
+                            {
+                              "value": "require_verified"
+                            },
+                            {
+                              "value": false
+                            }
+                          ]
+                        },
+                        {
+                          "value": false
+                        }
+                      ]
+                    },
+                    {
+                      "op": "eq",
+                      "args": [
+                        {
+                          "op": "get",
+                          "args": [
+                            {
+                              "var": "evidence.0"
+                            },
+                            {
+                              "value": "verified"
+                            },
+                            {
+                              "value": false
+                            }
+                          ]
+                        },
+                        {
+                          "value": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "all",
+                  "items": {
+                    "op": "get",
+                    "args": [
+                      {
+                        "var": "policy"
+                      },
+                      {
+                        "value": "required_conditions"
+                      },
+                      {
+                        "value": []
+                      }
+                    ]
+                  },
+                  "as": "condition_name",
+                  "test": {
+                    "op": "eq",
+                    "args": [
+                      {
+                        "op": "get",
+                        "args": [
+                          {
+                            "var": "evidence.0.conditions"
+                          },
+                          {
+                            "var": "condition_name"
+                          },
+                          {
+                            "value": {
+                              "__missing__": true
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "op": "get",
+                        "args": [
+                          {
+                            "var": "request.conditions"
+                          },
+                          {
+                            "var": "condition_name"
+                          },
+                          {
+                            "value": {
+                              "__missing_request__": true
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "op": "eq",
+                  "args": [
+                    {
+                      "var": "evidence.0.value"
+                    },
+                    {
+                      "value": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "then": {
+              "value": "unsupported"
+            },
+            "evidence": [
+              "9018da24"
+            ],
+            "dependencies": [
+              "work.py",
+              "TASK.md"
+            ]
+          }
+        ],
+        "cases": [
+          {
+            "id": "challenge_single_matching_false",
+            "target": "status",
+            "inputs": {
+              "request": {
+                "claim": "c",
+                "conditions": {
+                  "mode": "x"
+                }
+              },
+              "policy": {
+                "required_conditions": [
+                  "mode"
+                ],
+                "require_verified": false
+              },
+              "evidence": [
+                {
+                  "source": "s",
+                  "claim": "c",
+                  "conditions": {
+                    "mode": "x"
+                  },
+                  "value": false
+                }
+              ]
+            },
+            "expected": "unsupported",
+            "evidence": [
+              "9018da24"
+            ],
+            "challenge": true
+          }
+        ],
+        "alternatives": [],
+        "unresolved": [
+          "Behavior outside this modeled singleton Boolean-false boundary remains governed by TASK.md and work.py; malformed or non-JSON inputs are unspecified."
+        ]
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 49454,
+    "output_tokens": 3367,
+    "cached_input_tokens": 37504,
+    "reasoning_output_tokens": 1501
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 64.90874429093674,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

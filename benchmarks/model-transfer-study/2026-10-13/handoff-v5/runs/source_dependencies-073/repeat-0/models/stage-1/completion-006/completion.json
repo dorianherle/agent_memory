@@ -1,0 +1,58 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "read",
+          "arguments": {
+            "path": "work.py"
+          }
+        },
+        {
+          "action": "read",
+          "arguments": {
+            "path": "report.json"
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy,json\nfrom pathlib import Path\nfrom work import evaluate\nrequests=json.loads(Path('requests.json').read_text())\npolicy=json.loads(Path('policy.json').read_text())\nexpected=[evaluate(r,policy) for r in requests]\nactual=json.loads(Path('report.json').read_text())\nassert actual==expected,(actual,expected)\nprobes=[\n({'declared':['z','a','z'],'saved':{'z':{'kind':'file','hash':'1'},'a':{'kind':'missing'},'noise':{'v':1}},'current':{'z':{'kind':'file','hash':'2'},'noise':{'v':2}}},{'ignored':[]},{'needs_review':True,'changed':['z']}),\n({'declared':['q'],'saved':{'q':{'kind':'file','hash':'1','mtime':1}},'current':{'q':{'kind':'file','hash':'1','mtime':2}}},{'ignored':['q']},{'needs_review':False,'changed':[]}),\n({'declared':['x'],'saved':{'x':{'b':2,'a':1}},'current':{'x':{'a':1,'b':2}}},{},{'needs_review':False,'changed':[]})]\nfor req,pol,want in probes:\n b=(copy.deepcopy(req),copy.deepcopy(pol)); got=evaluate(req,pol); assert got==want,(got,want); assert (req,pol)==b\nprint(json.dumps({'report':actual,'boundary_passed':len(probes)},sort_keys=True))"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "diff",
+              "--",
+              "work.py",
+              "report.json"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 23156,
+    "output_tokens": 1142,
+    "cached_input_tokens": 18816,
+    "reasoning_output_tokens": 267
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 24.77748458320275,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

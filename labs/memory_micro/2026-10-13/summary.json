@@ -1,0 +1,89 @@
+{
+  "date": "2026-10-13",
+  "main_finding": "The screens found useful local mechanisms and important failure modes. They did not establish a breakthrough or a generally reliable memory system.",
+  "interpretation": "A candidate for the next test combines protected user requirements, an explicit task frontier, selective rule compaction, and source retrieval. This combination remains a proposal. It was not tested end to end.",
+  "experiments": [
+    {
+      "id": "E1",
+      "name": "Five recursive handoffs",
+      "hypothesis": "A typed ledger preserves critical facts better than recursive prose under the same size limit.",
+      "finding": "Prose passed 9/9 groups. The ledger passed 8/9. It missed a new constraint when first introduced. Both formats exceeded the frozen size maximum.",
+      "classification": "Inconclusive: budget control failed. No ledger advantage was observed."
+    },
+    {
+      "id": "E2",
+      "name": "Rule-focused compaction",
+      "hypothesis": "A rule-and-exception packet transfers useful relationships to unseen cases within a small packet.",
+      "finding": "Both packets answered all 8 unseen release cases correctly. Rule packet: 145 estimated tokens. Summary: 232, above the 220 target. On independent trials, rules used 156 tokens versus 108 for summary. Both retained unknown results.",
+      "classification": "Local size benefit on patterned evidence. No prediction advantage. Not a valid equal-size comparison."
+    },
+    {
+      "id": "E3",
+      "name": "Tiny-model weight memory",
+      "hypothesis": "A small pretrained model can become useful memory after a short local update.",
+      "finding": "Setup reached its time limit before SmolLM2-135M-Instruct weights arrived. No model was loaded. No training or answer generation occurred.",
+      "classification": "Inconclusive: setup only. No evidence for or against weight memory."
+    },
+    {
+      "id": "E4",
+      "name": "Query-conditioned retrieval",
+      "hypothesis": "Query-shaped source retrieval preserves needed facts better than one compact global packet.",
+      "finding": "Retrieval answered all 12 questions with exact sources. The first global packet exceeded its cap. The adaptive capped-packet reader had one substantive answer error after the packet omitted the cooling hold. Batched retrieval exposed a larger union of source records.",
+      "classification": "Original comparison is budget-invalid. Adaptive batch result has a context confound."
+    },
+    {
+      "id": "E5",
+      "name": "Task-frontier checkpoint",
+      "hypothesis": "A checkpoint preserves resumption state better than a knowledge-focused summary.",
+      "finding": "Both arms passed 8/8 fields on one task. On backfill, the checkpoint passed 8/8 and the summary 4/8. All packets met the cap. The checkpoint omitted an unscored instruction not to publish a release.",
+      "classification": "Local improvement in scored resumption state. Full requirement preservation failed."
+    },
+    {
+      "id": "E6",
+      "name": "Checked compaction and repair",
+      "hypothesis": "A source-backed check and one repair improve aggressive compaction.",
+      "finding": "Initial and repaired packets both answered 10/10 hidden groups. The initial packet had 174 estimated tokens. Repair produced 161 against a 160 cap. The repaired packet was rejected.",
+      "classification": "Inconclusive: budget failure. No accuracy improvement. Rejection gate enforced the cap."
+    },
+    {
+      "id": "E7",
+      "name": "Isolated retrieval control",
+      "hypothesis": "E4 retrieval remains useful when readers cannot see other queries or contexts.",
+      "finding": "Separate readers answered 4/4 with retrieval and full history, versus 3/4 with the global packet. The global reader safely returned unknown for an omitted fact. Retrieval used 715 estimated context tokens in total, versus 656 for the global packets.",
+      "classification": "Positive local diagnostic. Four selected known queries. No independent confirmation."
+    },
+    {
+      "id": "E8",
+      "name": "No-memory control",
+      "hypothesis": "The receiver reproduces all E2 release labels without memory.",
+      "finding": "Without memory, release answers scored 0/3 observed and 0/8 unseen. Independent trials scored 0/3 observed and 4/4 unseen because those unseen labels were unknown. Every response was unknown.",
+      "classification": "The frozen no-memory hypothesis failed. This does not isolate prior knowledge once a packet is supplied."
+    }
+  ],
+  "limits": [
+    "The fixtures are constructed. Researchers authored their contracts and graders.",
+    "Samples are small. No statistical superiority or general reliability is established.",
+    "Only E1 tests repeated handoffs. The other behavior tests mainly use one handoff.",
+    "The receivers answer controlled questions. They do not execute full native agent tasks.",
+    "E4's exact-format scores reject some semantically correct answers. The unchanged scores and manual review remain available.",
+    "E4's capped arm, E7, and E8 are adaptive diagnostics on known fixtures.",
+    "A passing grader can miss important source requirements, as E5 demonstrated.",
+    "All packet sizes use o200k_base estimates. Native usage includes substantial CLI overhead.",
+    "Orchestration, setup, training, storage, and worker inference are separate resource categories.",
+    "No experiment establishes extraction of unique fundamental truths or equations."
+  ],
+  "next_experiments": [
+    "Test a protected requirement store plus task frontier over ten actual interrupted tasks. Check every user constraint.",
+    "Compare adaptive choice of prose, rules, and retrieval on new task families. Keep each receiver isolated.",
+    "With pretrained weights available before the timer starts, compare raw-history and verified-answer updates under an equal training-token budget.",
+    "Add late exceptions to an apparent shared rule. Measure correction, uncertainty, and retention across further handoffs."
+  ],
+  "worker_accounting": {
+    "calls": 57,
+    "native_usage": {
+      "input_tokens": 698515,
+      "output_tokens": 10089
+    },
+    "note": "These counts exclude parent and subagent orchestration. The successful setup probe is separate. Packet sizes use o200k_base estimates. They are not total model-call costs."
+  }
+}

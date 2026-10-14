@@ -1,0 +1,8 @@
+WARNING: The directory '/Users/dorianherle/Library/Caches/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.
+Processing ./benchmark-v3/private-wheel-final/agent_memory-0.1.0-py3-none-any.whl
+Installing collected packages: agent-memory
+  Attempting uninstall: agent-memory
+    Found existing installation: agent-memory 0.1.0
+    Uninstalling agent-memory-0.1.0:
+      Successfully uninstalled agent-memory-0.1.0
+Successfully installed agent-memory-0.1.0

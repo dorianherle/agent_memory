@@ -1,0 +1,482 @@
+{
+  "protocol_sha256": "9f92c3fcf022d6e7488b97b9e1f61fbcddb45156edcee949c2508ae5e03edeab",
+  "elapsed_seconds": 49.849569791927934,
+  "calls_attempted": 10,
+  "calls_completed": 10,
+  "errors": {},
+  "native_usage": {
+    "input_tokens": 122067,
+    "output_tokens": 1302,
+    "complete": true
+  },
+  "call_usage": {
+    "independent_full": {
+      "usage": {
+        "input_tokens": 13548,
+        "output_tokens": 52
+      },
+      "elapsed_seconds": 11.89425504207611,
+      "ok": true,
+      "errors": []
+    },
+    "independent_rules_read": {
+      "usage": {
+        "input_tokens": 10622,
+        "output_tokens": 52
+      },
+      "elapsed_seconds": 11.791241208091378,
+      "ok": true,
+      "errors": []
+    },
+    "independent_rules_write": {
+      "usage": {
+        "input_tokens": 10198,
+        "output_tokens": 244
+      },
+      "elapsed_seconds": 13.77502379193902,
+      "ok": true,
+      "errors": []
+    },
+    "independent_summary_read": {
+      "usage": {
+        "input_tokens": 10580,
+        "output_tokens": 52
+      },
+      "elapsed_seconds": 9.36735275015235,
+      "ok": true,
+      "errors": []
+    },
+    "independent_summary_write": {
+      "usage": {
+        "input_tokens": 13303,
+        "output_tokens": 154
+      },
+      "elapsed_seconds": 10.875216417014599,
+      "ok": true,
+      "errors": []
+    },
+    "release_full": {
+      "usage": {
+        "input_tokens": 14325,
+        "output_tokens": 77
+      },
+      "elapsed_seconds": 13.053486249875277,
+      "ok": true,
+      "errors": []
+    },
+    "release_rules_read": {
+      "usage": {
+        "input_tokens": 10998,
+        "output_tokens": 111
+      },
+      "elapsed_seconds": 10.99905199999921,
+      "ok": true,
+      "errors": []
+    },
+    "release_rules_write": {
+      "usage": {
+        "input_tokens": 13711,
+        "output_tokens": 189
+      },
+      "elapsed_seconds": 13.366028625052422,
+      "ok": true,
+      "errors": []
+    },
+    "release_summary_read": {
+      "usage": {
+        "input_tokens": 11085,
+        "output_tokens": 77
+      },
+      "elapsed_seconds": 9.772326125064865,
+      "ok": true,
+      "errors": []
+    },
+    "release_summary_write": {
+      "usage": {
+        "input_tokens": 13697,
+        "output_tokens": 294
+      },
+      "elapsed_seconds": 14.723558207973838,
+      "ok": true,
+      "errors": []
+    }
+  },
+  "packets": {
+    "release": {
+      "summary": "Release workflow facts:\n- Content tokens identify exact file bytes. Equal tokens mean equal bytes.\n- A package is usable only if its output exists and all current build inputs match the inputs recorded by the build.\n- A temporary input change does not permanently invalidate an output. Restoring the exact recorded bytes restores usability without a rebuild.\n- Changes to non-input files do not affect usability.\n\nAtlas: Built with map=m1 and style=s1. Notes are not an input. Style s2 made it unusable; restoring s1 made it usable. Notes n1→n2 had no effect. Removing map made it unusable. Map was restored to m1, but the atlas output was then removed. Current atlas is unusable because its output is absent.\n\nBeacon: Initially built with scene=c7, lighting=l2. Rebuilt with scene=c8, lighting=l2. Lighting l3 made it unusable. Restoring l2 made it usable. README changes have no effect. Current beacon is usable.\n\nComet: Built with mesh=q4. Mesh changed to q5 and then returned to q4 without a rebuild. Current comet is usable.",
+      "rules": "Observations: A build is usable when its output exists and each current input has the same content token as the input recorded by that build. Atlas became unusable when style changed or map was absent. It became usable after the original bytes returned. Notes did not affect it. Beacon followed the same pattern for scene and lighting. README changes did not affect it. A rebuild recorded new input tokens. Comet stayed usable after mesh changed and returned to its recorded token.\n\nInferred rule: Usability depends on the current state, not edit history. The output must exist. All declared inputs must exist and match the recorded bytes. Non-input files do not affect usability. Exception limit: The records support only these packages and checks."
+    },
+    "independent": {
+      "summary": "Six independent trials were directly observed. No other results exist.\n- n17, CSV, blue: usable.\n- n17, JSON, blue: unusable.\n- m42, CSV, blue: unusable.\n- m42, JSON, green: usable.\n- p09, XML, red: usable.\n- p09, CSV, green: unusable.\nThe assistant asked if operator color controls all results. The records do not support this conclusion. Further combinations were not tested. Do not predict untested combinations as facts.",
+      "rules": "Memory packet:\n\nObserved results:\n- n17 + CSV + blue: usable.\n- n17 + JSON + blue: unusable.\n- m42 + CSV + blue: unusable.\n- m42 + JSON + green: usable.\n- p09 + XML + red: usable.\n- p09 + CSV + green: unusable.\n\nInferred rule: Treat each tool, format, and operator combination as a separate case. Use a recorded result only when all three values match. Exception: None is supported.\n\nLimits: The data does not show that operator color controls the result. Blue gives both results. Green gives both results. Red has only one trial. Tool and format effects are also not isolated. For an untested combination, report that the result is unknown."
+    }
+  },
+  "sizes": {
+    "release": {
+      "history_tokens": 537,
+      "history_utf8_bytes": 2100,
+      "summary": {
+        "packet_tokens": 232,
+        "packet_utf8_bytes": 1031,
+        "within_target": false
+      },
+      "rules": {
+        "packet_tokens": 145,
+        "packet_utf8_bytes": 749,
+        "within_target": true
+      }
+    },
+    "independent": {
+      "history_tokens": 156,
+      "history_utf8_bytes": 676,
+      "summary": {
+        "packet_tokens": 108,
+        "packet_utf8_bytes": 424,
+        "within_target": true
+      },
+      "rules": {
+        "packet_tokens": 156,
+        "packet_utf8_bytes": 641,
+        "within_target": true
+      }
+    }
+  },
+  "evaluations": {
+    "release_full": {
+      "answers": {
+        "T1": "unusable",
+        "T2": "usable",
+        "T3": "usable",
+        "U1": "usable",
+        "U2": "unusable",
+        "U3": "unusable",
+        "U4": "usable",
+        "U5": "unusable",
+        "U6": "usable",
+        "U7": "unusable",
+        "U8": "unusable"
+      },
+      "counts": {
+        "observed": {
+          "correct": 3,
+          "total": 3
+        },
+        "unseen": {
+          "correct": 8,
+          "total": 8
+        }
+      },
+      "failures": [],
+      "parse_error": null,
+      "all_pass": true
+    },
+    "release_summary": {
+      "answers": {
+        "T1": "unusable",
+        "T2": "usable",
+        "T3": "usable",
+        "U1": "usable",
+        "U2": "unusable",
+        "U3": "unusable",
+        "U4": "usable",
+        "U5": "unusable",
+        "U6": "usable",
+        "U7": "unusable",
+        "U8": "unusable"
+      },
+      "counts": {
+        "observed": {
+          "correct": 3,
+          "total": 3
+        },
+        "unseen": {
+          "correct": 8,
+          "total": 8
+        }
+      },
+      "failures": [],
+      "parse_error": null,
+      "all_pass": true
+    },
+    "release_rules": {
+      "answers": {
+        "T1": "unusable",
+        "T2": "usable",
+        "T3": "usable",
+        "U1": "usable",
+        "U2": "unusable",
+        "U3": "unusable",
+        "U4": "usable",
+        "U5": "unusable",
+        "U6": "usable",
+        "U7": "unusable",
+        "U8": "unusable"
+      },
+      "counts": {
+        "observed": {
+          "correct": 3,
+          "total": 3
+        },
+        "unseen": {
+          "correct": 8,
+          "total": 8
+        }
+      },
+      "failures": [],
+      "parse_error": null,
+      "all_pass": true
+    },
+    "independent_full": {
+      "answers": {
+        "T1": "usable",
+        "T2": "unusable",
+        "T3": "usable",
+        "U1": "unknown",
+        "U2": "unknown",
+        "U3": "unknown",
+        "U4": "unknown"
+      },
+      "counts": {
+        "observed": {
+          "correct": 3,
+          "total": 3
+        },
+        "unseen": {
+          "correct": 4,
+          "total": 4
+        }
+      },
+      "failures": [],
+      "parse_error": null,
+      "all_pass": true
+    },
+    "independent_summary": {
+      "answers": {
+        "T1": "usable",
+        "T2": "unusable",
+        "T3": "usable",
+        "U1": "unknown",
+        "U2": "unknown",
+        "U3": "unknown",
+        "U4": "unknown"
+      },
+      "counts": {
+        "observed": {
+          "correct": 3,
+          "total": 3
+        },
+        "unseen": {
+          "correct": 4,
+          "total": 4
+        }
+      },
+      "failures": [],
+      "parse_error": null,
+      "all_pass": true
+    },
+    "independent_rules": {
+      "answers": {
+        "T1": "usable",
+        "T2": "unusable",
+        "T3": "usable",
+        "U1": "unknown",
+        "U2": "unknown",
+        "U3": "unknown",
+        "U4": "unknown"
+      },
+      "counts": {
+        "observed": {
+          "correct": 3,
+          "total": 3
+        },
+        "unseen": {
+          "correct": 4,
+          "total": 4
+        }
+      },
+      "failures": [],
+      "parse_error": null,
+      "all_pass": true
+    }
+  },
+  "pass_rule": {
+    "release_summary": false,
+    "release_rules": true,
+    "independent_summary": true,
+    "independent_rules": true
+  },
+  "full_results": {
+    "independent_full": {
+      "ok": true,
+      "text": "{\"T1\":\"usable\",\"T2\":\"unusable\",\"T3\":\"usable\",\"U1\":\"unknown\",\"U2\":\"unknown\",\"U3\":\"unknown\",\"U4\":\"unknown\"}",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 11.89425504207611,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 13548,
+        "output_tokens": 52
+      },
+      "native_tools": [],
+      "prompt_sha256": "cfabfc450628241b0eda745b7711cc59edd1b0ebd84d4343d3589597bc9bb3a5",
+      "call": "independent_full"
+    },
+    "independent_rules_read": {
+      "ok": true,
+      "text": "{\"T1\":\"usable\",\"T2\":\"unusable\",\"T3\":\"usable\",\"U1\":\"unknown\",\"U2\":\"unknown\",\"U3\":\"unknown\",\"U4\":\"unknown\"}",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 11.791241208091378,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 10622,
+        "output_tokens": 52
+      },
+      "native_tools": [],
+      "prompt_sha256": "e07cf77fb90a24c4c52a711b7c566e44e8445ec0e8728bb96c13fed81f99ad79",
+      "call": "independent_rules_read"
+    },
+    "independent_rules_write": {
+      "ok": true,
+      "text": "Memory packet:\n\nObserved results:\n- n17 + CSV + blue: usable.\n- n17 + JSON + blue: unusable.\n- m42 + CSV + blue: unusable.\n- m42 + JSON + green: usable.\n- p09 + XML + red: usable.\n- p09 + CSV + green: unusable.\n\nInferred rule: Treat each tool, format, and operator combination as a separate case. Use a recorded result only when all three values match. Exception: None is supported.\n\nLimits: The data does not show that operator color controls the result. Blue gives both results. Green gives both results. Red has only one trial. Tool and format effects are also not isolated. For an untested combination, report that the result is unknown.",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 13.77502379193902,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 10198,
+        "output_tokens": 244
+      },
+      "native_tools": [],
+      "prompt_sha256": "7d4aebbbcb3d46bfea8693b1aa656d5297d7f5966f5c09b628fda8d176c6aff8",
+      "call": "independent_rules_write"
+    },
+    "independent_summary_read": {
+      "ok": true,
+      "text": "{\"T1\":\"usable\",\"T2\":\"unusable\",\"T3\":\"usable\",\"U1\":\"unknown\",\"U2\":\"unknown\",\"U3\":\"unknown\",\"U4\":\"unknown\"}",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 9.36735275015235,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 10580,
+        "output_tokens": 52
+      },
+      "native_tools": [],
+      "prompt_sha256": "bfedaa10706aabbaf42f9813a126516218f7a345db16d0a2eb42b1d858540ef3",
+      "call": "independent_summary_read"
+    },
+    "independent_summary_write": {
+      "ok": true,
+      "text": "Six independent trials were directly observed. No other results exist.\n- n17, CSV, blue: usable.\n- n17, JSON, blue: unusable.\n- m42, CSV, blue: unusable.\n- m42, JSON, green: usable.\n- p09, XML, red: usable.\n- p09, CSV, green: unusable.\nThe assistant asked if operator color controls all results. The records do not support this conclusion. Further combinations were not tested. Do not predict untested combinations as facts.",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 10.875216417014599,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 13303,
+        "output_tokens": 154
+      },
+      "native_tools": [],
+      "prompt_sha256": "072d0cf5bd3406df11ba22f95f8b772c278aaa529ab2ac69cc2a1b22212bda61",
+      "call": "independent_summary_write"
+    },
+    "release_full": {
+      "ok": true,
+      "text": "{\"T1\":\"unusable\",\"T2\":\"usable\",\"T3\":\"usable\",\"U1\":\"usable\",\"U2\":\"unusable\",\"U3\":\"unusable\",\"U4\":\"usable\",\"U5\":\"unusable\",\"U6\":\"usable\",\"U7\":\"unusable\",\"U8\":\"unusable\"}",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 13.053486249875277,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 14325,
+        "output_tokens": 77
+      },
+      "native_tools": [],
+      "prompt_sha256": "5d7a0131b2a5fff41c3d73cc1e669686b69d5bec03268da271822830dc96ae47",
+      "call": "release_full"
+    },
+    "release_rules_read": {
+      "ok": true,
+      "text": "{\"T1\":\"unusable\",\"T2\":\"usable\",\"T3\":\"usable\",\"U1\":\"usable\",\"U2\":\"unusable\",\"U3\":\"unusable\",\"U4\":\"usable\",\"U5\":\"unusable\",\"U6\":\"usable\",\"U7\":\"unusable\",\"U8\":\"unusable\"}",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 10.99905199999921,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 10998,
+        "output_tokens": 111
+      },
+      "native_tools": [],
+      "prompt_sha256": "73565e674936c1855e0229c858b257a8191beb34f810c162b0a71c5079b4402e",
+      "call": "release_rules_read"
+    },
+    "release_rules_write": {
+      "ok": true,
+      "text": "Observations: A build is usable when its output exists and each current input has the same content token as the input recorded by that build. Atlas became unusable when style changed or map was absent. It became usable after the original bytes returned. Notes did not affect it. Beacon followed the same pattern for scene and lighting. README changes did not affect it. A rebuild recorded new input tokens. Comet stayed usable after mesh changed and returned to its recorded token.\n\nInferred rule: Usability depends on the current state, not edit history. The output must exist. All declared inputs must exist and match the recorded bytes. Non-input files do not affect usability. Exception limit: The records support only these packages and checks.",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 13.366028625052422,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 13711,
+        "output_tokens": 189
+      },
+      "native_tools": [],
+      "prompt_sha256": "bb978dad9073f8496be0fcf9849990d76c13479b72772330e099651902fde004",
+      "call": "release_rules_write"
+    },
+    "release_summary_read": {
+      "ok": true,
+      "text": "{\"T1\":\"unusable\",\"T2\":\"usable\",\"T3\":\"usable\",\"U1\":\"usable\",\"U2\":\"unusable\",\"U3\":\"unusable\",\"U4\":\"usable\",\"U5\":\"unusable\",\"U6\":\"usable\",\"U7\":\"unusable\",\"U8\":\"unusable\"}",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 9.772326125064865,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 11085,
+        "output_tokens": 77
+      },
+      "native_tools": [],
+      "prompt_sha256": "989a023f516ba088d6ba5c4e287d81079d203043ea6521979921c455c0d72b03",
+      "call": "release_summary_read"
+    },
+    "release_summary_write": {
+      "ok": true,
+      "text": "Release workflow facts:\n- Content tokens identify exact file bytes. Equal tokens mean equal bytes.\n- A package is usable only if its output exists and all current build inputs match the inputs recorded by the build.\n- A temporary input change does not permanently invalidate an output. Restoring the exact recorded bytes restores usability without a rebuild.\n- Changes to non-input files do not affect usability.\n\nAtlas: Built with map=m1 and style=s1. Notes are not an input. Style s2 made it unusable; restoring s1 made it usable. Notes n1→n2 had no effect. Removing map made it unusable. Map was restored to m1, but the atlas output was then removed. Current atlas is unusable because its output is absent.\n\nBeacon: Initially built with scene=c7, lighting=l2. Rebuilt with scene=c8, lighting=l2. Lighting l3 made it unusable. Restoring l2 made it usable. README changes have no effect. Current beacon is usable.\n\nComet: Built with mesh=q4. Mesh changed to q5 and then returned to q4 without a rebuild. Current comet is usable.",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 14.723558207973838,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 13697,
+        "output_tokens": 294
+      },
+      "native_tools": [],
+      "prompt_sha256": "66db752168f19f02f7348077c8c31c200e13d8a141c769bcad3cf9a089e43db5",
+      "call": "release_summary_write"
+    }
+  },
+  "interpretation": {
+    "all_receivers_correct": true,
+    "prediction_advantage_for_rule_prompt": false,
+    "release_summary_budget_failure_only": true,
+    "release_packet_reduction_vs_summary_percent": 37.5,
+    "independent_rule_packet_increase_vs_summary_percent": 44.44444444444444,
+    "ordinary_summary_also_inferred_shared_rule": true,
+    "estimated_size_label": "o200k_base packet-size estimate, not native call usage",
+    "native_usage_limit": "Input overhead differs across waves. Do not attribute the full native input difference to packet compression.",
+    "scope_limit": "This was one handoff. It did not test repeated compaction, learned latent memory, or fine-tuning.",
+    "source_grounding_limit": "The rule packet begins with a general statement under Observations. This screen did not separately grade statement-level source grounding."
+  }
+}

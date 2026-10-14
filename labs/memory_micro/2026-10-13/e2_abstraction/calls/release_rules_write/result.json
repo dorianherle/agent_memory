@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "text": "Observations: A build is usable when its output exists and each current input has the same content token as the input recorded by that build. Atlas became unusable when style changed or map was absent. It became usable after the original bytes returned. Notes did not affect it. Beacon followed the same pattern for scene and lighting. README changes did not affect it. A rebuild recorded new input tokens. Comet stayed usable after mesh changed and returned to its recorded token.\n\nInferred rule: Usability depends on the current state, not edit history. The output must exist. All declared inputs must exist and match the recorded bytes. Non-input files do not affect usability. Exception limit: The records support only these packages and checks.",
+  "errors": [],
+  "model": "gpt-5.6-sol",
+  "reasoning": "low",
+  "elapsed_seconds": 13.366028625052422,
+  "usage_complete": true,
+  "usage": {
+    "input_tokens": 13711,
+    "output_tokens": 189
+  },
+  "native_tools": [],
+  "prompt_sha256": "bb978dad9073f8496be0fcf9849990d76c13479b72772330e099651902fde004"
+}

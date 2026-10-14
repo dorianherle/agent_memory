@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy,json\nfrom work import evaluate\n\ndef check(name,request,evidence,policy,expected):\n before=copy.deepcopy((request,evidence,policy)); got=evaluate(request,evidence,policy); assert got==expected,(name,got,expected); assert (request,evidence,policy)==before,(name,'modified')\nbase={'claim':'c','conditions':{'k':'v'}}\np={'required_conditions':['k'],'require_verified':True}\ncheck('ineligible-superseder',base,[{'source':'old','claim':'c','value':1,'conditions':{'k':'v'},'verified':True},{'source':'new','claim':'c','value':2,'conditions':{'k':'v'},'verified':False,'supersedes':'old'}],p,{'status':'supported','value':1,'sources':['old'],'unknowns':[]})\ncheck('chain',base,[{'source':'a','claim':'c','value':1,'conditions':{'k':'v'},'verified':True},{'source':'b','claim':'c','value':2,'conditions':{'k':'v'},'verified':True,'supersedes':['a']},{'source':'c','claim':'c','value':3,'conditions':{'k':'v'},'verified':True,'supersedes':['b']}],p,{'status':'supported','value':3,'sources':['c'],'unknowns':[]})\ncheck('typed-value-conflict',base,[{'source':'a','claim':'c','value':True,'conditions':{'k':'v'},'verified':True},{'source':'b','claim':'c','value':1,'conditions':{'k':'v'},'verified':True}],p,{'status':'conflict','value':None,'sources':['a','b'],'unknowns':['source disagreement']})\ncheck('unverified-allowed',base,[{'source':'u','claim':'c','value':8,'conditions':{'k':'v'}}],{'required_conditions':['k'],'require_verified':False},{'status':'supported','value':8,'sources':['u'],'unknowns':[]})\npolicy=json.load(open('policy.json')); evidence=json.load(open('evidence.json')); requests=json.load(open('requests.json')); expected=json.load(open('report.json')); assert [evaluate(x,evidence,policy) for x in requests]==expected\nprint(json.dumps({'checks':5,'ok':True}))"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "diff",
+              "--",
+              "work.py",
+              "report.json"
+            ]
+          }
+        },
+        {
+          "action": "read",
+          "arguments": {
+            "path": "SOURCES.md"
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 38920,
+    "output_tokens": 1383,
+    "cached_input_tokens": 26624,
+    "reasoning_output_tokens": 755
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 41.472370916977525,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

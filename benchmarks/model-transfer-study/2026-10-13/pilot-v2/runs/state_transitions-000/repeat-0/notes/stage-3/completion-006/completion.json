@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy,json\nfrom work import evaluate\nwith open('policy.json') as f: p=json.load(f)\nwith open('requests.json') as f: rs=json.load(f)\nwith open('report.json') as f: report=json.load(f)\nassert report == [evaluate(r,p) for r in rs]\ncases=[\n ({'from':'x','to':'y'},p,{'ok':False,'value':None,'reason':'blocked'}),\n ({'from':'ready','to':'running','role':'wrong','retry':True,'attempts':0},p,{'ok':False,'value':None,'reason':'permission'}),\n ({'from':'failed','to':'ready','retry':True,'attempts':True},p,{'ok':False,'value':None,'reason':'retry_limit'}),\n ({'from':'failed','to':'ready','retry':True,'attempts':0},p,{'ok':True,'value':'ready','reason':'ok'}),\n ({'from':'failed','to':'ready','retry':True,'attempts':2},p,{'ok':False,'value':None,'reason':'retry_limit'})\n]\nfor r,pol,want in cases:\n rb,pb=copy.deepcopy(r),copy.deepcopy(pol)\n assert evaluate(r,pol)==want\n assert r==rb and pol==pb\nprint('all checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 19239,
+    "output_tokens": 839,
+    "cached_input_tokens": 15744,
+    "reasoning_output_tokens": 158
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 17.37716933293268,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

@@ -1,0 +1,2072 @@
+{
+  "conclusion": "inconclusive",
+  "phase": "pilot",
+  "reasons": [
+    "Incomplete or unexpected task/method matrix",
+    "Native token counts are missing",
+    "A model-method trajectory did not transfer a tested model at every handoff"
+  ],
+  "trajectories": 8,
+  "preflight": {
+    "model": "gpt-5.6-sol",
+    "model_access": true,
+    "metering": true,
+    "isolation": true,
+    "errors": [],
+    "image_id": "sha256:d608e0d2204df97e85e1829fbf01de3fa091fa68e0df94f93865dc90ac547039",
+    "ready": true
+  },
+  "execution_comparison": [],
+  "execution_analysis": {
+    "paired_tasks": 0,
+    "token_ratio": null,
+    "ratio_interval": null,
+    "undefined_bootstrap_samples": 0,
+    "additional_failure_tasks": 0,
+    "additional_failure_upper": null,
+    "limits": [
+      "Receiver tokens only; sender costs stay in the main comparison",
+      "Same initial evidence and model; executable receivers can also revise models",
+      "Unavailable donors and incomplete pairs are reported, not replaced"
+    ]
+  },
+  "resource_details": {
+    "notebook": {
+      "elapsed_seconds": 975.3902923734859,
+      "repeated_identical_file_reads": 2,
+      "unsupported_conclusions": 0,
+      "missed_source_changes": 0
+    },
+    "notes": {
+      "elapsed_seconds": 833.9319345848635,
+      "repeated_identical_file_reads": 0,
+      "unsupported_conclusions": 0,
+      "missed_source_changes": 0
+    },
+    "models": {
+      "elapsed_seconds": 1297.3106411658227,
+      "repeated_identical_file_reads": 0,
+      "unsupported_conclusions": 0,
+      "missed_source_changes": 0
+    }
+  },
+  "break_even": [],
+  "model_details": [
+    {
+      "task": "source_dependencies-000",
+      "repeat": 0,
+      "stage": 1,
+      "checks": {
+        "id": "d207f1b3f1df5a833af588008184db6e0359145d",
+        "status": "tested",
+        "issues": [],
+        "cases": [
+          {
+            "id": "recorded_unchanged",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": false,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            "expected": false,
+            "challenge": false
+          },
+          {
+            "id": "state_change_challenge",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            "expected": true,
+            "challenge": true
+          }
+        ],
+        "uncovered_rules": [],
+        "missing_evidence": [],
+        "changed_dependencies": [],
+        "alternatives": [],
+        "complexity": {
+          "cases": 2,
+          "complete_bytes": 1332,
+          "rules": 1,
+          "working_bytes": 355
+        },
+        "unresolved": [
+          "This initial executable approximation compares whole mappings; work.py performs exact declared-path filtering."
+        ]
+      },
+      "model": {
+        "id": "d207f1b3f1df5a833af588008184db6e0359145d",
+        "event": "accepted",
+        "checks": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": false,
+              "expected": false,
+              "id": "recorded_unchanged",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "review_on_mapping_difference"
+                ],
+                "status": "predicted",
+                "value": false
+              }
+            },
+            {
+              "challenge": true,
+              "expected": true,
+              "id": "state_change_challenge",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "review_on_mapping_difference"
+                ],
+                "status": "predicted",
+                "value": true
+              }
+            }
+          ],
+          "changed_dependencies": [],
+          "complexity": {
+            "cases": 2,
+            "complete_bytes": 1332,
+            "rules": 1,
+            "working_bytes": 355
+          },
+          "id": "2667757ac5e7b73f7a324ba89709d3c14a5cd3cd",
+          "issues": [],
+          "missing_evidence": [],
+          "status": "tested",
+          "uncovered_rules": [],
+          "unresolved": [
+            "This initial executable approximation compares whole mappings; work.py performs exact declared-path filtering."
+          ]
+        },
+        "complexity": {
+          "cases": 2,
+          "complete_bytes": 1332,
+          "rules": 1,
+          "working_bytes": 355
+        },
+        "fingerprints": {
+          "TASK.md": {
+            "sha256": "2279d6e04bd2a865d662ddfb66489ba2d5c18b65fffb3d73935cd302e02cc1e2",
+            "state": "file"
+          },
+          "policy.json": {
+            "sha256": "fa58ad697dc2195b0854c0577164e3400ecca9300dc6bf7c25ff4f4000c196ac",
+            "state": "file"
+          },
+          "report.json": {
+            "sha256": "cd5f4dd3e24be317071ce439fb1e9fe1c053fa6c004e27d0ba40447f7ee69638",
+            "state": "file"
+          },
+          "requests.json": {
+            "sha256": "513fbfebac58790db0e365623dce3567b4d751c8cc9fff11309356c765e37231",
+            "state": "file"
+          },
+          "work.py": {
+            "sha256": "3db779fe02a25665e85d9fdbb6386168691eb3c61251b35307ece90a30beed20",
+            "state": "file"
+          }
+        },
+        "model": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": false,
+              "evidence": [
+                "426e31ec2d38919adfeb95e8acc8842895e797be"
+              ],
+              "expected": false,
+              "id": "recorded_unchanged",
+              "inputs": {
+                "policy": {
+                  "ignored": [],
+                  "variant": 0
+                },
+                "request": {
+                  "current": {
+                    "worker_0.py": {
+                      "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                      "kind": "file"
+                    }
+                  },
+                  "declared": [
+                    "worker_0.py"
+                  ],
+                  "saved": {
+                    "worker_0.py": {
+                      "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                      "kind": "file"
+                    }
+                  }
+                }
+              },
+              "target": "needs_review"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "426e31ec2d38919adfeb95e8acc8842895e797be"
+              ],
+              "expected": true,
+              "id": "state_change_challenge",
+              "inputs": {
+                "policy": {
+                  "ignored": []
+                },
+                "request": {
+                  "current": {
+                    "meta": {
+                      "kind": "file",
+                      "timestamp": 2
+                    }
+                  },
+                  "declared": [
+                    "meta"
+                  ],
+                  "saved": {
+                    "meta": {
+                      "kind": "file",
+                      "timestamp": 1
+                    }
+                  }
+                }
+              },
+              "target": "needs_review"
+            }
+          ],
+          "inputs": {
+            "policy": "object",
+            "request": "object"
+          },
+          "resolutions": [],
+          "rules": [
+            {
+              "claim": "needs_review",
+              "dependencies": [
+                "work.py",
+                "TASK.md"
+              ],
+              "evidence": [
+                "426e31ec2d38919adfeb95e8acc8842895e797be"
+              ],
+              "id": "review_on_mapping_difference",
+              "target": "needs_review",
+              "then": {
+                "args": [
+                  {
+                    "var": "request.saved"
+                  },
+                  {
+                    "var": "request.current"
+                  }
+                ],
+                "op": "ne"
+              },
+              "when": {
+                "value": true
+              }
+            }
+          ],
+          "schema": 1,
+          "title": "Declared source dependency review",
+          "unresolved": [
+            "This initial executable approximation compares whole mappings; work.py performs exact declared-path filtering."
+          ]
+        },
+        "parent": null,
+        "proposal": "2667757ac5e7b73f7a324ba89709d3c14a5cd3cd",
+        "reason": "Agent proposed a model revision",
+        "revision": 1
+      },
+      "unseen_probes": {
+        "target": "needs_review",
+        "predictions": {
+          "ok": true,
+          "result": [
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            },
+            {
+              "model_id": "d207f1b3f1df5a833af588008184db6e0359145d",
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_mapping_difference"
+              ]
+            }
+          ]
+        },
+        "expected": [
+          false,
+          true,
+          true,
+          true,
+          false,
+          false,
+          true,
+          true,
+          true,
+          false,
+          false,
+          true,
+          true,
+          true,
+          false,
+          false,
+          true,
+          true,
+          true,
+          false,
+          false,
+          true,
+          true,
+          true,
+          false,
+          true,
+          false
+        ]
+      }
+    },
+    {
+      "task": "configuration_changes-000",
+      "repeat": 0,
+      "stage": 1,
+      "checks": {
+        "id": "816ff8e0bbe7ba2bc8b77db78eaf82afd57653ee",
+        "status": "tested",
+        "issues": [],
+        "cases": [
+          {
+            "id": "current_request",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "verified",
+              "rules": [
+                "verified_implementation"
+              ]
+            },
+            "expected": "verified",
+            "challenge": false
+          },
+          {
+            "id": "bool_not_integer",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "verified",
+              "rules": [
+                "verified_implementation"
+              ]
+            },
+            "expected": "verified",
+            "challenge": true
+          }
+        ],
+        "uncovered_rules": [],
+        "missing_evidence": [],
+        "changed_dependencies": [],
+        "alternatives": [],
+        "complexity": {
+          "cases": 2,
+          "complete_bytes": 1519,
+          "rules": 1,
+          "working_bytes": 420
+        },
+        "unresolved": [
+          "Behavior is unspecified for malformed non-object layers or environment containers, missing type declarations, and defaults keys absent from policy.types."
+        ]
+      },
+      "model": {
+        "id": "816ff8e0bbe7ba2bc8b77db78eaf82afd57653ee",
+        "event": "accepted",
+        "checks": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": false,
+              "expected": "verified",
+              "id": "current_request",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "verified_implementation"
+                ],
+                "status": "predicted",
+                "value": "verified"
+              }
+            },
+            {
+              "challenge": true,
+              "expected": "verified",
+              "id": "bool_not_integer",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "verified_implementation"
+                ],
+                "status": "predicted",
+                "value": "verified"
+              }
+            }
+          ],
+          "changed_dependencies": [],
+          "complexity": {
+            "cases": 2,
+            "complete_bytes": 1519,
+            "rules": 1,
+            "working_bytes": 420
+          },
+          "id": "77d62507fbf700639a3bafbd806f4123cd509071",
+          "issues": [],
+          "missing_evidence": [],
+          "status": "tested",
+          "uncovered_rules": [],
+          "unresolved": [
+            "Behavior is unspecified for malformed non-object layers or environment containers, missing type declarations, and defaults keys absent from policy.types."
+          ]
+        },
+        "complexity": {
+          "cases": 2,
+          "complete_bytes": 1519,
+          "rules": 1,
+          "working_bytes": 420
+        },
+        "fingerprints": {
+          "TASK.md": {
+            "sha256": "683bdbed511a1c4398e529c43b03f117549d56d3209b6f8ec40365b47512e583",
+            "state": "file"
+          },
+          "policy.json": {
+            "sha256": "ec43a92756cf705aa639602e6237d345d008a1a64a46a0cce352d03537d76f02",
+            "state": "file"
+          },
+          "report.json": {
+            "sha256": "152c6bd64bedc75697923aa3315c66c40896383828a8974cbef180250099d2ca",
+            "state": "file"
+          },
+          "requests.json": {
+            "sha256": "b3ba3932ee147117c553c34299ed39fccac39a61a86004b43b70f39bdc3a8e67",
+            "state": "file"
+          },
+          "work.py": {
+            "sha256": "fb32ed4eaea940f3187e0bc401d87290cf052e56f08c0838aecf1cb57ff8c576",
+            "state": "file"
+          }
+        },
+        "model": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": false,
+              "evidence": [
+                "c1c59c445f0987197c021ddcc94c59b7143089a8"
+              ],
+              "expected": "verified",
+              "id": "current_request",
+              "inputs": {
+                "evidence": [],
+                "policy": {
+                  "defaults": {
+                    "enabled": true,
+                    "label": "job_0",
+                    "retries": 3
+                  },
+                  "environment": false,
+                  "null_resets": false,
+                  "types": {
+                    "enabled": "boolean",
+                    "label": "string",
+                    "retries": "integer"
+                  },
+                  "variant": 0
+                },
+                "request": {
+                  "layers": [
+                    {
+                      "enabled": false
+                    },
+                    {
+                      "retries": 0
+                    }
+                  ]
+                }
+              },
+              "target": "status"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "c1c59c445f0987197c021ddcc94c59b7143089a8"
+              ],
+              "expected": "verified",
+              "id": "bool_not_integer",
+              "inputs": {
+                "evidence": [
+                  {
+                    "kind": "type_check",
+                    "observed": "boolean_is_not_integer"
+                  }
+                ],
+                "policy": {
+                  "defaults": {
+                    "enabled": true,
+                    "label": "job_0",
+                    "retries": 3
+                  },
+                  "environment": false,
+                  "null_resets": false,
+                  "types": {
+                    "enabled": "boolean",
+                    "label": "string",
+                    "retries": "integer"
+                  }
+                },
+                "request": {
+                  "layers": [
+                    {
+                      "retries": true
+                    }
+                  ]
+                }
+              },
+              "target": "status"
+            }
+          ],
+          "inputs": {
+            "evidence": "array",
+            "policy": "object",
+            "request": "object"
+          },
+          "resolutions": [],
+          "rules": [
+            {
+              "claim": "Local checks verify the implemented evaluator against the Stage 1 contract.",
+              "dependencies": [
+                "TASK.md",
+                "work.py",
+                "policy.json",
+                "requests.json",
+                "report.json"
+              ],
+              "evidence": [
+                "c1c59c445f0987197c021ddcc94c59b7143089a8"
+              ],
+              "id": "verified_implementation",
+              "target": "status",
+              "then": {
+                "value": "verified"
+              },
+              "when": {
+                "value": true
+              }
+            }
+          ],
+          "schema": 1,
+          "title": "Stage 1 configuration evaluator handoff",
+          "unresolved": [
+            "Behavior is unspecified for malformed non-object layers or environment containers, missing type declarations, and defaults keys absent from policy.types."
+          ]
+        },
+        "parent": null,
+        "proposal": "77d62507fbf700639a3bafbd806f4123cd509071",
+        "reason": "Agent proposed a model revision",
+        "revision": 1
+      },
+      "unseen_probes": {
+        "status": "unprobed",
+        "reason": "Model uses other inputs or targets; no feature extractor was validated"
+      }
+    },
+    {
+      "task": "configuration_changes-000",
+      "repeat": 0,
+      "stage": 2,
+      "checks": {
+        "id": "816ff8e0bbe7ba2bc8b77db78eaf82afd57653ee",
+        "status": "blocked",
+        "issues": [
+          "Evidence or dependency versions changed"
+        ],
+        "cases": [
+          {
+            "id": "current_request",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "verified",
+              "rules": [
+                "verified_implementation"
+              ]
+            },
+            "expected": "verified",
+            "challenge": false
+          },
+          {
+            "id": "bool_not_integer",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "verified",
+              "rules": [
+                "verified_implementation"
+              ]
+            },
+            "expected": "verified",
+            "challenge": true
+          }
+        ],
+        "uncovered_rules": [],
+        "missing_evidence": [],
+        "changed_dependencies": [
+          "TASK.md",
+          "policy.json"
+        ],
+        "alternatives": [],
+        "complexity": {
+          "cases": 2,
+          "complete_bytes": 1519,
+          "rules": 1,
+          "working_bytes": 420
+        },
+        "unresolved": [
+          "Behavior is unspecified for malformed non-object layers or environment containers, missing type declarations, and defaults keys absent from policy.types."
+        ]
+      },
+      "model": {
+        "id": "816ff8e0bbe7ba2bc8b77db78eaf82afd57653ee",
+        "event": "accepted",
+        "checks": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": false,
+              "expected": "verified",
+              "id": "current_request",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "verified_implementation"
+                ],
+                "status": "predicted",
+                "value": "verified"
+              }
+            },
+            {
+              "challenge": true,
+              "expected": "verified",
+              "id": "bool_not_integer",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "verified_implementation"
+                ],
+                "status": "predicted",
+                "value": "verified"
+              }
+            }
+          ],
+          "changed_dependencies": [],
+          "complexity": {
+            "cases": 2,
+            "complete_bytes": 1519,
+            "rules": 1,
+            "working_bytes": 420
+          },
+          "id": "77d62507fbf700639a3bafbd806f4123cd509071",
+          "issues": [],
+          "missing_evidence": [],
+          "status": "tested",
+          "uncovered_rules": [],
+          "unresolved": [
+            "Behavior is unspecified for malformed non-object layers or environment containers, missing type declarations, and defaults keys absent from policy.types."
+          ]
+        },
+        "complexity": {
+          "cases": 2,
+          "complete_bytes": 1519,
+          "rules": 1,
+          "working_bytes": 420
+        },
+        "fingerprints": {
+          "TASK.md": {
+            "sha256": "683bdbed511a1c4398e529c43b03f117549d56d3209b6f8ec40365b47512e583",
+            "state": "file"
+          },
+          "policy.json": {
+            "sha256": "ec43a92756cf705aa639602e6237d345d008a1a64a46a0cce352d03537d76f02",
+            "state": "file"
+          },
+          "report.json": {
+            "sha256": "152c6bd64bedc75697923aa3315c66c40896383828a8974cbef180250099d2ca",
+            "state": "file"
+          },
+          "requests.json": {
+            "sha256": "b3ba3932ee147117c553c34299ed39fccac39a61a86004b43b70f39bdc3a8e67",
+            "state": "file"
+          },
+          "work.py": {
+            "sha256": "fb32ed4eaea940f3187e0bc401d87290cf052e56f08c0838aecf1cb57ff8c576",
+            "state": "file"
+          }
+        },
+        "model": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": false,
+              "evidence": [
+                "c1c59c445f0987197c021ddcc94c59b7143089a8"
+              ],
+              "expected": "verified",
+              "id": "current_request",
+              "inputs": {
+                "evidence": [],
+                "policy": {
+                  "defaults": {
+                    "enabled": true,
+                    "label": "job_0",
+                    "retries": 3
+                  },
+                  "environment": false,
+                  "null_resets": false,
+                  "types": {
+                    "enabled": "boolean",
+                    "label": "string",
+                    "retries": "integer"
+                  },
+                  "variant": 0
+                },
+                "request": {
+                  "layers": [
+                    {
+                      "enabled": false
+                    },
+                    {
+                      "retries": 0
+                    }
+                  ]
+                }
+              },
+              "target": "status"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "c1c59c445f0987197c021ddcc94c59b7143089a8"
+              ],
+              "expected": "verified",
+              "id": "bool_not_integer",
+              "inputs": {
+                "evidence": [
+                  {
+                    "kind": "type_check",
+                    "observed": "boolean_is_not_integer"
+                  }
+                ],
+                "policy": {
+                  "defaults": {
+                    "enabled": true,
+                    "label": "job_0",
+                    "retries": 3
+                  },
+                  "environment": false,
+                  "null_resets": false,
+                  "types": {
+                    "enabled": "boolean",
+                    "label": "string",
+                    "retries": "integer"
+                  }
+                },
+                "request": {
+                  "layers": [
+                    {
+                      "retries": true
+                    }
+                  ]
+                }
+              },
+              "target": "status"
+            }
+          ],
+          "inputs": {
+            "evidence": "array",
+            "policy": "object",
+            "request": "object"
+          },
+          "resolutions": [],
+          "rules": [
+            {
+              "claim": "Local checks verify the implemented evaluator against the Stage 1 contract.",
+              "dependencies": [
+                "TASK.md",
+                "work.py",
+                "policy.json",
+                "requests.json",
+                "report.json"
+              ],
+              "evidence": [
+                "c1c59c445f0987197c021ddcc94c59b7143089a8"
+              ],
+              "id": "verified_implementation",
+              "target": "status",
+              "then": {
+                "value": "verified"
+              },
+              "when": {
+                "value": true
+              }
+            }
+          ],
+          "schema": 1,
+          "title": "Stage 1 configuration evaluator handoff",
+          "unresolved": [
+            "Behavior is unspecified for malformed non-object layers or environment containers, missing type declarations, and defaults keys absent from policy.types."
+          ]
+        },
+        "parent": null,
+        "proposal": "77d62507fbf700639a3bafbd806f4123cd509071",
+        "reason": "Agent proposed a model revision",
+        "revision": 1
+      },
+      "unseen_probes": null
+    },
+    {
+      "task": "state_transitions-000",
+      "repeat": 0,
+      "stage": 1,
+      "checks": {
+        "id": "7265cec319b4bbf9d7193f5b68e2d152261364eb",
+        "status": "tested",
+        "issues": [],
+        "cases": [
+          {
+            "id": "observed_allowed",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "ok",
+              "rules": [
+                "allowed_transition"
+              ]
+            },
+            "expected": "ok",
+            "challenge": false
+          },
+          {
+            "id": "challenge_permission_precedence",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "permission",
+              "rules": [
+                "role_denied"
+              ]
+            },
+            "expected": "permission",
+            "challenge": true
+          },
+          {
+            "id": "challenge_bool_attempts",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "retry_limit",
+              "rules": [
+                "invalid_retry"
+              ]
+            },
+            "expected": "retry_limit",
+            "challenge": true
+          },
+          {
+            "id": "challenge_missing_edge",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "blocked",
+              "rules": [
+                "missing_edge"
+              ]
+            },
+            "expected": "blocked",
+            "challenge": true
+          }
+        ],
+        "uncovered_rules": [],
+        "missing_evidence": [],
+        "changed_dependencies": [],
+        "alternatives": [],
+        "complexity": {
+          "cases": 4,
+          "complete_bytes": 3613,
+          "rules": 4,
+          "working_bytes": 2065
+        },
+        "unresolved": [
+          "No evidence.json file was present; evidence-dependent behavior is unobserved."
+        ]
+      },
+      "model": {
+        "id": "7265cec319b4bbf9d7193f5b68e2d152261364eb",
+        "event": "accepted",
+        "checks": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": false,
+              "expected": "ok",
+              "id": "observed_allowed",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "allowed_transition"
+                ],
+                "status": "predicted",
+                "value": "ok"
+              }
+            },
+            {
+              "challenge": true,
+              "expected": "permission",
+              "id": "challenge_permission_precedence",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "role_denied"
+                ],
+                "status": "predicted",
+                "value": "permission"
+              }
+            },
+            {
+              "challenge": true,
+              "expected": "retry_limit",
+              "id": "challenge_bool_attempts",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "invalid_retry"
+                ],
+                "status": "predicted",
+                "value": "retry_limit"
+              }
+            },
+            {
+              "challenge": true,
+              "expected": "blocked",
+              "id": "challenge_missing_edge",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "missing_edge"
+                ],
+                "status": "predicted",
+                "value": "blocked"
+              }
+            }
+          ],
+          "changed_dependencies": [],
+          "complexity": {
+            "cases": 4,
+            "complete_bytes": 3613,
+            "rules": 4,
+            "working_bytes": 2065
+          },
+          "id": "e061844ff8dfbd12fb65dfc3fbd593c1d5b6e040",
+          "issues": [],
+          "missing_evidence": [],
+          "status": "tested",
+          "uncovered_rules": [],
+          "unresolved": [
+            "No evidence.json file was present; evidence-dependent behavior is unobserved."
+          ]
+        },
+        "complexity": {
+          "cases": 4,
+          "complete_bytes": 3613,
+          "rules": 4,
+          "working_bytes": 2065
+        },
+        "fingerprints": {
+          "TASK.md": {
+            "sha256": "d104f1932efd039bd291a2cb977026762c8e9dd0f2d37f0c6243ec1a6a832e89",
+            "state": "file"
+          },
+          "policy.json": {
+            "sha256": "afb4bb721f21a3e6eb9ce1fedd28cb685016662b49d7918d95e38dd8d82cb922",
+            "state": "file"
+          },
+          "work.py": {
+            "sha256": "cf2ab385f5a030f4616d212d2a8f2187e2d8eb740d484a82644aa4f9df789fa5",
+            "state": "file"
+          }
+        },
+        "model": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": false,
+              "evidence": [
+                "89a660e2daab8226eea7f5d10c639ca3d4b97e48"
+              ],
+              "expected": "ok",
+              "id": "observed_allowed",
+              "inputs": {
+                "attempts_valid": false,
+                "edge_exists": true,
+                "evidence": [],
+                "policy": {
+                  "retry_limit": 2
+                },
+                "request": {
+                  "from": "draft",
+                  "to": "ready"
+                },
+                "retry_requested": false,
+                "role_allowed": true
+              },
+              "target": "status"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "89a660e2daab8226eea7f5d10c639ca3d4b97e48"
+              ],
+              "expected": "permission",
+              "id": "challenge_permission_precedence",
+              "inputs": {
+                "attempts_valid": true,
+                "edge_exists": true,
+                "evidence": [],
+                "policy": {
+                  "retry_limit": 2
+                },
+                "request": {
+                  "attempts": 0,
+                  "from": "ready",
+                  "retry": true,
+                  "role": "wrong",
+                  "to": "running"
+                },
+                "retry_requested": true,
+                "role_allowed": false
+              },
+              "target": "status"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "89a660e2daab8226eea7f5d10c639ca3d4b97e48"
+              ],
+              "expected": "retry_limit",
+              "id": "challenge_bool_attempts",
+              "inputs": {
+                "attempts_valid": false,
+                "edge_exists": true,
+                "evidence": [],
+                "policy": {
+                  "retry_limit": 2
+                },
+                "request": {
+                  "attempts": true,
+                  "from": "running",
+                  "retry": true,
+                  "to": "done"
+                },
+                "retry_requested": true,
+                "role_allowed": true
+              },
+              "target": "status"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "89a660e2daab8226eea7f5d10c639ca3d4b97e48"
+              ],
+              "expected": "blocked",
+              "id": "challenge_missing_edge",
+              "inputs": {
+                "attempts_valid": false,
+                "edge_exists": false,
+                "evidence": [],
+                "policy": {
+                  "retry_limit": 2
+                },
+                "request": {
+                  "from": "x",
+                  "to": "y"
+                },
+                "retry_requested": false,
+                "role_allowed": true
+              },
+              "target": "status"
+            }
+          ],
+          "inputs": {
+            "attempts_valid": "boolean",
+            "edge_exists": "boolean",
+            "evidence": "array",
+            "policy": "object",
+            "request": "object",
+            "retry_requested": "boolean",
+            "role_allowed": "boolean"
+          },
+          "resolutions": [],
+          "rules": [
+            {
+              "claim": "A requested transition missing from policy.edges is blocked.",
+              "dependencies": [
+                "TASK.md",
+                "policy.json",
+                "work.py"
+              ],
+              "evidence": [
+                "89a660e2daab8226eea7f5d10c639ca3d4b97e48"
+              ],
+              "id": "missing_edge",
+              "target": "status",
+              "then": {
+                "value": "blocked"
+              },
+              "when": {
+                "args": [
+                  {
+                    "var": "edge_exists"
+                  },
+                  {
+                    "value": false
+                  }
+                ],
+                "op": "eq"
+              }
+            },
+            {
+              "claim": "An existing edge whose role requirement is not met is denied before retry validation.",
+              "dependencies": [
+                "TASK.md",
+                "policy.json",
+                "work.py"
+              ],
+              "evidence": [
+                "89a660e2daab8226eea7f5d10c639ca3d4b97e48"
+              ],
+              "id": "role_denied",
+              "target": "status",
+              "then": {
+                "value": "permission"
+              },
+              "when": {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "var": "edge_exists"
+                      },
+                      {
+                        "value": true
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "var": "role_allowed"
+                      },
+                      {
+                        "value": false
+                      }
+                    ],
+                    "op": "eq"
+                  }
+                ],
+                "op": "and"
+              }
+            },
+            {
+              "claim": "A permitted existing edge requested as a retry fails when attempts is not a non-boolean integer in [0, retry_limit).",
+              "dependencies": [
+                "TASK.md",
+                "policy.json",
+                "work.py"
+              ],
+              "evidence": [
+                "89a660e2daab8226eea7f5d10c639ca3d4b97e48"
+              ],
+              "id": "invalid_retry",
+              "target": "status",
+              "then": {
+                "value": "retry_limit"
+              },
+              "when": {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "var": "edge_exists"
+                      },
+                      {
+                        "value": true
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "var": "role_allowed"
+                      },
+                      {
+                        "value": true
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "var": "retry_requested"
+                      },
+                      {
+                        "value": true
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "var": "attempts_valid"
+                      },
+                      {
+                        "value": false
+                      }
+                    ],
+                    "op": "eq"
+                  }
+                ],
+                "op": "and"
+              }
+            },
+            {
+              "claim": "An existing permitted edge succeeds unless a requested retry has invalid attempts.",
+              "dependencies": [
+                "TASK.md",
+                "policy.json",
+                "work.py"
+              ],
+              "evidence": [
+                "89a660e2daab8226eea7f5d10c639ca3d4b97e48"
+              ],
+              "id": "allowed_transition",
+              "target": "status",
+              "then": {
+                "value": "ok"
+              },
+              "when": {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "var": "edge_exists"
+                      },
+                      {
+                        "value": true
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "var": "role_allowed"
+                      },
+                      {
+                        "value": true
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "var": "retry_requested"
+                          },
+                          {
+                            "value": false
+                          }
+                        ],
+                        "op": "eq"
+                      },
+                      {
+                        "args": [
+                          {
+                            "var": "attempts_valid"
+                          },
+                          {
+                            "value": true
+                          }
+                        ],
+                        "op": "eq"
+                      }
+                    ],
+                    "op": "or"
+                  }
+                ],
+                "op": "and"
+              }
+            }
+          ],
+          "schema": 1,
+          "title": "Policy-controlled state transition evaluation",
+          "unresolved": [
+            "No evidence.json file was present; evidence-dependent behavior is unobserved."
+          ]
+        },
+        "parent": null,
+        "proposal": "e061844ff8dfbd12fb65dfc3fbd593c1d5b6e040",
+        "reason": "Agent proposed a model revision",
+        "revision": 1
+      },
+      "unseen_probes": {
+        "status": "unprobed",
+        "reason": "Model uses other inputs or targets; no feature extractor was validated"
+      }
+    },
+    {
+      "task": "state_transitions-000",
+      "repeat": 0,
+      "stage": 2,
+      "checks": {
+        "id": "7265cec319b4bbf9d7193f5b68e2d152261364eb",
+        "status": "blocked",
+        "issues": [
+          "Evidence or dependency versions changed"
+        ],
+        "cases": [
+          {
+            "id": "observed_allowed",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "ok",
+              "rules": [
+                "allowed_transition"
+              ]
+            },
+            "expected": "ok",
+            "challenge": false
+          },
+          {
+            "id": "challenge_permission_precedence",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "permission",
+              "rules": [
+                "role_denied"
+              ]
+            },
+            "expected": "permission",
+            "challenge": true
+          },
+          {
+            "id": "challenge_bool_attempts",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "retry_limit",
+              "rules": [
+                "invalid_retry"
+              ]
+            },
+            "expected": "retry_limit",
+            "challenge": true
+          },
+          {
+            "id": "challenge_missing_edge",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "blocked",
+              "rules": [
+                "missing_edge"
+              ]
+            },
+            "expected": "blocked",
+            "challenge": true
+          }
+        ],
+        "uncovered_rules": [],
+        "missing_evidence": [],
+        "changed_dependencies": [
+          "TASK.md",
+          "policy.json"
+        ],
+        "alternatives": [],
+        "complexity": {
+          "cases": 4,
+          "complete_bytes": 3613,
+          "rules": 4,
+          "working_bytes": 2065
+        },
+        "unresolved": [
+          "No evidence.json file was present; evidence-dependent behavior is unobserved."
+        ]
+      },
+      "model": {
+        "id": "7265cec319b4bbf9d7193f5b68e2d152261364eb",
+        "event": "accepted",
+        "checks": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": false,
+              "expected": "ok",
+              "id": "observed_allowed",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "allowed_transition"
+                ],
+                "status": "predicted",
+                "value": "ok"
+              }
+            },
+            {
+              "challenge": true,
+              "expected": "permission",
+              "id": "challenge_permission_precedence",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "role_denied"
+                ],
+                "status": "predicted",
+                "value": "permission"
+              }
+            },
+            {
+              "challenge": true,
+              "expected": "retry_limit",
+              "id": "challenge_bool_attempts",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "invalid_retry"
+                ],
+                "status": "predicted",
+                "value": "retry_limit"
+              }
+            },
+            {
+              "challenge": true,
+              "expected": "blocked",
+              "id": "challenge_missing_edge",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "missing_edge"
+                ],
+                "status": "predicted",
+                "value": "blocked"
+              }
+            }
+          ],
+          "changed_dependencies": [],
+          "complexity": {
+            "cases": 4,
+            "complete_bytes": 3613,
+            "rules": 4,
+            "working_bytes": 2065
+          },
+          "id": "e061844ff8dfbd12fb65dfc3fbd593c1d5b6e040",
+          "issues": [],
+          "missing_evidence": [],
+          "status": "tested",
+          "uncovered_rules": [],
+          "unresolved": [
+            "No evidence.json file was present; evidence-dependent behavior is unobserved."
+          ]
+        },
+        "complexity": {
+          "cases": 4,
+          "complete_bytes": 3613,
+          "rules": 4,
+          "working_bytes": 2065
+        },
+        "fingerprints": {
+          "TASK.md": {
+            "sha256": "d104f1932efd039bd291a2cb977026762c8e9dd0f2d37f0c6243ec1a6a832e89",
+            "state": "file"
+          },
+          "policy.json": {
+            "sha256": "afb4bb721f21a3e6eb9ce1fedd28cb685016662b49d7918d95e38dd8d82cb922",
+            "state": "file"
+          },
+          "work.py": {
+            "sha256": "cf2ab385f5a030f4616d212d2a8f2187e2d8eb740d484a82644aa4f9df789fa5",
+            "state": "file"
+          }
+        },
+        "model": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": false,
+              "evidence": [
+                "89a660e2daab8226eea7f5d10c639ca3d4b97e48"
+              ],
+              "expected": "ok",
+              "id": "observed_allowed",
+              "inputs": {
+                "attempts_valid": false,
+                "edge_exists": true,
+                "evidence": [],
+                "policy": {
+                  "retry_limit": 2
+                },
+                "request": {
+                  "from": "draft",
+                  "to": "ready"
+                },
+                "retry_requested": false,
+                "role_allowed": true
+              },
+              "target": "status"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "89a660e2daab8226eea7f5d10c639ca3d4b97e48"
+              ],
+              "expected": "permission",
+              "id": "challenge_permission_precedence",
+              "inputs": {
+                "attempts_valid": true,
+                "edge_exists": true,
+                "evidence": [],
+                "policy": {
+                  "retry_limit": 2
+                },
+                "request": {
+                  "attempts": 0,
+                  "from": "ready",
+                  "retry": true,
+                  "role": "wrong",
+                  "to": "running"
+                },
+                "retry_requested": true,
+                "role_allowed": false
+              },
+              "target": "status"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "89a660e2daab8226eea7f5d10c639ca3d4b97e48"
+              ],
+              "expected": "retry_limit",
+              "id": "challenge_bool_attempts",
+              "inputs": {
+                "attempts_valid": false,
+                "edge_exists": true,
+                "evidence": [],
+                "policy": {
+                  "retry_limit": 2
+                },
+                "request": {
+                  "attempts": true,
+                  "from": "running",
+                  "retry": true,
+                  "to": "done"
+                },
+                "retry_requested": true,
+                "role_allowed": true
+              },
+              "target": "status"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "89a660e2daab8226eea7f5d10c639ca3d4b97e48"
+              ],
+              "expected": "blocked",
+              "id": "challenge_missing_edge",
+              "inputs": {
+                "attempts_valid": false,
+                "edge_exists": false,
+                "evidence": [],
+                "policy": {
+                  "retry_limit": 2
+                },
+                "request": {
+                  "from": "x",
+                  "to": "y"
+                },
+                "retry_requested": false,
+                "role_allowed": true
+              },
+              "target": "status"
+            }
+          ],
+          "inputs": {
+            "attempts_valid": "boolean",
+            "edge_exists": "boolean",
+            "evidence": "array",
+            "policy": "object",
+            "request": "object",
+            "retry_requested": "boolean",
+            "role_allowed": "boolean"
+          },
+          "resolutions": [],
+          "rules": [
+            {
+              "claim": "A requested transition missing from policy.edges is blocked.",
+              "dependencies": [
+                "TASK.md",
+                "policy.json",
+                "work.py"
+              ],
+              "evidence": [
+                "89a660e2daab8226eea7f5d10c639ca3d4b97e48"
+              ],
+              "id": "missing_edge",
+              "target": "status",
+              "then": {
+                "value": "blocked"
+              },
+              "when": {
+                "args": [
+                  {
+                    "var": "edge_exists"
+                  },
+                  {
+                    "value": false
+                  }
+                ],
+                "op": "eq"
+              }
+            },
+            {
+              "claim": "An existing edge whose role requirement is not met is denied before retry validation.",
+              "dependencies": [
+                "TASK.md",
+                "policy.json",
+                "work.py"
+              ],
+              "evidence": [
+                "89a660e2daab8226eea7f5d10c639ca3d4b97e48"
+              ],
+              "id": "role_denied",
+              "target": "status",
+              "then": {
+                "value": "permission"
+              },
+              "when": {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "var": "edge_exists"
+                      },
+                      {
+                        "value": true
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "var": "role_allowed"
+                      },
+                      {
+                        "value": false
+                      }
+                    ],
+                    "op": "eq"
+                  }
+                ],
+                "op": "and"
+              }
+            },
+            {
+              "claim": "A permitted existing edge requested as a retry fails when attempts is not a non-boolean integer in [0, retry_limit).",
+              "dependencies": [
+                "TASK.md",
+                "policy.json",
+                "work.py"
+              ],
+              "evidence": [
+                "89a660e2daab8226eea7f5d10c639ca3d4b97e48"
+              ],
+              "id": "invalid_retry",
+              "target": "status",
+              "then": {
+                "value": "retry_limit"
+              },
+              "when": {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "var": "edge_exists"
+                      },
+                      {
+                        "value": true
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "var": "role_allowed"
+                      },
+                      {
+                        "value": true
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "var": "retry_requested"
+                      },
+                      {
+                        "value": true
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "var": "attempts_valid"
+                      },
+                      {
+                        "value": false
+                      }
+                    ],
+                    "op": "eq"
+                  }
+                ],
+                "op": "and"
+              }
+            },
+            {
+              "claim": "An existing permitted edge succeeds unless a requested retry has invalid attempts.",
+              "dependencies": [
+                "TASK.md",
+                "policy.json",
+                "work.py"
+              ],
+              "evidence": [
+                "89a660e2daab8226eea7f5d10c639ca3d4b97e48"
+              ],
+              "id": "allowed_transition",
+              "target": "status",
+              "then": {
+                "value": "ok"
+              },
+              "when": {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "var": "edge_exists"
+                      },
+                      {
+                        "value": true
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "var": "role_allowed"
+                      },
+                      {
+                        "value": true
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "var": "retry_requested"
+                          },
+                          {
+                            "value": false
+                          }
+                        ],
+                        "op": "eq"
+                      },
+                      {
+                        "args": [
+                          {
+                            "var": "attempts_valid"
+                          },
+                          {
+                            "value": true
+                          }
+                        ],
+                        "op": "eq"
+                      }
+                    ],
+                    "op": "or"
+                  }
+                ],
+                "op": "and"
+              }
+            }
+          ],
+          "schema": 1,
+          "title": "Policy-controlled state transition evaluation",
+          "unresolved": [
+            "No evidence.json file was present; evidence-dependent behavior is unobserved."
+          ]
+        },
+        "parent": null,
+        "proposal": "e061844ff8dfbd12fb65dfc3fbd593c1d5b6e040",
+        "reason": "Agent proposed a model revision",
+        "revision": 1
+      },
+      "unseen_probes": null
+    }
+  ],
+  "manifest_hash": "df5d60955775ccfe3bb084fa646c49dba07d450c772880ef7154c6bad771643f",
+  "limits": [
+    "Constructed task population, eight families, shared author for task contracts and oracle",
+    "Confirmation variants are new instances of these families, not 96 new domains",
+    "Structured decision loop; not native IDE-agent performance",
+    "No monetary cost estimate without verified billing",
+    "Research records are constructed test evidence, not measured fabrication data"
+  ]
+}

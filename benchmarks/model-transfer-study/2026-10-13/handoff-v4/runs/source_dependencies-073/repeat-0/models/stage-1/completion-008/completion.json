@@ -1,0 +1,251 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "model_handoff",
+      "id": null,
+      "payload": {
+        "schema": 1,
+        "title": "Source dependency review decision",
+        "inputs": {
+          "request": "object",
+          "policy": "object",
+          "evidence": "array"
+        },
+        "rules": [
+          {
+            "id": "declared_state_change_requires_review",
+            "target": "needs_review",
+            "claim": "Review is needed exactly when at least one declared, non-ignored path has a different complete JSON state between saved and current; an absent entry is equivalent to {kind:missing}.",
+            "when": {
+              "value": true
+            },
+            "then": {
+              "op": "any",
+              "items": {
+                "op": "get",
+                "args": [
+                  {
+                    "var": "request"
+                  },
+                  {
+                    "value": "declared"
+                  },
+                  {
+                    "value": []
+                  }
+                ]
+              },
+              "as": "path",
+              "test": {
+                "op": "and",
+                "args": [
+                  {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "in",
+                        "args": [
+                          {
+                            "var": "path"
+                          },
+                          {
+                            "op": "get",
+                            "args": [
+                              {
+                                "var": "policy"
+                              },
+                              {
+                                "value": "ignored"
+                              },
+                              {
+                                "value": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "ne",
+                    "args": [
+                      {
+                        "op": "get",
+                        "args": [
+                          {
+                            "op": "get",
+                            "args": [
+                              {
+                                "var": "request"
+                              },
+                              {
+                                "value": "saved"
+                              },
+                              {
+                                "value": {}
+                              }
+                            ]
+                          },
+                          {
+                            "var": "path"
+                          },
+                          {
+                            "value": {
+                              "kind": "missing"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "op": "get",
+                        "args": [
+                          {
+                            "op": "get",
+                            "args": [
+                              {
+                                "var": "request"
+                              },
+                              {
+                                "value": "current"
+                              },
+                              {
+                                "value": {}
+                              }
+                            ]
+                          },
+                          {
+                            "var": "path"
+                          },
+                          {
+                            "value": {
+                              "kind": "missing"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            "evidence": [
+              "6703b2a3"
+            ],
+            "dependencies": [
+              "work.py"
+            ]
+          }
+        ],
+        "cases": [
+          {
+            "id": "independent_mixed_boundary",
+            "target": "needs_review",
+            "inputs": {
+              "request": {
+                "declared": [
+                  "b",
+                  "a",
+                  "a",
+                  "ignored"
+                ],
+                "saved": {
+                  "a": {
+                    "kind": "file",
+                    "hash": "x",
+                    "meta": 1
+                  },
+                  "b": {
+                    "kind": "file",
+                    "hash": "z"
+                  },
+                  "ignored": {
+                    "kind": "file",
+                    "hash": "1"
+                  },
+                  "extra": {
+                    "kind": "file",
+                    "hash": "old"
+                  }
+                },
+                "current": {
+                  "a": {
+                    "meta": 1,
+                    "hash": "x",
+                    "kind": "file"
+                  },
+                  "b": {
+                    "kind": "file",
+                    "hash": "y"
+                  },
+                  "ignored": {
+                    "kind": "file",
+                    "hash": "2"
+                  },
+                  "extra": {
+                    "kind": "file",
+                    "hash": "new"
+                  }
+                }
+              },
+              "policy": {
+                "ignored": [
+                  "ignored"
+                ]
+              },
+              "evidence": []
+            },
+            "expected": true,
+            "evidence": [
+              "6703b2a3"
+            ],
+            "challenge": true
+          },
+          {
+            "id": "absent_equals_explicit_missing",
+            "target": "needs_review",
+            "inputs": {
+              "request": {
+                "declared": [
+                  "x"
+                ],
+                "saved": {},
+                "current": {
+                  "x": {
+                    "kind": "missing"
+                  }
+                }
+              },
+              "policy": {},
+              "evidence": []
+            },
+            "expected": false,
+            "evidence": [
+              "6703b2a3"
+            ],
+            "challenge": false
+          }
+        ],
+        "alternatives": [],
+        "unresolved": [
+          "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+        ]
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 12207,
+    "output_tokens": 1253,
+    "cached_input_tokens": 0,
+    "reasoning_output_tokens": 599
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 36.44925708300434,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

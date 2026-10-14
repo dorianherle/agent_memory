@@ -1,0 +1,28 @@
+E3 weight memory
+Status: inconclusive
+Protocol SHA256: 28aecd2625fd184f5d592c62c35cf0050553e1f3b3f172df7db71060661c7fb5
+Elapsed seconds: 0.14
+The pretrained run did not complete. E3 is inconclusive.
+Limit: One fictional task
+Limit: One seed
+Limit: Short updates
+Limit: Small instruction model
+Limit: No downstream large-agent continuation
+Limit: No measured fundamental-rule extraction
+Limit: Adapter tied to one base
+Limit: Lexical scorer can misclassify meaning
+Limit: Fixed steps do not equal fixed training-token count
+Limit: No replay in second update
+Traceback (most recent call last):
+  File "/Users/dorianherle/Documents/Personal/agent_memory/labs/memory_micro/2026-10-13/e3_weight_memory/script.py", line 139, in <module>
+    main()
+  File "/Users/dorianherle/Documents/Personal/agent_memory/labs/memory_micro/2026-10-13/e3_weight_memory/script.py", line 26, in main
+    raise RuntimeError("The pretrained weight download did not complete within the 180-second setup cap. No training or capability evaluation was run.")
+RuntimeError: The pretrained weight download did not complete within the 180-second setup cap. No training or capability evaluation was run.
+
+
+Setup started at 20:40:36 UTC. The 180-second cap was reached before complete weights were available. Download stop was confirmed.
+Model directory bytes after stop: 117453830.
+Dependencies: 173110691 bytes.
+No model weights were loaded. No training ran. No answer was generated. Parameter and adapter counts are unavailable.
+A failed setup is not evidence against parametric memory.

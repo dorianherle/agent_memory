@@ -1,0 +1,61 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "read",
+          "arguments": {
+            "path": "report.json"
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "status",
+              "--short"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-m",
+              "py_compile",
+              "work.py"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import json; from work import evaluate; p=json.load(open('policy.json')); rs=json.load(open('requests.json')); print(json.dumps([evaluate(r,p) for r in rs],sort_keys=True))"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 12122,
+    "output_tokens": 221,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 78
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 10.428655500058085,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

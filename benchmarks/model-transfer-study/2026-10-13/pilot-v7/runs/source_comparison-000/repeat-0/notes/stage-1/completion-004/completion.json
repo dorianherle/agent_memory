@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy\nfrom work import evaluate\n\ndef check(got, want):\n assert got == want, (got, want)\nreq={'claim':'c','conditions':{'x':1}}\npol={'required_conditions':['x'],'require_verified':False}\ncheck(evaluate(req,[{'source':'W','claim':'c','value':1,'conditions':{'x':1},'withdrawn':True}],pol),{'status':'unknown','value':None,'sources':[],'unknowns':['no matching evidence']})\ncheck(evaluate(req,[{'source':'A','claim':'c','value':1,'conditions':{'x':1}},{'source':'B','claim':'other','value':2,'conditions':{'x':1},'supersedes':['A']}],pol),{'status':'supported','value':1,'sources':['A'],'unknowns':[]})\ncheck(evaluate(req,[{'source':'A','claim':'c','value':{'b':2,'a':1},'conditions':{'x':1}},{'source':'B','claim':'c','value':{'a':1,'b':2},'conditions':{'x':1}}],pol),{'status':'supported','value':{'b':2,'a':1},'sources':['A','B'],'unknowns':[]})\ncheck(evaluate(req,[{'source':'N','claim':'c','value':None,'conditions':{'x':1}}],pol),{'status':'supported','value':None,'sources':['N'],'unknowns':[]})\ncheck(evaluate(req,[{'source':'C','claim':'c','value':5,'conditions':{'x':1}}],{'required_conditions':['x'],'require_verified':False,'calibration':None}),{'status':'supported','value':5,'sources':['C'],'unknowns':[]})\nprint('extended checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 25298,
+    "output_tokens": 798,
+    "cached_input_tokens": 18816,
+    "reasoning_output_tokens": 337
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 11.709241500124335,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

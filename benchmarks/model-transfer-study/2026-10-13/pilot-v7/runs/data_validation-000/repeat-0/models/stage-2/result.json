@@ -1,0 +1,1964 @@
+{
+  "stop": "finished",
+  "tool_calls": 25,
+  "elapsed_seconds": 154.30029416712932,
+  "usage_complete": true,
+  "tokens": 168577,
+  "known_tokens": 168577,
+  "input_tokens": 164591,
+  "output_tokens": 3986,
+  "cached_input_tokens": 94976,
+  "reasoning_output_tokens": 2024,
+  "model_probes": {
+    "target": "ok",
+    "predictions": {
+      "ok": true,
+      "result": [
+        {
+          "model_id": "6d3460112634b528673abe202464f18b83c0154d",
+          "status": "unknown",
+          "reason": "No applicable rule",
+          "rules": []
+        },
+        {
+          "model_id": "6d3460112634b528673abe202464f18b83c0154d",
+          "status": "unknown",
+          "reason": "No applicable rule",
+          "rules": []
+        },
+        {
+          "model_id": "6d3460112634b528673abe202464f18b83c0154d",
+          "status": "unknown",
+          "reason": "No applicable rule",
+          "rules": []
+        },
+        {
+          "model_id": "6d3460112634b528673abe202464f18b83c0154d",
+          "status": "unknown",
+          "reason": "No applicable rule",
+          "rules": []
+        },
+        {
+          "model_id": "6d3460112634b528673abe202464f18b83c0154d",
+          "status": "unknown",
+          "reason": "No applicable rule",
+          "rules": []
+        },
+        {
+          "model_id": "6d3460112634b528673abe202464f18b83c0154d",
+          "status": "unknown",
+          "reason": "No applicable rule",
+          "rules": []
+        },
+        {
+          "model_id": "6d3460112634b528673abe202464f18b83c0154d",
+          "status": "unknown",
+          "reason": "No applicable rule",
+          "rules": []
+        },
+        {
+          "model_id": "6d3460112634b528673abe202464f18b83c0154d",
+          "status": "unknown",
+          "reason": "No applicable rule",
+          "rules": []
+        },
+        {
+          "model_id": "6d3460112634b528673abe202464f18b83c0154d",
+          "status": "unknown",
+          "reason": "No applicable rule",
+          "rules": []
+        },
+        {
+          "model_id": "6d3460112634b528673abe202464f18b83c0154d",
+          "status": "unknown",
+          "reason": "No applicable rule",
+          "rules": []
+        }
+      ]
+    },
+    "expected": [
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false
+    ]
+  },
+  "stage": 2,
+  "grade": {
+    "full_pass": true,
+    "passed": 13,
+    "total": 13,
+    "checks": [
+      {
+        "check": "case_0",
+        "passed": true
+      },
+      {
+        "check": "case_1",
+        "passed": true
+      },
+      {
+        "check": "case_2",
+        "passed": true
+      },
+      {
+        "check": "case_3",
+        "passed": true
+      },
+      {
+        "check": "case_4",
+        "passed": true
+      },
+      {
+        "check": "case_5",
+        "passed": true
+      },
+      {
+        "check": "case_6",
+        "passed": true
+      },
+      {
+        "check": "case_7",
+        "passed": true
+      },
+      {
+        "check": "case_8",
+        "passed": true
+      },
+      {
+        "check": "case_9",
+        "passed": true
+      },
+      {
+        "check": "case_10",
+        "passed": true
+      },
+      {
+        "check": "all_cases_returned",
+        "passed": true
+      },
+      {
+        "check": "current_source_report",
+        "passed": true
+      }
+    ],
+    "unsupported_conclusions": 0,
+    "missed_source_changes": 0
+  },
+  "memory": {
+    "ok": true,
+    "result": {
+      "notes": 9,
+      "model": {
+        "id": "6d3460112634b528673abe202464f18b83c0154d",
+        "event": "accepted",
+        "checks": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": true,
+              "expected": true,
+              "id": "stage2_current_valid_policy_v0",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "all_valid_succeeds"
+                ],
+                "status": "predicted",
+                "value": true
+              }
+            },
+            {
+              "challenge": true,
+              "expected": false,
+              "id": "stage2_priority_duplicate_boundary",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "row_error_fails_batch"
+                ],
+                "status": "predicted",
+                "value": false
+              }
+            },
+            {
+              "challenge": true,
+              "expected": true,
+              "id": "current_single_valid_row",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "all_valid_succeeds"
+                ],
+                "status": "predicted",
+                "value": true
+              }
+            },
+            {
+              "challenge": true,
+              "expected": false,
+              "id": "duplicate_after_accepted_row",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "row_error_fails_batch"
+                ],
+                "status": "predicted",
+                "value": false
+              }
+            },
+            {
+              "challenge": false,
+              "expected": false,
+              "id": "invalid_rows_with_later_accepted_duplicate",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "row_error_fails_batch"
+                ],
+                "status": "predicted",
+                "value": false
+              }
+            }
+          ],
+          "changed_dependencies": [],
+          "complexity": {
+            "cases": 5,
+            "complete_bytes": 3398,
+            "rules": 2,
+            "working_bytes": 1179
+          },
+          "id": "6dd592b1bc18978d9a793eb746011f11dab36b3c",
+          "issues": [],
+          "missing_evidence": [],
+          "status": "tested",
+          "uncovered_rules": [],
+          "unresolved": [
+            "The executable model predicts batch ok only when supplied evidence classifies whether row errors are present; it does not itself derive that classification from arbitrary nested rows because the expression language lacks type tests, indexing, and prior-row distinctness.",
+            "Malformed top-level request or policy objects are outside the tested task contract."
+          ]
+        },
+        "complexity": {
+          "cases": 5,
+          "complete_bytes": 3398,
+          "rules": 2,
+          "working_bytes": 1179
+        },
+        "fingerprints": {
+          "OUTPUT_SCHEMA.json": {
+            "sha256": "c2ce7013c3bd0d4dd80a26b5455f18e589d829dd848dae1d1e9d583894c87490",
+            "state": "file"
+          },
+          "policy.json": {
+            "sha256": "6a36e01b42ea549e4c3e759329d31904f25d93013303074238bd0a2e76b03732",
+            "state": "file"
+          },
+          "report.json": {
+            "sha256": "0e800b6e8ab91355a34b01850f84ad4fd564dfa74d6c5bccb03ce7627379190b",
+            "state": "file"
+          },
+          "requests.json": {
+            "sha256": "90fef6aac4df7b9abdbdbdb3019ae38e5188b72f958c8f96a62a10be06d5d34d",
+            "state": "file"
+          },
+          "work.py": {
+            "sha256": "45102c08fc1cf417c6a73de877358311d962d8b2395a981b5ec71dea0ff23c3c",
+            "state": "file"
+          }
+        },
+        "model": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": true,
+              "evidence": [
+                "a735d4df31a2a32cf07a565bf817960f1356ddc3"
+              ],
+              "expected": true,
+              "id": "stage2_current_valid_policy_v0",
+              "inputs": {
+                "evidence": [
+                  "all_rows_valid"
+                ],
+                "policy": {
+                  "base_unit": "nm",
+                  "unique": false,
+                  "units": {
+                    "nm": 1,
+                    "um": 1000
+                  },
+                  "variant": 0
+                },
+                "request": {
+                  "rows": [
+                    {
+                      "amount": 4,
+                      "id": "sample_0",
+                      "unit": "nm"
+                    }
+                  ]
+                }
+              },
+              "target": "ok"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "a735d4df31a2a32cf07a565bf817960f1356ddc3"
+              ],
+              "expected": false,
+              "id": "stage2_priority_duplicate_boundary",
+              "inputs": {
+                "evidence": [
+                  "row_errors_present"
+                ],
+                "policy": {
+                  "base_unit": "m",
+                  "unique": true,
+                  "units": {
+                    "cm": 0.01,
+                    "m": 1
+                  }
+                },
+                "request": {
+                  "rows": [
+                    {
+                      "amount": false,
+                      "id": "",
+                      "unit": "bad"
+                    },
+                    {
+                      "amount": true,
+                      "id": "a"
+                    },
+                    {
+                      "amount": 1,
+                      "id": "a",
+                      "unit": []
+                    },
+                    {
+                      "amount": 2,
+                      "id": "a"
+                    },
+                    {
+                      "amount": 3,
+                      "id": "a"
+                    }
+                  ]
+                }
+              },
+              "target": "ok"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "fe5dcaf0e9ff838cf1596e62f8de4905099afdd6"
+              ],
+              "expected": true,
+              "id": "current_single_valid_row",
+              "inputs": {
+                "evidence": [
+                  "all_rows_valid"
+                ],
+                "policy": {
+                  "base_unit": "nm",
+                  "unique": false,
+                  "units": {
+                    "nm": 1
+                  },
+                  "variant": 0
+                },
+                "request": {
+                  "rows": [
+                    {
+                      "amount": 4,
+                      "id": "sample_0",
+                      "unit": "nm"
+                    }
+                  ]
+                }
+              },
+              "target": "ok"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "040d988edfa52ebb4d8d4caac152fda736332a33"
+              ],
+              "expected": false,
+              "id": "duplicate_after_accepted_row",
+              "inputs": {
+                "evidence": [
+                  "row_errors_present"
+                ],
+                "policy": {
+                  "base_unit": "u",
+                  "unique": true,
+                  "units": {
+                    "u": 2
+                  }
+                },
+                "request": {
+                  "rows": [
+                    {
+                      "amount": 1,
+                      "id": "a"
+                    },
+                    {
+                      "amount": 2,
+                      "id": "a"
+                    }
+                  ]
+                }
+              },
+              "target": "ok"
+            },
+            {
+              "challenge": false,
+              "evidence": [
+                "040d988edfa52ebb4d8d4caac152fda736332a33"
+              ],
+              "expected": false,
+              "id": "invalid_rows_with_later_accepted_duplicate",
+              "inputs": {
+                "evidence": [
+                  "row_errors_present"
+                ],
+                "policy": {
+                  "base_unit": "u",
+                  "unique": true,
+                  "units": {
+                    "u": 1
+                  }
+                },
+                "request": {
+                  "rows": [
+                    {
+                      "amount": true,
+                      "id": "x",
+                      "unit": []
+                    },
+                    {
+                      "amount": 1,
+                      "id": "x",
+                      "unit": []
+                    },
+                    {
+                      "amount": 1,
+                      "id": "x"
+                    },
+                    {
+                      "amount": 2,
+                      "id": "x"
+                    }
+                  ]
+                }
+              },
+              "target": "ok"
+            }
+          ],
+          "inputs": {
+            "evidence": "array",
+            "policy": "object",
+            "request": "object"
+          },
+          "resolutions": [],
+          "rules": [
+            {
+              "claim": "If validation produces any prioritized row error, the complete batch fails and records are empty; row validation priority is id, amount, unit, duplicate, and duplicate tracking includes only earlier fully accepted rows.",
+              "dependencies": [
+                "work.py",
+                "OUTPUT_SCHEMA.json"
+              ],
+              "evidence": [
+                "fe5dcaf0e9ff838cf1596e62f8de4905099afdd6",
+                "040d988edfa52ebb4d8d4caac152fda736332a33"
+              ],
+              "id": "row_error_fails_batch",
+              "target": "ok",
+              "then": {
+                "value": false
+              },
+              "when": {
+                "as": "item",
+                "items": {
+                  "var": "evidence"
+                },
+                "op": "any",
+                "test": {
+                  "args": [
+                    {
+                      "var": "item"
+                    },
+                    {
+                      "value": "row_errors_present"
+                    }
+                  ],
+                  "op": "eq"
+                }
+              }
+            },
+            {
+              "claim": "When every row is valid, the batch succeeds with normalized records in input order and no errors; units default to base_unit and inputs remain unmodified.",
+              "dependencies": [
+                "work.py",
+                "OUTPUT_SCHEMA.json"
+              ],
+              "evidence": [
+                "fe5dcaf0e9ff838cf1596e62f8de4905099afdd6",
+                "040d988edfa52ebb4d8d4caac152fda736332a33"
+              ],
+              "id": "all_valid_succeeds",
+              "target": "ok",
+              "then": {
+                "value": true
+              },
+              "when": {
+                "as": "item",
+                "items": {
+                  "var": "evidence"
+                },
+                "op": "any",
+                "test": {
+                  "args": [
+                    {
+                      "var": "item"
+                    },
+                    {
+                      "value": "all_rows_valid"
+                    }
+                  ],
+                  "op": "eq"
+                }
+              }
+            }
+          ],
+          "schema": 1,
+          "title": "Stage 1 row-validation batch outcome",
+          "unresolved": [
+            "The executable model predicts batch ok only when supplied evidence classifies whether row errors are present; it does not itself derive that classification from arbitrary nested rows because the expression language lacks type tests, indexing, and prior-row distinctness.",
+            "Malformed top-level request or policy objects are outside the tested task contract."
+          ]
+        },
+        "parent": "d5323717dd9fab85b22d0031d4333ff677d001bb",
+        "proposal": "6dd592b1bc18978d9a793eb746011f11dab36b3c",
+        "reason": "Agent proposed a model revision",
+        "revision": 2
+      },
+      "checks": {
+        "id": "6d3460112634b528673abe202464f18b83c0154d",
+        "status": "tested",
+        "issues": [],
+        "cases": [
+          {
+            "id": "stage2_current_valid_policy_v0",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "all_valid_succeeds"
+              ]
+            },
+            "expected": true,
+            "challenge": true
+          },
+          {
+            "id": "stage2_priority_duplicate_boundary",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": false,
+              "rules": [
+                "row_error_fails_batch"
+              ]
+            },
+            "expected": false,
+            "challenge": true
+          },
+          {
+            "id": "current_single_valid_row",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "all_valid_succeeds"
+              ]
+            },
+            "expected": true,
+            "challenge": true
+          },
+          {
+            "id": "duplicate_after_accepted_row",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": false,
+              "rules": [
+                "row_error_fails_batch"
+              ]
+            },
+            "expected": false,
+            "challenge": true
+          },
+          {
+            "id": "invalid_rows_with_later_accepted_duplicate",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": false,
+              "rules": [
+                "row_error_fails_batch"
+              ]
+            },
+            "expected": false,
+            "challenge": false
+          }
+        ],
+        "uncovered_rules": [],
+        "missing_evidence": [],
+        "changed_dependencies": [],
+        "alternatives": [],
+        "complexity": {
+          "cases": 5,
+          "complete_bytes": 3398,
+          "rules": 2,
+          "working_bytes": 1179
+        },
+        "unresolved": [
+          "The executable model predicts batch ok only when supplied evidence classifies whether row errors are present; it does not itself derive that classification from arbitrary nested rows because the expression language lacks type tests, indexing, and prior-row distinctness.",
+          "Malformed top-level request or policy objects are outside the tested task contract."
+        ]
+      },
+      "evidence": [
+        {
+          "id": "fe5dcaf0e9ff838cf1596e62f8de4905099afdd6",
+          "text": "Implemented evaluate(request, policy) in work.py. It validates rows in input order with one prioritized error (id, amount, unit, duplicate), defaults unit from policy, tracks only fully accepted IDs, normalizes amounts, clears all records on any error, and does not mutate inputs. Current report.json exactly matches evaluating requests.json under policy.json.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "report.json",
+              "requests.json",
+              "policy.json",
+              "OUTPUT_SCHEMA.json"
+            ]
+          }
+        },
+        {
+          "id": "040d988edfa52ebb4d8d4caac152fda736332a33",
+          "text": "Boundary checks passed for duplicate handling, invalid bool/NaN/inf/negative amounts, unhashable unknown units, error priority, -0.0 acceptance, exact output fields, report regeneration, and input immutability. Limits: behavior assumes request has rows and policy has base_unit, units, unique as required by the task contract; malformed top-level API objects were not specified or tested.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py"
+            ]
+          }
+        },
+        {
+          "id": "007ad4171e3a759dca3d8738e210b0bde1f653b5",
+          "text": "Task model proposed: Stage 1 row-validation batch outcome",
+          "payload": {
+            "agent": "agent",
+            "model_event": "proposed",
+            "task_model": {
+              "complexity": {
+                "cases": 3,
+                "complete_bytes": 2650,
+                "rules": 2,
+                "working_bytes": 1179
+              },
+              "fingerprints": {
+                "OUTPUT_SCHEMA.json": {
+                  "sha256": "c2ce7013c3bd0d4dd80a26b5455f18e589d829dd848dae1d1e9d583894c87490",
+                  "state": "file"
+                },
+                "policy.json": {
+                  "sha256": "bca05f2d9bd5ae6eb14179143dcb7930b1ca8dcd655a7666a068aff9bf3527a1",
+                  "state": "file"
+                },
+                "report.json": {
+                  "sha256": "0e800b6e8ab91355a34b01850f84ad4fd564dfa74d6c5bccb03ce7627379190b",
+                  "state": "file"
+                },
+                "requests.json": {
+                  "sha256": "90fef6aac4df7b9abdbdbdb3019ae38e5188b72f958c8f96a62a10be06d5d34d",
+                  "state": "file"
+                },
+                "work.py": {
+                  "sha256": "45102c08fc1cf417c6a73de877358311d962d8b2395a981b5ec71dea0ff23c3c",
+                  "state": "file"
+                }
+              },
+              "model": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "fe5dcaf0e9ff838cf1596e62f8de4905099afdd6"
+                    ],
+                    "expected": true,
+                    "id": "current_single_valid_row",
+                    "inputs": {
+                      "evidence": [
+                        "all_rows_valid"
+                      ],
+                      "policy": {
+                        "base_unit": "nm",
+                        "unique": false,
+                        "units": {
+                          "nm": 1
+                        },
+                        "variant": 0
+                      },
+                      "request": {
+                        "rows": [
+                          {
+                            "amount": 4,
+                            "id": "sample_0",
+                            "unit": "nm"
+                          }
+                        ]
+                      }
+                    },
+                    "target": "ok"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "040d988edfa52ebb4d8d4caac152fda736332a33"
+                    ],
+                    "expected": false,
+                    "id": "duplicate_after_accepted_row",
+                    "inputs": {
+                      "evidence": [
+                        "row_errors_present"
+                      ],
+                      "policy": {
+                        "base_unit": "u",
+                        "unique": true,
+                        "units": {
+                          "u": 2
+                        }
+                      },
+                      "request": {
+                        "rows": [
+                          {
+                            "amount": 1,
+                            "id": "a"
+                          },
+                          {
+                            "amount": 2,
+                            "id": "a"
+                          }
+                        ]
+                      }
+                    },
+                    "target": "ok"
+                  },
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "040d988edfa52ebb4d8d4caac152fda736332a33"
+                    ],
+                    "expected": false,
+                    "id": "invalid_rows_with_later_accepted_duplicate",
+                    "inputs": {
+                      "evidence": [
+                        "row_errors_present"
+                      ],
+                      "policy": {
+                        "base_unit": "u",
+                        "unique": true,
+                        "units": {
+                          "u": 1
+                        }
+                      },
+                      "request": {
+                        "rows": [
+                          {
+                            "amount": true,
+                            "id": "x",
+                            "unit": []
+                          },
+                          {
+                            "amount": 1,
+                            "id": "x",
+                            "unit": []
+                          },
+                          {
+                            "amount": 1,
+                            "id": "x"
+                          },
+                          {
+                            "amount": 2,
+                            "id": "x"
+                          }
+                        ]
+                      }
+                    },
+                    "target": "ok"
+                  }
+                ],
+                "inputs": {
+                  "evidence": "array",
+                  "policy": "object",
+                  "request": "object"
+                },
+                "resolutions": [],
+                "rules": [
+                  {
+                    "claim": "If validation produces any prioritized row error, the complete batch fails and records are empty; row validation priority is id, amount, unit, duplicate, and duplicate tracking includes only earlier fully accepted rows.",
+                    "dependencies": [
+                      "work.py",
+                      "OUTPUT_SCHEMA.json"
+                    ],
+                    "evidence": [
+                      "fe5dcaf0e9ff838cf1596e62f8de4905099afdd6",
+                      "040d988edfa52ebb4d8d4caac152fda736332a33"
+                    ],
+                    "id": "row_error_fails_batch",
+                    "target": "ok",
+                    "then": {
+                      "value": false
+                    },
+                    "when": {
+                      "as": "item",
+                      "items": {
+                        "var": "evidence"
+                      },
+                      "op": "any",
+                      "test": {
+                        "args": [
+                          {
+                            "var": "item"
+                          },
+                          {
+                            "value": "row_errors_present"
+                          }
+                        ],
+                        "op": "eq"
+                      }
+                    }
+                  },
+                  {
+                    "claim": "When every row is valid, the batch succeeds with normalized records in input order and no errors; units default to base_unit and inputs remain unmodified.",
+                    "dependencies": [
+                      "work.py",
+                      "OUTPUT_SCHEMA.json"
+                    ],
+                    "evidence": [
+                      "fe5dcaf0e9ff838cf1596e62f8de4905099afdd6",
+                      "040d988edfa52ebb4d8d4caac152fda736332a33"
+                    ],
+                    "id": "all_valid_succeeds",
+                    "target": "ok",
+                    "then": {
+                      "value": true
+                    },
+                    "when": {
+                      "as": "item",
+                      "items": {
+                        "var": "evidence"
+                      },
+                      "op": "any",
+                      "test": {
+                        "args": [
+                          {
+                            "var": "item"
+                          },
+                          {
+                            "value": "all_rows_valid"
+                          }
+                        ],
+                        "op": "eq"
+                      }
+                    }
+                  }
+                ],
+                "schema": 1,
+                "title": "Stage 1 row-validation batch outcome",
+                "unresolved": [
+                  "The executable model predicts batch ok only when supplied evidence classifies whether row errors are present; it does not itself derive that classification from arbitrary nested rows because the expression language lacks type tests, indexing, and prior-row distinctness.",
+                  "Malformed top-level request or policy objects are outside the tested task contract."
+                ]
+              },
+              "parent": null,
+              "reason": "Agent proposed a model revision",
+              "revision": 1
+            }
+          }
+        },
+        {
+          "id": "d5323717dd9fab85b22d0031d4333ff677d001bb",
+          "text": "Task model active: Stage 1 row-validation batch outcome",
+          "payload": {
+            "agent": "agent",
+            "model_event": "accepted",
+            "task_model": {
+              "checks": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": true,
+                    "expected": true,
+                    "id": "current_single_valid_row",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "all_valid_succeeds"
+                      ],
+                      "status": "predicted",
+                      "value": true
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": false,
+                    "id": "duplicate_after_accepted_row",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "row_error_fails_batch"
+                      ],
+                      "status": "predicted",
+                      "value": false
+                    }
+                  },
+                  {
+                    "challenge": false,
+                    "expected": false,
+                    "id": "invalid_rows_with_later_accepted_duplicate",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "row_error_fails_batch"
+                      ],
+                      "status": "predicted",
+                      "value": false
+                    }
+                  }
+                ],
+                "changed_dependencies": [],
+                "complexity": {
+                  "cases": 3,
+                  "complete_bytes": 2650,
+                  "rules": 2,
+                  "working_bytes": 1179
+                },
+                "id": "007ad4171e3a759dca3d8738e210b0bde1f653b5",
+                "issues": [],
+                "missing_evidence": [],
+                "status": "tested",
+                "uncovered_rules": [],
+                "unresolved": [
+                  "The executable model predicts batch ok only when supplied evidence classifies whether row errors are present; it does not itself derive that classification from arbitrary nested rows because the expression language lacks type tests, indexing, and prior-row distinctness.",
+                  "Malformed top-level request or policy objects are outside the tested task contract."
+                ]
+              },
+              "complexity": {
+                "cases": 3,
+                "complete_bytes": 2650,
+                "rules": 2,
+                "working_bytes": 1179
+              },
+              "fingerprints": {
+                "OUTPUT_SCHEMA.json": {
+                  "sha256": "c2ce7013c3bd0d4dd80a26b5455f18e589d829dd848dae1d1e9d583894c87490",
+                  "state": "file"
+                },
+                "policy.json": {
+                  "sha256": "bca05f2d9bd5ae6eb14179143dcb7930b1ca8dcd655a7666a068aff9bf3527a1",
+                  "state": "file"
+                },
+                "report.json": {
+                  "sha256": "0e800b6e8ab91355a34b01850f84ad4fd564dfa74d6c5bccb03ce7627379190b",
+                  "state": "file"
+                },
+                "requests.json": {
+                  "sha256": "90fef6aac4df7b9abdbdbdb3019ae38e5188b72f958c8f96a62a10be06d5d34d",
+                  "state": "file"
+                },
+                "work.py": {
+                  "sha256": "45102c08fc1cf417c6a73de877358311d962d8b2395a981b5ec71dea0ff23c3c",
+                  "state": "file"
+                }
+              },
+              "model": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "fe5dcaf0e9ff838cf1596e62f8de4905099afdd6"
+                    ],
+                    "expected": true,
+                    "id": "current_single_valid_row",
+                    "inputs": {
+                      "evidence": [
+                        "all_rows_valid"
+                      ],
+                      "policy": {
+                        "base_unit": "nm",
+                        "unique": false,
+                        "units": {
+                          "nm": 1
+                        },
+                        "variant": 0
+                      },
+                      "request": {
+                        "rows": [
+                          {
+                            "amount": 4,
+                            "id": "sample_0",
+                            "unit": "nm"
+                          }
+                        ]
+                      }
+                    },
+                    "target": "ok"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "040d988edfa52ebb4d8d4caac152fda736332a33"
+                    ],
+                    "expected": false,
+                    "id": "duplicate_after_accepted_row",
+                    "inputs": {
+                      "evidence": [
+                        "row_errors_present"
+                      ],
+                      "policy": {
+                        "base_unit": "u",
+                        "unique": true,
+                        "units": {
+                          "u": 2
+                        }
+                      },
+                      "request": {
+                        "rows": [
+                          {
+                            "amount": 1,
+                            "id": "a"
+                          },
+                          {
+                            "amount": 2,
+                            "id": "a"
+                          }
+                        ]
+                      }
+                    },
+                    "target": "ok"
+                  },
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "040d988edfa52ebb4d8d4caac152fda736332a33"
+                    ],
+                    "expected": false,
+                    "id": "invalid_rows_with_later_accepted_duplicate",
+                    "inputs": {
+                      "evidence": [
+                        "row_errors_present"
+                      ],
+                      "policy": {
+                        "base_unit": "u",
+                        "unique": true,
+                        "units": {
+                          "u": 1
+                        }
+                      },
+                      "request": {
+                        "rows": [
+                          {
+                            "amount": true,
+                            "id": "x",
+                            "unit": []
+                          },
+                          {
+                            "amount": 1,
+                            "id": "x",
+                            "unit": []
+                          },
+                          {
+                            "amount": 1,
+                            "id": "x"
+                          },
+                          {
+                            "amount": 2,
+                            "id": "x"
+                          }
+                        ]
+                      }
+                    },
+                    "target": "ok"
+                  }
+                ],
+                "inputs": {
+                  "evidence": "array",
+                  "policy": "object",
+                  "request": "object"
+                },
+                "resolutions": [],
+                "rules": [
+                  {
+                    "claim": "If validation produces any prioritized row error, the complete batch fails and records are empty; row validation priority is id, amount, unit, duplicate, and duplicate tracking includes only earlier fully accepted rows.",
+                    "dependencies": [
+                      "work.py",
+                      "OUTPUT_SCHEMA.json"
+                    ],
+                    "evidence": [
+                      "fe5dcaf0e9ff838cf1596e62f8de4905099afdd6",
+                      "040d988edfa52ebb4d8d4caac152fda736332a33"
+                    ],
+                    "id": "row_error_fails_batch",
+                    "target": "ok",
+                    "then": {
+                      "value": false
+                    },
+                    "when": {
+                      "as": "item",
+                      "items": {
+                        "var": "evidence"
+                      },
+                      "op": "any",
+                      "test": {
+                        "args": [
+                          {
+                            "var": "item"
+                          },
+                          {
+                            "value": "row_errors_present"
+                          }
+                        ],
+                        "op": "eq"
+                      }
+                    }
+                  },
+                  {
+                    "claim": "When every row is valid, the batch succeeds with normalized records in input order and no errors; units default to base_unit and inputs remain unmodified.",
+                    "dependencies": [
+                      "work.py",
+                      "OUTPUT_SCHEMA.json"
+                    ],
+                    "evidence": [
+                      "fe5dcaf0e9ff838cf1596e62f8de4905099afdd6",
+                      "040d988edfa52ebb4d8d4caac152fda736332a33"
+                    ],
+                    "id": "all_valid_succeeds",
+                    "target": "ok",
+                    "then": {
+                      "value": true
+                    },
+                    "when": {
+                      "as": "item",
+                      "items": {
+                        "var": "evidence"
+                      },
+                      "op": "any",
+                      "test": {
+                        "args": [
+                          {
+                            "var": "item"
+                          },
+                          {
+                            "value": "all_rows_valid"
+                          }
+                        ],
+                        "op": "eq"
+                      }
+                    }
+                  }
+                ],
+                "schema": 1,
+                "title": "Stage 1 row-validation batch outcome",
+                "unresolved": [
+                  "The executable model predicts batch ok only when supplied evidence classifies whether row errors are present; it does not itself derive that classification from arbitrary nested rows because the expression language lacks type tests, indexing, and prior-row distinctness.",
+                  "Malformed top-level request or policy objects are outside the tested task contract."
+                ]
+              },
+              "parent": null,
+              "proposal": "007ad4171e3a759dca3d8738e210b0bde1f653b5",
+              "reason": "Agent proposed a model revision",
+              "revision": 1
+            }
+          }
+        },
+        {
+          "id": "a735d4df31a2a32cf07a565bf817960f1356ddc3",
+          "text": "Stage 2 implementation in work.py was verified against current requests.json/policy.json and independent boundary cases. It validates rows in id\u2192amount\u2192unit\u2192duplicate priority, tracks only fully accepted IDs, clears all records if any row errors, preserves inputs, and emits exact output fields. report.json exactly matches evaluation of the current request. evidence.json is absent, so no evidence argument applies to the current validation-only API.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "OUTPUT_SCHEMA.json",
+              "requests.json",
+              "policy.json",
+              "report.json"
+            ]
+          }
+        },
+        {
+          "id": "6dd592b1bc18978d9a793eb746011f11dab36b3c",
+          "text": "Task model proposed: Stage 1 row-validation batch outcome",
+          "payload": {
+            "agent": "agent",
+            "model_event": "proposed",
+            "task_model": {
+              "complexity": {
+                "cases": 5,
+                "complete_bytes": 3398,
+                "rules": 2,
+                "working_bytes": 1179
+              },
+              "fingerprints": {
+                "OUTPUT_SCHEMA.json": {
+                  "sha256": "c2ce7013c3bd0d4dd80a26b5455f18e589d829dd848dae1d1e9d583894c87490",
+                  "state": "file"
+                },
+                "policy.json": {
+                  "sha256": "6a36e01b42ea549e4c3e759329d31904f25d93013303074238bd0a2e76b03732",
+                  "state": "file"
+                },
+                "report.json": {
+                  "sha256": "0e800b6e8ab91355a34b01850f84ad4fd564dfa74d6c5bccb03ce7627379190b",
+                  "state": "file"
+                },
+                "requests.json": {
+                  "sha256": "90fef6aac4df7b9abdbdbdb3019ae38e5188b72f958c8f96a62a10be06d5d34d",
+                  "state": "file"
+                },
+                "work.py": {
+                  "sha256": "45102c08fc1cf417c6a73de877358311d962d8b2395a981b5ec71dea0ff23c3c",
+                  "state": "file"
+                }
+              },
+              "model": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "a735d4df31a2a32cf07a565bf817960f1356ddc3"
+                    ],
+                    "expected": true,
+                    "id": "stage2_current_valid_policy_v0",
+                    "inputs": {
+                      "evidence": [
+                        "all_rows_valid"
+                      ],
+                      "policy": {
+                        "base_unit": "nm",
+                        "unique": false,
+                        "units": {
+                          "nm": 1,
+                          "um": 1000
+                        },
+                        "variant": 0
+                      },
+                      "request": {
+                        "rows": [
+                          {
+                            "amount": 4,
+                            "id": "sample_0",
+                            "unit": "nm"
+                          }
+                        ]
+                      }
+                    },
+                    "target": "ok"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "a735d4df31a2a32cf07a565bf817960f1356ddc3"
+                    ],
+                    "expected": false,
+                    "id": "stage2_priority_duplicate_boundary",
+                    "inputs": {
+                      "evidence": [
+                        "row_errors_present"
+                      ],
+                      "policy": {
+                        "base_unit": "m",
+                        "unique": true,
+                        "units": {
+                          "cm": 0.01,
+                          "m": 1
+                        }
+                      },
+                      "request": {
+                        "rows": [
+                          {
+                            "amount": false,
+                            "id": "",
+                            "unit": "bad"
+                          },
+                          {
+                            "amount": true,
+                            "id": "a"
+                          },
+                          {
+                            "amount": 1,
+                            "id": "a",
+                            "unit": []
+                          },
+                          {
+                            "amount": 2,
+                            "id": "a"
+                          },
+                          {
+                            "amount": 3,
+                            "id": "a"
+                          }
+                        ]
+                      }
+                    },
+                    "target": "ok"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "fe5dcaf0e9ff838cf1596e62f8de4905099afdd6"
+                    ],
+                    "expected": true,
+                    "id": "current_single_valid_row",
+                    "inputs": {
+                      "evidence": [
+                        "all_rows_valid"
+                      ],
+                      "policy": {
+                        "base_unit": "nm",
+                        "unique": false,
+                        "units": {
+                          "nm": 1
+                        },
+                        "variant": 0
+                      },
+                      "request": {
+                        "rows": [
+                          {
+                            "amount": 4,
+                            "id": "sample_0",
+                            "unit": "nm"
+                          }
+                        ]
+                      }
+                    },
+                    "target": "ok"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "040d988edfa52ebb4d8d4caac152fda736332a33"
+                    ],
+                    "expected": false,
+                    "id": "duplicate_after_accepted_row",
+                    "inputs": {
+                      "evidence": [
+                        "row_errors_present"
+                      ],
+                      "policy": {
+                        "base_unit": "u",
+                        "unique": true,
+                        "units": {
+                          "u": 2
+                        }
+                      },
+                      "request": {
+                        "rows": [
+                          {
+                            "amount": 1,
+                            "id": "a"
+                          },
+                          {
+                            "amount": 2,
+                            "id": "a"
+                          }
+                        ]
+                      }
+                    },
+                    "target": "ok"
+                  },
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "040d988edfa52ebb4d8d4caac152fda736332a33"
+                    ],
+                    "expected": false,
+                    "id": "invalid_rows_with_later_accepted_duplicate",
+                    "inputs": {
+                      "evidence": [
+                        "row_errors_present"
+                      ],
+                      "policy": {
+                        "base_unit": "u",
+                        "unique": true,
+                        "units": {
+                          "u": 1
+                        }
+                      },
+                      "request": {
+                        "rows": [
+                          {
+                            "amount": true,
+                            "id": "x",
+                            "unit": []
+                          },
+                          {
+                            "amount": 1,
+                            "id": "x",
+                            "unit": []
+                          },
+                          {
+                            "amount": 1,
+                            "id": "x"
+                          },
+                          {
+                            "amount": 2,
+                            "id": "x"
+                          }
+                        ]
+                      }
+                    },
+                    "target": "ok"
+                  }
+                ],
+                "inputs": {
+                  "evidence": "array",
+                  "policy": "object",
+                  "request": "object"
+                },
+                "resolutions": [],
+                "rules": [
+                  {
+                    "claim": "If validation produces any prioritized row error, the complete batch fails and records are empty; row validation priority is id, amount, unit, duplicate, and duplicate tracking includes only earlier fully accepted rows.",
+                    "dependencies": [
+                      "work.py",
+                      "OUTPUT_SCHEMA.json"
+                    ],
+                    "evidence": [
+                      "fe5dcaf0e9ff838cf1596e62f8de4905099afdd6",
+                      "040d988edfa52ebb4d8d4caac152fda736332a33"
+                    ],
+                    "id": "row_error_fails_batch",
+                    "target": "ok",
+                    "then": {
+                      "value": false
+                    },
+                    "when": {
+                      "as": "item",
+                      "items": {
+                        "var": "evidence"
+                      },
+                      "op": "any",
+                      "test": {
+                        "args": [
+                          {
+                            "var": "item"
+                          },
+                          {
+                            "value": "row_errors_present"
+                          }
+                        ],
+                        "op": "eq"
+                      }
+                    }
+                  },
+                  {
+                    "claim": "When every row is valid, the batch succeeds with normalized records in input order and no errors; units default to base_unit and inputs remain unmodified.",
+                    "dependencies": [
+                      "work.py",
+                      "OUTPUT_SCHEMA.json"
+                    ],
+                    "evidence": [
+                      "fe5dcaf0e9ff838cf1596e62f8de4905099afdd6",
+                      "040d988edfa52ebb4d8d4caac152fda736332a33"
+                    ],
+                    "id": "all_valid_succeeds",
+                    "target": "ok",
+                    "then": {
+                      "value": true
+                    },
+                    "when": {
+                      "as": "item",
+                      "items": {
+                        "var": "evidence"
+                      },
+                      "op": "any",
+                      "test": {
+                        "args": [
+                          {
+                            "var": "item"
+                          },
+                          {
+                            "value": "all_rows_valid"
+                          }
+                        ],
+                        "op": "eq"
+                      }
+                    }
+                  }
+                ],
+                "schema": 1,
+                "title": "Stage 1 row-validation batch outcome",
+                "unresolved": [
+                  "The executable model predicts batch ok only when supplied evidence classifies whether row errors are present; it does not itself derive that classification from arbitrary nested rows because the expression language lacks type tests, indexing, and prior-row distinctness.",
+                  "Malformed top-level request or policy objects are outside the tested task contract."
+                ]
+              },
+              "parent": "d5323717dd9fab85b22d0031d4333ff677d001bb",
+              "reason": "Agent proposed a model revision",
+              "revision": 2
+            }
+          }
+        },
+        {
+          "id": "6d3460112634b528673abe202464f18b83c0154d",
+          "text": "Task model active: Stage 1 row-validation batch outcome",
+          "payload": {
+            "agent": "agent",
+            "model_event": "accepted",
+            "task_model": {
+              "checks": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": true,
+                    "expected": true,
+                    "id": "stage2_current_valid_policy_v0",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "all_valid_succeeds"
+                      ],
+                      "status": "predicted",
+                      "value": true
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": false,
+                    "id": "stage2_priority_duplicate_boundary",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "row_error_fails_batch"
+                      ],
+                      "status": "predicted",
+                      "value": false
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": true,
+                    "id": "current_single_valid_row",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "all_valid_succeeds"
+                      ],
+                      "status": "predicted",
+                      "value": true
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": false,
+                    "id": "duplicate_after_accepted_row",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "row_error_fails_batch"
+                      ],
+                      "status": "predicted",
+                      "value": false
+                    }
+                  },
+                  {
+                    "challenge": false,
+                    "expected": false,
+                    "id": "invalid_rows_with_later_accepted_duplicate",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "row_error_fails_batch"
+                      ],
+                      "status": "predicted",
+                      "value": false
+                    }
+                  }
+                ],
+                "changed_dependencies": [],
+                "complexity": {
+                  "cases": 5,
+                  "complete_bytes": 3398,
+                  "rules": 2,
+                  "working_bytes": 1179
+                },
+                "id": "6dd592b1bc18978d9a793eb746011f11dab36b3c",
+                "issues": [],
+                "missing_evidence": [],
+                "status": "tested",
+                "uncovered_rules": [],
+                "unresolved": [
+                  "The executable model predicts batch ok only when supplied evidence classifies whether row errors are present; it does not itself derive that classification from arbitrary nested rows because the expression language lacks type tests, indexing, and prior-row distinctness.",
+                  "Malformed top-level request or policy objects are outside the tested task contract."
+                ]
+              },
+              "complexity": {
+                "cases": 5,
+                "complete_bytes": 3398,
+                "rules": 2,
+                "working_bytes": 1179
+              },
+              "fingerprints": {
+                "OUTPUT_SCHEMA.json": {
+                  "sha256": "c2ce7013c3bd0d4dd80a26b5455f18e589d829dd848dae1d1e9d583894c87490",
+                  "state": "file"
+                },
+                "policy.json": {
+                  "sha256": "6a36e01b42ea549e4c3e759329d31904f25d93013303074238bd0a2e76b03732",
+                  "state": "file"
+                },
+                "report.json": {
+                  "sha256": "0e800b6e8ab91355a34b01850f84ad4fd564dfa74d6c5bccb03ce7627379190b",
+                  "state": "file"
+                },
+                "requests.json": {
+                  "sha256": "90fef6aac4df7b9abdbdbdb3019ae38e5188b72f958c8f96a62a10be06d5d34d",
+                  "state": "file"
+                },
+                "work.py": {
+                  "sha256": "45102c08fc1cf417c6a73de877358311d962d8b2395a981b5ec71dea0ff23c3c",
+                  "state": "file"
+                }
+              },
+              "model": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "a735d4df31a2a32cf07a565bf817960f1356ddc3"
+                    ],
+                    "expected": true,
+                    "id": "stage2_current_valid_policy_v0",
+                    "inputs": {
+                      "evidence": [
+                        "all_rows_valid"
+                      ],
+                      "policy": {
+                        "base_unit": "nm",
+                        "unique": false,
+                        "units": {
+                          "nm": 1,
+                          "um": 1000
+                        },
+                        "variant": 0
+                      },
+                      "request": {
+                        "rows": [
+                          {
+                            "amount": 4,
+                            "id": "sample_0",
+                            "unit": "nm"
+                          }
+                        ]
+                      }
+                    },
+                    "target": "ok"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "a735d4df31a2a32cf07a565bf817960f1356ddc3"
+                    ],
+                    "expected": false,
+                    "id": "stage2_priority_duplicate_boundary",
+                    "inputs": {
+                      "evidence": [
+                        "row_errors_present"
+                      ],
+                      "policy": {
+                        "base_unit": "m",
+                        "unique": true,
+                        "units": {
+                          "cm": 0.01,
+                          "m": 1
+                        }
+                      },
+                      "request": {
+                        "rows": [
+                          {
+                            "amount": false,
+                            "id": "",
+                            "unit": "bad"
+                          },
+                          {
+                            "amount": true,
+                            "id": "a"
+                          },
+                          {
+                            "amount": 1,
+                            "id": "a",
+                            "unit": []
+                          },
+                          {
+                            "amount": 2,
+                            "id": "a"
+                          },
+                          {
+                            "amount": 3,
+                            "id": "a"
+                          }
+                        ]
+                      }
+                    },
+                    "target": "ok"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "fe5dcaf0e9ff838cf1596e62f8de4905099afdd6"
+                    ],
+                    "expected": true,
+                    "id": "current_single_valid_row",
+                    "inputs": {
+                      "evidence": [
+                        "all_rows_valid"
+                      ],
+                      "policy": {
+                        "base_unit": "nm",
+                        "unique": false,
+                        "units": {
+                          "nm": 1
+                        },
+                        "variant": 0
+                      },
+                      "request": {
+                        "rows": [
+                          {
+                            "amount": 4,
+                            "id": "sample_0",
+                            "unit": "nm"
+                          }
+                        ]
+                      }
+                    },
+                    "target": "ok"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "040d988edfa52ebb4d8d4caac152fda736332a33"
+                    ],
+                    "expected": false,
+                    "id": "duplicate_after_accepted_row",
+                    "inputs": {
+                      "evidence": [
+                        "row_errors_present"
+                      ],
+                      "policy": {
+                        "base_unit": "u",
+                        "unique": true,
+                        "units": {
+                          "u": 2
+                        }
+                      },
+                      "request": {
+                        "rows": [
+                          {
+                            "amount": 1,
+                            "id": "a"
+                          },
+                          {
+                            "amount": 2,
+                            "id": "a"
+                          }
+                        ]
+                      }
+                    },
+                    "target": "ok"
+                  },
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "040d988edfa52ebb4d8d4caac152fda736332a33"
+                    ],
+                    "expected": false,
+                    "id": "invalid_rows_with_later_accepted_duplicate",
+                    "inputs": {
+                      "evidence": [
+                        "row_errors_present"
+                      ],
+                      "policy": {
+                        "base_unit": "u",
+                        "unique": true,
+                        "units": {
+                          "u": 1
+                        }
+                      },
+                      "request": {
+                        "rows": [
+                          {
+                            "amount": true,
+                            "id": "x",
+                            "unit": []
+                          },
+                          {
+                            "amount": 1,
+                            "id": "x",
+                            "unit": []
+                          },
+                          {
+                            "amount": 1,
+                            "id": "x"
+                          },
+                          {
+                            "amount": 2,
+                            "id": "x"
+                          }
+                        ]
+                      }
+                    },
+                    "target": "ok"
+                  }
+                ],
+                "inputs": {
+                  "evidence": "array",
+                  "policy": "object",
+                  "request": "object"
+                },
+                "resolutions": [],
+                "rules": [
+                  {
+                    "claim": "If validation produces any prioritized row error, the complete batch fails and records are empty; row validation priority is id, amount, unit, duplicate, and duplicate tracking includes only earlier fully accepted rows.",
+                    "dependencies": [
+                      "work.py",
+                      "OUTPUT_SCHEMA.json"
+                    ],
+                    "evidence": [
+                      "fe5dcaf0e9ff838cf1596e62f8de4905099afdd6",
+                      "040d988edfa52ebb4d8d4caac152fda736332a33"
+                    ],
+                    "id": "row_error_fails_batch",
+                    "target": "ok",
+                    "then": {
+                      "value": false
+                    },
+                    "when": {
+                      "as": "item",
+                      "items": {
+                        "var": "evidence"
+                      },
+                      "op": "any",
+                      "test": {
+                        "args": [
+                          {
+                            "var": "item"
+                          },
+                          {
+                            "value": "row_errors_present"
+                          }
+                        ],
+                        "op": "eq"
+                      }
+                    }
+                  },
+                  {
+                    "claim": "When every row is valid, the batch succeeds with normalized records in input order and no errors; units default to base_unit and inputs remain unmodified.",
+                    "dependencies": [
+                      "work.py",
+                      "OUTPUT_SCHEMA.json"
+                    ],
+                    "evidence": [
+                      "fe5dcaf0e9ff838cf1596e62f8de4905099afdd6",
+                      "040d988edfa52ebb4d8d4caac152fda736332a33"
+                    ],
+                    "id": "all_valid_succeeds",
+                    "target": "ok",
+                    "then": {
+                      "value": true
+                    },
+                    "when": {
+                      "as": "item",
+                      "items": {
+                        "var": "evidence"
+                      },
+                      "op": "any",
+                      "test": {
+                        "args": [
+                          {
+                            "var": "item"
+                          },
+                          {
+                            "value": "all_rows_valid"
+                          }
+                        ],
+                        "op": "eq"
+                      }
+                    }
+                  }
+                ],
+                "schema": 1,
+                "title": "Stage 1 row-validation batch outcome",
+                "unresolved": [
+                  "The executable model predicts batch ok only when supplied evidence classifies whether row errors are present; it does not itself derive that classification from arbitrary nested rows because the expression language lacks type tests, indexing, and prior-row distinctness.",
+                  "Malformed top-level request or policy objects are outside the tested task contract."
+                ]
+              },
+              "parent": "d5323717dd9fab85b22d0031d4333ff677d001bb",
+              "proposal": "6dd592b1bc18978d9a793eb746011f11dab36b3c",
+              "reason": "Agent proposed a model revision",
+              "revision": 2
+            }
+          }
+        },
+        {
+          "id": "8fc530904821e3e060e620850028cb3a9fda2b1d",
+          "text": "Milestone complete: work.py and report.json already satisfy Stage 2 and passed current-data plus independent boundary checks. Unresolved limits: malformed top-level request/policy objects are outside the stated and tested contract; evidence.json is absent, so no evidence-driven behavior was applicable. The executable handoff model requires caller-supplied evidence classification because its expression language cannot derive Python type validity or prior-row distinctness from arbitrary nested rows.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "report.json",
+              "OUTPUT_SCHEMA.json",
+              "requests.json",
+              "policy.json"
+            ]
+          }
+        },
+        {
+          "id": "687c0ae8525ada1bc333954833f0a42a14ea82e9",
+          "text": "Stage 2 work sample 0 complete. work.py implements evaluate(request, policy) with exact id/amount/unit/duplicate priority, accepted-only duplicate tracking, all-or-nothing records, exact output fields, and no input mutation. report.json matches current requests.json and policy.json. Verified with compilation, current-data comparison, and independent boundary tests covering bool/NaN/inf/negative amounts, invalid and unhashable units, priority, duplicates, unique=false, defaults, normalization, and input preservation. evidence.json is absent. Remaining limit: malformed top-level request/policy objects are outside the stated contract.",
+          "payload": {
+            "agent": "agent",
+            "covers": [
+              "fe5dcaf0e9ff838cf1596e62f8de4905099afdd6",
+              "040d988edfa52ebb4d8d4caac152fda736332a33",
+              "a735d4df31a2a32cf07a565bf817960f1356ddc3",
+              "8fc530904821e3e060e620850028cb3a9fda2b1d"
+            ],
+            "files": [
+              "work.py",
+              "report.json",
+              "OUTPUT_SCHEMA.json",
+              "requests.json",
+              "policy.json"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

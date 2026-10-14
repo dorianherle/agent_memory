@@ -1,0 +1,1109 @@
+{
+  "stage": 1,
+  "summary": {
+    "memory": {
+      "complete_tasks": 3,
+      "attempted_tasks": 4,
+      "full_case_passes": 39,
+      "cases": 40,
+      "mean_partial_score": 99.0625
+    },
+    "notebook": {
+      "complete_tasks": 3,
+      "attempted_tasks": 4,
+      "full_case_passes": 39,
+      "cases": 40,
+      "mean_partial_score": 99.0625
+    }
+  },
+  "rows": [
+    {
+      "trial": 1,
+      "condition": "memory",
+      "stage": 1,
+      "task": "research",
+      "source_sha256": "f9022d16aedfa4790dbaf073ac99ca7f7dbdab7d9339ba5476cc718a8ce25d5e",
+      "grade": {
+        "task": "research",
+        "max_stage": 1,
+        "cases": 12,
+        "full_passes": 11,
+        "score": 96.25,
+        "category_passes": {
+          "schema": 12,
+          "numeric": 12,
+          "decisions": 11
+        },
+        "category_weights": {
+          "schema": 10,
+          "numeric": 45,
+          "decisions": 45
+        },
+        "details": [
+          {
+            "name": "independent_pass",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "one_sided_pass_two_sided_fail",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "known_sigma_not_residual_scaled",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "gain_only",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "fit_only",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "both_gates",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "equality_pass",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": false
+            },
+            "all_pass": false,
+            "error": null
+          },
+          {
+            "name": "correlation_overrides_sigma",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "correlated_bad_fit",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "correlated_gain_gate",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "heteroscedastic_weights",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "general_spd_covariance",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "trial": 1,
+      "condition": "memory",
+      "stage": 1,
+      "task": "software",
+      "source_sha256": "9add6a0c961178b903a785bc4a329445f512a6d9230104cd0074240e8a64e451",
+      "grade": {
+        "task": "software",
+        "max_stage": 1,
+        "cases": 8,
+        "full_passes": 8,
+        "score": 100.0,
+        "category_passes": {
+          "schema": 8,
+          "responses": 8,
+          "state": 8
+        },
+        "category_weights": {
+          "schema": 10,
+          "responses": 50,
+          "state": 40
+        },
+        "details": [
+          {
+            "name": "reserve_buy_release",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "failed_response_is_cached",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "hold_id_is_never_reused",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "sort_holds_and_stock",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "old_policy_replays_changed_payload",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "expiry_before_replay_at_deadline",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "expiry_keeps_id_and_failed_cache",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "no_expiry_beyond_last_event",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "trial": 1,
+      "condition": "notebook",
+      "stage": 1,
+      "task": "research",
+      "source_sha256": "f1762c3fd96468743f514e6cfe07663103313062357bc00632c1c196e5e4b99c",
+      "grade": {
+        "task": "research",
+        "max_stage": 1,
+        "cases": 12,
+        "full_passes": 11,
+        "score": 96.25,
+        "category_passes": {
+          "schema": 12,
+          "numeric": 12,
+          "decisions": 11
+        },
+        "category_weights": {
+          "schema": 10,
+          "numeric": 45,
+          "decisions": 45
+        },
+        "details": [
+          {
+            "name": "independent_pass",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "one_sided_pass_two_sided_fail",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "known_sigma_not_residual_scaled",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "gain_only",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "fit_only",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "both_gates",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "equality_pass",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": false
+            },
+            "all_pass": false,
+            "error": null
+          },
+          {
+            "name": "correlation_overrides_sigma",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "correlated_bad_fit",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "correlated_gain_gate",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "heteroscedastic_weights",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "general_spd_covariance",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "trial": 1,
+      "condition": "notebook",
+      "stage": 1,
+      "task": "software",
+      "source_sha256": "d48bab8024eb7ae4cc38e2b95a80169e05a483ee31dfe724698db81f426aa6b8",
+      "grade": {
+        "task": "software",
+        "max_stage": 1,
+        "cases": 8,
+        "full_passes": 8,
+        "score": 100.0,
+        "category_passes": {
+          "schema": 8,
+          "responses": 8,
+          "state": 8
+        },
+        "category_weights": {
+          "schema": 10,
+          "responses": 50,
+          "state": 40
+        },
+        "details": [
+          {
+            "name": "reserve_buy_release",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "failed_response_is_cached",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "hold_id_is_never_reused",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "sort_holds_and_stock",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "old_policy_replays_changed_payload",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "expiry_before_replay_at_deadline",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "expiry_keeps_id_and_failed_cache",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "no_expiry_beyond_last_event",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "trial": 2,
+      "condition": "memory",
+      "stage": 1,
+      "task": "research",
+      "source_sha256": "7355473b5779fdbad93d149a3b7486d542815b204151c69765c868d1e30e790e",
+      "grade": {
+        "task": "research",
+        "max_stage": 1,
+        "cases": 12,
+        "full_passes": 12,
+        "score": 100.0,
+        "category_passes": {
+          "schema": 12,
+          "numeric": 12,
+          "decisions": 12
+        },
+        "category_weights": {
+          "schema": 10,
+          "numeric": 45,
+          "decisions": 45
+        },
+        "details": [
+          {
+            "name": "independent_pass",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "one_sided_pass_two_sided_fail",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "known_sigma_not_residual_scaled",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "gain_only",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "fit_only",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "both_gates",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "equality_pass",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "correlation_overrides_sigma",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "correlated_bad_fit",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "correlated_gain_gate",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "heteroscedastic_weights",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "general_spd_covariance",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "trial": 2,
+      "condition": "memory",
+      "stage": 1,
+      "task": "software",
+      "source_sha256": "0cf6f90e70a5a564cc328be85858264939e05db70b401d86651c5ff46ddf2657",
+      "grade": {
+        "task": "software",
+        "max_stage": 1,
+        "cases": 8,
+        "full_passes": 8,
+        "score": 100.0,
+        "category_passes": {
+          "schema": 8,
+          "responses": 8,
+          "state": 8
+        },
+        "category_weights": {
+          "schema": 10,
+          "responses": 50,
+          "state": 40
+        },
+        "details": [
+          {
+            "name": "reserve_buy_release",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "failed_response_is_cached",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "hold_id_is_never_reused",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "sort_holds_and_stock",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "old_policy_replays_changed_payload",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "expiry_before_replay_at_deadline",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "expiry_keeps_id_and_failed_cache",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "no_expiry_beyond_last_event",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "trial": 2,
+      "condition": "notebook",
+      "stage": 1,
+      "task": "research",
+      "source_sha256": "d61b0d495e8e298038a887eb44442228a869b62316c07d259a7df6c736f7c5dd",
+      "grade": {
+        "task": "research",
+        "max_stage": 1,
+        "cases": 12,
+        "full_passes": 12,
+        "score": 100.0,
+        "category_passes": {
+          "schema": 12,
+          "numeric": 12,
+          "decisions": 12
+        },
+        "category_weights": {
+          "schema": 10,
+          "numeric": 45,
+          "decisions": 45
+        },
+        "details": [
+          {
+            "name": "independent_pass",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "one_sided_pass_two_sided_fail",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "known_sigma_not_residual_scaled",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "gain_only",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "fit_only",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "both_gates",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "equality_pass",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "correlation_overrides_sigma",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "correlated_bad_fit",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "correlated_gain_gate",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "heteroscedastic_weights",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "general_spd_covariance",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "trial": 2,
+      "condition": "notebook",
+      "stage": 1,
+      "task": "software",
+      "source_sha256": "7d1dcaa1d034ce53ce7aa50a36c4bc93dbb1ddfea80db0434a8c2d45320861c7",
+      "grade": {
+        "task": "software",
+        "max_stage": 1,
+        "cases": 8,
+        "full_passes": 8,
+        "score": 100.0,
+        "category_passes": {
+          "schema": 8,
+          "responses": 8,
+          "state": 8
+        },
+        "category_weights": {
+          "schema": 10,
+          "responses": 50,
+          "state": 40
+        },
+        "details": [
+          {
+            "name": "reserve_buy_release",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "failed_response_is_cached",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "hold_id_is_never_reused",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "sort_holds_and_stock",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "old_policy_replays_changed_payload",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "expiry_before_replay_at_deadline",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "expiry_keeps_id_and_failed_cache",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "no_expiry_beyond_last_event",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          }
+        ]
+      }
+    }
+  ]
+}

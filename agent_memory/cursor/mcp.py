@@ -56,6 +56,32 @@ def _build_server():
         )
 
     @mcp.tool()
+    def memory_model(
+        operation: str = "get",
+        data: dict | None = None,
+        id: str | None = None,
+        base: str | None = None,
+        target: str | None = None,
+        agent: str | None = None,
+        goal: str | None = None,
+        full: bool = False,
+    ) -> str:
+        """Task model: get (full=True adds fixtures), propose(data=model, base=active id), check(id), accept(id), reduce, predict(data=inputs, target), handoff(data=model or {observations:[cases]} or null to reuse, base=active id). Handoff checks, accepts, reduces, and records a challenge prediction. Git retains evidence."""
+        memory = get_memory(goal)
+        result = call_tool(memory, "memory", {
+            "action": "model_" + operation, "payload": data,
+            "id": base if operation in ("propose", "handoff") else id,
+            "name": target, "agent": agent, "full": full,
+        })
+        if operation in ("propose", "accept", "reduce", "handoff") and not result.startswith("Error:"):
+            memory.write_state_file()
+            try:
+                memory.write_live_html()
+            except Exception:
+                pass
+        return result
+
+    @mcp.tool()
     def memory_find(
         query: str | None = None,
         text: str | None = None,

@@ -1,0 +1,64 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "show",
+              "61ec75b:work.py"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "show",
+              "61ec75b:report.json"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy, work\np={'edges':{'a>b':{},'b>c':{'role':'op'},'x>a':{'retry':True}},'retry_limit':2}\ncases=[({'from':'a','to':'b'},True,'ok'),({'from':'z','to':'b'},False,'blocked'),({'from':'b','to':'c','retry':True,'attempts':99},False,'permission'),({'from':'x','to':'a','attempts':0},True,'ok'),({'from':'x','to':'a','attempts':True},False,'retry_limit'),({'from':'x','to':'a','attempts':2},False,'retry_limit')]\nfor r,ok,reason in cases:\n before=(copy.deepcopy(r),copy.deepcopy(p)); out=work.evaluate(r,p); print(r,out,'immut',before==(r,p),'expect',ok,reason)"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "status",
+              "--short"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 23201,
+    "output_tokens": 519,
+    "cached_input_tokens": 11392,
+    "reasoning_output_tokens": 188
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 19.65635620895773,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy,json\nfrom work import evaluate\nwith open('requests.json',encoding='utf-8') as f: requests=json.load(f)\nwith open('evidence.json',encoding='utf-8') as f: evidence=json.load(f)\nwith open('policy.json',encoding='utf-8') as f: policy=json.load(f)\nwith open('report.json',encoding='utf-8') as f: report=json.load(f)\nactual=[evaluate(r,evidence,policy) for r in requests]\nassert report==actual,(report,actual)\nassert actual==[{'status':'conflict','value':None,'sources':['S1','X1'],'unknowns':['source disagreement']},{'status':'unsupported','value':False,'sources':['D1'],'unknowns':[]}]\nexpected_fields={'status','value','sources','unknowns'}\nassert all(set(x)==expected_fields for x in actual)\nbase={'claim':'c','conditions':{'a':1,'b':2}}\ndef test(req,ev,pol,want):\n    before=copy.deepcopy((req,ev,pol)); got=evaluate(req,ev,pol)\n    assert got==want,(got,want); assert (req,ev,pol)==before\ntest({'claim':'c','conditions':{}},[],{'required_conditions':['b','a']},{'status':'unknown','value':None,'sources':[],'unknowns':['a','b']})\ntest(base,[{'source':'old','claim':'c','value':1,'conditions':{'a':1,'b':2}},{'source':'new','claim':'c','value':2,'conditions':{'a':1,'b':2},'supersedes':'old'}],{'required_conditions':['a','b']},{'status':'supported','value':2,'sources':['new'],'unknowns':[]})\ntest(base,[{'source':'old','claim':'c','value':1,'conditions':{'a':1,'b':2}},{'source':'bad','claim':'other','value':2,'conditions':{'a':1,'b':2},'supersedes':['old']}],{'required_conditions':['a','b']},{'status':'supported','value':1,'sources':['old'],'unknowns':[]})\ntest(base,[{'source':'u','claim':'c','value':8,'conditions':{'a':1,'b':2},'verified':False}],{'required_conditions':['a','b'],'require_verified':True},{'status':'unknown','value':None,'sources':[],'unknowns':['no matching evidence']})\ntest(base,[{'source':'z','claim':'c','value':{'q':[1,2]},'conditions':{'a':1,'b':2}},{'source':'a','claim':'c','value':{'q':[1,3]},'conditions':{'a':1,'b':2}}],{'required_conditions':['a','b']},{'status':'conflict','value':None,'sources':['a','z'],'unknowns':['source disagreement']})\ntest(base,[{'source':'f','claim':'c','value':False,'conditions':{'a':1,'b':2}}],{'required_conditions':['a','b']},{'status':'unsupported','value':False,'sources':['f'],'unknowns':[]})\ntest(base,[{'source':'n','claim':'c','value':None,'conditions':{'a':1,'b':2}}],{'required_conditions':['a','b']},{'status':'supported','value':None,'sources':['n'],'unknowns':[]})\nprint(json.dumps({'report':actual,'checks':'passed'},sort_keys=True))"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 14417,
+    "output_tokens": 1498,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 669
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 23.345765041885898,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

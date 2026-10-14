@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "text": "{\"answer\":\"11 minutes\",\"source\":\"Q21\"}",
+  "errors": [],
+  "model": "gpt-5.6-sol",
+  "reasoning": "low",
+  "elapsed_seconds": 4.733760542003438,
+  "usage_complete": true,
+  "usage": {
+    "input_tokens": 10171,
+    "output_tokens": 26
+  },
+  "native_tools": [],
+  "prompt_sha256": "6baa1b8b713c97250da4bd2cb00f101517c17ee7197bd94ee79cafb73656fbe6"
+}

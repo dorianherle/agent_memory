@@ -1,0 +1,64 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy, json, math\nfrom work import evaluate\n\np={'base_unit':'m','units':{'m':1,'cm':0.01},'unique':True}\ncases=[\n ({'rows':[{'id':'a','amount':200,'unit':'cm'},{'id':'b','amount':0}]},{'ok':True,'records':[{'id':'a','amount':2.0,'unit':'m'},{'id':'b','amount':0,'unit':'m'}],'errors':[]}),\n ({'rows':[{'id':'','amount':-1,'unit':'x'},{'id':'a','amount':True},{'id':'b','amount':1,'unit':'x'},{'id':'b','amount':1}]},{'ok':False,'records':[],'errors':[{'row':0,'cause':'id'},{'row':1,'cause':'amount'},{'row':2,'cause':'unit'},{'row':3,'cause':'duplicate'}]}),\n ({'rows':[{'id':'a','amount':float('nan')},{'id':'b','amount':float('inf')},{'id':'c','amount':-1}]},{'ok':False,'records':[],'errors':[{'row':0,'cause':'amount'},{'row':1,'cause':'amount'},{'row':2,'cause':'amount'}]}),\n]\nfor req, expected in cases:\n before_req=copy.deepcopy(req); before_p=copy.deepcopy(p)\n actual=evaluate(req,p)\n assert actual==expected,(actual,expected)\n assert req==before_req and p==before_p\n# invalid, unhashable unit is a unit error rather than an exception\nassert evaluate({'rows':[{'id':'x','amount':1,'unit':[]}]},p)=={'ok':False,'records':[],'errors':[{'row':0,'cause':'unit'}]}\nprint('validation checks passed')"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import json\nfrom work import evaluate\nwith open('policy.json',encoding='utf-8') as f: policy=json.load(f)\nwith open('requests.json',encoding='utf-8') as f: requests=json.load(f)\nexpected=[evaluate(request,policy) for request in requests]\nwith open('report.json',encoding='utf-8') as f: report=json.load(f)\nassert report==expected,(report,expected)\nprint(json.dumps(report,sort_keys=True))"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "diff",
+              "--check"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "status",
+              "--short"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 11568,
+    "output_tokens": 906,
+    "cached_input_tokens": 8320,
+    "reasoning_output_tokens": 266
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 19.02042879210785,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

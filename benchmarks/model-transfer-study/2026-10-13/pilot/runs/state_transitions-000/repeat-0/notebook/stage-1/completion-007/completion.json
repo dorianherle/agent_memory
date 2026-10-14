@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "write",
+    "arguments": {
+      "path": "report.json",
+      "content": "[\n  {\n    \"ok\": true,\n    \"value\": \"ready\",\n    \"reason\": \"ok\"\n  },\n  {\n    \"ok\": true,\n    \"value\": \"running\",\n    \"reason\": \"ok\"\n  }\n]\n"
+    }
+  },
+  "usage": {
+    "input_tokens": 28984,
+    "output_tokens": 351,
+    "cached_input_tokens": 24832,
+    "reasoning_output_tokens": 120
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 12.502954749856144,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

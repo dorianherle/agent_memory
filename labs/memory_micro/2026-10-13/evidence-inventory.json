@@ -1,0 +1,914 @@
+{
+  "date": "2026-10-13",
+  "purpose": "Screen memory mechanisms for long-running agent tasks.",
+  "experiments": [
+    {
+      "id": "E1",
+      "path": "e1_drift",
+      "files": {
+        "protocol.json": true,
+        "script.py": true,
+        "results.json": true,
+        "report.txt": true
+      },
+      "model_calls": 13,
+      "failed_calls": 0,
+      "unknown_or_incomplete_usage_calls": 0,
+      "known_native_usage": {
+        "input_tokens": 143067,
+        "output_tokens": 3931
+      },
+      "native_usage_applicable": true,
+      "total_native_usage_verified": true,
+      "artifact_sha256": {
+        "protocol.json": "a30e26b058f973d11fcbca2f16fb9d328e506151b005663d7d3d7a3a34491f89",
+        "script.py": "f013485b53dca7fe0a1d05e8d9b6d12cc6283e03bd958bd9b946b3b047802e46",
+        "results.json": "1865332b644ba9084f33ef52dcf541c840b0f8b9ec4affd64e3f0150b0d8a3a0",
+        "report.txt": "2a3ac7d814f56b838fa7caa5d8f51916f4040f3f9794e05fe8afa3c2ce674ffe"
+      },
+      "calls": [
+        {
+          "path": "e1_drift/calls/ledger_handoff_1/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10517,
+            "output_tokens": 278
+          },
+          "errors": [],
+          "elapsed_seconds": 15.492242624983191,
+          "native_tools": []
+        },
+        {
+          "path": "e1_drift/calls/ledger_handoff_2/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10629,
+            "output_tokens": 324
+          },
+          "errors": [],
+          "elapsed_seconds": 12.812004749896005,
+          "native_tools": []
+        },
+        {
+          "path": "e1_drift/calls/ledger_handoff_3/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10673,
+            "output_tokens": 342
+          },
+          "errors": [],
+          "elapsed_seconds": 13.168234457960352,
+          "native_tools": []
+        },
+        {
+          "path": "e1_drift/calls/ledger_handoff_4/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10705,
+            "output_tokens": 369
+          },
+          "errors": [],
+          "elapsed_seconds": 9.854355415794998,
+          "native_tools": []
+        },
+        {
+          "path": "e1_drift/calls/ledger_handoff_5/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10767,
+            "output_tokens": 384
+          },
+          "errors": [],
+          "elapsed_seconds": 13.127889374969527,
+          "native_tools": []
+        },
+        {
+          "path": "e1_drift/calls/prose_handoff_1/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10487,
+            "output_tokens": 240
+          },
+          "errors": [],
+          "elapsed_seconds": 15.473429707810283,
+          "native_tools": []
+        },
+        {
+          "path": "e1_drift/calls/prose_handoff_2/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10587,
+            "output_tokens": 180
+          },
+          "errors": [],
+          "elapsed_seconds": 10.180511499987915,
+          "native_tools": []
+        },
+        {
+          "path": "e1_drift/calls/prose_handoff_3/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10574,
+            "output_tokens": 300
+          },
+          "errors": [],
+          "elapsed_seconds": 11.636238083941862,
+          "native_tools": []
+        },
+        {
+          "path": "e1_drift/calls/prose_handoff_4/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10663,
+            "output_tokens": 313
+          },
+          "errors": [],
+          "elapsed_seconds": 7.966713916044682,
+          "native_tools": []
+        },
+        {
+          "path": "e1_drift/calls/prose_handoff_5/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10674,
+            "output_tokens": 335
+          },
+          "errors": [],
+          "elapsed_seconds": 13.147434749873355,
+          "native_tools": []
+        },
+        {
+          "path": "e1_drift/calls/receiver_full_history_control/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 11535,
+            "output_tokens": 256
+          },
+          "errors": [],
+          "elapsed_seconds": 7.081032583024353,
+          "native_tools": []
+        },
+        {
+          "path": "e1_drift/calls/receiver_ledger/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 11197,
+            "output_tokens": 328
+          },
+          "errors": [],
+          "elapsed_seconds": 9.584576416062191,
+          "native_tools": []
+        },
+        {
+          "path": "e1_drift/calls/receiver_prose/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 14059,
+            "output_tokens": 282
+          },
+          "errors": [],
+          "elapsed_seconds": 11.846743791829795,
+          "native_tools": []
+        }
+      ]
+    },
+    {
+      "id": "E2",
+      "path": "e2_abstraction",
+      "files": {
+        "protocol.json": true,
+        "script.py": true,
+        "results.json": true,
+        "report.txt": true
+      },
+      "model_calls": 10,
+      "failed_calls": 0,
+      "unknown_or_incomplete_usage_calls": 0,
+      "known_native_usage": {
+        "input_tokens": 122067,
+        "output_tokens": 1302
+      },
+      "native_usage_applicable": true,
+      "total_native_usage_verified": true,
+      "artifact_sha256": {
+        "protocol.json": "9f92c3fcf022d6e7488b97b9e1f61fbcddb45156edcee949c2508ae5e03edeab",
+        "script.py": "80fdd3b4410b9c8477be80f4210d38b0e719c3b4c981646041d9618ac6f4df0b",
+        "results.json": "bdf4861674a628e9ac63b313954854d401b92949e571bb3a95bec03d7a1393c2",
+        "report.txt": "7d91f4276065b17b560aefe958e60b194552b7812c7726c7ad3e230f9f63777a"
+      },
+      "calls": [
+        {
+          "path": "e2_abstraction/calls/independent_full/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 13548,
+            "output_tokens": 52
+          },
+          "errors": [],
+          "elapsed_seconds": 11.89425504207611,
+          "native_tools": []
+        },
+        {
+          "path": "e2_abstraction/calls/independent_rules_read/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10622,
+            "output_tokens": 52
+          },
+          "errors": [],
+          "elapsed_seconds": 11.791241208091378,
+          "native_tools": []
+        },
+        {
+          "path": "e2_abstraction/calls/independent_rules_write/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10198,
+            "output_tokens": 244
+          },
+          "errors": [],
+          "elapsed_seconds": 13.77502379193902,
+          "native_tools": []
+        },
+        {
+          "path": "e2_abstraction/calls/independent_summary_read/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10580,
+            "output_tokens": 52
+          },
+          "errors": [],
+          "elapsed_seconds": 9.36735275015235,
+          "native_tools": []
+        },
+        {
+          "path": "e2_abstraction/calls/independent_summary_write/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 13303,
+            "output_tokens": 154
+          },
+          "errors": [],
+          "elapsed_seconds": 10.875216417014599,
+          "native_tools": []
+        },
+        {
+          "path": "e2_abstraction/calls/release_full/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 14325,
+            "output_tokens": 77
+          },
+          "errors": [],
+          "elapsed_seconds": 13.053486249875277,
+          "native_tools": []
+        },
+        {
+          "path": "e2_abstraction/calls/release_rules_read/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10998,
+            "output_tokens": 111
+          },
+          "errors": [],
+          "elapsed_seconds": 10.99905199999921,
+          "native_tools": []
+        },
+        {
+          "path": "e2_abstraction/calls/release_rules_write/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 13711,
+            "output_tokens": 189
+          },
+          "errors": [],
+          "elapsed_seconds": 13.366028625052422,
+          "native_tools": []
+        },
+        {
+          "path": "e2_abstraction/calls/release_summary_read/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 11085,
+            "output_tokens": 77
+          },
+          "errors": [],
+          "elapsed_seconds": 9.772326125064865,
+          "native_tools": []
+        },
+        {
+          "path": "e2_abstraction/calls/release_summary_write/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 13697,
+            "output_tokens": 294
+          },
+          "errors": [],
+          "elapsed_seconds": 14.723558207973838,
+          "native_tools": []
+        }
+      ]
+    },
+    {
+      "id": "E3",
+      "path": "e3_weight_memory",
+      "files": {
+        "protocol.json": true,
+        "script.py": true,
+        "results.json": true,
+        "report.txt": true
+      },
+      "model_calls": 0,
+      "failed_calls": 0,
+      "unknown_or_incomplete_usage_calls": 0,
+      "known_native_usage": {
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "native_usage_applicable": false,
+      "total_native_usage_verified": null,
+      "artifact_sha256": {
+        "protocol.json": "28aecd2625fd184f5d592c62c35cf0050553e1f3b3f172df7db71060661c7fb5",
+        "script.py": "f3291266cdef95e086f9872ba238018ffb79843f46f6b38eadc8050b766625e1",
+        "results.json": "94469cd05cee6b9a0499814e0564ad6bf2d6c469763a070dc7d8019755d728e4",
+        "report.txt": "902f85936040a69d0674e0e9d32a2229697fbca28742c3363d694f8b46f7abb0"
+      },
+      "calls": []
+    },
+    {
+      "id": "E4",
+      "path": "e4_query_memory",
+      "files": {
+        "protocol.json": true,
+        "script.py": true,
+        "results.json": true,
+        "report.txt": true
+      },
+      "model_calls": 6,
+      "failed_calls": 0,
+      "unknown_or_incomplete_usage_calls": 0,
+      "known_native_usage": {
+        "input_tokens": 88303,
+        "output_tokens": 1757
+      },
+      "native_usage_applicable": true,
+      "total_native_usage_verified": true,
+      "artifact_sha256": {
+        "protocol.json": "11bd29dd3cfaf118b2ef50a9af06ef989f82656673e56b192ef6965244c41843",
+        "script.py": "b7ee207d7c32e22b59a3aa9a7abd628340bb589d198616b2c64983a7531afc36",
+        "results.json": "a97eccb50ae98c63d0e777743c5afe11e82384550ee10295652ea5660ec6de9a",
+        "report.txt": "de462eaf9438c6ec38020a9093176f0d6d2ff596ff9e9cb7a30ca6bf9d59ffd6"
+      },
+      "calls": [
+        {
+          "path": "e4_query_memory/full_history_reader/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 23485,
+            "output_tokens": 250
+          },
+          "errors": [],
+          "elapsed_seconds": 6.542136749951169,
+          "native_tools": []
+        },
+        {
+          "path": "e4_query_memory/global_capped_reader/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 12602,
+            "output_tokens": 343
+          },
+          "errors": [],
+          "elapsed_seconds": 11.042195499874651,
+          "native_tools": []
+        },
+        {
+          "path": "e4_query_memory/global_reader/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 14031,
+            "output_tokens": 258
+          },
+          "errors": [],
+          "elapsed_seconds": 6.4793793328572065,
+          "native_tools": []
+        },
+        {
+          "path": "e4_query_memory/retrieval_reader/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 12823,
+            "output_tokens": 250
+          },
+          "errors": [],
+          "elapsed_seconds": 7.5071672918275,
+          "native_tools": []
+        },
+        {
+          "path": "e4_query_memory/writer/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 14138,
+            "output_tokens": 427
+          },
+          "errors": [],
+          "elapsed_seconds": 13.307431874796748,
+          "native_tools": []
+        },
+        {
+          "path": "e4_query_memory/writer_capped/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 11224,
+            "output_tokens": 229
+          },
+          "errors": [],
+          "elapsed_seconds": 11.661297041922808,
+          "native_tools": []
+        }
+      ]
+    },
+    {
+      "id": "E5",
+      "path": "e5_task_frontier",
+      "files": {
+        "protocol.json": true,
+        "script.py": true,
+        "results.json": true,
+        "report.txt": true
+      },
+      "model_calls": 8,
+      "failed_calls": 0,
+      "unknown_or_incomplete_usage_calls": 0,
+      "known_native_usage": {
+        "input_tokens": 102660,
+        "output_tokens": 1517
+      },
+      "native_usage_applicable": true,
+      "total_native_usage_verified": true,
+      "artifact_sha256": {
+        "protocol.json": "fdb7d0d63cf6ce2fbdca80a931cd0b07cde157dabce6fef2ac08653f774575df",
+        "script.py": "5f2216d5c6bae209a5b4a4b80e3eba3ffff7c53f1cc31d70e3b7469a20cade56",
+        "results.json": "d8a898e84e46e01cb8de294e9782e52164d124442923f05ad5207e60750faef8",
+        "report.txt": "6c71cc3663397d4037f488206c64d663d3a001542847fb5dd32fabc31d5c0527"
+      },
+      "calls": [
+        {
+          "path": "e5_task_frontier/calls/backfill_cache_checkpoint_read/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10482,
+            "output_tokens": 84
+          },
+          "errors": [],
+          "elapsed_seconds": 6.502545417053625,
+          "native_tools": []
+        },
+        {
+          "path": "e5_task_frontier/calls/backfill_cache_full/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 13765,
+            "output_tokens": 162
+          },
+          "errors": [],
+          "elapsed_seconds": 12.535406541079283,
+          "native_tools": []
+        },
+        {
+          "path": "e5_task_frontier/calls/backfill_cache_knowledge_read/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 13367,
+            "output_tokens": 158
+          },
+          "errors": [],
+          "elapsed_seconds": 13.125587125075981,
+          "native_tools": []
+        },
+        {
+          "path": "e5_task_frontier/calls/backfill_cache_write/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10795,
+            "output_tokens": 332
+          },
+          "errors": [],
+          "elapsed_seconds": 11.484688374912366,
+          "native_tools": []
+        },
+        {
+          "path": "e5_task_frontier/calls/cancel_export_checkpoint_read/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 13410,
+            "output_tokens": 126
+          },
+          "errors": [],
+          "elapsed_seconds": 12.50969783286564,
+          "native_tools": []
+        },
+        {
+          "path": "e5_task_frontier/calls/cancel_export_full/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 13756,
+            "output_tokens": 172
+          },
+          "errors": [],
+          "elapsed_seconds": 12.070255083031952,
+          "native_tools": []
+        },
+        {
+          "path": "e5_task_frontier/calls/cancel_export_knowledge_read/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 13373,
+            "output_tokens": 165
+          },
+          "errors": [],
+          "elapsed_seconds": 10.425603874959052,
+          "native_tools": []
+        },
+        {
+          "path": "e5_task_frontier/calls/cancel_export_write/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 13712,
+            "output_tokens": 318
+          },
+          "errors": [],
+          "elapsed_seconds": 12.756777833914384,
+          "native_tools": []
+        }
+      ]
+    },
+    {
+      "id": "E6",
+      "path": "e6_checked_compaction",
+      "files": {
+        "protocol.json": true,
+        "script.py": true,
+        "results.json": true,
+        "report.txt": true
+      },
+      "model_calls": 6,
+      "failed_calls": 0,
+      "unknown_or_incomplete_usage_calls": 0,
+      "known_native_usage": {
+        "input_tokens": 65104,
+        "output_tokens": 1144
+      },
+      "native_usage_applicable": true,
+      "total_native_usage_verified": true,
+      "artifact_sha256": {
+        "protocol.json": "e7d83dbda5f2f02baf630799b3bfbf43a559ac5f5af0cb37a6cdfbf6ea9e24c3",
+        "script.py": "e343a20ad2050525a89acef07b85e13d74d4aaae0ef08c7a0cb7801b5beb4336",
+        "results.json": "35d8e65e862a9144c0010ee22ffc5696bd40d83183d905441803218383bb0402",
+        "report.txt": "1cc3894af1662630aca1f8a4667965574feb012df1f5feee8fd2f10380c49166"
+      },
+      "calls": [
+        {
+          "path": "e6_checked_compaction/calls/hidden_receiver_checked/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10825,
+            "output_tokens": 183
+          },
+          "errors": [],
+          "elapsed_seconds": 6.695938625140116,
+          "native_tools": []
+        },
+        {
+          "path": "e6_checked_compaction/calls/hidden_receiver_full_history_control/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 11074,
+            "output_tokens": 140
+          },
+          "errors": [],
+          "elapsed_seconds": 7.4442433749791235,
+          "native_tools": []
+        },
+        {
+          "path": "e6_checked_compaction/calls/hidden_receiver_unchecked/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10842,
+            "output_tokens": 150
+          },
+          "errors": [],
+          "elapsed_seconds": 6.239988208049908,
+          "native_tools": []
+        },
+        {
+          "path": "e6_checked_compaction/calls/initial_public_check/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10809,
+            "output_tokens": 209
+          },
+          "errors": [],
+          "elapsed_seconds": 7.780150291044265,
+          "native_tools": []
+        },
+        {
+          "path": "e6_checked_compaction/calls/initial_writer/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10654,
+            "output_tokens": 247
+          },
+          "errors": [],
+          "elapsed_seconds": 8.795635499991477,
+          "native_tools": []
+        },
+        {
+          "path": "e6_checked_compaction/calls/repair_writer/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10900,
+            "output_tokens": 215
+          },
+          "errors": [],
+          "elapsed_seconds": 9.119238917017356,
+          "native_tools": []
+        }
+      ]
+    },
+    {
+      "id": "E7",
+      "path": "e7_isolated_retrieval",
+      "files": {
+        "protocol.json": true,
+        "script.py": true,
+        "results.json": true,
+        "report.txt": true
+      },
+      "model_calls": 12,
+      "failed_calls": 0,
+      "unknown_or_incomplete_usage_calls": 0,
+      "known_native_usage": {
+        "input_tokens": 150153,
+        "output_tokens": 316
+      },
+      "native_usage_applicable": true,
+      "total_native_usage_verified": true,
+      "artifact_sha256": {
+        "protocol.json": "d3b151fef42f4f99a6d747d4e1e71811c9f141d3fac6cbcc1c9a2b9e7b81b938",
+        "script.py": "a0bfeb824896fda9f7313ef86d7f4e21e152fe183f83a8d602e6d33b4d1a1e10",
+        "results.json": "7acb1d03b68c68f1d1662b06545f0c6f84d97593f0489ee416fdede17ba3ca46",
+        "report.txt": "4941b07eaa156d1d7ef9052d32e9b80b468e804eb759a545b9dcb629e2e6bb96"
+      },
+      "calls": [
+        {
+          "path": "e7_isolated_retrieval/full_history_quarry_absent/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 14156,
+            "output_tokens": 24
+          },
+          "errors": [],
+          "elapsed_seconds": 9.004326000111178,
+          "native_tools": []
+        },
+        {
+          "path": "e7_isolated_retrieval/full_history_quarry_correction/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 14156,
+            "output_tokens": 26
+          },
+          "errors": [],
+          "elapsed_seconds": 9.594774417113513,
+          "native_tools": []
+        },
+        {
+          "path": "e7_isolated_retrieval/full_history_quarry_rare_lateral/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 14165,
+            "output_tokens": 29
+          },
+          "errors": [],
+          "elapsed_seconds": 11.483514291932806,
+          "native_tools": []
+        },
+        {
+          "path": "e7_isolated_retrieval/full_history_quarry_tail/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 14156,
+            "output_tokens": 26
+          },
+          "errors": [],
+          "elapsed_seconds": 9.69426183286123,
+          "native_tools": []
+        },
+        {
+          "path": "e7_isolated_retrieval/global_quarry_absent/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 13320,
+            "output_tokens": 24
+          },
+          "errors": [],
+          "elapsed_seconds": 11.36954087484628,
+          "native_tools": []
+        },
+        {
+          "path": "e7_isolated_retrieval/global_quarry_correction/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 13309,
+            "output_tokens": 27
+          },
+          "errors": [],
+          "elapsed_seconds": 9.414254083996639,
+          "native_tools": []
+        },
+        {
+          "path": "e7_isolated_retrieval/global_quarry_rare_lateral/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 13314,
+            "output_tokens": 31
+          },
+          "errors": [],
+          "elapsed_seconds": 9.977358333999291,
+          "native_tools": []
+        },
+        {
+          "path": "e7_isolated_retrieval/global_quarry_tail/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 13311,
+            "output_tokens": 24
+          },
+          "errors": [],
+          "elapsed_seconds": 10.61465804092586,
+          "native_tools": []
+        },
+        {
+          "path": "e7_isolated_retrieval/retrieval_quarry_absent/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 9959,
+            "output_tokens": 24
+          },
+          "errors": [],
+          "elapsed_seconds": 4.925698833074421,
+          "native_tools": []
+        },
+        {
+          "path": "e7_isolated_retrieval/retrieval_quarry_correction/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10173,
+            "output_tokens": 26
+          },
+          "errors": [],
+          "elapsed_seconds": 6.043072917032987,
+          "native_tools": []
+        },
+        {
+          "path": "e7_isolated_retrieval/retrieval_quarry_rare_lateral/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 9963,
+            "output_tokens": 29
+          },
+          "errors": [],
+          "elapsed_seconds": 5.09263545810245,
+          "native_tools": []
+        },
+        {
+          "path": "e7_isolated_retrieval/retrieval_quarry_tail/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 10171,
+            "output_tokens": 26
+          },
+          "errors": [],
+          "elapsed_seconds": 4.733760542003438,
+          "native_tools": []
+        }
+      ]
+    },
+    {
+      "id": "E8",
+      "path": "e8_no_memory",
+      "files": {
+        "protocol.json": true,
+        "script.py": true,
+        "results.json": true,
+        "report.txt": true
+      },
+      "model_calls": 2,
+      "failed_calls": 0,
+      "unknown_or_incomplete_usage_calls": 0,
+      "known_native_usage": {
+        "input_tokens": 27161,
+        "output_tokens": 122
+      },
+      "native_usage_applicable": true,
+      "total_native_usage_verified": true,
+      "artifact_sha256": {
+        "protocol.json": "ea478c179df9a05d5eaf1d995d6302a9da498d1075b495c15d1695faef257a64",
+        "script.py": "0a67bfb9776b353535e8670a45137ae217e0151c273f68da7d26e8c62b2273c9",
+        "results.json": "458ab8b50a7aca8fd93f29c958e059c40c47749b04d7e2f7aa7586312e5e0118",
+        "report.txt": "d940a3dc19db5d2682fd3cd5da5a26f320eba5102069464ba3206ea0274089ee"
+      },
+      "calls": [
+        {
+          "path": "e8_no_memory/calls/independent_no_memory/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 13390,
+            "output_tokens": 51
+          },
+          "errors": [],
+          "elapsed_seconds": 8.113846875028685,
+          "native_tools": []
+        },
+        {
+          "path": "e8_no_memory/calls/release_no_memory/result.json",
+          "ok": true,
+          "usage_complete": true,
+          "usage": {
+            "input_tokens": 13771,
+            "output_tokens": 71
+          },
+          "errors": [],
+          "elapsed_seconds": 8.371039666002616,
+          "native_tools": []
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "Researchers construct both tasks and graders; this is not an independent benchmark.",
+    "Tests do not reproduce an entire native IDE agent workflow.",
+    "Small samples screen mechanisms; they do not establish statistical superiority.",
+    "All calls, failures, setup costs, and unavailable usage remain in records.",
+    "A random tiny model is not evidence for a capable pretrained tiny LLM.",
+    "Training and reader inference costs must be reported separately from packet tokens."
+  ],
+  "accounting_note": "Known usage excludes parent and subagent orchestration. Training costs are separate. Missing usage is unknown, not zero."
+}

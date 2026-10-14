@@ -1,0 +1,108 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "model_handoff",
+      "id": "d5323717dd9fab85b22d0031d4333ff677d001bb",
+      "payload": {
+        "observations": [
+          {
+            "id": "stage2_current_valid_policy_v0",
+            "target": "ok",
+            "inputs": {
+              "request": {
+                "rows": [
+                  {
+                    "id": "sample_0",
+                    "amount": 4,
+                    "unit": "nm"
+                  }
+                ]
+              },
+              "policy": {
+                "variant": 0,
+                "base_unit": "nm",
+                "units": {
+                  "nm": 1,
+                  "um": 1000
+                },
+                "unique": false
+              },
+              "evidence": [
+                "all_rows_valid"
+              ]
+            },
+            "expected": true,
+            "evidence": [
+              "a735d4df"
+            ],
+            "challenge": true
+          },
+          {
+            "id": "stage2_priority_duplicate_boundary",
+            "target": "ok",
+            "inputs": {
+              "request": {
+                "rows": [
+                  {
+                    "id": "",
+                    "amount": false,
+                    "unit": "bad"
+                  },
+                  {
+                    "id": "a",
+                    "amount": true
+                  },
+                  {
+                    "id": "a",
+                    "amount": 1,
+                    "unit": []
+                  },
+                  {
+                    "id": "a",
+                    "amount": 2
+                  },
+                  {
+                    "id": "a",
+                    "amount": 3
+                  }
+                ]
+              },
+              "policy": {
+                "base_unit": "m",
+                "units": {
+                  "m": 1,
+                  "cm": 0.01
+                },
+                "unique": true
+              },
+              "evidence": [
+                "row_errors_present"
+              ]
+            },
+            "expected": false,
+            "evidence": [
+              "a735d4df"
+            ],
+            "challenge": true
+          }
+        ]
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 29795,
+    "output_tokens": 809,
+    "cached_input_tokens": 20992,
+    "reasoning_output_tokens": 493
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 20.222505958052352,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

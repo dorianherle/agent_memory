@@ -1,0 +1,25 @@
+Run state_transitions-000 repeat=0 method=notebook
+Run source_dependencies-000 repeat=0 method=notebook
+Run configuration_changes-000 repeat=0 method=notes
+Stage done: state_transitions-000 repeat=0 method=notebook stage=1 stop=finished pass=True tokens=151330
+Stage done: source_dependencies-000 repeat=0 method=notebook stage=1 stop=finished pass=True tokens=202361
+Stage done: state_transitions-000 repeat=0 method=notebook stage=2 stop=finished pass=False tokens=81330
+Stage done: source_dependencies-000 repeat=0 method=notebook stage=2 stop=finished pass=True tokens=91807
+Stage done: state_transitions-000 repeat=0 method=notebook stage=3 stop=finished pass=True tokens=114878
+Run state_transitions-000 repeat=0 method=notes
+Stage done: configuration_changes-000 repeat=0 method=notes stage=1 stop=finished pass=False tokens=375729
+Stage done: source_dependencies-000 repeat=0 method=notebook stage=3 stop=finished pass=True tokens=138511
+Run source_dependencies-000 repeat=0 method=models
+Stage done: configuration_changes-000 repeat=0 method=notes stage=2 stop=finished pass=False tokens=147659
+Stage done: state_transitions-000 repeat=0 method=notes stage=1 stop=finished pass=True tokens=213116
+Stage done: source_dependencies-000 repeat=0 method=models stage=1 stop=finished pass=True tokens=186367
+Stage done: state_transitions-000 repeat=0 method=notes stage=2 stop=finished pass=False tokens=120333
+Stage done: configuration_changes-000 repeat=0 method=notes stage=3 stop=finished pass=False tokens=237861
+Run configuration_changes-000 repeat=0 method=notebook
+Stage done: source_dependencies-000 repeat=0 method=models stage=2 stop=finished pass=True tokens=197949
+Stage done: state_transitions-000 repeat=0 method=notes stage=3 stop=finished pass=True tokens=138874
+Run state_transitions-000 repeat=0 method=models
+Stage done: source_dependencies-000 repeat=0 method=models stage=3 stop=finished pass=True tokens=150489
+Run source_dependencies-000 repeat=0 method=notes
+Stage done: state_transitions-000 repeat=0 method=models stage=1 stop=finished pass=True tokens=135170
+Stage done: source_dependencies-000 repeat=0 method=notes stage=1 stop=finished pass=True tokens=112985

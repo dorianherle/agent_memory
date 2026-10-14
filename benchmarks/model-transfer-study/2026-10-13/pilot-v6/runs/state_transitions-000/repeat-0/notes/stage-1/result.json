@@ -1,0 +1,257 @@
+{
+  "stop": "finished",
+  "tool_calls": 15,
+  "elapsed_seconds": 110.45861900015734,
+  "usage_complete": true,
+  "tokens": 110820,
+  "known_tokens": 110820,
+  "input_tokens": 107580,
+  "output_tokens": 3240,
+  "cached_input_tokens": 74880,
+  "reasoning_output_tokens": 1623,
+  "stage": 1,
+  "grade": {
+    "full_pass": true,
+    "passed": 49,
+    "total": 49,
+    "checks": [
+      {
+        "check": "case_0",
+        "passed": true
+      },
+      {
+        "check": "case_1",
+        "passed": true
+      },
+      {
+        "check": "case_2",
+        "passed": true
+      },
+      {
+        "check": "case_3",
+        "passed": true
+      },
+      {
+        "check": "case_4",
+        "passed": true
+      },
+      {
+        "check": "case_5",
+        "passed": true
+      },
+      {
+        "check": "case_6",
+        "passed": true
+      },
+      {
+        "check": "case_7",
+        "passed": true
+      },
+      {
+        "check": "case_8",
+        "passed": true
+      },
+      {
+        "check": "case_9",
+        "passed": true
+      },
+      {
+        "check": "case_10",
+        "passed": true
+      },
+      {
+        "check": "case_11",
+        "passed": true
+      },
+      {
+        "check": "case_12",
+        "passed": true
+      },
+      {
+        "check": "case_13",
+        "passed": true
+      },
+      {
+        "check": "case_14",
+        "passed": true
+      },
+      {
+        "check": "case_15",
+        "passed": true
+      },
+      {
+        "check": "case_16",
+        "passed": true
+      },
+      {
+        "check": "case_17",
+        "passed": true
+      },
+      {
+        "check": "case_18",
+        "passed": true
+      },
+      {
+        "check": "case_19",
+        "passed": true
+      },
+      {
+        "check": "case_20",
+        "passed": true
+      },
+      {
+        "check": "case_21",
+        "passed": true
+      },
+      {
+        "check": "case_22",
+        "passed": true
+      },
+      {
+        "check": "case_23",
+        "passed": true
+      },
+      {
+        "check": "case_24",
+        "passed": true
+      },
+      {
+        "check": "case_25",
+        "passed": true
+      },
+      {
+        "check": "case_26",
+        "passed": true
+      },
+      {
+        "check": "case_27",
+        "passed": true
+      },
+      {
+        "check": "case_28",
+        "passed": true
+      },
+      {
+        "check": "case_29",
+        "passed": true
+      },
+      {
+        "check": "case_30",
+        "passed": true
+      },
+      {
+        "check": "case_31",
+        "passed": true
+      },
+      {
+        "check": "case_32",
+        "passed": true
+      },
+      {
+        "check": "case_33",
+        "passed": true
+      },
+      {
+        "check": "case_34",
+        "passed": true
+      },
+      {
+        "check": "case_35",
+        "passed": true
+      },
+      {
+        "check": "case_36",
+        "passed": true
+      },
+      {
+        "check": "case_37",
+        "passed": true
+      },
+      {
+        "check": "case_38",
+        "passed": true
+      },
+      {
+        "check": "case_39",
+        "passed": true
+      },
+      {
+        "check": "case_40",
+        "passed": true
+      },
+      {
+        "check": "case_41",
+        "passed": true
+      },
+      {
+        "check": "case_42",
+        "passed": true
+      },
+      {
+        "check": "case_43",
+        "passed": true
+      },
+      {
+        "check": "case_44",
+        "passed": true
+      },
+      {
+        "check": "case_45",
+        "passed": true
+      },
+      {
+        "check": "case_46",
+        "passed": true
+      },
+      {
+        "check": "all_cases_returned",
+        "passed": true
+      },
+      {
+        "check": "current_source_report",
+        "passed": true
+      }
+    ],
+    "unsupported_conclusions": 0,
+    "missed_source_changes": 0
+  },
+  "memory": {
+    "ok": true,
+    "result": {
+      "notes": 2,
+      "model": null,
+      "checks": {
+        "status": "absent"
+      },
+      "evidence": [
+        {
+          "id": "bcea2f167452cce1f6552ca492ef34308fc078fb",
+          "text": "Implemented work.py evaluate(request, policy): resolves from>to edges, blocks missing edges, checks required roles before retries, requires retry attempts to be a non-bool int in [0, retry_limit), returns the specified result shape, and does not mutate inputs. Added report generation and produced report.json for current policy.json/requests.json. Local checks covered success, blocked, permission precedence, retry boundaries, bool rejection, immutability, script execution, and git diff whitespace; all passed. No evidence.json is present. No unresolved limits found.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "report.json",
+              "policy.json",
+              "requests.json"
+            ]
+          }
+        },
+        {
+          "id": "70add667fd0902b41f4e9135d11acb8ac0462241",
+          "text": "Milestone complete: work.py implements evaluate(request, policy) with blocked missing edges, role enforcement before retry validation, strict non-bool integer attempts in [0, retry_limit), exact result shapes, and no input mutation. report.json was generated for current requests.json and policy.json. Local behavioral, immutability, execution, and whitespace checks all passed. evidence.json is absent; no unresolved questions.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "report.json",
+              "policy.json",
+              "requests.json"
+            ],
+            "summary": true
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a13701-8b8a-7672-84cd-d7811ffcf3ac"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"text\":\"{\\\"T1\\\":\\\"unusable\\\",\\\"T2\\\":\\\"usable\\\",\\\"T3\\\":\\\"usable\\\",\\\"U1\\\":\\\"usable\\\",\\\"U2\\\":\\\"unusable\\\",\\\"U3\\\":\\\"unusable\\\",\\\"U4\\\":\\\"usable\\\",\\\"U5\\\":\\\"unusable\\\",\\\"U6\\\":\\\"usable\\\",\\\"U7\\\":\\\"unusable\\\",\\\"U8\\\":\\\"unusable\\\"}\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":10998,"cached_input_tokens":9216,"cache_write_input_tokens":0,"output_tokens":111,"reasoning_output_tokens":32}}

@@ -38,6 +38,14 @@ State contains Goal, Steering, Handoff, questions and relevant excerpts.
 [stale] means supporting files changed: verify before relying on the claim.
 Use visible ids to find details; full=true retrieves an uncut body.
 Save decisions, evidence, failed approaches and Next: before handoff.
+The active Task model holds executable rules, conditions, and evidence cases.
+Use model_get to read it. Use model_predict for a checked prediction.
+Model tools return working rules first; full=true also retrieves stored cases.
+After new evidence, propose a model revision with model_propose, check it with
+model_check, then accept a passing proposal with model_accept. model_reduce
+factors shared rules without dropping recorded cases. It creates a proposal.
+Keep alternatives and unresolved results. A tested model is conditional evidence,
+not a physical law. Cases must come from actual observations or tests.
 Distill durable user constraints; never copy raw prompts or answers into memory.
 Use payload={"handoff":true,"files":["relative/path"]} for a transfer checkpoint.
 Summarize completed work; inspect/branch rewrite files.
@@ -124,6 +132,7 @@ def _recent_findings(items: list[MemoryItem]) -> list[MemoryItem]:
         and item.id not in pinned
         and not item.payload.get("user")
         and not item.payload.get("auto")
+        and not item.payload.get("model_event")
     ]
 
 
@@ -272,14 +281,15 @@ def render_timeline(items: list[MemoryItem], *, full: bool = False) -> str:
     return "\n".join(lines) or "Nothing saved yet."
 
 
-def _handoff(items: list[MemoryItem]) -> MemoryItem | None:
+def _handoff(items: list[MemoryItem], *, covered=()) -> MemoryItem | None:
     """Prefer an explicit transfer checkpoint over incidental later notes."""
     checkpoints = [item for item in items if item.payload.get("handoff")]
     if checkpoints:
         return checkpoints[-1]
     actionable = [item for item in items if item.payload.get("auto")
                   and re.search(r"(?im)^(next|blocked|remaining):", item.message)]
-    findings = _recent_findings(items)
+    findings = [item for item in _recent_findings(items) if item.id not in covered
+                or re.search(r"(?im)^(next|blocked|remaining):", item.message)]
     candidates = {item.id for item in actionable + findings}
     for item in reversed(items):
         if item.id in candidates:
@@ -333,6 +343,7 @@ def render_packet(
     query: str = "",
     stale_ids: set[str] | None = None,
     max_chars: int = 1200,
+    model: dict | None = None,
 ) -> str:
     """Bounded transfer packet. Durable bodies stay available through find."""
     if max_chars < 256:
@@ -372,12 +383,29 @@ def render_packet(
     add("Goal", [goal] if goal else [], 260)
     steering = _steering(items, goal)
     add("Steering", [steering] if steering else [], 220)
-    handoff = _handoff(items)
+    handoff = _handoff(items, covered=model["covered"] if model else ())
     add("Handoff", [handoff] if handoff else [], 360)
+    if model:
+        head = (f"r{model['revision']} {model['status']}; "
+                f"{len(model['rules'])} rules. Read model_get for conditions.")
+        lines = [head]
+        if model["status"] != "tested":
+            lines.append("Needs review: " + "; ".join(model["issues"]))
+        else:
+            for rule in model["rules"][:2]:
+                lines.append(f"{rule['id']}: {rule['claim']}")
+            if len(model["rules"]) > 2:
+                lines.append(f"{len(model['rules']) - 2} more rules; use model_get.")
+        if model["alternatives"] or model["unresolved"]:
+            lines.append(f"{model['alternatives']} alternatives; {model['unresolved']} unresolved results.")
+        from datetime import datetime
+        model_item = MemoryItem(model["id"], "\n".join(lines), {}, datetime.now().astimezone())
+        add("Task model", [model_item], 300)
     questions = split_open_questions(items)
     add("Open questions", questions[:8], 120)
     omitted += max(0, len(questions) - 8)
-    add("Related", related, 260)
+    covered = set(model["covered"]) if model else set()
+    add("Related", [item for item in related if item.id not in covered], 260)
     if branches and len(branches) > 1:
         current = next((b for b in branches if b["current"]), None)
         if current:

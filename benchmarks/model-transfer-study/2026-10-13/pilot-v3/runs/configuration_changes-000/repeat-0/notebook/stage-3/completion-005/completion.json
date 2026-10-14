@@ -1,0 +1,23 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "read",
+    "arguments": {
+      "path": "report.json"
+    }
+  },
+  "usage": {
+    "input_tokens": 9802,
+    "output_tokens": 69,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 41
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 6.695800459012389,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

@@ -1,0 +1,5977 @@
+[
+  {
+    "id": "source_dependencies-073",
+    "family": "source_dependencies",
+    "domain": "code",
+    "variant": 73,
+    "stages": [
+      {
+        "stage": 1,
+        "files": {
+          "policy.json": "{\n  \"variant\": 73,\n  \"ignored\": []\n}",
+          "requests.json": "[\n  {\n    \"declared\": [\n      \"worker_73.py\"\n    ],\n    \"saved\": {\n      \"worker_73.py\": {\n        \"kind\": \"file\",\n        \"hash\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\n      }\n    },\n    \"current\": {\n      \"worker_73.py\": {\n        \"kind\": \"file\",\n        \"hash\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\n      }\n    }\n  }\n]",
+          "TASK.md": "Stage 1: source_dependencies; work sample 73.\nImplement evaluate(request, policy). Return {needs_review, changed}. Compare canonical JSON source states for every unique declared path except policy.ignored. An absent state equals {kind:missing}. Compare complete states, not names or timestamps. Return sorted changed paths. Irrelevant changes do not require review. Do not modify inputs.\nWrite work.py with this API. Also write report.json as a JSON array of evaluate results for requests.json, using current policy.json and evidence.json when present. Keep prior supported behavior. Use actual local checks. Store findings and unresolved limits for the next agent.\n",
+          "work.py": "# Complete the required API and report.\n"
+        },
+        "policy": {
+          "variant": 73,
+          "ignored": []
+        },
+        "evidence": null,
+        "visible_count": 1,
+        "cases": [
+          {
+            "request": {
+              "declared": [
+                "worker_73.py"
+              ],
+              "saved": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "worker_73.py",
+                "worker_73.py"
+              ],
+              "saved": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "worker_73.py",
+                "worker_73.py"
+              ],
+              "saved": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "worker_73.py"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "worker_73.py",
+                "worker_73.py"
+              ],
+              "saved": {
+                "worker_73.py": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "worker_73.py"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "worker_73.py",
+                "worker_73.py"
+              ],
+              "saved": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "worker_73.py": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "worker_73.py"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "worker_73.py",
+                "worker_73.py"
+              ],
+              "saved": {
+                "worker_73.py": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "worker_73.py": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "recipe_73.json",
+                "recipe_73.json"
+              ],
+              "saved": {
+                "recipe_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "recipe_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "recipe_73.json",
+                "recipe_73.json"
+              ],
+              "saved": {
+                "recipe_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "recipe_73.json": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "recipe_73.json"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "recipe_73.json",
+                "recipe_73.json"
+              ],
+              "saved": {
+                "recipe_73.json": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "recipe_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "recipe_73.json"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "recipe_73.json",
+                "recipe_73.json"
+              ],
+              "saved": {
+                "recipe_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "recipe_73.json": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "recipe_73.json"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "recipe_73.json",
+                "recipe_73.json"
+              ],
+              "saved": {
+                "recipe_73.json": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "recipe_73.json": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "new_73.json",
+                "new_73.json"
+              ],
+              "saved": {
+                "new_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "new_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "new_73.json",
+                "new_73.json"
+              ],
+              "saved": {
+                "new_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "new_73.json": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "new_73.json"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "new_73.json",
+                "new_73.json"
+              ],
+              "saved": {
+                "new_73.json": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "new_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "new_73.json"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "new_73.json",
+                "new_73.json"
+              ],
+              "saved": {
+                "new_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "new_73.json": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "new_73.json"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "new_73.json",
+                "new_73.json"
+              ],
+              "saved": {
+                "new_73.json": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "new_73.json": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "unseen_73.cfg",
+                "unseen_73.cfg"
+              ],
+              "saved": {
+                "unseen_73.cfg": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "unseen_73.cfg": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "unseen_73.cfg",
+                "unseen_73.cfg"
+              ],
+              "saved": {
+                "unseen_73.cfg": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "unseen_73.cfg": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "unseen_73.cfg"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "unseen_73.cfg",
+                "unseen_73.cfg"
+              ],
+              "saved": {
+                "unseen_73.cfg": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "unseen_73.cfg": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "unseen_73.cfg"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "unseen_73.cfg",
+                "unseen_73.cfg"
+              ],
+              "saved": {
+                "unseen_73.cfg": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "unseen_73.cfg": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "unseen_73.cfg"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "unseen_73.cfg",
+                "unseen_73.cfg"
+              ],
+              "saved": {
+                "unseen_73.cfg": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "unseen_73.cfg": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "scratch_73.txt",
+                "scratch_73.txt"
+              ],
+              "saved": {
+                "scratch_73.txt": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "scratch_73.txt": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "scratch_73.txt",
+                "scratch_73.txt"
+              ],
+              "saved": {
+                "scratch_73.txt": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "scratch_73.txt": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "scratch_73.txt"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "scratch_73.txt",
+                "scratch_73.txt"
+              ],
+              "saved": {
+                "scratch_73.txt": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "scratch_73.txt": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "scratch_73.txt"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "scratch_73.txt",
+                "scratch_73.txt"
+              ],
+              "saved": {
+                "scratch_73.txt": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "scratch_73.txt": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "scratch_73.txt"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "scratch_73.txt",
+                "scratch_73.txt"
+              ],
+              "saved": {
+                "scratch_73.txt": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "scratch_73.txt": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "worker_73.py"
+              ],
+              "saved": {},
+              "current": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "worker_73.py"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [],
+              "saved": {},
+              "current": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "files": {
+          "policy.json": "{\n  \"variant\": 73,\n  \"ignored\": []\n}",
+          "requests.json": "[\n  {\n    \"declared\": [\n      \"worker_73.py\",\n      \"recipe_73.json\"\n    ],\n    \"saved\": {\n      \"worker_73.py\": {\n        \"kind\": \"file\",\n        \"hash\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\n      }\n    },\n    \"current\": {\n      \"worker_73.py\": {\n        \"kind\": \"file\",\n        \"hash\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\n      }\n    }\n  }\n]",
+          "TASK.md": "Stage 2: source_dependencies; work sample 73.\nImplement evaluate(request, policy). Return {needs_review, changed}. Compare canonical JSON source states for every unique declared path except policy.ignored. An absent state equals {kind:missing}. Compare complete states, not names or timestamps. Return sorted changed paths. Irrelevant changes do not require review. Do not modify inputs.\nWrite work.py with this API. Also write report.json as a JSON array of evaluate results for requests.json, using current policy.json and evidence.json when present. Keep prior supported behavior. Use actual local checks. Store findings and unresolved limits for the next agent.\n"
+        },
+        "policy": {
+          "variant": 73,
+          "ignored": []
+        },
+        "evidence": null,
+        "visible_count": 1,
+        "cases": [
+          {
+            "request": {
+              "declared": [
+                "worker_73.py",
+                "recipe_73.json"
+              ],
+              "saved": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "worker_73.py",
+                "worker_73.py"
+              ],
+              "saved": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "worker_73.py",
+                "worker_73.py"
+              ],
+              "saved": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "worker_73.py"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "worker_73.py",
+                "worker_73.py"
+              ],
+              "saved": {
+                "worker_73.py": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "worker_73.py"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "worker_73.py",
+                "worker_73.py"
+              ],
+              "saved": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "worker_73.py": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "worker_73.py"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "worker_73.py",
+                "worker_73.py"
+              ],
+              "saved": {
+                "worker_73.py": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "worker_73.py": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "recipe_73.json",
+                "recipe_73.json"
+              ],
+              "saved": {
+                "recipe_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "recipe_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "recipe_73.json",
+                "recipe_73.json"
+              ],
+              "saved": {
+                "recipe_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "recipe_73.json": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "recipe_73.json"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "recipe_73.json",
+                "recipe_73.json"
+              ],
+              "saved": {
+                "recipe_73.json": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "recipe_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "recipe_73.json"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "recipe_73.json",
+                "recipe_73.json"
+              ],
+              "saved": {
+                "recipe_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "recipe_73.json": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "recipe_73.json"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "recipe_73.json",
+                "recipe_73.json"
+              ],
+              "saved": {
+                "recipe_73.json": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "recipe_73.json": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "new_73.json",
+                "new_73.json"
+              ],
+              "saved": {
+                "new_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "new_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "new_73.json",
+                "new_73.json"
+              ],
+              "saved": {
+                "new_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "new_73.json": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "new_73.json"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "new_73.json",
+                "new_73.json"
+              ],
+              "saved": {
+                "new_73.json": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "new_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "new_73.json"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "new_73.json",
+                "new_73.json"
+              ],
+              "saved": {
+                "new_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "new_73.json": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "new_73.json"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "new_73.json",
+                "new_73.json"
+              ],
+              "saved": {
+                "new_73.json": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "new_73.json": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "unseen_73.cfg",
+                "unseen_73.cfg"
+              ],
+              "saved": {
+                "unseen_73.cfg": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "unseen_73.cfg": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "unseen_73.cfg",
+                "unseen_73.cfg"
+              ],
+              "saved": {
+                "unseen_73.cfg": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "unseen_73.cfg": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "unseen_73.cfg"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "unseen_73.cfg",
+                "unseen_73.cfg"
+              ],
+              "saved": {
+                "unseen_73.cfg": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "unseen_73.cfg": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "unseen_73.cfg"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "unseen_73.cfg",
+                "unseen_73.cfg"
+              ],
+              "saved": {
+                "unseen_73.cfg": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "unseen_73.cfg": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "unseen_73.cfg"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "unseen_73.cfg",
+                "unseen_73.cfg"
+              ],
+              "saved": {
+                "unseen_73.cfg": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "unseen_73.cfg": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "scratch_73.txt",
+                "scratch_73.txt"
+              ],
+              "saved": {
+                "scratch_73.txt": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "scratch_73.txt": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "scratch_73.txt",
+                "scratch_73.txt"
+              ],
+              "saved": {
+                "scratch_73.txt": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "scratch_73.txt": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "scratch_73.txt"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "scratch_73.txt",
+                "scratch_73.txt"
+              ],
+              "saved": {
+                "scratch_73.txt": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "scratch_73.txt": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "scratch_73.txt"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "scratch_73.txt",
+                "scratch_73.txt"
+              ],
+              "saved": {
+                "scratch_73.txt": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "scratch_73.txt": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "scratch_73.txt"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "scratch_73.txt",
+                "scratch_73.txt"
+              ],
+              "saved": {
+                "scratch_73.txt": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "scratch_73.txt": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "worker_73.py"
+              ],
+              "saved": {},
+              "current": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "worker_73.py"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [],
+              "saved": {},
+              "current": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "files": {
+          "policy.json": "{\n  \"variant\": 73,\n  \"ignored\": [\n    \"scratch_73.txt\"\n  ]\n}",
+          "requests.json": "[\n  {\n    \"declared\": [\n      \"worker_73.py\",\n      \"recipe_73.json\",\n      \"new_73.json\"\n    ],\n    \"saved\": {\n      \"worker_73.py\": {\n        \"kind\": \"file\",\n        \"hash\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\n      }\n    },\n    \"current\": {\n      \"worker_73.py\": {\n        \"kind\": \"file\",\n        \"hash\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\n      }\n    }\n  }\n]",
+          "TASK.md": "Stage 3: source_dependencies; work sample 73.\nImplement evaluate(request, policy). Return {needs_review, changed}. Compare canonical JSON source states for every unique declared path except policy.ignored. An absent state equals {kind:missing}. Compare complete states, not names or timestamps. Return sorted changed paths. Irrelevant changes do not require review. Do not modify inputs.\nWrite work.py with this API. Also write report.json as a JSON array of evaluate results for requests.json, using current policy.json and evidence.json when present. Keep prior supported behavior. Use actual local checks. Store findings and unresolved limits for the next agent.\n"
+        },
+        "policy": {
+          "variant": 73,
+          "ignored": [
+            "scratch_73.txt"
+          ]
+        },
+        "evidence": null,
+        "visible_count": 1,
+        "cases": [
+          {
+            "request": {
+              "declared": [
+                "worker_73.py",
+                "recipe_73.json",
+                "new_73.json"
+              ],
+              "saved": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "worker_73.py",
+                "worker_73.py"
+              ],
+              "saved": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "worker_73.py",
+                "worker_73.py"
+              ],
+              "saved": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "worker_73.py"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "worker_73.py",
+                "worker_73.py"
+              ],
+              "saved": {
+                "worker_73.py": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "worker_73.py"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "worker_73.py",
+                "worker_73.py"
+              ],
+              "saved": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "worker_73.py": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "worker_73.py"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "worker_73.py",
+                "worker_73.py"
+              ],
+              "saved": {
+                "worker_73.py": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "worker_73.py": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "recipe_73.json",
+                "recipe_73.json"
+              ],
+              "saved": {
+                "recipe_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "recipe_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "recipe_73.json",
+                "recipe_73.json"
+              ],
+              "saved": {
+                "recipe_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "recipe_73.json": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "recipe_73.json"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "recipe_73.json",
+                "recipe_73.json"
+              ],
+              "saved": {
+                "recipe_73.json": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "recipe_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "recipe_73.json"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "recipe_73.json",
+                "recipe_73.json"
+              ],
+              "saved": {
+                "recipe_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "recipe_73.json": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "recipe_73.json"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "recipe_73.json",
+                "recipe_73.json"
+              ],
+              "saved": {
+                "recipe_73.json": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "recipe_73.json": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "new_73.json",
+                "new_73.json"
+              ],
+              "saved": {
+                "new_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "new_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "new_73.json",
+                "new_73.json"
+              ],
+              "saved": {
+                "new_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "new_73.json": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "new_73.json"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "new_73.json",
+                "new_73.json"
+              ],
+              "saved": {
+                "new_73.json": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "new_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "new_73.json"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "new_73.json",
+                "new_73.json"
+              ],
+              "saved": {
+                "new_73.json": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "new_73.json": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "new_73.json"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "new_73.json",
+                "new_73.json"
+              ],
+              "saved": {
+                "new_73.json": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "new_73.json": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "unseen_73.cfg",
+                "unseen_73.cfg"
+              ],
+              "saved": {
+                "unseen_73.cfg": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "unseen_73.cfg": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "unseen_73.cfg",
+                "unseen_73.cfg"
+              ],
+              "saved": {
+                "unseen_73.cfg": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "unseen_73.cfg": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "unseen_73.cfg"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "unseen_73.cfg",
+                "unseen_73.cfg"
+              ],
+              "saved": {
+                "unseen_73.cfg": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "unseen_73.cfg": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "unseen_73.cfg"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "unseen_73.cfg",
+                "unseen_73.cfg"
+              ],
+              "saved": {
+                "unseen_73.cfg": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "unseen_73.cfg": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "unseen_73.cfg"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "unseen_73.cfg",
+                "unseen_73.cfg"
+              ],
+              "saved": {
+                "unseen_73.cfg": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "unseen_73.cfg": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "scratch_73.txt",
+                "scratch_73.txt"
+              ],
+              "saved": {
+                "scratch_73.txt": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "scratch_73.txt": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "scratch_73.txt",
+                "scratch_73.txt"
+              ],
+              "saved": {
+                "scratch_73.txt": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "scratch_73.txt": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "scratch_73.txt",
+                "scratch_73.txt"
+              ],
+              "saved": {
+                "scratch_73.txt": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "scratch_73.txt": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "scratch_73.txt",
+                "scratch_73.txt"
+              ],
+              "saved": {
+                "scratch_73.txt": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "current": {
+                "scratch_73.txt": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "scratch_73.txt",
+                "scratch_73.txt"
+              ],
+              "saved": {
+                "scratch_73.txt": {
+                  "kind": "missing"
+                }
+              },
+              "current": {
+                "scratch_73.txt": {
+                  "kind": "missing"
+                },
+                "irrelevant": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          },
+          {
+            "request": {
+              "declared": [
+                "worker_73.py"
+              ],
+              "saved": {},
+              "current": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": true,
+              "changed": [
+                "worker_73.py"
+              ]
+            }
+          },
+          {
+            "request": {
+              "declared": [],
+              "saved": {},
+              "current": {
+                "worker_73.py": {
+                  "kind": "file",
+                  "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                }
+              }
+            },
+            "evidence": null,
+            "expected": {
+              "needs_review": false,
+              "changed": []
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "calibration_limits-073",
+    "family": "calibration_limits",
+    "domain": "research",
+    "variant": 73,
+    "stages": [
+      {
+        "stage": 1,
+        "files": {
+          "policy.json": "{\n  \"variant\": 73,\n  \"required_conditions\": [\n    \"recipe\",\n    \"material\"\n  ],\n  \"require_verified\": false\n}",
+          "requests.json": "[\n  {\n    \"claim\": \"vertical_rate\",\n    \"conditions\": {\n      \"recipe\": \"R73\",\n      \"material\": \"SiN\",\n      \"regime\": \"dry\"\n    }\n  },\n  {\n    \"claim\": \"device_validated\",\n    \"conditions\": {\n      \"recipe\": \"R73\",\n      \"material\": \"SiN\",\n      \"regime\": \"dry\"\n    }\n  }\n]",
+          "TASK.md": "Stage 1: calibration_limits; work sample 73.\nImplement evaluate(request, evidence, policy). Use only records whose claim matches, which are not withdrawn, and whose required conditions exactly match the request. If require_verified, use only verified records. Missing required request conditions yield unknown with their sorted names. Remove source IDs superseded by other eligible records. No eligible sources yield unknown with unknowns=['no matching evidence']. Disagreeing canonical JSON values yield conflict, null value, all eligible sorted source IDs, and unknowns=['source disagreement']. Agreement yields supported (unsupported for the Boolean false), that value, sorted source IDs, and empty unknowns. Return {status,value,sources,unknowns}. Do not treat absent calibration as zero. Do not treat source counts as authority. Do not modify inputs.\nWrite work.py with this API. Also write report.json as a JSON array of evaluate results for requests.json, using current policy.json and evidence.json when present. Keep prior supported behavior. Use actual local checks. Store findings and unresolved limits for the next agent.\n",
+          "work.py": "# Complete the required API and report.\n",
+          "evidence.json": "[\n  {\n    \"source\": \"S1\",\n    \"claim\": \"vertical_rate\",\n    \"value\": 37,\n    \"conditions\": {\n      \"recipe\": \"R73\",\n      \"material\": \"SiN\",\n      \"regime\": \"dry\"\n    },\n    \"verified\": true\n  },\n  {\n    \"source\": \"U1\",\n    \"claim\": \"vertical_rate\",\n    \"value\": 999,\n    \"conditions\": {\n      \"recipe\": \"other\",\n      \"material\": \"SiN\",\n      \"regime\": \"dry\"\n    },\n    \"verified\": true\n  },\n  {\n    \"source\": \"D1\",\n    \"claim\": \"device_validated\",\n    \"value\": false,\n    \"conditions\": {\n      \"recipe\": \"R73\",\n      \"material\": \"SiN\",\n      \"regime\": \"dry\"\n    },\n    \"verified\": true\n  }\n]",
+          "SOURCES.md": "Constructed study records; not measured fabrication data.\n[S1] {\"claim\": \"vertical_rate\", \"conditions\": {\"material\": \"SiN\", \"recipe\": \"R73\", \"regime\": \"dry\"}, \"source\": \"S1\", \"value\": 37, \"verified\": true}\n[U1] {\"claim\": \"vertical_rate\", \"conditions\": {\"material\": \"SiN\", \"recipe\": \"other\", \"regime\": \"dry\"}, \"source\": \"U1\", \"value\": 999, \"verified\": true}\n[D1] {\"claim\": \"device_validated\", \"conditions\": {\"material\": \"SiN\", \"recipe\": \"R73\", \"regime\": \"dry\"}, \"source\": \"D1\", \"value\": false, \"verified\": true}"
+        },
+        "policy": {
+          "variant": 73,
+          "required_conditions": [
+            "recipe",
+            "material"
+          ],
+          "require_verified": false
+        },
+        "evidence": [
+          {
+            "source": "S1",
+            "claim": "vertical_rate",
+            "value": 37,
+            "conditions": {
+              "recipe": "R73",
+              "material": "SiN",
+              "regime": "dry"
+            },
+            "verified": true
+          },
+          {
+            "source": "U1",
+            "claim": "vertical_rate",
+            "value": 999,
+            "conditions": {
+              "recipe": "other",
+              "material": "SiN",
+              "regime": "dry"
+            },
+            "verified": true
+          },
+          {
+            "source": "D1",
+            "claim": "device_validated",
+            "value": false,
+            "conditions": {
+              "recipe": "R73",
+              "material": "SiN",
+              "regime": "dry"
+            },
+            "verified": true
+          }
+        ],
+        "visible_count": 2,
+        "cases": [
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "supported",
+              "value": 37,
+              "sources": [
+                "S1"
+              ],
+              "unknowns": []
+            }
+          },
+          {
+            "request": {
+              "claim": "device_validated",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unsupported",
+              "value": false,
+              "sources": [
+                "D1"
+              ],
+              "unknowns": []
+            }
+          },
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "supported",
+              "value": 37,
+              "sources": [
+                "S1"
+              ],
+              "unknowns": []
+            }
+          },
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "R73"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "material"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "other",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "supported",
+              "value": 999,
+              "sources": [
+                "U1"
+              ],
+              "unknowns": []
+            }
+          },
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "wet"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "supported",
+              "value": 37,
+              "sources": [
+                "S1"
+              ],
+              "unknowns": []
+            }
+          },
+          {
+            "request": {
+              "claim": "lateral_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "lateral_rate",
+              "conditions": {
+                "recipe": "R73"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "material"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "lateral_rate",
+              "conditions": {
+                "recipe": "other",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "lateral_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "wet"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "device_validated",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unsupported",
+              "value": false,
+              "sources": [
+                "D1"
+              ],
+              "unknowns": []
+            }
+          },
+          {
+            "request": {
+              "claim": "device_validated",
+              "conditions": {
+                "recipe": "R73"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "material"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "device_validated",
+              "conditions": {
+                "recipe": "other",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "device_validated",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "wet"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unsupported",
+              "value": false,
+              "sources": [
+                "D1"
+              ],
+              "unknowns": []
+            }
+          },
+          {
+            "request": {
+              "claim": "loss_after_package",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "loss_after_package",
+              "conditions": {
+                "recipe": "R73"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "material"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "loss_after_package",
+              "conditions": {
+                "recipe": "other",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "loss_after_package",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "wet"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "unseen_source",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true,
+                "withdrawn": false
+              }
+            ],
+            "expected": {
+              "status": "supported",
+              "value": 37,
+              "sources": [
+                "unseen_source"
+              ],
+              "unknowns": []
+            }
+          },
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "A",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true,
+                "withdrawn": false
+              },
+              {
+                "source": "B",
+                "claim": "vertical_rate",
+                "value": 44,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true,
+                "withdrawn": false
+              }
+            ],
+            "expected": {
+              "status": "conflict",
+              "value": null,
+              "sources": [
+                "A",
+                "B"
+              ],
+              "unknowns": [
+                "source disagreement"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "files": {
+          "policy.json": "{\n  \"variant\": 73,\n  \"required_conditions\": [\n    \"recipe\",\n    \"material\",\n    \"regime\"\n  ],\n  \"require_verified\": true\n}",
+          "requests.json": "[\n  {\n    \"claim\": \"vertical_rate\",\n    \"conditions\": {\n      \"recipe\": \"R73\",\n      \"material\": \"SiN\",\n      \"regime\": \"dry\"\n    }\n  },\n  {\n    \"claim\": \"device_validated\",\n    \"conditions\": {\n      \"recipe\": \"R73\",\n      \"material\": \"SiN\",\n      \"regime\": \"dry\"\n    }\n  }\n]",
+          "TASK.md": "Stage 2: calibration_limits; work sample 73.\nImplement evaluate(request, evidence, policy). Use only records whose claim matches, which are not withdrawn, and whose required conditions exactly match the request. If require_verified, use only verified records. Missing required request conditions yield unknown with their sorted names. Remove source IDs superseded by other eligible records. No eligible sources yield unknown with unknowns=['no matching evidence']. Disagreeing canonical JSON values yield conflict, null value, all eligible sorted source IDs, and unknowns=['source disagreement']. Agreement yields supported (unsupported for the Boolean false), that value, sorted source IDs, and empty unknowns. Return {status,value,sources,unknowns}. Do not treat absent calibration as zero. Do not treat source counts as authority. Do not modify inputs.\nWrite work.py with this API. Also write report.json as a JSON array of evaluate results for requests.json, using current policy.json and evidence.json when present. Keep prior supported behavior. Use actual local checks. Store findings and unresolved limits for the next agent.\n",
+          "evidence.json": "[\n  {\n    \"source\": \"S1\",\n    \"claim\": \"vertical_rate\",\n    \"value\": 37,\n    \"conditions\": {\n      \"recipe\": \"R73\",\n      \"material\": \"SiN\",\n      \"regime\": \"dry\"\n    },\n    \"verified\": true\n  },\n  {\n    \"source\": \"U1\",\n    \"claim\": \"vertical_rate\",\n    \"value\": 999,\n    \"conditions\": {\n      \"recipe\": \"other\",\n      \"material\": \"SiN\",\n      \"regime\": \"dry\"\n    },\n    \"verified\": true\n  },\n  {\n    \"source\": \"D1\",\n    \"claim\": \"device_validated\",\n    \"value\": false,\n    \"conditions\": {\n      \"recipe\": \"R73\",\n      \"material\": \"SiN\",\n      \"regime\": \"dry\"\n    },\n    \"verified\": true\n  }\n]",
+          "SOURCES.md": "Constructed study records; not measured fabrication data.\n[S1] {\"claim\": \"vertical_rate\", \"conditions\": {\"material\": \"SiN\", \"recipe\": \"R73\", \"regime\": \"dry\"}, \"source\": \"S1\", \"value\": 37, \"verified\": true}\n[U1] {\"claim\": \"vertical_rate\", \"conditions\": {\"material\": \"SiN\", \"recipe\": \"other\", \"regime\": \"dry\"}, \"source\": \"U1\", \"value\": 999, \"verified\": true}\n[D1] {\"claim\": \"device_validated\", \"conditions\": {\"material\": \"SiN\", \"recipe\": \"R73\", \"regime\": \"dry\"}, \"source\": \"D1\", \"value\": false, \"verified\": true}"
+        },
+        "policy": {
+          "variant": 73,
+          "required_conditions": [
+            "recipe",
+            "material",
+            "regime"
+          ],
+          "require_verified": true
+        },
+        "evidence": [
+          {
+            "source": "S1",
+            "claim": "vertical_rate",
+            "value": 37,
+            "conditions": {
+              "recipe": "R73",
+              "material": "SiN",
+              "regime": "dry"
+            },
+            "verified": true
+          },
+          {
+            "source": "U1",
+            "claim": "vertical_rate",
+            "value": 999,
+            "conditions": {
+              "recipe": "other",
+              "material": "SiN",
+              "regime": "dry"
+            },
+            "verified": true
+          },
+          {
+            "source": "D1",
+            "claim": "device_validated",
+            "value": false,
+            "conditions": {
+              "recipe": "R73",
+              "material": "SiN",
+              "regime": "dry"
+            },
+            "verified": true
+          }
+        ],
+        "visible_count": 2,
+        "cases": [
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "supported",
+              "value": 37,
+              "sources": [
+                "S1"
+              ],
+              "unknowns": []
+            }
+          },
+          {
+            "request": {
+              "claim": "device_validated",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unsupported",
+              "value": false,
+              "sources": [
+                "D1"
+              ],
+              "unknowns": []
+            }
+          },
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "supported",
+              "value": 37,
+              "sources": [
+                "S1"
+              ],
+              "unknowns": []
+            }
+          },
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "R73"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "material",
+                "regime"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "other",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "supported",
+              "value": 999,
+              "sources": [
+                "U1"
+              ],
+              "unknowns": []
+            }
+          },
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "wet"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "lateral_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "lateral_rate",
+              "conditions": {
+                "recipe": "R73"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "material",
+                "regime"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "lateral_rate",
+              "conditions": {
+                "recipe": "other",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "lateral_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "wet"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "device_validated",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unsupported",
+              "value": false,
+              "sources": [
+                "D1"
+              ],
+              "unknowns": []
+            }
+          },
+          {
+            "request": {
+              "claim": "device_validated",
+              "conditions": {
+                "recipe": "R73"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "material",
+                "regime"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "device_validated",
+              "conditions": {
+                "recipe": "other",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "device_validated",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "wet"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "loss_after_package",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "loss_after_package",
+              "conditions": {
+                "recipe": "R73"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "material",
+                "regime"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "loss_after_package",
+              "conditions": {
+                "recipe": "other",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "loss_after_package",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "wet"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "unseen_source",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true,
+                "withdrawn": false
+              }
+            ],
+            "expected": {
+              "status": "supported",
+              "value": 37,
+              "sources": [
+                "unseen_source"
+              ],
+              "unknowns": []
+            }
+          },
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "A",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true,
+                "withdrawn": false
+              },
+              {
+                "source": "B",
+                "claim": "vertical_rate",
+                "value": 44,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true,
+                "withdrawn": false
+              }
+            ],
+            "expected": {
+              "status": "conflict",
+              "value": null,
+              "sources": [
+                "A",
+                "B"
+              ],
+              "unknowns": [
+                "source disagreement"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "files": {
+          "policy.json": "{\n  \"variant\": 73,\n  \"required_conditions\": [\n    \"recipe\",\n    \"material\",\n    \"regime\"\n  ],\n  \"require_verified\": true\n}",
+          "requests.json": "[\n  {\n    \"claim\": \"vertical_rate\",\n    \"conditions\": {\n      \"recipe\": \"R73\",\n      \"material\": \"SiN\",\n      \"regime\": \"dry\"\n    }\n  },\n  {\n    \"claim\": \"device_validated\",\n    \"conditions\": {\n      \"recipe\": \"R73\",\n      \"material\": \"SiN\",\n      \"regime\": \"dry\"\n    }\n  }\n]",
+          "TASK.md": "Stage 3: calibration_limits; work sample 73.\nImplement evaluate(request, evidence, policy). Use only records whose claim matches, which are not withdrawn, and whose required conditions exactly match the request. If require_verified, use only verified records. Missing required request conditions yield unknown with their sorted names. Remove source IDs superseded by other eligible records. No eligible sources yield unknown with unknowns=['no matching evidence']. Disagreeing canonical JSON values yield conflict, null value, all eligible sorted source IDs, and unknowns=['source disagreement']. Agreement yields supported (unsupported for the Boolean false), that value, sorted source IDs, and empty unknowns. Return {status,value,sources,unknowns}. Do not treat absent calibration as zero. Do not treat source counts as authority. Do not modify inputs.\nWrite work.py with this API. Also write report.json as a JSON array of evaluate results for requests.json, using current policy.json and evidence.json when present. Keep prior supported behavior. Use actual local checks. Store findings and unresolved limits for the next agent.\n",
+          "evidence.json": "[\n  {\n    \"source\": \"S1\",\n    \"claim\": \"vertical_rate\",\n    \"value\": 37,\n    \"conditions\": {\n      \"recipe\": \"R73\",\n      \"material\": \"SiN\",\n      \"regime\": \"dry\"\n    },\n    \"verified\": true\n  },\n  {\n    \"source\": \"U1\",\n    \"claim\": \"vertical_rate\",\n    \"value\": 999,\n    \"conditions\": {\n      \"recipe\": \"other\",\n      \"material\": \"SiN\",\n      \"regime\": \"dry\"\n    },\n    \"verified\": true\n  },\n  {\n    \"source\": \"D1\",\n    \"claim\": \"device_validated\",\n    \"value\": false,\n    \"conditions\": {\n      \"recipe\": \"R73\",\n      \"material\": \"SiN\",\n      \"regime\": \"dry\"\n    },\n    \"verified\": true\n  },\n  {\n    \"source\": \"P1\",\n    \"claim\": \"lateral_rate\",\n    \"value\": 0,\n    \"conditions\": {\n      \"recipe\": \"R73\",\n      \"material\": \"SiN\",\n      \"regime\": \"dry\"\n    },\n    \"verified\": false\n  }\n]",
+          "SOURCES.md": "Constructed study records; not measured fabrication data.\n[S1] {\"claim\": \"vertical_rate\", \"conditions\": {\"material\": \"SiN\", \"recipe\": \"R73\", \"regime\": \"dry\"}, \"source\": \"S1\", \"value\": 37, \"verified\": true}\n[U1] {\"claim\": \"vertical_rate\", \"conditions\": {\"material\": \"SiN\", \"recipe\": \"other\", \"regime\": \"dry\"}, \"source\": \"U1\", \"value\": 999, \"verified\": true}\n[D1] {\"claim\": \"device_validated\", \"conditions\": {\"material\": \"SiN\", \"recipe\": \"R73\", \"regime\": \"dry\"}, \"source\": \"D1\", \"value\": false, \"verified\": true}\n[P1] {\"claim\": \"lateral_rate\", \"conditions\": {\"material\": \"SiN\", \"recipe\": \"R73\", \"regime\": \"dry\"}, \"source\": \"P1\", \"value\": 0, \"verified\": false}"
+        },
+        "policy": {
+          "variant": 73,
+          "required_conditions": [
+            "recipe",
+            "material",
+            "regime"
+          ],
+          "require_verified": true
+        },
+        "evidence": [
+          {
+            "source": "S1",
+            "claim": "vertical_rate",
+            "value": 37,
+            "conditions": {
+              "recipe": "R73",
+              "material": "SiN",
+              "regime": "dry"
+            },
+            "verified": true
+          },
+          {
+            "source": "U1",
+            "claim": "vertical_rate",
+            "value": 999,
+            "conditions": {
+              "recipe": "other",
+              "material": "SiN",
+              "regime": "dry"
+            },
+            "verified": true
+          },
+          {
+            "source": "D1",
+            "claim": "device_validated",
+            "value": false,
+            "conditions": {
+              "recipe": "R73",
+              "material": "SiN",
+              "regime": "dry"
+            },
+            "verified": true
+          },
+          {
+            "source": "P1",
+            "claim": "lateral_rate",
+            "value": 0,
+            "conditions": {
+              "recipe": "R73",
+              "material": "SiN",
+              "regime": "dry"
+            },
+            "verified": false
+          }
+        ],
+        "visible_count": 2,
+        "cases": [
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "P1",
+                "claim": "lateral_rate",
+                "value": 0,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": false
+              }
+            ],
+            "expected": {
+              "status": "supported",
+              "value": 37,
+              "sources": [
+                "S1"
+              ],
+              "unknowns": []
+            }
+          },
+          {
+            "request": {
+              "claim": "device_validated",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "P1",
+                "claim": "lateral_rate",
+                "value": 0,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": false
+              }
+            ],
+            "expected": {
+              "status": "unsupported",
+              "value": false,
+              "sources": [
+                "D1"
+              ],
+              "unknowns": []
+            }
+          },
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "P1",
+                "claim": "lateral_rate",
+                "value": 0,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": false
+              }
+            ],
+            "expected": {
+              "status": "supported",
+              "value": 37,
+              "sources": [
+                "S1"
+              ],
+              "unknowns": []
+            }
+          },
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "R73"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "P1",
+                "claim": "lateral_rate",
+                "value": 0,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": false
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "material",
+                "regime"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "other",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "P1",
+                "claim": "lateral_rate",
+                "value": 0,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": false
+              }
+            ],
+            "expected": {
+              "status": "supported",
+              "value": 999,
+              "sources": [
+                "U1"
+              ],
+              "unknowns": []
+            }
+          },
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "wet"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "P1",
+                "claim": "lateral_rate",
+                "value": 0,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": false
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "lateral_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "P1",
+                "claim": "lateral_rate",
+                "value": 0,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": false
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "lateral_rate",
+              "conditions": {
+                "recipe": "R73"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "P1",
+                "claim": "lateral_rate",
+                "value": 0,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": false
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "material",
+                "regime"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "lateral_rate",
+              "conditions": {
+                "recipe": "other",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "P1",
+                "claim": "lateral_rate",
+                "value": 0,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": false
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "lateral_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "wet"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "P1",
+                "claim": "lateral_rate",
+                "value": 0,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": false
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "device_validated",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "P1",
+                "claim": "lateral_rate",
+                "value": 0,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": false
+              }
+            ],
+            "expected": {
+              "status": "unsupported",
+              "value": false,
+              "sources": [
+                "D1"
+              ],
+              "unknowns": []
+            }
+          },
+          {
+            "request": {
+              "claim": "device_validated",
+              "conditions": {
+                "recipe": "R73"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "P1",
+                "claim": "lateral_rate",
+                "value": 0,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": false
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "material",
+                "regime"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "device_validated",
+              "conditions": {
+                "recipe": "other",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "P1",
+                "claim": "lateral_rate",
+                "value": 0,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": false
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "device_validated",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "wet"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "P1",
+                "claim": "lateral_rate",
+                "value": 0,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": false
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "loss_after_package",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "P1",
+                "claim": "lateral_rate",
+                "value": 0,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": false
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "loss_after_package",
+              "conditions": {
+                "recipe": "R73"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "P1",
+                "claim": "lateral_rate",
+                "value": 0,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": false
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "material",
+                "regime"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "loss_after_package",
+              "conditions": {
+                "recipe": "other",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "P1",
+                "claim": "lateral_rate",
+                "value": 0,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": false
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "loss_after_package",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "wet"
+              }
+            },
+            "evidence": [
+              {
+                "source": "S1",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "U1",
+                "claim": "vertical_rate",
+                "value": 999,
+                "conditions": {
+                  "recipe": "other",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "D1",
+                "claim": "device_validated",
+                "value": false,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true
+              },
+              {
+                "source": "P1",
+                "claim": "lateral_rate",
+                "value": 0,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": false
+              }
+            ],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [],
+            "expected": {
+              "status": "unknown",
+              "value": null,
+              "sources": [],
+              "unknowns": [
+                "no matching evidence"
+              ]
+            }
+          },
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "unseen_source",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true,
+                "withdrawn": false
+              }
+            ],
+            "expected": {
+              "status": "supported",
+              "value": 37,
+              "sources": [
+                "unseen_source"
+              ],
+              "unknowns": []
+            }
+          },
+          {
+            "request": {
+              "claim": "vertical_rate",
+              "conditions": {
+                "recipe": "R73",
+                "material": "SiN",
+                "regime": "dry"
+              }
+            },
+            "evidence": [
+              {
+                "source": "A",
+                "claim": "vertical_rate",
+                "value": 37,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true,
+                "withdrawn": false
+              },
+              {
+                "source": "B",
+                "claim": "vertical_rate",
+                "value": 44,
+                "conditions": {
+                  "recipe": "R73",
+                  "material": "SiN",
+                  "regime": "dry"
+                },
+                "verified": true,
+                "withdrawn": false
+              }
+            ],
+            "expected": {
+              "status": "conflict",
+              "value": null,
+              "sources": [
+                "A",
+                "B"
+              ],
+              "unknowns": [
+                "source disagreement"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

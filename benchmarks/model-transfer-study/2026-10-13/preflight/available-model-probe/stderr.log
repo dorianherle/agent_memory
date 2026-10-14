@@ -1,0 +1,4 @@
+2026-10-13T13:54:35.088588Z  WARN codex_models_manager::model_info: Unknown model gpt-5.4 is used. This will use fallback model metadata.
+2026-10-13T13:54:35.105406Z  WARN codex_models_manager::model_info: Unknown model gpt-5.4 is used. This will use fallback model metadata.
+2026-10-13T13:54:35.110597Z  WARN codex_models_manager::model_info: Unknown model gpt-5.4 is used. This will use fallback model metadata.
+2026-10-13T13:54:36.641437Z  WARN codex_core::session_startup_prewarm: startup websocket prewarm setup failed: {"type":"error","status":400,"error":{"type":"invalid_request_error","message":"The 'gpt-5.4' model is not supported when using Codex with a ChatGPT account."}}

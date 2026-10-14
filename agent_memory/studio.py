@@ -110,6 +110,36 @@ def bound_root(project: str, goal_id: str | None = None) -> str:
     return resolve_goal(project, goal_id)["workspace"]
 
 
+_FILE_SKIP = {".git", ".agent_memory", "node_modules", ".venv", "venv", "__pycache__", ".pytest_cache"}
+_FILE_MAX = 400_000
+
+
+def _workspace_file(root: str, rel: str) -> Path:
+    base = Path(root).resolve()
+    target = (base / rel).resolve()
+    if not target.is_relative_to(base):
+        raise ValueError("Path leaves the workspace.")
+    return target
+
+
+def list_workspace_files(root: str, limit: int = 80) -> list[dict]:
+    base = Path(root)
+    rows = []
+    for path in base.rglob("*"):
+        if not path.is_file() or any(part in _FILE_SKIP for part in path.relative_to(base).parts):
+            continue
+        stat = path.stat()
+        rows.append({
+            "path": path.relative_to(base).as_posix(),
+            "bytes": stat.st_size,
+            "mtime": stat.st_mtime,
+        })
+        if len(rows) >= 400:
+            break
+    rows.sort(key=lambda row: row["mtime"], reverse=True)
+    return rows[:limit]
+
+
 def goals_view(project: str) -> dict:
     from agent_memory.goals import list_goals
 
@@ -678,6 +708,34 @@ class Handler(BaseHTTPRequestHandler):
                 )
             except Exception as error:
                 return self._json(500, {"error": str(error)})
+        if path == "/api/files":
+            project = SESSION.get("project")
+            if not project:
+                return self._json(400, {"error": "Open a project first."})
+            try:
+                root = bound_root(project, query.get("goal", [None])[0])
+                return self._json(200, {"files": list_workspace_files(root)})
+            except Exception as error:
+                return self._json(400, {"error": str(error)})
+        if path == "/api/file":
+            project = SESSION.get("project")
+            rel = (query.get("path") or [""])[0]
+            if not project or not rel:
+                return self._json(400, {"error": "Open a goal file."})
+            try:
+                target = _workspace_file(bound_root(project, query.get("goal", [None])[0]), rel)
+                if not target.is_file():
+                    return self._json(404, {"error": "No such file."})
+                if target.stat().st_size > _FILE_MAX:
+                    return self._json(400, {"error": "File is too large to edit here."})
+                text = target.read_text()
+            except ValueError as error:
+                return self._json(400, {"error": str(error)})
+            except UnicodeDecodeError:
+                return self._json(400, {"error": "Binary file."})
+            except OSError as error:
+                return self._json(400, {"error": str(error)})
+            return self._json(200, {"path": rel, "text": text})
         self.send_error(404)
 
     def do_POST(self) -> None:
@@ -820,6 +878,23 @@ class Handler(BaseHTTPRequestHandler):
             with LOCK:
                 _close_agent()
             return self._json(200, {"ok": True})
+        if path == "/api/file":
+            project = SESSION.get("project")
+            rel = str(data.get("path") or "").strip()
+            goal_id = str(data.get("goal") or data.get("goal_id") or "").strip()
+            if not project or not rel:
+                return self._json(400, {"error": "Open a goal file."})
+            if "text" not in data:
+                return self._json(400, {"error": "Missing text."})
+            try:
+                target = _workspace_file(bound_root(project, goal_id or None), rel)
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text(str(data.get("text") or ""))
+            except ValueError as error:
+                return self._json(400, {"error": str(error)})
+            except OSError as error:
+                return self._json(400, {"error": str(error)})
+            return self._json(200, {"ok": True, "path": rel})
         self.send_error(404)
 
 

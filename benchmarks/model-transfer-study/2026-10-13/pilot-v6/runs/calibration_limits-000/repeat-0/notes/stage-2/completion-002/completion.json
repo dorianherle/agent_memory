@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import json,copy,work\nwith open('requests.json') as f:r=json.load(f)\nwith open('evidence.json') as f:e=json.load(f)\nwith open('policy.json') as f:p=json.load(f)\nrb,eb,pb=copy.deepcopy(r),copy.deepcopy(e),copy.deepcopy(p)\nout=[work.evaluate(x,e,p) for x in r]\nwith open('report.json') as f:report=json.load(f)\nassert out==report\nassert (r,e,p)==(rb,eb,pb)\n# missing conditions\nassert work.evaluate({'claim':'x','conditions':{}},[],{'required_conditions':['z','a']})=={'status':'unknown','value':None,'sources':[],'unknowns':['a','z']}\n# verified filtering and no evidence\nassert work.evaluate({'claim':'x','conditions':{'a':1}},[{'source':'u','claim':'x','value':2,'conditions':{'a':1}}],{'required_conditions':['a'],'require_verified':True})['unknowns']==['no matching evidence']\n# eligible supersession\nev=[{'source':'old','claim':'x','value':1,'conditions':{'a':1},'verified':True},{'source':'new','claim':'x','value':2,'conditions':{'a':1},'verified':True,'supersedes':'old'}]\nassert work.evaluate({'claim':'x','conditions':{'a':1}},ev,{'required_conditions':['a'],'require_verified':True})=={'status':'supported','value':2,'sources':['new'],'unknowns':[]}\n# disagreement, canonical object equality, and bool false\nev2=[{'source':'b','claim':'x','value':{'q':1,'p':2},'conditions':{}},{'source':'a','claim':'x','value':{'p':2,'q':1},'conditions':{}}]\nassert work.evaluate({'claim':'x','conditions':{}},ev2,{'required_conditions':[]})=={'status':'supported','value':{'q':1,'p':2},'sources':['a','b'],'unknowns':[]}\nev2[1]['value']=False\nassert work.evaluate({'claim':'x','conditions':{}},ev2,{'required_conditions':[]})=={'status':'conflict','value':None,'sources':['a','b'],'unknowns':['source disagreement']}\nassert work.evaluate({'claim':'x','conditions':{}},[{'source':'s','claim':'x','value':False,'conditions':{}}],{'required_conditions':[]})['status']=='unsupported'\nprint('all checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 10375,
+    "output_tokens": 703,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 94
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 11.893945291871205,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

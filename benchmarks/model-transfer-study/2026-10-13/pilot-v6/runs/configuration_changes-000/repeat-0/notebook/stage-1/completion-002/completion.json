@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "log",
+              "--oneline",
+              "--all",
+              "-5"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "status",
+              "--short"
+            ]
+          }
+        },
+        {
+          "action": "list",
+          "arguments": {
+            "path": ".notebook"
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 9192,
+    "output_tokens": 144,
+    "cached_input_tokens": 8320,
+    "reasoning_output_tokens": 57
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 6.936121915932745,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

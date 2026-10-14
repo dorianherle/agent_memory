@@ -1,0 +1,44 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "model_predict",
+      "name": "status",
+      "payload": {
+        "edge_exists": true,
+        "evidence": [
+          "independent Stage 3 boundary probe"
+        ],
+        "policy": {
+          "edges": {
+            "plain>done": {}
+          },
+          "retry_limit": 2
+        },
+        "request": {
+          "from": "plain",
+          "to": "done",
+          "attempts": true
+        },
+        "retry_present": true,
+        "retry_valid": false,
+        "role_allowed": true
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 41314,
+    "output_tokens": 1264,
+    "cached_input_tokens": 26368,
+    "reasoning_output_tokens": 1133
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 28.119015166070312,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

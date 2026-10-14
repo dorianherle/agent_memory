@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy; from work import evaluate; r={'claim':'c','conditions':{'a':1,'b':2}}; p={'required_conditions':['b','a'],'require_verified':True}; e=[{'source':'old','claim':'c','value':{'y':2,'x':1},'conditions':{'a':1,'b':2},'verified':True},{'source':'new','claim':'c','value':{'x':1,'y':2},'conditions':{'a':1,'b':2},'verified':True,'supersedes':'old'},{'source':'bad','claim':'c','value':9,'conditions':{'a':1,'b':2},'verified':False},{'source':'gone','claim':'c','value':8,'conditions':{'a':1,'b':2},'verified':True,'withdrawn':True}]; before=copy.deepcopy((r,e,p)); assert evaluate(r,e,p)=={'status':'supported','value':{'x':1,'y':2},'sources':['new'],'unknowns':[]}; assert (r,e,p)==before; assert evaluate({'claim':'c','conditions':{}},e,p)=={'status':'unknown','value':None,'sources':[],'unknowns':['a','b']}; assert evaluate({'claim':'z','conditions':{'a':1,'b':2}},e,p)=={'status':'unknown','value':None,'sources':[],'unknowns':['no matching evidence']}; e2=[{'source':'a','claim':'c','value':False,'conditions':{'a':1}},{'source':'b','claim':'c','value':0,'conditions':{'a':1}}]; assert evaluate({'claim':'c','conditions':{'a':1}},e2,{'required_conditions':['a']})=={'status':'conflict','value':None,'sources':['a','b'],'unknowns':['source disagreement']}; print('custom checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 25959,
+    "output_tokens": 905,
+    "cached_input_tokens": 20480,
+    "reasoning_output_tokens": 419
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 16.935827708104625,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

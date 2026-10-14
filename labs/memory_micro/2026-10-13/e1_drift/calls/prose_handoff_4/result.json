@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "text": "The goal is to qualify controller version 2.6 at 0.80 m/s, with a 2.50 ms PWM period, a maximum load of 4.00 kg, and an ambient temperature of 18.0 to 28.0 degrees C. For motor M17 only, reduce the maximum load to 2.75 kg when the temperature is more than 26.0 degrees C. At exactly 26.0 degrees C, the 4.00 kg limit applies. Timing qualification must use test B, a load of 2.00 kg, and a 120 s warmup before measurement. The proposed shorter warmup was rejected. The timing limit is a 99th percentile of 3.00 ms. H2 withdraws the version 2.5 pass claim. Its corrected result is 3.20 ms and fails. Version 2.6 timing is not tested. H3 reports a watchdog fault in 3 of 5 simulator runs at 3.60 kg. A watchdog reset is an untested explanation. No cause is established. Do not use zero for an unknown quantity to make a check pass. Release is on hold until version 2.6 timing passes and the watchdog fault is resolved. The proposed extra test is optional.",
+  "errors": [],
+  "model": "gpt-5.6-sol",
+  "reasoning": "low",
+  "elapsed_seconds": 7.966713916044682,
+  "usage_complete": true,
+  "usage": {
+    "input_tokens": 10663,
+    "output_tokens": 313
+  },
+  "native_tools": [],
+  "prompt_sha256": "904a69e66d2cc0abc7070a8bb62760c962ad4154a107b525d6fa7aa0e0255f4a"
+}

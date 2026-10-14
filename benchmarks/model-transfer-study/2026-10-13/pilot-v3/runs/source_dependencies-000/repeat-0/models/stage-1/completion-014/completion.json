@@ -1,0 +1,300 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "model_propose",
+      "id": null,
+      "payload": {
+        "schema": 1,
+        "title": "Declared source dependency review evaluation",
+        "inputs": {
+          "request": "object",
+          "policy": "object",
+          "evidence": "array"
+        },
+        "rules": [
+          {
+            "id": "review_relevant_state_changes",
+            "target": "needs_review",
+            "claim": "Review is required when at least one normalized path comparison is declared, not ignored, and has unequal complete saved and current JSON states.",
+            "when": {
+              "value": true
+            },
+            "then": {
+              "op": "any",
+              "items": {
+                "var": "evidence"
+              },
+              "as": "comparison",
+              "test": {
+                "op": "and",
+                "args": [
+                  {
+                    "op": "eq",
+                    "args": [
+                      {
+                        "var": "comparison.declared"
+                      },
+                      {
+                        "value": true
+                      }
+                    ]
+                  },
+                  {
+                    "op": "eq",
+                    "args": [
+                      {
+                        "var": "comparison.ignored"
+                      },
+                      {
+                        "value": false
+                      }
+                    ]
+                  },
+                  {
+                    "op": "ne",
+                    "args": [
+                      {
+                        "var": "comparison.saved"
+                      },
+                      {
+                        "var": "comparison.current"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            "evidence": [
+              "426e31ec"
+            ],
+            "dependencies": [
+              "work.py",
+              "TASK.md"
+            ]
+          }
+        ],
+        "cases": [
+          {
+            "id": "recorded_unchanged_request",
+            "target": "needs_review",
+            "inputs": {
+              "request": {
+                "declared": [
+                  "worker_0.py"
+                ],
+                "saved": {
+                  "worker_0.py": {
+                    "kind": "file",
+                    "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                },
+                "current": {
+                  "worker_0.py": {
+                    "kind": "file",
+                    "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                }
+              },
+              "policy": {
+                "variant": 0,
+                "ignored": []
+              },
+              "evidence": [
+                {
+                  "path": "worker_0.py",
+                  "declared": true,
+                  "ignored": false,
+                  "saved": {
+                    "kind": "file",
+                    "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  },
+                  "current": {
+                    "kind": "file",
+                    "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                }
+              ]
+            },
+            "expected": false,
+            "evidence": [
+              "426e31ec"
+            ],
+            "challenge": false
+          },
+          {
+            "id": "complete_state_difference_challenge",
+            "target": "needs_review",
+            "inputs": {
+              "request": {
+                "declared": [
+                  "meta"
+                ],
+                "saved": {
+                  "meta": {
+                    "kind": "file",
+                    "name": "n",
+                    "timestamp": 1
+                  }
+                },
+                "current": {
+                  "meta": {
+                    "kind": "file",
+                    "name": "n",
+                    "timestamp": 2
+                  }
+                }
+              },
+              "policy": {
+                "ignored": []
+              },
+              "evidence": [
+                {
+                  "path": "meta",
+                  "declared": true,
+                  "ignored": false,
+                  "saved": {
+                    "kind": "file",
+                    "name": "n",
+                    "timestamp": 1
+                  },
+                  "current": {
+                    "kind": "file",
+                    "name": "n",
+                    "timestamp": 2
+                  }
+                }
+              ]
+            },
+            "expected": true,
+            "evidence": [
+              "426e31ec"
+            ],
+            "challenge": true
+          },
+          {
+            "id": "ignored_change_challenge",
+            "target": "needs_review",
+            "inputs": {
+              "request": {
+                "declared": [
+                  "skip"
+                ],
+                "saved": {
+                  "skip": {
+                    "kind": "file",
+                    "hash": "a"
+                  }
+                },
+                "current": {
+                  "skip": {
+                    "kind": "file",
+                    "hash": "b"
+                  }
+                }
+              },
+              "policy": {
+                "ignored": [
+                  "skip"
+                ]
+              },
+              "evidence": [
+                {
+                  "path": "skip",
+                  "declared": true,
+                  "ignored": true,
+                  "saved": {
+                    "kind": "file",
+                    "hash": "a"
+                  },
+                  "current": {
+                    "kind": "file",
+                    "hash": "b"
+                  }
+                }
+              ]
+            },
+            "expected": false,
+            "evidence": [
+              "426e31ec"
+            ],
+            "challenge": true
+          },
+          {
+            "id": "missing_normalization_challenge",
+            "target": "needs_review",
+            "inputs": {
+              "request": {
+                "declared": [
+                  "gone"
+                ],
+                "saved": {},
+                "current": {
+                  "gone": {
+                    "kind": "missing"
+                  }
+                }
+              },
+              "policy": {
+                "ignored": []
+              },
+              "evidence": [
+                {
+                  "path": "gone",
+                  "declared": true,
+                  "ignored": false,
+                  "saved": {
+                    "kind": "missing"
+                  },
+                  "current": {
+                    "kind": "missing"
+                  }
+                }
+              ]
+            },
+            "expected": false,
+            "evidence": [
+              "426e31ec"
+            ],
+            "challenge": true
+          }
+        ],
+        "alternatives": [
+          {
+            "id": "selected_metadata_only",
+            "claim": "Comparing only selected fields such as hash, name, or timestamp can miss complete-state differences.",
+            "rules": [
+              "review_relevant_state_changes"
+            ]
+          },
+          {
+            "id": "all_observed_paths",
+            "claim": "Considering undeclared or ignored paths would incorrectly require review for irrelevant changes.",
+            "rules": [
+              "review_relevant_state_changes"
+            ]
+          }
+        ],
+        "unresolved": [
+          "The executable model uses normalized per-path evidence because the model expression language cannot dynamically index request.saved and request.current by each declared path.",
+          "Malformed non-JSON-serializable states are unspecified and untested."
+        ]
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 12913,
+    "output_tokens": 1697,
+    "cached_input_tokens": 7808,
+    "reasoning_output_tokens": 781
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 33.23690958390944,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

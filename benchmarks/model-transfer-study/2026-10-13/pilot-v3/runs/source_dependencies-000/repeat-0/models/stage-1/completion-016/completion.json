@@ -1,0 +1,208 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "model_propose",
+      "id": null,
+      "payload": {
+        "schema": 1,
+        "title": "Declared source dependency review",
+        "inputs": {
+          "request": "object",
+          "policy": "object"
+        },
+        "rules": [
+          {
+            "id": "review_relevant_changes",
+            "target": "needs_review",
+            "claim": "A request needs review when its saved and current source mappings differ and at least one declared path is not ignored.",
+            "when": {
+              "value": true
+            },
+            "then": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "ne",
+                  "args": [
+                    {
+                      "var": "request.saved"
+                    },
+                    {
+                      "var": "request.current"
+                    }
+                  ]
+                },
+                {
+                  "op": "any",
+                  "items": {
+                    "var": "request.declared"
+                  },
+                  "as": "path",
+                  "test": {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "in",
+                        "args": [
+                          {
+                            "var": "path"
+                          },
+                          {
+                            "var": "policy.ignored"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "evidence": [
+              "426e31ec"
+            ],
+            "dependencies": [
+              "work.py",
+              "TASK.md"
+            ]
+          }
+        ],
+        "cases": [
+          {
+            "id": "recorded_unchanged_request",
+            "target": "needs_review",
+            "inputs": {
+              "request": {
+                "declared": [
+                  "worker_0.py"
+                ],
+                "saved": {
+                  "worker_0.py": {
+                    "kind": "file",
+                    "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                },
+                "current": {
+                  "worker_0.py": {
+                    "kind": "file",
+                    "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                }
+              },
+              "policy": {
+                "variant": 0,
+                "ignored": []
+              }
+            },
+            "expected": false,
+            "evidence": [
+              "426e31ec"
+            ],
+            "challenge": false
+          },
+          {
+            "id": "complete_state_change_challenge",
+            "target": "needs_review",
+            "inputs": {
+              "request": {
+                "declared": [
+                  "meta"
+                ],
+                "saved": {
+                  "meta": {
+                    "kind": "file",
+                    "name": "n",
+                    "timestamp": 1
+                  }
+                },
+                "current": {
+                  "meta": {
+                    "kind": "file",
+                    "name": "n",
+                    "timestamp": 2
+                  }
+                }
+              },
+              "policy": {
+                "ignored": []
+              }
+            },
+            "expected": true,
+            "evidence": [
+              "426e31ec"
+            ],
+            "challenge": true
+          },
+          {
+            "id": "ignored_only_change_challenge",
+            "target": "needs_review",
+            "inputs": {
+              "request": {
+                "declared": [
+                  "skip"
+                ],
+                "saved": {
+                  "skip": {
+                    "kind": "file",
+                    "hash": "a"
+                  }
+                },
+                "current": {
+                  "skip": {
+                    "kind": "file",
+                    "hash": "b"
+                  }
+                }
+              },
+              "policy": {
+                "ignored": [
+                  "skip"
+                ]
+              }
+            },
+            "expected": false,
+            "evidence": [
+              "426e31ec"
+            ],
+            "challenge": true
+          }
+        ],
+        "alternatives": [
+          {
+            "id": "selected_fields",
+            "claim": "Comparing selected metadata fields can miss complete-state changes.",
+            "rules": [
+              "review_relevant_changes"
+            ]
+          },
+          {
+            "id": "all_paths",
+            "claim": "Including undeclared or ignored paths treats irrelevant changes as review-worthy.",
+            "rules": [
+              "review_relevant_changes"
+            ]
+          }
+        ],
+        "unresolved": [
+          "The executable expression is conservative and cannot dynamically index saved and current mappings by each declared path; work.py implements the precise per-path behavior.",
+          "Malformed non-JSON-serializable states are unspecified and untested."
+        ]
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 14928,
+    "output_tokens": 1501,
+    "cached_input_tokens": 7808,
+    "reasoning_output_tokens": 875
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 42.81692258315161,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

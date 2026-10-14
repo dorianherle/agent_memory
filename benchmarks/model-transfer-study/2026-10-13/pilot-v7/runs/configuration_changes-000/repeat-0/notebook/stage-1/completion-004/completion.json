@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "git",
+        "diff",
+        "--",
+        "work.py",
+        "report.json"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 22912,
+    "output_tokens": 186,
+    "cached_input_tokens": 17792,
+    "reasoning_output_tokens": 117
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 8.754930583992973,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

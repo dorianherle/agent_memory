@@ -50,6 +50,31 @@ Watch it live: `.agent_memory/live/index.html`.
 
 ## The tools
 
+Agent Memory also keeps a versioned **task model**. Agents can replace separate
+case rules with shared executable rules. Git retains the earlier models and
+their evidence. The active packet shows the current model first and omits
+related notes that its tested rules already cover.
+
+Use `memory_model` to get, propose, check, accept, reduce, or predict. The default
+tool result contains working rules and check counts. Use `full=True` to inspect
+the stored cases. A revision carries earlier cases forward. Failed proposals
+remain in Git and do not replace the active model. Changed source files block
+predictions until a revision supplies fresh test evidence.
+
+The reducer factors rules with the same effect and repeated Boolean conditions.
+It retains the original conditions. An agent can propose a broader rule after
+new tests. This checks recorded cases; it does not prove a universal law or an
+agent accuracy gain.
+
+Read [the task model API](docs/task-models.md). Run the file-change example:
+
+```bash
+.venv/bin/python examples/task_model_revision.py --output /tmp/my-task-model-example
+```
+
+Use a new output directory. The example uses actual file creation, changes,
+and deletion. It checks model revisions and Git retention.
+
 The first prompt establishes the goal. The agent saves only durable constraints,
 findings, decisions, and checkpoints after that.
 
@@ -313,3 +338,35 @@ after interruption. Concurrent code writers should use separate workspaces.
 Legacy transcript entries use only their former 100-character headline for
 optional embeddings. New ordinary prompts and answers are not stored as memory;
 work notes retain their normal semantic indexing.
+
+
+## Private research development
+
+This development work has not been published. Start with the local example:
+
+```sh
+python examples/research_resume/run_demo.py --output /tmp/research-resume-demo
+```
+
+It starts a new process, detects a stale cavity result, and verifies the changed
+geometry. It needs no API key or model call. See the [study procedure](docs/research-handoff-study.md),
+[measured development results](docs/research-handoff-results.md), and
+[private development review](docs/private-development-review.md).
+
+The fresh-agent studies use synthetic tasks. Their limits remain explicit.
+The runner also checks worker signatures before execution. An internal
+TypeError cannot trigger a second experiment through the compatibility path.
+
+
+## Private validation, 13 October 2026
+
+The [completed benchmark report](docs/memory-benchmark-results-2026-10-13.md)
+records 470 published retrieval questions and two fresh-agent handoff stages.
+Agent Memory and the searchable notebook had equal accuracy in these tests.
+Seven source defects were corrected. The final suite reports 274 passed tests.
+See the [source review](docs/source-reliability-audit-2026-10-13.md),
+[published benchmark selection](docs/external-memory-benchmarks.md), and
+[next test procedure](docs/next-memory-evaluation.md).
+
+The evidence, failed runs, and package remain private. Retrieval scores are not
+answer scores. Native model token counts and cost savings were not measured.

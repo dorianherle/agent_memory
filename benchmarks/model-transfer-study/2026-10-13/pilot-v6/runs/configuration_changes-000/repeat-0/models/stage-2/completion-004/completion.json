@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "from work import evaluate\nbase={'defaults':{'b':True,'i':4,'s':'x'},'types':{'b':'boolean','i':'integer','s':'string'},'null_resets':True,'environment':True}\ncases=[\n('preserve_false_zero_empty',{'layers':[{'b':False,'i':0,'s':''}]},base,{'ok':True,'config':{'b':False,'i':0,'s':''},'error':None}),\n('ordered_and_reset',{'layers':[{'i':9},{'i':None}]},base,{'ok':True,'config':{'b':True,'i':4,'s':'x'},'error':None}),\n('null_without_reset',{'layers':[{'i':None}]},{**base,'null_resets':False},{'ok':False,'config':{},'error':'type'}),\n('unknown_precedes_environment',{'layers':[{'bad':1}],'environment':{'i':'oops'}},base,{'ok':False,'config':{},'error':'unknown_key'}),\n('environment_disabled',{'environment':{'i':'2'}},{**base,'environment':False},{'ok':False,'config':{},'error':'environment'}),\n('environment_unknown',{'environment':{'bad':'2'}},base,{'ok':False,'config':{},'error':'environment'}),\n('environment_exact_parsing',{'environment':{'b':'false','i':'-12','s':''}},base,{'ok':True,'config':{'b':False,'i':-12,'s':''},'error':None}),\n('environment_bad_bool',{'environment':{'b':'True'}},base,{'ok':False,'config':{},'error':'environment'}),\n('environment_bad_int',{'environment':{'i':' 2'}},base,{'ok':False,'config':{},'error':'environment'}),\n('bool_not_integer',{'layers':[{'i':False}]},base,{'ok':False,'config':{},'error':'type'}),\n('type_after_environment',{'layers':[{'i':'bad'}],'environment':{'i':'7'}},base,{'ok':True,'config':{'b':True,'i':7,'s':'x'},'error':None})]\nfor name,request,policy,expected in cases:\n actual=evaluate(request,policy)\n assert actual==expected,(name,actual,expected)\n print(name,actual['error'] or 'ok')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 14273,
+    "output_tokens": 877,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 298
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 16.60880829207599,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

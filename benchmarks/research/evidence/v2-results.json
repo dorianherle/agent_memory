@@ -1,0 +1,1365 @@
+{
+  "protocol_version": 2,
+  "summary": {
+    "memory": {
+      "task_passes": 6,
+      "tasks": 6,
+      "checks_passed": 66,
+      "checks_total": 66,
+      "mean_initial_context_proxy_tokens": 188.33333333333334,
+      "mean_visible_evidence_proxy_tokens": 408.6666666666667,
+      "memory_reads": 13
+    },
+    "recent": {
+      "task_passes": 2,
+      "tasks": 6,
+      "checks_passed": 54,
+      "checks_total": 66,
+      "mean_initial_context_proxy_tokens": 156.33333333333334,
+      "mean_visible_evidence_proxy_tokens": 156.33333333333334,
+      "memory_reads": 0
+    },
+    "full": {
+      "task_passes": 6,
+      "tasks": 6,
+      "checks_passed": 66,
+      "checks_total": 66,
+      "mean_initial_context_proxy_tokens": 1085.6666666666667,
+      "mean_visible_evidence_proxy_tokens": 1085.6666666666667,
+      "memory_reads": 0
+    }
+  },
+  "rows": [
+    {
+      "trial": 1,
+      "condition": "memory",
+      "case": "convergence",
+      "workspace": "workspaces/trial-1/memory/convergence",
+      "fixture_sha256": "cd3db913c4988cd0c4f50ce657b759f44f256557d434fcd0602aa001efbae4d4",
+      "input_sha256": {
+        "measure.py": "8c514bc2c12f836c54b64f8f6cf98ff519e4ae7a8fb76a27a0a2b336c56dbc57",
+        "samples.json": "8106cf74c31db62ff93bb14bfa165874b13e1c5283406c7b0fca9fac9fe8d8cd",
+        "config.json": "82c3c2270402c3ce7a96527c81b72e65f3a857f1279a5ea0ef0925b7f8070d61",
+        "memory_read.py": "f175db523e8924bf411474761b407fbb84a3bc6c04b77ce5044dae716eaa9b6e",
+        "TASK.md": "05afc5bcbedc4fb2a84e86ca356d03f8b56299b50bf678e7e79602ab7a53d639",
+        "context.txt": "98c2d790d55815d11c48b22964626a691549b20f0d0fa3810358d7229bca16c6"
+      },
+      "context_characters": 827,
+      "context_proxy_tokens": 199,
+      "packet_ms": 162.875,
+      "passed": 11,
+      "total": 11,
+      "checks": [
+        {
+          "check": "second_order",
+          "passed": true
+        },
+        {
+          "check": "reversed_error_sign",
+          "passed": true
+        },
+        {
+          "check": "first_order_rejected",
+          "passed": true
+        },
+        {
+          "check": "extrapolation_not_reference_substitution",
+          "passed": true
+        },
+        {
+          "check": "order_independent_of_input_sort",
+          "passed": true
+        },
+        {
+          "check": "stale_geometry_rejected",
+          "passed": true
+        },
+        {
+          "check": "nondoubling_grid_rejected",
+          "passed": true
+        },
+        {
+          "check": "insufficient_data_rejected",
+          "passed": true
+        },
+        {
+          "check": "degenerate_data_rejected",
+          "passed": true
+        },
+        {
+          "check": "nonfinite_data_rejected",
+          "passed": true
+        },
+        {
+          "check": "current_data_report",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "full_task_pass": true,
+      "main_stdout": "",
+      "main_stderr": "",
+      "memory_reads": 2,
+      "read_proxy_tokens": 217,
+      "visible_evidence_proxy_tokens": 416,
+      "candidate_sha256": "c7b0dae1aed2aacd45757d8af424129ed01445f15f42ba32d23785b550d188e8"
+    },
+    {
+      "trial": 1,
+      "condition": "recent",
+      "case": "convergence",
+      "workspace": "workspaces/trial-1/recent/convergence",
+      "fixture_sha256": "cd3db913c4988cd0c4f50ce657b759f44f256557d434fcd0602aa001efbae4d4",
+      "input_sha256": {
+        "measure.py": "8c514bc2c12f836c54b64f8f6cf98ff519e4ae7a8fb76a27a0a2b336c56dbc57",
+        "samples.json": "8106cf74c31db62ff93bb14bfa165874b13e1c5283406c7b0fca9fac9fe8d8cd",
+        "config.json": "82c3c2270402c3ce7a96527c81b72e65f3a857f1279a5ea0ef0925b7f8070d61",
+        "TASK.md": "05afc5bcbedc4fb2a84e86ca356d03f8b56299b50bf678e7e79602ab7a53d639",
+        "context.txt": "e6e0f2f647e76062607726d1c834ab9079a66b58ccc620eb11c0e97c9ef02b23"
+      },
+      "context_characters": 827,
+      "context_proxy_tokens": 159,
+      "packet_ms": null,
+      "passed": 11,
+      "total": 11,
+      "checks": [
+        {
+          "check": "second_order",
+          "passed": true
+        },
+        {
+          "check": "reversed_error_sign",
+          "passed": true
+        },
+        {
+          "check": "first_order_rejected",
+          "passed": true
+        },
+        {
+          "check": "extrapolation_not_reference_substitution",
+          "passed": true
+        },
+        {
+          "check": "order_independent_of_input_sort",
+          "passed": true
+        },
+        {
+          "check": "stale_geometry_rejected",
+          "passed": true
+        },
+        {
+          "check": "nondoubling_grid_rejected",
+          "passed": true
+        },
+        {
+          "check": "insufficient_data_rejected",
+          "passed": true
+        },
+        {
+          "check": "degenerate_data_rejected",
+          "passed": true
+        },
+        {
+          "check": "nonfinite_data_rejected",
+          "passed": true
+        },
+        {
+          "check": "current_data_report",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "full_task_pass": true,
+      "main_stdout": "",
+      "main_stderr": "",
+      "memory_reads": 0,
+      "read_proxy_tokens": 0,
+      "visible_evidence_proxy_tokens": 159,
+      "candidate_sha256": "866780479b6aab82c9be0a97a08c00e5ed1aa044181027ea70a35b3e78bd7d93"
+    },
+    {
+      "trial": 1,
+      "condition": "full",
+      "case": "convergence",
+      "workspace": "workspaces/trial-1/full/convergence",
+      "fixture_sha256": "cd3db913c4988cd0c4f50ce657b759f44f256557d434fcd0602aa001efbae4d4",
+      "input_sha256": {
+        "measure.py": "8c514bc2c12f836c54b64f8f6cf98ff519e4ae7a8fb76a27a0a2b336c56dbc57",
+        "samples.json": "8106cf74c31db62ff93bb14bfa165874b13e1c5283406c7b0fca9fac9fe8d8cd",
+        "config.json": "82c3c2270402c3ce7a96527c81b72e65f3a857f1279a5ea0ef0925b7f8070d61",
+        "TASK.md": "05afc5bcbedc4fb2a84e86ca356d03f8b56299b50bf678e7e79602ab7a53d639",
+        "context.txt": "972810aaceff1fa09b571087f162f0a1d0b3b580a6f34d72f047ed3fcab1284a"
+      },
+      "context_characters": 5376,
+      "context_proxy_tokens": 1089,
+      "packet_ms": null,
+      "passed": 11,
+      "total": 11,
+      "checks": [
+        {
+          "check": "second_order",
+          "passed": true
+        },
+        {
+          "check": "reversed_error_sign",
+          "passed": true
+        },
+        {
+          "check": "first_order_rejected",
+          "passed": true
+        },
+        {
+          "check": "extrapolation_not_reference_substitution",
+          "passed": true
+        },
+        {
+          "check": "order_independent_of_input_sort",
+          "passed": true
+        },
+        {
+          "check": "stale_geometry_rejected",
+          "passed": true
+        },
+        {
+          "check": "nondoubling_grid_rejected",
+          "passed": true
+        },
+        {
+          "check": "insufficient_data_rejected",
+          "passed": true
+        },
+        {
+          "check": "degenerate_data_rejected",
+          "passed": true
+        },
+        {
+          "check": "nonfinite_data_rejected",
+          "passed": true
+        },
+        {
+          "check": "current_data_report",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "full_task_pass": true,
+      "main_stdout": "",
+      "main_stderr": "",
+      "memory_reads": 0,
+      "read_proxy_tokens": 0,
+      "visible_evidence_proxy_tokens": 1089,
+      "candidate_sha256": "c901212bc7366b2b4cedb4dd56febeb5ece4c32d78bd0099f2000ebde500aa07"
+    },
+    {
+      "trial": 1,
+      "condition": "memory",
+      "case": "vector_error",
+      "workspace": "workspaces/trial-1/memory/vector_error",
+      "fixture_sha256": "bd20656ca3d5074aeca4c3c91817ede9bd58abc2d5db8ab8ac422dd3f92e2f75",
+      "input_sha256": {
+        "policy.json": "2366340d2a3b181cabff11330b3e4bebce3d4e0abf63da832391709b4f1fc28e",
+        "fields.json": "326ce04e5e0e9727ec4a447baad497717d7198230a1d40c8c08b48a83e4d0a6b",
+        "memory_read.py": "f175db523e8924bf411474761b407fbb84a3bc6c04b77ce5044dae716eaa9b6e",
+        "TASK.md": "3f1c3493dbe24879a2bbc88ab06eccca07ca4c5c2e66ce3704b8ab874520f58f",
+        "context.txt": "038983c5d62b2e2456478a92318ff1a614f8bdd7ce8d3fc0d41191d2c76b3a4a"
+      },
+      "context_characters": 822,
+      "context_proxy_tokens": 183,
+      "packet_ms": 184.193,
+      "passed": 11,
+      "total": 11,
+      "checks": [
+        {
+          "check": "identical",
+          "passed": true
+        },
+        {
+          "check": "phase_invariance",
+          "passed": true
+        },
+        {
+          "check": "scale_invariance",
+          "passed": true
+        },
+        {
+          "check": "relative_phase_detected",
+          "passed": true
+        },
+        {
+          "check": "missing_component_detected",
+          "passed": true
+        },
+        {
+          "check": "arbitrary_vector_matches_independent_formula",
+          "passed": true
+        },
+        {
+          "check": "zero_norm_rejected",
+          "passed": true
+        },
+        {
+          "check": "unequal_lengths_rejected",
+          "passed": true
+        },
+        {
+          "check": "multidimensional_rejected",
+          "passed": true
+        },
+        {
+          "check": "nonfinite_rejected",
+          "passed": true
+        },
+        {
+          "check": "current_data_report",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "full_task_pass": true,
+      "main_stdout": "",
+      "main_stderr": "",
+      "memory_reads": 2,
+      "read_proxy_tokens": 168,
+      "visible_evidence_proxy_tokens": 351,
+      "candidate_sha256": "1ffb6361c2e2ffd1aa1aad290caa9687bbc42f128ab401d7919d1b491dc5a34f"
+    },
+    {
+      "trial": 1,
+      "condition": "recent",
+      "case": "vector_error",
+      "workspace": "workspaces/trial-1/recent/vector_error",
+      "fixture_sha256": "bd20656ca3d5074aeca4c3c91817ede9bd58abc2d5db8ab8ac422dd3f92e2f75",
+      "input_sha256": {
+        "policy.json": "2366340d2a3b181cabff11330b3e4bebce3d4e0abf63da832391709b4f1fc28e",
+        "fields.json": "326ce04e5e0e9727ec4a447baad497717d7198230a1d40c8c08b48a83e4d0a6b",
+        "TASK.md": "3f1c3493dbe24879a2bbc88ab06eccca07ca4c5c2e66ce3704b8ab874520f58f",
+        "context.txt": "0b03e298bd83e25f7eff5f2e9905f997f2249961b700b6f8ae4681228963a1c9"
+      },
+      "context_characters": 822,
+      "context_proxy_tokens": 159,
+      "packet_ms": null,
+      "passed": 6,
+      "total": 11,
+      "checks": [
+        {
+          "check": "identical",
+          "passed": true
+        },
+        {
+          "check": "phase_invariance",
+          "passed": true
+        },
+        {
+          "check": "scale_invariance",
+          "passed": false,
+          "error": "AssertionError: (446.6190476190476, 0)"
+        },
+        {
+          "check": "relative_phase_detected",
+          "passed": true
+        },
+        {
+          "check": "missing_component_detected",
+          "passed": false,
+          "error": "AssertionError: (0.7071067811865475, 0.7653668647301795)"
+        },
+        {
+          "check": "arbitrary_vector_matches_independent_formula",
+          "passed": false,
+          "error": "AssertionError: (1.274003958831316, 1.1640054501940191)"
+        },
+        {
+          "check": "zero_norm_rejected",
+          "passed": false,
+          "error": "AssertionError: Invalid evidence must raise ValueError."
+        },
+        {
+          "check": "unequal_lengths_rejected",
+          "passed": true
+        },
+        {
+          "check": "multidimensional_rejected",
+          "passed": false,
+          "error": "TypeError: complex() argument must be a string or a number, not list"
+        },
+        {
+          "check": "nonfinite_rejected",
+          "passed": true
+        },
+        {
+          "check": "current_data_report",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "full_task_pass": false,
+      "main_stdout": "",
+      "main_stderr": "",
+      "memory_reads": 0,
+      "read_proxy_tokens": 0,
+      "visible_evidence_proxy_tokens": 159,
+      "candidate_sha256": "e353119a9f99e776fac71af5c0f3a065c4f50d95ce9c8e2735ea7d3df7513bdd"
+    },
+    {
+      "trial": 1,
+      "condition": "full",
+      "case": "vector_error",
+      "workspace": "workspaces/trial-1/full/vector_error",
+      "fixture_sha256": "bd20656ca3d5074aeca4c3c91817ede9bd58abc2d5db8ab8ac422dd3f92e2f75",
+      "input_sha256": {
+        "policy.json": "2366340d2a3b181cabff11330b3e4bebce3d4e0abf63da832391709b4f1fc28e",
+        "fields.json": "326ce04e5e0e9727ec4a447baad497717d7198230a1d40c8c08b48a83e4d0a6b",
+        "TASK.md": "3f1c3493dbe24879a2bbc88ab06eccca07ca4c5c2e66ce3704b8ab874520f58f",
+        "context.txt": "278e0bbb11758d2812602fb314446c9540f082ec09bb76069ab17e9c06630a98"
+      },
+      "context_characters": 5275,
+      "context_proxy_tokens": 1049,
+      "packet_ms": null,
+      "passed": 11,
+      "total": 11,
+      "checks": [
+        {
+          "check": "identical",
+          "passed": true
+        },
+        {
+          "check": "phase_invariance",
+          "passed": true
+        },
+        {
+          "check": "scale_invariance",
+          "passed": true
+        },
+        {
+          "check": "relative_phase_detected",
+          "passed": true
+        },
+        {
+          "check": "missing_component_detected",
+          "passed": true
+        },
+        {
+          "check": "arbitrary_vector_matches_independent_formula",
+          "passed": true
+        },
+        {
+          "check": "zero_norm_rejected",
+          "passed": true
+        },
+        {
+          "check": "unequal_lengths_rejected",
+          "passed": true
+        },
+        {
+          "check": "multidimensional_rejected",
+          "passed": true
+        },
+        {
+          "check": "nonfinite_rejected",
+          "passed": true
+        },
+        {
+          "check": "current_data_report",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "full_task_pass": true,
+      "main_stdout": "",
+      "main_stderr": "",
+      "memory_reads": 0,
+      "read_proxy_tokens": 0,
+      "visible_evidence_proxy_tokens": 1049,
+      "candidate_sha256": "05e8140cbb01b5e7dc796078394882d1578f276ccfac8d56460970c0c3b13eb2"
+    },
+    {
+      "trial": 1,
+      "condition": "memory",
+      "case": "runtime_audit",
+      "workspace": "workspaces/trial-1/memory/runtime_audit",
+      "fixture_sha256": "dca07020d61fe0f3c754ce6fcd0da9789539c08dc050572188c34524cf17c756",
+      "input_sha256": {
+        "timings.json": "20729101945ddf50dbc490d8b2edc15aa9562b8ddda60804da151aa52e0b88e4",
+        "policy.json": "81f8b56f2b0a94bf34920f2f8c8205259f19a155aa2b108c0238e0404d5c5cc9",
+        "memory_read.py": "f175db523e8924bf411474761b407fbb84a3bc6c04b77ce5044dae716eaa9b6e",
+        "TASK.md": "c7a086cc0cfb6752cc33e202a9b2bc399e0fb9b6edafda2598837894b5489e7a",
+        "context.txt": "21708d6577c30dfeb1d4defa4d0413e6ab8b1681c7afdc9df3198f4ec5e69c67"
+      },
+      "context_characters": 772,
+      "context_proxy_tokens": 183,
+      "packet_ms": 175.613,
+      "passed": 11,
+      "total": 11,
+      "checks": [
+        {
+          "check": "full_pipeline_cost",
+          "passed": true
+        },
+        {
+          "check": "accuracy_coverage",
+          "passed": true
+        },
+        {
+          "check": "failed_cases_not_speed_wins",
+          "passed": true
+        },
+        {
+          "check": "accuracy_limited_claim",
+          "passed": true
+        },
+        {
+          "check": "pure_inference_separate",
+          "passed": true
+        },
+        {
+          "check": "offline_training_not_charged",
+          "passed": true
+        },
+        {
+          "check": "baseline_contract_explicit",
+          "passed": true
+        },
+        {
+          "check": "no_accepted_result",
+          "passed": true
+        },
+        {
+          "check": "full_coverage_slow_and_fast",
+          "passed": true
+        },
+        {
+          "check": "invalid_evidence_rejected",
+          "passed": true
+        },
+        {
+          "check": "current_data_report",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "full_task_pass": true,
+      "main_stdout": "",
+      "main_stderr": "",
+      "memory_reads": 4,
+      "read_proxy_tokens": 346,
+      "visible_evidence_proxy_tokens": 529,
+      "candidate_sha256": "1d1a48e1bbc1aa580830f2c95861fd70289441effce0fa37fe8c1188d13dc8ca"
+    },
+    {
+      "trial": 1,
+      "condition": "recent",
+      "case": "runtime_audit",
+      "workspace": "workspaces/trial-1/recent/runtime_audit",
+      "fixture_sha256": "dca07020d61fe0f3c754ce6fcd0da9789539c08dc050572188c34524cf17c756",
+      "input_sha256": {
+        "timings.json": "20729101945ddf50dbc490d8b2edc15aa9562b8ddda60804da151aa52e0b88e4",
+        "policy.json": "81f8b56f2b0a94bf34920f2f8c8205259f19a155aa2b108c0238e0404d5c5cc9",
+        "TASK.md": "c7a086cc0cfb6752cc33e202a9b2bc399e0fb9b6edafda2598837894b5489e7a",
+        "context.txt": "d4b17d5e4cd9c017b68ede90db2cef6855572fb24ac34b96c801ce7311429329"
+      },
+      "context_characters": 772,
+      "context_proxy_tokens": 151,
+      "packet_ms": null,
+      "passed": 9,
+      "total": 11,
+      "checks": [
+        {
+          "check": "full_pipeline_cost",
+          "passed": true
+        },
+        {
+          "check": "accuracy_coverage",
+          "passed": true
+        },
+        {
+          "check": "failed_cases_not_speed_wins",
+          "passed": true
+        },
+        {
+          "check": "accuracy_limited_claim",
+          "passed": true
+        },
+        {
+          "check": "pure_inference_separate",
+          "passed": true
+        },
+        {
+          "check": "offline_training_not_charged",
+          "passed": true
+        },
+        {
+          "check": "baseline_contract_explicit",
+          "passed": false,
+          "error": "AssertionError: "
+        },
+        {
+          "check": "no_accepted_result",
+          "passed": true
+        },
+        {
+          "check": "full_coverage_slow_and_fast",
+          "passed": true
+        },
+        {
+          "check": "invalid_evidence_rejected",
+          "passed": false,
+          "error": "AssertionError: Invalid evidence must raise ValueError."
+        },
+        {
+          "check": "current_data_report",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "full_task_pass": false,
+      "main_stdout": "",
+      "main_stderr": "",
+      "memory_reads": 0,
+      "read_proxy_tokens": 0,
+      "visible_evidence_proxy_tokens": 151,
+      "candidate_sha256": "0f8ff32cce16d77e1b47444a712349a2120ec77788ab3767494ede819678831e"
+    },
+    {
+      "trial": 1,
+      "condition": "full",
+      "case": "runtime_audit",
+      "workspace": "workspaces/trial-1/full/runtime_audit",
+      "fixture_sha256": "dca07020d61fe0f3c754ce6fcd0da9789539c08dc050572188c34524cf17c756",
+      "input_sha256": {
+        "timings.json": "20729101945ddf50dbc490d8b2edc15aa9562b8ddda60804da151aa52e0b88e4",
+        "policy.json": "81f8b56f2b0a94bf34920f2f8c8205259f19a155aa2b108c0238e0404d5c5cc9",
+        "TASK.md": "c7a086cc0cfb6752cc33e202a9b2bc399e0fb9b6edafda2598837894b5489e7a",
+        "context.txt": "21b36809d844400dfc93e06e01f86f4e6e8105d19e3dbf42672b134b67406c85"
+      },
+      "context_characters": 5490,
+      "context_proxy_tokens": 1119,
+      "packet_ms": null,
+      "passed": 11,
+      "total": 11,
+      "checks": [
+        {
+          "check": "full_pipeline_cost",
+          "passed": true
+        },
+        {
+          "check": "accuracy_coverage",
+          "passed": true
+        },
+        {
+          "check": "failed_cases_not_speed_wins",
+          "passed": true
+        },
+        {
+          "check": "accuracy_limited_claim",
+          "passed": true
+        },
+        {
+          "check": "pure_inference_separate",
+          "passed": true
+        },
+        {
+          "check": "offline_training_not_charged",
+          "passed": true
+        },
+        {
+          "check": "baseline_contract_explicit",
+          "passed": true
+        },
+        {
+          "check": "no_accepted_result",
+          "passed": true
+        },
+        {
+          "check": "full_coverage_slow_and_fast",
+          "passed": true
+        },
+        {
+          "check": "invalid_evidence_rejected",
+          "passed": true
+        },
+        {
+          "check": "current_data_report",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "full_task_pass": true,
+      "main_stdout": "",
+      "main_stderr": "",
+      "memory_reads": 0,
+      "read_proxy_tokens": 0,
+      "visible_evidence_proxy_tokens": 1119,
+      "candidate_sha256": "9d7f76c335130542b88f64ac33d1102b7cda3cfb4e18313f881c1a5eb874d2e4"
+    },
+    {
+      "trial": 2,
+      "condition": "memory",
+      "case": "convergence",
+      "workspace": "workspaces/trial-2/memory/convergence",
+      "fixture_sha256": "3afec9ed9f3f26bdd9e1bef20559d68a2a76f0854ce172d79a8e08e4905f1f75",
+      "input_sha256": {
+        "measure.py": "8c514bc2c12f836c54b64f8f6cf98ff519e4ae7a8fb76a27a0a2b336c56dbc57",
+        "samples.json": "8106cf74c31db62ff93bb14bfa165874b13e1c5283406c7b0fca9fac9fe8d8cd",
+        "config.json": "3ba8a5b5948f69376cce086cf99ba49c2c9c07c00dc70eb3415f40434f7bffd8",
+        "memory_read.py": "f175db523e8924bf411474761b407fbb84a3bc6c04b77ce5044dae716eaa9b6e",
+        "TASK.md": "05afc5bcbedc4fb2a84e86ca356d03f8b56299b50bf678e7e79602ab7a53d639",
+        "context.txt": "82c53b0b150180e51841510cc98c565ccc77212c092d57b9a8e06a250294b3d2"
+      },
+      "context_characters": 827,
+      "context_proxy_tokens": 204,
+      "packet_ms": 165.836,
+      "passed": 11,
+      "total": 11,
+      "checks": [
+        {
+          "check": "second_order",
+          "passed": true
+        },
+        {
+          "check": "reversed_error_sign",
+          "passed": true
+        },
+        {
+          "check": "first_order_rejected",
+          "passed": true
+        },
+        {
+          "check": "extrapolation_not_reference_substitution",
+          "passed": true
+        },
+        {
+          "check": "order_independent_of_input_sort",
+          "passed": true
+        },
+        {
+          "check": "stale_geometry_rejected",
+          "passed": true
+        },
+        {
+          "check": "nondoubling_grid_rejected",
+          "passed": true
+        },
+        {
+          "check": "insufficient_data_rejected",
+          "passed": true
+        },
+        {
+          "check": "degenerate_data_rejected",
+          "passed": true
+        },
+        {
+          "check": "nonfinite_data_rejected",
+          "passed": true
+        },
+        {
+          "check": "current_data_report",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "full_task_pass": true,
+      "main_stdout": "",
+      "main_stderr": "",
+      "memory_reads": 2,
+      "read_proxy_tokens": 219,
+      "visible_evidence_proxy_tokens": 423,
+      "candidate_sha256": "4716c7a3b6fc367327275517e7df756d2d9f0fed838bb90b1b933c135a2ef85d"
+    },
+    {
+      "trial": 2,
+      "condition": "recent",
+      "case": "convergence",
+      "workspace": "workspaces/trial-2/recent/convergence",
+      "fixture_sha256": "3afec9ed9f3f26bdd9e1bef20559d68a2a76f0854ce172d79a8e08e4905f1f75",
+      "input_sha256": {
+        "measure.py": "8c514bc2c12f836c54b64f8f6cf98ff519e4ae7a8fb76a27a0a2b336c56dbc57",
+        "samples.json": "8106cf74c31db62ff93bb14bfa165874b13e1c5283406c7b0fca9fac9fe8d8cd",
+        "config.json": "3ba8a5b5948f69376cce086cf99ba49c2c9c07c00dc70eb3415f40434f7bffd8",
+        "TASK.md": "05afc5bcbedc4fb2a84e86ca356d03f8b56299b50bf678e7e79602ab7a53d639",
+        "context.txt": "e6e0f2f647e76062607726d1c834ab9079a66b58ccc620eb11c0e97c9ef02b23"
+      },
+      "context_characters": 827,
+      "context_proxy_tokens": 159,
+      "packet_ms": null,
+      "passed": 11,
+      "total": 11,
+      "checks": [
+        {
+          "check": "second_order",
+          "passed": true
+        },
+        {
+          "check": "reversed_error_sign",
+          "passed": true
+        },
+        {
+          "check": "first_order_rejected",
+          "passed": true
+        },
+        {
+          "check": "extrapolation_not_reference_substitution",
+          "passed": true
+        },
+        {
+          "check": "order_independent_of_input_sort",
+          "passed": true
+        },
+        {
+          "check": "stale_geometry_rejected",
+          "passed": true
+        },
+        {
+          "check": "nondoubling_grid_rejected",
+          "passed": true
+        },
+        {
+          "check": "insufficient_data_rejected",
+          "passed": true
+        },
+        {
+          "check": "degenerate_data_rejected",
+          "passed": true
+        },
+        {
+          "check": "nonfinite_data_rejected",
+          "passed": true
+        },
+        {
+          "check": "current_data_report",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "full_task_pass": true,
+      "main_stdout": "",
+      "main_stderr": "",
+      "memory_reads": 0,
+      "read_proxy_tokens": 0,
+      "visible_evidence_proxy_tokens": 159,
+      "candidate_sha256": "c03bed1b9f3475107a758a9784b708c6eca75e7c31ce716e6697a825fda17a21"
+    },
+    {
+      "trial": 2,
+      "condition": "full",
+      "case": "convergence",
+      "workspace": "workspaces/trial-2/full/convergence",
+      "fixture_sha256": "3afec9ed9f3f26bdd9e1bef20559d68a2a76f0854ce172d79a8e08e4905f1f75",
+      "input_sha256": {
+        "measure.py": "8c514bc2c12f836c54b64f8f6cf98ff519e4ae7a8fb76a27a0a2b336c56dbc57",
+        "samples.json": "8106cf74c31db62ff93bb14bfa165874b13e1c5283406c7b0fca9fac9fe8d8cd",
+        "config.json": "3ba8a5b5948f69376cce086cf99ba49c2c9c07c00dc70eb3415f40434f7bffd8",
+        "TASK.md": "05afc5bcbedc4fb2a84e86ca356d03f8b56299b50bf678e7e79602ab7a53d639",
+        "context.txt": "972810aaceff1fa09b571087f162f0a1d0b3b580a6f34d72f047ed3fcab1284a"
+      },
+      "context_characters": 5376,
+      "context_proxy_tokens": 1089,
+      "packet_ms": null,
+      "passed": 11,
+      "total": 11,
+      "checks": [
+        {
+          "check": "second_order",
+          "passed": true
+        },
+        {
+          "check": "reversed_error_sign",
+          "passed": true
+        },
+        {
+          "check": "first_order_rejected",
+          "passed": true
+        },
+        {
+          "check": "extrapolation_not_reference_substitution",
+          "passed": true
+        },
+        {
+          "check": "order_independent_of_input_sort",
+          "passed": true
+        },
+        {
+          "check": "stale_geometry_rejected",
+          "passed": true
+        },
+        {
+          "check": "nondoubling_grid_rejected",
+          "passed": true
+        },
+        {
+          "check": "insufficient_data_rejected",
+          "passed": true
+        },
+        {
+          "check": "degenerate_data_rejected",
+          "passed": true
+        },
+        {
+          "check": "nonfinite_data_rejected",
+          "passed": true
+        },
+        {
+          "check": "current_data_report",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "full_task_pass": true,
+      "main_stdout": "",
+      "main_stderr": "",
+      "memory_reads": 0,
+      "read_proxy_tokens": 0,
+      "visible_evidence_proxy_tokens": 1089,
+      "candidate_sha256": "424c50995f33fedfef68e8862fa83c1cac80372e0dcf4ca8ad5b07ee7c34f2bf"
+    },
+    {
+      "trial": 2,
+      "condition": "memory",
+      "case": "vector_error",
+      "workspace": "workspaces/trial-2/memory/vector_error",
+      "fixture_sha256": "b179029351929bf6f56bf568bdd07d43b257c63bd9b33d2458f2141d1c67bb4e",
+      "input_sha256": {
+        "policy.json": "2366340d2a3b181cabff11330b3e4bebce3d4e0abf63da832391709b4f1fc28e",
+        "fields.json": "25951a84ec78040bbef0dd86ffdd91bff388392fde9afa06c13e2f6c22e95d2a",
+        "memory_read.py": "f175db523e8924bf411474761b407fbb84a3bc6c04b77ce5044dae716eaa9b6e",
+        "TASK.md": "3f1c3493dbe24879a2bbc88ab06eccca07ca4c5c2e66ce3704b8ab874520f58f",
+        "context.txt": "a4271df84415e4a6b04e00ca8e1e932ce4306d588f0953463ca669b116804307"
+      },
+      "context_characters": 822,
+      "context_proxy_tokens": 180,
+      "packet_ms": 159.472,
+      "passed": 11,
+      "total": 11,
+      "checks": [
+        {
+          "check": "identical",
+          "passed": true
+        },
+        {
+          "check": "phase_invariance",
+          "passed": true
+        },
+        {
+          "check": "scale_invariance",
+          "passed": true
+        },
+        {
+          "check": "relative_phase_detected",
+          "passed": true
+        },
+        {
+          "check": "missing_component_detected",
+          "passed": true
+        },
+        {
+          "check": "arbitrary_vector_matches_independent_formula",
+          "passed": true
+        },
+        {
+          "check": "zero_norm_rejected",
+          "passed": true
+        },
+        {
+          "check": "unequal_lengths_rejected",
+          "passed": true
+        },
+        {
+          "check": "multidimensional_rejected",
+          "passed": true
+        },
+        {
+          "check": "nonfinite_rejected",
+          "passed": true
+        },
+        {
+          "check": "current_data_report",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "full_task_pass": true,
+      "main_stdout": "",
+      "main_stderr": "",
+      "memory_reads": 1,
+      "read_proxy_tokens": 126,
+      "visible_evidence_proxy_tokens": 306,
+      "candidate_sha256": "06454d74f9be4c6867cfd425954dad61f583b8dbc1f7c343dda5ee26f647cc61"
+    },
+    {
+      "trial": 2,
+      "condition": "recent",
+      "case": "vector_error",
+      "workspace": "workspaces/trial-2/recent/vector_error",
+      "fixture_sha256": "b179029351929bf6f56bf568bdd07d43b257c63bd9b33d2458f2141d1c67bb4e",
+      "input_sha256": {
+        "policy.json": "2366340d2a3b181cabff11330b3e4bebce3d4e0abf63da832391709b4f1fc28e",
+        "fields.json": "25951a84ec78040bbef0dd86ffdd91bff388392fde9afa06c13e2f6c22e95d2a",
+        "TASK.md": "3f1c3493dbe24879a2bbc88ab06eccca07ca4c5c2e66ce3704b8ab874520f58f",
+        "context.txt": "0b03e298bd83e25f7eff5f2e9905f997f2249961b700b6f8ae4681228963a1c9"
+      },
+      "context_characters": 822,
+      "context_proxy_tokens": 159,
+      "packet_ms": null,
+      "passed": 7,
+      "total": 11,
+      "checks": [
+        {
+          "check": "identical",
+          "passed": true
+        },
+        {
+          "check": "phase_invariance",
+          "passed": true
+        },
+        {
+          "check": "scale_invariance",
+          "passed": false,
+          "error": "AssertionError: (446.6190476190476, 0)"
+        },
+        {
+          "check": "relative_phase_detected",
+          "passed": true
+        },
+        {
+          "check": "missing_component_detected",
+          "passed": false,
+          "error": "AssertionError: (0.7071067811865475, 0.7653668647301795)"
+        },
+        {
+          "check": "arbitrary_vector_matches_independent_formula",
+          "passed": false,
+          "error": "AssertionError: (1.274003958831316, 1.1640054501940191)"
+        },
+        {
+          "check": "zero_norm_rejected",
+          "passed": false,
+          "error": "AssertionError: Invalid evidence must raise ValueError."
+        },
+        {
+          "check": "unequal_lengths_rejected",
+          "passed": true
+        },
+        {
+          "check": "multidimensional_rejected",
+          "passed": true
+        },
+        {
+          "check": "nonfinite_rejected",
+          "passed": true
+        },
+        {
+          "check": "current_data_report",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "full_task_pass": false,
+      "main_stdout": "",
+      "main_stderr": "",
+      "memory_reads": 0,
+      "read_proxy_tokens": 0,
+      "visible_evidence_proxy_tokens": 159,
+      "candidate_sha256": "5dd2bd5b53226d749ba6ee8e82d0444751d783f7f40d8e335468049a09e39f2e"
+    },
+    {
+      "trial": 2,
+      "condition": "full",
+      "case": "vector_error",
+      "workspace": "workspaces/trial-2/full/vector_error",
+      "fixture_sha256": "b179029351929bf6f56bf568bdd07d43b257c63bd9b33d2458f2141d1c67bb4e",
+      "input_sha256": {
+        "policy.json": "2366340d2a3b181cabff11330b3e4bebce3d4e0abf63da832391709b4f1fc28e",
+        "fields.json": "25951a84ec78040bbef0dd86ffdd91bff388392fde9afa06c13e2f6c22e95d2a",
+        "TASK.md": "3f1c3493dbe24879a2bbc88ab06eccca07ca4c5c2e66ce3704b8ab874520f58f",
+        "context.txt": "278e0bbb11758d2812602fb314446c9540f082ec09bb76069ab17e9c06630a98"
+      },
+      "context_characters": 5275,
+      "context_proxy_tokens": 1049,
+      "packet_ms": null,
+      "passed": 11,
+      "total": 11,
+      "checks": [
+        {
+          "check": "identical",
+          "passed": true
+        },
+        {
+          "check": "phase_invariance",
+          "passed": true
+        },
+        {
+          "check": "scale_invariance",
+          "passed": true
+        },
+        {
+          "check": "relative_phase_detected",
+          "passed": true
+        },
+        {
+          "check": "missing_component_detected",
+          "passed": true
+        },
+        {
+          "check": "arbitrary_vector_matches_independent_formula",
+          "passed": true
+        },
+        {
+          "check": "zero_norm_rejected",
+          "passed": true
+        },
+        {
+          "check": "unequal_lengths_rejected",
+          "passed": true
+        },
+        {
+          "check": "multidimensional_rejected",
+          "passed": true
+        },
+        {
+          "check": "nonfinite_rejected",
+          "passed": true
+        },
+        {
+          "check": "current_data_report",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "full_task_pass": true,
+      "main_stdout": "",
+      "main_stderr": "",
+      "memory_reads": 0,
+      "read_proxy_tokens": 0,
+      "visible_evidence_proxy_tokens": 1049,
+      "candidate_sha256": "c2fcb6db76c2fe5f756d5585a6bc6bd422cea5957880d4612acc3330591e6028"
+    },
+    {
+      "trial": 2,
+      "condition": "memory",
+      "case": "runtime_audit",
+      "workspace": "workspaces/trial-2/memory/runtime_audit",
+      "fixture_sha256": "49bed1268d2da2fd4b8bc27f53267345eebef66ef5ed6070e7de265b631b83fc",
+      "input_sha256": {
+        "timings.json": "e4ec1013583727ac77bdad47b37653488f74ce16d94b4b0249d07432161ea2a3",
+        "policy.json": "81f8b56f2b0a94bf34920f2f8c8205259f19a155aa2b108c0238e0404d5c5cc9",
+        "memory_read.py": "f175db523e8924bf411474761b407fbb84a3bc6c04b77ce5044dae716eaa9b6e",
+        "TASK.md": "c7a086cc0cfb6752cc33e202a9b2bc399e0fb9b6edafda2598837894b5489e7a",
+        "context.txt": "2dd873ca1d0e6b81b6887e896f64006a6ad04cec0731787a84cdcd7e2dc0663b"
+      },
+      "context_characters": 772,
+      "context_proxy_tokens": 181,
+      "packet_ms": 164.882,
+      "passed": 11,
+      "total": 11,
+      "checks": [
+        {
+          "check": "full_pipeline_cost",
+          "passed": true
+        },
+        {
+          "check": "accuracy_coverage",
+          "passed": true
+        },
+        {
+          "check": "failed_cases_not_speed_wins",
+          "passed": true
+        },
+        {
+          "check": "accuracy_limited_claim",
+          "passed": true
+        },
+        {
+          "check": "pure_inference_separate",
+          "passed": true
+        },
+        {
+          "check": "offline_training_not_charged",
+          "passed": true
+        },
+        {
+          "check": "baseline_contract_explicit",
+          "passed": true
+        },
+        {
+          "check": "no_accepted_result",
+          "passed": true
+        },
+        {
+          "check": "full_coverage_slow_and_fast",
+          "passed": true
+        },
+        {
+          "check": "invalid_evidence_rejected",
+          "passed": true
+        },
+        {
+          "check": "current_data_report",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "full_task_pass": true,
+      "main_stdout": "",
+      "main_stderr": "",
+      "memory_reads": 2,
+      "read_proxy_tokens": 246,
+      "visible_evidence_proxy_tokens": 427,
+      "candidate_sha256": "99fab020e56e0f84603551b92e3f124b196d9095b93325eeb0da7d509815eaad"
+    },
+    {
+      "trial": 2,
+      "condition": "recent",
+      "case": "runtime_audit",
+      "workspace": "workspaces/trial-2/recent/runtime_audit",
+      "fixture_sha256": "49bed1268d2da2fd4b8bc27f53267345eebef66ef5ed6070e7de265b631b83fc",
+      "input_sha256": {
+        "timings.json": "e4ec1013583727ac77bdad47b37653488f74ce16d94b4b0249d07432161ea2a3",
+        "policy.json": "81f8b56f2b0a94bf34920f2f8c8205259f19a155aa2b108c0238e0404d5c5cc9",
+        "TASK.md": "c7a086cc0cfb6752cc33e202a9b2bc399e0fb9b6edafda2598837894b5489e7a",
+        "context.txt": "d4b17d5e4cd9c017b68ede90db2cef6855572fb24ac34b96c801ce7311429329"
+      },
+      "context_characters": 772,
+      "context_proxy_tokens": 151,
+      "packet_ms": null,
+      "passed": 10,
+      "total": 11,
+      "checks": [
+        {
+          "check": "full_pipeline_cost",
+          "passed": true
+        },
+        {
+          "check": "accuracy_coverage",
+          "passed": true
+        },
+        {
+          "check": "failed_cases_not_speed_wins",
+          "passed": true
+        },
+        {
+          "check": "accuracy_limited_claim",
+          "passed": true
+        },
+        {
+          "check": "pure_inference_separate",
+          "passed": true
+        },
+        {
+          "check": "offline_training_not_charged",
+          "passed": true
+        },
+        {
+          "check": "baseline_contract_explicit",
+          "passed": false,
+          "error": "AssertionError: "
+        },
+        {
+          "check": "no_accepted_result",
+          "passed": true
+        },
+        {
+          "check": "full_coverage_slow_and_fast",
+          "passed": true
+        },
+        {
+          "check": "invalid_evidence_rejected",
+          "passed": true
+        },
+        {
+          "check": "current_data_report",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "full_task_pass": false,
+      "main_stdout": "",
+      "main_stderr": "",
+      "memory_reads": 0,
+      "read_proxy_tokens": 0,
+      "visible_evidence_proxy_tokens": 151,
+      "candidate_sha256": "4c45c9adb38a22543adad0e7bb40b2bce728886bc2395b00dc1fd4a77022a7ab"
+    },
+    {
+      "trial": 2,
+      "condition": "full",
+      "case": "runtime_audit",
+      "workspace": "workspaces/trial-2/full/runtime_audit",
+      "fixture_sha256": "49bed1268d2da2fd4b8bc27f53267345eebef66ef5ed6070e7de265b631b83fc",
+      "input_sha256": {
+        "timings.json": "e4ec1013583727ac77bdad47b37653488f74ce16d94b4b0249d07432161ea2a3",
+        "policy.json": "81f8b56f2b0a94bf34920f2f8c8205259f19a155aa2b108c0238e0404d5c5cc9",
+        "TASK.md": "c7a086cc0cfb6752cc33e202a9b2bc399e0fb9b6edafda2598837894b5489e7a",
+        "context.txt": "21b36809d844400dfc93e06e01f86f4e6e8105d19e3dbf42672b134b67406c85"
+      },
+      "context_characters": 5490,
+      "context_proxy_tokens": 1119,
+      "packet_ms": null,
+      "passed": 11,
+      "total": 11,
+      "checks": [
+        {
+          "check": "full_pipeline_cost",
+          "passed": true
+        },
+        {
+          "check": "accuracy_coverage",
+          "passed": true
+        },
+        {
+          "check": "failed_cases_not_speed_wins",
+          "passed": true
+        },
+        {
+          "check": "accuracy_limited_claim",
+          "passed": true
+        },
+        {
+          "check": "pure_inference_separate",
+          "passed": true
+        },
+        {
+          "check": "offline_training_not_charged",
+          "passed": true
+        },
+        {
+          "check": "baseline_contract_explicit",
+          "passed": true
+        },
+        {
+          "check": "no_accepted_result",
+          "passed": true
+        },
+        {
+          "check": "full_coverage_slow_and_fast",
+          "passed": true
+        },
+        {
+          "check": "invalid_evidence_rejected",
+          "passed": true
+        },
+        {
+          "check": "current_data_report",
+          "passed": true,
+          "error": null
+        }
+      ],
+      "full_task_pass": true,
+      "main_stdout": "",
+      "main_stderr": "",
+      "memory_reads": 0,
+      "read_proxy_tokens": 0,
+      "visible_evidence_proxy_tokens": 1119,
+      "candidate_sha256": "376e755bdd43e6feddb5460d0ce74878838492ca6140f948668f32b7afe44a99"
+    }
+  ],
+  "tokenizer": "cl100k_base; proxy only, not native provider usage",
+  "native_provider_usage": null,
+  "fixture_scope": "synthetic development tasks; two fresh-agent trials per context arm; tasks batched within each agent",
+  "grader_sha256": "9d1040fca455773e6d44fab08e869b7b4ff4f98f58a551b611b9102bf0bf0241",
+  "score_engine_protocol_version": 1,
+  "metadata_correction": {
+    "reason": "The frozen scorer uses the version-1 label for both studies.",
+    "raw_result": "raw-grader-result-fe4bb3150e83.json",
+    "raw_sha256": "fe4bb3150e83f12a13ee237db4ce649731471ef17115f8ce1905b7574bc0c3e5",
+    "check_results_changed": false
+  }
+}

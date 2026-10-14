@@ -1,0 +1,16 @@
+Processing ./.
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: agent-memory
+  Building wheel for agent-memory (pyproject.toml): started
+  Building wheel for agent-memory (pyproject.toml): finished with status 'done'
+  Created wheel for agent-memory: filename=agent_memory-0.1.0-py3-none-any.whl size=181355 sha256=32bfa9fd645f5b1a957bb200869748e190ab6f715c8f284983ab46215d89a92e
+  Stored in directory: /Users/dorianherle/Library/Caches/pip/wheels/1e/9f/b2/cf033264ab72f4e4b9bd30bacb303be5ebb88aa131d72a642c
+Successfully built agent-memory
+
+[notice] A new release of pip is available: 26.0 -> 26.2.1
+[notice] To update, run: /Users/dorianherle/Documents/Personal/agent_memory/.venv/bin/python -m pip install --upgrade pip

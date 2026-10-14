@@ -1,0 +1,23 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "list",
+    "arguments": {
+      "path": ".notebook"
+    }
+  },
+  "usage": {
+    "input_tokens": 21381,
+    "output_tokens": 590,
+    "cached_input_tokens": 16640,
+    "reasoning_output_tokens": 536
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 20.38146512489766,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "text": "goal: Qualify controller version 2.6.\ncurrent_facts: Settings: speed 0.80 m/s; PWM period 2.50 ms; maximum load 4.00 kg; ambient temperature 18.0–28.0 °C. Timing acceptance limit: 99th percentile ≤3.00 ms.\nsuperseded_facts: Version 2.5 passed the timing test. This does not qualify version 2.6.\nfailures: None recorded.\nconditions: For motor serial M17, maximum load is 2.75 kg when ambient temperature is strictly >26.0 °C. At exactly 26.0 °C, the 4.00 kg limit applies.\nunknowns: Version 2.6 timing result and final qualification status.",
+  "errors": [],
+  "model": "gpt-5.6-sol",
+  "reasoning": "low",
+  "elapsed_seconds": 15.492242624983191,
+  "usage_complete": true,
+  "usage": {
+    "input_tokens": 10517,
+    "output_tokens": 278
+  },
+  "native_tools": [],
+  "prompt_sha256": "f91a85ebb4f7a80d10fc6c40cc60283de03b631364f4fcaa352d5916c7307b51"
+}

@@ -1,0 +1,17 @@
+E8: No-memory control on the known E2 fixture.
+Hypothesis: failed.
+This is an adaptive control. It is not a new independent test.
+No memory, release, observed: 0 of 3 correct.
+No memory, release, unseen: 0 of 8 correct.
+Existing E2 scores, release: {"full": {"observed": {"correct": 3, "total": 3}, "unseen": {"correct": 8, "total": 8}}, "summary": {"observed": {"correct": 3, "total": 3}, "unseen": {"correct": 8, "total": 8}}, "rules": {"observed": {"correct": 3, "total": 3}, "unseen": {"correct": 8, "total": 8}}}
+No memory, independent, observed: 0 of 3 correct.
+No memory, independent, unseen: 4 of 4 correct.
+Existing E2 scores, independent: {"full": {"observed": {"correct": 3, "total": 3}, "unseen": {"correct": 4, "total": 4}}, "summary": {"observed": {"correct": 3, "total": 3}, "unseen": {"correct": 4, "total": 4}}, "rules": {"observed": {"correct": 3, "total": 3}, "unseen": {"correct": 4, "total": 4}}}
+The instruction and questions were unchanged. The supplied MEMORY field was empty.
+Correct unknown answers on independent unseen cases do not show transferred case knowledge.
+Calls with results: 2. Native input tokens: 27161. Native output tokens: 122.
+Elapsed time: 8.4 s.
+A low no-memory score cannot prove a purely source-derived learning mechanism.
+Both no-memory readers answered unknown for every question.
+The no-memory readers did not reproduce the E2 observed scores. The release no-memory reader also failed all unseen cases.
+This control did not detect full answer recovery from questions alone under the fixed receiver instruction. It does not isolate the role of model prior knowledge after a packet is supplied.

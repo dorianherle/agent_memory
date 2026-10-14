@@ -1,0 +1,25 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "model_get",
+      "full": false,
+      "result_file": "stored-model.json"
+    }
+  },
+  "usage": {
+    "input_tokens": 15245,
+    "output_tokens": 127,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 88
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 6.9541389578953385,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

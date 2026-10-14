@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "from work import evaluate\np={'defaults':{'s':'d','b':True,'i':1},'types':{'s':'string','b':'boolean','i':'integer'},'null_resets':True,'environment':True}\ncases=[{'environment':{'s':7}},{'layers':[{'s':None}]},{'environment':{'b':'TRUE'}},{'environment':{'i':'+1'}},{'environment':{'i':'-0'}},{'layers':[{'i':True}]},{'environment':{'x':'1'}},{'layers':[{'s':''},{'b':False},{'i':0}]}]\nfor c in cases: print(c, evaluate(c,p))"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 26010,
+    "output_tokens": 921,
+    "cached_input_tokens": 18944,
+    "reasoning_output_tokens": 551
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 22.861431875033304,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

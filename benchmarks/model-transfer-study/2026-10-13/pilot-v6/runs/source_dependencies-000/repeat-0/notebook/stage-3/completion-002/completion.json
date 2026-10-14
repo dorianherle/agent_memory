@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy,json\nfrom work import evaluate\n\ncases = [\n ({'declared':['b','a','a','ignored'],'saved':{'a':{'kind':'file','hash':'x','meta':1},'b':{'kind':'file','hash':'same'}},'current':{'a':{'meta':2,'hash':'x','kind':'file'},'b':{'hash':'same','kind':'file'},'ignored':{'kind':'file','hash':'old'}}},{'ignored':['ignored']},{'needs_review':True,'changed':['a']}),\n ({'declared':['x'],'saved':{},'current':{}},{},{'needs_review':False,'changed':[]}),\n ({'declared':['x'],'saved':{'x':{'kind':'missing'}},'current':{}},{},{'needs_review':False,'changed':[]}),\n ({'declared':['x'],'saved':{},'current':{'x':{'kind':'file','hash':'z'}}},{},{'needs_review':True,'changed':['x']}),\n ({'declared':['x'],'saved':{'other':1},'current':{'other':2}},{},{'needs_review':False,'changed':[]}),\n]\nfor request, policy, expected in cases:\n    request_before=copy.deepcopy(request); policy_before=copy.deepcopy(policy)\n    actual=evaluate(request, policy)\n    assert actual == expected, (actual, expected)\n    assert request == request_before and policy == policy_before\nwith open('requests.json', encoding='utf-8') as f: requests=json.load(f)\nwith open('policy.json', encoding='utf-8') as f: policy=json.load(f)\nwith open('report.json', encoding='utf-8') as f: report=json.load(f)\nassert report == [evaluate(r, policy) for r in requests]\nprint('all checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 9646,
+    "output_tokens": 547,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 97
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 11.787418665830046,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

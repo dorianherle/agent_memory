@@ -1,0 +1,61 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "write",
+          "arguments": {
+            "path": "report.json",
+            "content": "[\n  {\n    \"needs_review\": false,\n    \"changed\": []\n  }\n]\n"
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy\nfrom work import evaluate\ncases = [\n    ({'declared':['b','a','a','ignored'], 'saved':{'a':{'kind':'file','hash':'x','meta':{'z':1,'a':2}}, 'b':{'kind':'missing'}, 'ignored':1, 'extra':0}, 'current':{'a':{'meta':{'a':2,'z':1},'hash':'x','kind':'file'}, 'ignored':2, 'other':3}}, {'ignored':['ignored']}, {'needs_review':False,'changed':[]}),\n    ({'declared':['gone','new','same'], 'saved':{'gone':{'kind':'file','hash':'a'}, 'same':{'kind':'missing'}}, 'current':{'new':{'kind':'file','hash':'b'}}}, {'ignored':[]}, {'needs_review':True,'changed':['gone','new']}),\n    ({'declared':['x'], 'saved':{'x':{'kind':'file','name':'n','timestamp':1}}, 'current':{'x':{'kind':'file','name':'n','timestamp':2}}}, {}, {'needs_review':True,'changed':['x']}),\n]\nfor req, pol, expected in cases:\n    before = (copy.deepcopy(req), copy.deepcopy(pol))\n    got = evaluate(req, pol)\n    assert got == expected, (got, expected)\n    assert (req, pol) == before\nprint('synthetic checks passed')"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import json\nfrom work import evaluate\nwith open('requests.json', encoding='utf-8') as f: requests=json.load(f)\nwith open('policy.json', encoding='utf-8') as f: policy=json.load(f)\nwith open('report.json', encoding='utf-8') as f: report=json.load(f)\nexpected=[evaluate(request, policy) for request in requests]\nassert report == expected, (report, expected)\nprint('report check passed')"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "diff",
+              "--check"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 11245,
+    "output_tokens": 709,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 141
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 15.86522770812735,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

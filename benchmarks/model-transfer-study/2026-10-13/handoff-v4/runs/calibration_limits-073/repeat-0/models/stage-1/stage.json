@@ -1,0 +1,12 @@
+{
+  "stop": "study_cancelled",
+  "tool_calls": 26,
+  "elapsed_seconds": 385.48962325020693,
+  "usage_complete": true,
+  "tokens": 320967,
+  "known_tokens": 320967,
+  "input_tokens": 306382,
+  "output_tokens": 14585,
+  "cached_input_tokens": 173312,
+  "reasoning_output_tokens": 9208
+}

@@ -1,0 +1,47 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "memory",
+          "arguments": {
+            "action": "save",
+            "text": "Stage 2 configuration evaluator matches the current contract and sample. Actual local checks passed for ordered layers, null reset on/off, unknown-key precedence, environment disabled/unknown/invalid values, exact lowercase boolean parsing, signed ASCII-decimal integer parsing, final exact types (bool is not int), environment repair before type checking, and preservation of false/zero/empty string. report.json exactly matches evaluate over requests.json with current policy.json; evidence.json is absent.",
+            "payload": {
+              "files": [
+                "TASK.md",
+                "work.py",
+                "policy.json",
+                "requests.json",
+                "report.json"
+              ]
+            }
+          }
+        },
+        {
+          "action": "memory",
+          "arguments": {
+            "action": "save",
+            "text": "Unresolved limits: malformed request/policy container shapes and policy type names beyond boolean/integer/string are not specified or tested. Known keys are derived from policy.defaults. An empty environment object is treated as no override even when environment overrides are disabled."
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 33398,
+    "output_tokens": 953,
+    "cached_input_tokens": 23936,
+    "reasoning_output_tokens": 704
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 23.95922645786777,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

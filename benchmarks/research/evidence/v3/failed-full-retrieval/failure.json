@@ -1,0 +1,27 @@
+{
+  "status": "failed",
+  "completed_cases": 69,
+  "requested_cases": 470,
+  "error": "ValueError: not enough values to unpack (expected 4, got 1)",
+  "location": "Memory._parse_record: raw.split(FIELD_SEPARATOR,3)",
+  "incomplete_cases": [
+    "f9e8c073",
+    "c7dc5443"
+  ],
+  "separator_check": [
+    {
+      "question_id": "f9e8c073",
+      "sessions_with_record_separator": [
+        "sharegpt_QmVUZ8v_4"
+      ]
+    },
+    {
+      "question_id": "c7dc5443",
+      "sessions_with_record_separator": [
+        "sharegpt_XaM55h6_28"
+      ]
+    }
+  ],
+  "full_score_available": false,
+  "preserved": true
+}

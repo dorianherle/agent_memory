@@ -1,0 +1,234 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "model_handoff",
+      "id": null,
+      "payload": {
+        "schema": 1,
+        "title": "Configuration evaluation outcome precedence",
+        "inputs": {
+          "unknown_key": "boolean",
+          "environment_error": "boolean",
+          "type_error": "boolean"
+        },
+        "rules": [
+          {
+            "id": "unknown-key-first",
+            "target": "status",
+            "claim": "Any unknown key in a layer, or in enabled environment overrides, fails with unknown_key before parsing or final type validation.",
+            "when": {
+              "var": "unknown_key"
+            },
+            "then": {
+              "value": "unknown_key"
+            },
+            "evidence": [
+              "854a3126",
+              "cfd159f1"
+            ],
+            "dependencies": [
+              "work.py",
+              "TASK.md"
+            ]
+          },
+          {
+            "id": "environment-second",
+            "target": "status",
+            "claim": "With no unknown key, an invalid enabled boolean or integer environment value fails with environment.",
+            "when": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "not",
+                  "args": [
+                    {
+                      "var": "unknown_key"
+                    }
+                  ]
+                },
+                {
+                  "var": "environment_error"
+                }
+              ]
+            },
+            "then": {
+              "value": "environment"
+            },
+            "evidence": [
+              "854a3126",
+              "cfd159f1"
+            ],
+            "dependencies": [
+              "work.py",
+              "TASK.md"
+            ]
+          },
+          {
+            "id": "type-third",
+            "target": "status",
+            "claim": "After all layers and enabled environment overrides, an exact-type mismatch fails with type; booleans do not satisfy integer.",
+            "when": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "not",
+                  "args": [
+                    {
+                      "var": "unknown_key"
+                    }
+                  ]
+                },
+                {
+                  "op": "not",
+                  "args": [
+                    {
+                      "var": "environment_error"
+                    }
+                  ]
+                },
+                {
+                  "var": "type_error"
+                }
+              ]
+            },
+            "then": {
+              "value": "type"
+            },
+            "evidence": [
+              "854a3126",
+              "cfd159f1"
+            ],
+            "dependencies": [
+              "work.py",
+              "TASK.md"
+            ]
+          },
+          {
+            "id": "success",
+            "target": "status",
+            "claim": "When key, environment parsing, and final exact-type checks pass, evaluation succeeds and preserves explicit false, zero, and empty strings.",
+            "when": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "not",
+                  "args": [
+                    {
+                      "var": "unknown_key"
+                    }
+                  ]
+                },
+                {
+                  "op": "not",
+                  "args": [
+                    {
+                      "var": "environment_error"
+                    }
+                  ]
+                },
+                {
+                  "op": "not",
+                  "args": [
+                    {
+                      "var": "type_error"
+                    }
+                  ]
+                }
+              ]
+            },
+            "then": {
+              "value": "ok"
+            },
+            "evidence": [
+              "854a3126",
+              "cfd159f1"
+            ],
+            "dependencies": [
+              "work.py",
+              "TASK.md",
+              "report.json"
+            ]
+          }
+        ],
+        "cases": [
+          {
+            "id": "current-report",
+            "target": "status",
+            "inputs": {
+              "unknown_key": false,
+              "environment_error": false,
+              "type_error": false
+            },
+            "expected": "ok",
+            "evidence": [
+              "cfd159f1"
+            ],
+            "challenge": false
+          },
+          {
+            "id": "unknown-layer-boundary",
+            "target": "status",
+            "inputs": {
+              "unknown_key": true,
+              "environment_error": false,
+              "type_error": false
+            },
+            "expected": "unknown_key",
+            "evidence": [
+              "cfd159f1"
+            ],
+            "challenge": false
+          },
+          {
+            "id": "invalid-integer-environment-challenge",
+            "target": "status",
+            "inputs": {
+              "unknown_key": false,
+              "environment_error": true,
+              "type_error": false
+            },
+            "expected": "environment",
+            "evidence": [
+              "cfd159f1"
+            ],
+            "challenge": true
+          },
+          {
+            "id": "boolean-is-not-integer",
+            "target": "status",
+            "inputs": {
+              "unknown_key": false,
+              "environment_error": false,
+              "type_error": true
+            },
+            "expected": "type",
+            "evidence": [
+              "cfd159f1"
+            ],
+            "challenge": false
+          }
+        ],
+        "alternatives": [],
+        "unresolved": [
+          "Malformed policy structures and unsupported policy type names are outside the tested contract."
+        ]
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 14542,
+    "output_tokens": 2017,
+    "cached_input_tokens": 7808,
+    "reasoning_output_tokens": 1261
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 38.12257495895028,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

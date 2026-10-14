@@ -1,0 +1,34 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "save",
+      "text": "Milestone complete: Stage 2 work sample 0 is implemented and verified. work.py satisfies eligibility, verification, exact required-condition matching, eligible-only supersession, canonical JSON agreement/conflict, Boolean-false unsupported status, sorting, and input immutability. report.json matches evaluation of current fixtures. Extended checks passed. No unresolved limits for supplied contract; inputs are assumed to contain sortable source IDs and finite JSON values.",
+      "payload": {
+        "files": [
+          "work.py",
+          "report.json",
+          "requests.json",
+          "evidence.json",
+          "policy.json"
+        ],
+        "summary": true
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 13105,
+    "output_tokens": 284,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 141
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 9.783627707976848,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

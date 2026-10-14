@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "write",
+    "arguments": {
+      "path": "work.py",
+      "content": "\"\"\"Configuration-layer evaluator.\"\"\"\n\nfrom copy import deepcopy\nimport re\n\n\n_INTEGER_ENV = re.compile(r\"-?[0-9]+\\Z\")\n\n\ndef _failure(error):\n    return {\"ok\": False, \"config\": {}, \"error\": error}\n\n\ndef evaluate(request, policy):\n    \"\"\"Apply request configuration layers and optional environment overrides.\"\"\"\n    defaults = policy[\"defaults\"]\n    expected_types = policy[\"types\"]\n    known = set(defaults)\n    config = deepcopy(defaults)\n\n    for layer in request.get(\"layers\", []):\n        if any(key not in known for key in layer):\n            return _failure(\"unknown_key\")\n        for key, value in layer.items():\n            if value is None and policy.get(\"null_resets\") is True:\n                config[key] = deepcopy(defaults[key])\n            else:\n                config[key] = value\n\n    environment = request.get(\"environment\", {})\n    if policy.get(\"environment\") is True:\n        if any(key not in known for key in environment):\n            return _failure(\"unknown_key\")\n        for key, value in environment.items():\n            kind = expected_types.get(key)\n            if kind == \"boolean\":\n                if value == \"true\":\n                    config[key] = True\n                elif value == \"false\":\n                    config[key] = False\n                else:\n                    return _failure(\"environment\")\n            elif kind == \"integer\":\n                if not isinstance(value, str) or _INTEGER_ENV.fullmatch(value) is None:\n                    return _failure(\"environment\")\n                config[key] = int(value)\n            elif kind == \"string\":\n                config[key] = value\n            else:\n                return _failure(\"environment\")\n\n    for key, kind in expected_types.items():\n        value = config.get(key)\n        if kind == \"boolean\":\n            valid = type(value) is bool\n        elif kind == \"integer\":\n            valid = type(value) is int\n        elif kind == \"string\":\n            valid = type(value) is str\n        else:\n            valid = False\n        if not valid:\n            return _failure(\"type\")\n\n    return {\"ok\": True, \"config\": config, \"error\": None}\n"
+    }
+  },
+  "usage": {
+    "input_tokens": 30180,
+    "output_tokens": 1401,
+    "cached_input_tokens": 20992,
+    "reasoning_output_tokens": 658
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 43.516618290916085,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

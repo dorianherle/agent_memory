@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import json,copy; from work import evaluate; p=json.load(open('policy.json')); rs=json.load(open('requests.json')); print(json.dumps([evaluate(r,p) for r in rs])); tests=[({'declared':['b','a','a'],'saved':{'a':{'kind':'file','hash':'x'},'b':{'kind':'file','hash':'z'}},'current':{'a':{'kind':'file','hash':'y'},'b':{'kind':'file','hash':'z'}}},{'ignored':[]}),({'declared':['x'],'saved':{},'current':{'x':{'kind':'missing'}}},{'ignored':[]}),({'declared':['x'],'saved':{'x':{'kind':'file','hash':'a'}},'current':{'x':{'kind':'file','hash':'b'}}},{'ignored':['x']}),({'declared':['x'],'saved':{'x':{'name':'n','timestamp':1}},'current':{'x':{'name':'n','timestamp':2}}},{'ignored':[]}),({'declared':['x'],'saved':{},'current':{'y':{'kind':'file'}}},{'ignored':[]})]; print([evaluate(r,p) for r,p in tests]); r,p=tests[0]; rb=copy.deepcopy(r); pb=copy.deepcopy(p); evaluate(r,p); assert r==rb and p==pb"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 9718,
+    "output_tokens": 365,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 40
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 11.196263666963205,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

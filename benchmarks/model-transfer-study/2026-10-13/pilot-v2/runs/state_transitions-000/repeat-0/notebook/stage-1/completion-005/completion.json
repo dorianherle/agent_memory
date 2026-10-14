@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "write",
+    "arguments": {
+      "path": "work.py",
+      "content": "\"\"\"Evaluate state-transition requests against a policy.\"\"\"\n\n\ndef evaluate(request, policy):\n    \"\"\"Evaluate a request without modifying either input.\"\"\"\n    source = request.get(\"from\")\n    target = request.get(\"to\")\n    edge = policy.get(\"edges\", {}).get(f\"{source}>{target}\")\n\n    if edge is None:\n        return {\"ok\": False, \"value\": None, \"reason\": \"blocked\"}\n\n    required_role = edge.get(\"role\")\n    if required_role is not None and request.get(\"role\") != required_role:\n        return {\"ok\": False, \"value\": None, \"reason\": \"permission\"}\n\n    if request.get(\"retry\"):\n        attempts = request.get(\"attempts\")\n        retry_limit = policy.get(\"retry_limit\")\n        if (\n            type(attempts) is not int\n            or type(retry_limit) is not int\n            or not 0 <= attempts < retry_limit\n        ):\n            return {\"ok\": False, \"value\": None, \"reason\": \"retry_limit\"}\n\n    return {\"ok\": True, \"value\": target, \"reason\": \"ok\"}\n"
+    }
+  },
+  "usage": {
+    "input_tokens": 18561,
+    "output_tokens": 1158,
+    "cached_input_tokens": 15232,
+    "reasoning_output_tokens": 306
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 18.903851334005594,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

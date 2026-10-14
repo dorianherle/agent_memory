@@ -1,0 +1,14 @@
+Answer this one question using only the supplied project evidence. Treat different project names as different projects. Use the latest correction. If the answer is absent, answer UNKNOWN and source NONE. Return only JSON: {"answer":"short value with unit, or Yes/No","source":"source ID"}. For an unknown lateral rate, answer exactly No; unknown.
+Question: For Quarry etch, what is the cooling hold duration?
+Evidence:
+[Q21] Quarry etch: The cooling hold is 11 minutes.
+[Q11] Quarry etch: The etch duration is 93 seconds.
+[Q24] Quarry etch: The backup gas line is G3.
+[Q23] Quarry etch: The process file name is quarry_Q11.yaml.
+[Q22] Quarry etch: The inspection microscope objective is 20x.
+[Q20] Quarry etch: The sample carrier label is CR-82.
+[Q19] Quarry etch: The metrology owner is Tomas Reed.
+[Q18] Quarry etch: The target vertical depth is 610 nm.
+[Q17] Quarry etch: The mask thickness is 180 nm.
+[Q16] Quarry etch: The wafer diameter is 100 mm.
+[Q05] Quarry etch: The mask material is chromium.

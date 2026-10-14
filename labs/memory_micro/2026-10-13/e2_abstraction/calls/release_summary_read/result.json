@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "text": "{\"T1\":\"unusable\",\"T2\":\"usable\",\"T3\":\"usable\",\"U1\":\"usable\",\"U2\":\"unusable\",\"U3\":\"unusable\",\"U4\":\"usable\",\"U5\":\"unusable\",\"U6\":\"usable\",\"U7\":\"unusable\",\"U8\":\"unusable\"}",
+  "errors": [],
+  "model": "gpt-5.6-sol",
+  "reasoning": "low",
+  "elapsed_seconds": 9.772326125064865,
+  "usage_complete": true,
+  "usage": {
+    "input_tokens": 11085,
+    "output_tokens": 77
+  },
+  "native_tools": [],
+  "prompt_sha256": "989a023f516ba088d6ba5c4e287d81079d203043ea6521979921c455c0d72b03"
+}

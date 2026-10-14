@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy,json,work; p=json.load(open('policy.json')); rs=json.load(open('requests.json')); expected=[work.evaluate(r,p) for r in rs]; actual=json.load(open('report.json')); assert actual==expected; rb=copy.deepcopy(rs); pb=copy.deepcopy(p); [work.evaluate(r,p) for r in rs]; assert rs==rb and p==pb; print('final checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 14545,
+    "output_tokens": 208,
+    "cached_input_tokens": 10624,
+    "reasoning_output_tokens": 90
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 7.667605999857187,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

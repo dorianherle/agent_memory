@@ -1,0 +1,60 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "write",
+          "arguments": {
+            "path": "work.py",
+            "content": "\"\"\"Validate and normalize batches of measurement rows.\"\"\"\n\nimport math\n\n\ndef evaluate(request, policy):\n    \"\"\"Return an atomic validation result without modifying either input.\"\"\"\n    records = []\n    errors = []\n    seen_ids = set()\n\n    for index, row in enumerate(request[\"rows\"]):\n        identifier = row.get(\"id\")\n        if not isinstance(identifier, str) or not identifier:\n            errors.append({\"row\": index, \"cause\": \"id\"})\n            continue\n\n        amount = row.get(\"amount\")\n        if (\n            isinstance(amount, bool)\n            or not isinstance(amount, (int, float))\n            or not math.isfinite(amount)\n            or amount < 0\n        ):\n            errors.append({\"row\": index, \"cause\": \"amount\"})\n            continue\n\n        unit = row.get(\"unit\", policy[\"base_unit\"])\n        if not isinstance(unit, str) or unit not in policy[\"units\"]:\n            errors.append({\"row\": index, \"cause\": \"unit\"})\n            continue\n\n        if policy.get(\"unique\", False) and identifier in seen_ids:\n            errors.append({\"row\": index, \"cause\": \"duplicate\"})\n            continue\n\n        seen_ids.add(identifier)\n        records.append({\"id\": identifier, \"amount\": amount * policy[\"units\"][unit]})\n\n    if errors:\n        records = []\n    return {\"ok\": not errors, \"records\": records, \"errors\": errors}\n"
+          }
+        },
+        {
+          "action": "write",
+          "arguments": {
+            "path": "report.json",
+            "content": "[\n  {\n    \"ok\": true,\n    \"records\": [\n      {\n        \"id\": \"sample_0\",\n        \"amount\": 4\n      }\n    ],\n    \"errors\": []\n  }\n]\n"
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy, json, math; from work import evaluate; p={'base_unit':'m','units':{'m':1,'cm':0.01},'unique':True}; r={'rows':[{'id':'a','amount':200,'unit':'cm'},{'id':'a','amount':1},{'id':'','amount':1},{'id':'b','amount':True},{'id':'c','amount':float('inf')},{'id':'d','amount':1,'unit':[]}]}; rc=copy.deepcopy(r); pc=copy.deepcopy(p); got=evaluate(r,p); assert got=={'ok':False,'records':[],'errors':[{'row':1,'cause':'duplicate'},{'row':2,'cause':'id'},{'row':3,'cause':'amount'},{'row':4,'cause':'amount'},{'row':5,'cause':'unit'}]}, got; assert r==rc and p==pc; sample=json.load(open('requests.json')); policy=json.load(open('policy.json')); report=json.load(open('report.json')); assert report==[evaluate(x,policy) for x in sample]; print('checks passed')"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "diff",
+              "--",
+              "work.py",
+              "report.json"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 21418,
+    "output_tokens": 2529,
+    "cached_input_tokens": 13056,
+    "reasoning_output_tokens": 1467
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 38.758552375016734,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "handoff": 1,
+    "text": "The goal is to qualify controller version 2.6. Use speed 0.80 m/s, PWM period 2.50 ms, maximum load 4.00 kg, and ambient temperature from 18.0 to 28.0 degrees C. For motor serial M17, reduce the maximum load to 2.75 kg only when the ambient temperature is more than 26.0 degrees C. At exactly 26.0 degrees C, the 4.00 kg limit applies. The timing acceptance limit is a 99th percentile of 3.00 ms. An early note says that version 2.5 passed the timing test. This result does not qualify version 2.6. The qualification status of version 2.6 is unknown.",
+    "tokens": 157,
+    "prompt_sha256": "8d0e5897d60474b40a0631e1ad4b6abaf5dd4fe0815cdb322ca124c0fe68dc91"
+  },
+  {
+    "handoff": 2,
+    "text": "The goal is to qualify controller version 2.6 at 0.80 m/s, a 2.50 ms PWM period, a maximum load of 4.00 kg, and 18.0 to 28.0 degrees C. For motor M17 only, reduce the maximum load to 2.75 kg when ambient temperature is more than 26.0 degrees C. At exactly 26.0 degrees C, the 4.00 kg limit applies. The timing limit is a 99th percentile of 3.00 ms. H2 withdraws the version 2.5 pass claim. Its corrected result is 3.20 ms, which fails the limit. Version 2.6 timing is not tested. Release is on hold until timing passes and the watchdog fault is resolved.",
+    "tokens": 166,
+    "prompt_sha256": "8654d3d57a41e64b78c219a074e79ab7ba6876b9cd81d54a03aba86f826e1c8d"
+  },
+  {
+    "handoff": 3,
+    "text": "The goal is to qualify controller version 2.6 at 0.80 m/s, with a 2.50 ms PWM period, a maximum load of 4.00 kg, and an ambient temperature of 18.0 to 28.0 degrees C. For motor M17 only, reduce the maximum load to 2.75 kg when the ambient temperature is more than 26.0 degrees C. At exactly 26.0 degrees C, the 4.00 kg limit applies. The timing limit is a 99th percentile of 3.00 ms. H2 withdraws the version 2.5 pass claim. The corrected version 2.5 result is 3.20 ms and fails the limit. Version 2.6 timing is not tested. H3 reports a watchdog fault in 3 of 5 simulator runs at a load of 3.60 kg. The cause is unknown and must not be reported as established. Do not use zero for an unknown quantity to make a check pass. Release is on hold until version 2.6 timing passes and the watchdog fault is resolved. A proposed extra test is optional. The operating settings and motor exception did not change.",
+    "tokens": 248,
+    "prompt_sha256": "b80657ea18201b2e8750acebc6fc1b0ed2ebc7081e849f419f1c9e1db77c300c"
+  },
+  {
+    "handoff": 4,
+    "text": "The goal is to qualify controller version 2.6 at 0.80 m/s, with a 2.50 ms PWM period, a maximum load of 4.00 kg, and an ambient temperature of 18.0 to 28.0 degrees C. For motor M17 only, reduce the maximum load to 2.75 kg when the temperature is more than 26.0 degrees C. At exactly 26.0 degrees C, the 4.00 kg limit applies. Timing qualification must use test B, a load of 2.00 kg, and a 120 s warmup before measurement. The proposed shorter warmup was rejected. The timing limit is a 99th percentile of 3.00 ms. H2 withdraws the version 2.5 pass claim. Its corrected result is 3.20 ms and fails. Version 2.6 timing is not tested. H3 reports a watchdog fault in 3 of 5 simulator runs at 3.60 kg. A watchdog reset is an untested explanation. No cause is established. Do not use zero for an unknown quantity to make a check pass. Release is on hold until version 2.6 timing passes and the watchdog fault is resolved. The proposed extra test is optional.",
+    "tokens": 263,
+    "prompt_sha256": "904a69e66d2cc0abc7070a8bb62760c962ad4154a107b525d6fa7aa0e0255f4a"
+  },
+  {
+    "handoff": 5,
+    "text": "The goal is to qualify controller version 2.6 at 0.80 m/s, with a 2.50 ms PWM period, a maximum load of 4.00 kg, and an ambient temperature of 18.0 to 28.0 degrees C. For motor M17 only, the maximum load is 2.75 kg above 26.0 degrees C. At exactly 26.0 degrees C, the 4.00 kg limit applies. Timing qualification must use test B, a 2.00 kg load, and a 120 s warmup. The shorter warmup was rejected. The timing limit is a 99th percentile of 3.00 ms. H2 withdraws the version 2.5 pass claim. The corrected result is 3.20 ms, which fails. Version 2.6 timing remains untested. H3 reports a watchdog fault in 3 of 5 simulator runs at 3.60 kg. A watchdog reset is an untested explanation. The cause is unknown. Do not use zero for an unknown quantity to make a check pass. H5 confirms that no operating limit or qualification condition changed. Release remains on hold until version 2.6 timing passes and the watchdog fault is resolved. The extra test is optional. Remaining routine document work does not affect qualification.",
+    "tokens": 274,
+    "prompt_sha256": "05803b578f0506a9b264369d64ab51fbb3f107fdb33965ca29c22a0d665b5517"
+  }
+]

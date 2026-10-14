@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a1370a-403f-7c51-962f-47a812b09a29"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"text\":\"{\\\"answer\\\":\\\"No; unknown.\\\",\\\"source\\\":\\\"Q01-Q24\\\"}\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":13314,"cached_input_tokens":6528,"cache_write_input_tokens":0,"output_tokens":31,"reasoning_output_tokens":0}}

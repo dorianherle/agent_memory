@@ -1,0 +1,23 @@
+You are an agent in a controlled work study. Use only the study tool protocol.
+Do not call any native Codex tool. The completion process has no project files.
+Return one JSON object: action plus arguments_json (a JSON-encoded object).
+Actions:
+read {path}; write {path,content}; list {path}; run {command:[program,arg,...]};
+memory {action:save|find|history|open_questions|delete,text?,query?,ids?,payload?};
+finish {}. Commands run offline in the project container, with Python and Git.
+Use current files and local tests. Complete work.py and report.json. Save durable
+findings and unresolved questions before finish. You may store concise reusable
+rules in ordinary notes. Do not invent observations. Tool errors can be repaired.
+Save source-bound findings with payload {files:[relative_source_paths]} when useful.
+The history below contains every previous study tool call and its full result.
+
+Current task:
+Stage 1: configuration_changes; work sample 0.
+Implement evaluate(request, policy). Start with policy.defaults and apply layers in order. Unknown keys fail with unknown_key. Null resets to defaults only when policy.null_resets is true. Environment overrides require policy.environment and known keys. Parse boolean only from exact true/false strings; parse integers only from signed decimal strings. Invalid environment values fail with environment. Enforce exact policy types; booleans are not integers. Type failures use type. Return {ok, config, error}; failures have empty config, successes have null error. Preserve explicit false, zero, and empty strings.
+Write work.py with this API. Also write report.json as a JSON array of evaluate results for requests.json, using current policy.json and evidence.json when present. Keep prior supported behavior. Use actual local checks. Store findings and unresolved limits for the next agent.
+
+Initial memory (maximum 1200 characters):
+
+Tool calls used: 4/40.
+History:
+[{"type": "tool", "number": 1, "action": "list", "arguments": {"path": "."}, "result": {"ok": true, "result": [".git", ".notebook", "TASK.md", "policy.json", "requests.json", "work.py"]}}, {"type": "tool", "number": 2, "action": "read", "arguments": {"path": "work.py"}, "result": {"ok": true, "result": {"content": "# Complete the required API and report.\n"}}}, {"type": "tool", "number": 3, "action": "read", "arguments": {"path": "TASK.md"}, "result": {"ok": true, "result": {"content": "Stage 1: configuration_changes; work sample 0.\nImplement evaluate(request, policy). Start with policy.defaults and apply layers in order. Unknown keys fail with unknown_key. Null resets to defaults only when policy.null_resets is true. Environment overrides require policy.environment and known keys. Parse boolean only from exact true/false strings; parse integers only from signed decimal strings. Invalid environment values fail with environment. Enforce exact policy types; booleans are not integers. Type failures use type. Return {ok, config, error}; failures have empty config, successes have null error. Preserve explicit false, zero, and empty strings.\nWrite work.py with this API. Also write report.json as a JSON array of evaluate results for requests.json, using current policy.json and evidence.json when present. Keep prior supported behavior. Use actual local checks. Store findings and unresolved limits for the next agent.\n"}}}, {"type": "tool", "number": 4, "action": "read", "arguments": {"path": "policy.json"}, "result": {"ok": true, "result": {"content": "{\n  \"variant\": 0,\n  \"defaults\": {\n    \"enabled\": true,\n    \"retries\": 3,\n    \"label\": \"job_0\"\n  },\n  \"types\": {\n    \"enabled\": \"boolean\",\n    \"retries\": \"integer\",\n    \"label\": \"string\"\n  },\n  \"null_resets\": false,\n  \"environment\": false\n}"}}}]

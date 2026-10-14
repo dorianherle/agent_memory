@@ -1,0 +1,676 @@
+{
+  "stage": 3,
+  "stop": "study_aborted_worker_contract_fault",
+  "tool_calls": 1,
+  "usage_complete": false,
+  "tokens": null,
+  "known_tokens": 8565,
+  "input_tokens": 8514,
+  "output_tokens": 51,
+  "cached_input_tokens": null,
+  "reasoning_output_tokens": null,
+  "elapsed_seconds": 0,
+  "elapsed_complete": false,
+  "memory": {
+    "ok": true,
+    "result": {
+      "notes": 5,
+      "model": null,
+      "checks": {
+        "status": "absent"
+      },
+      "evidence": [
+        {
+          "id": "55dfc7e6a9f9cecd09db67e3a412b58c0c5a3a41",
+          "text": "Implemented work.py evaluate(request, policy): composite from>to edge lookup; missing edge blocked; required edge role checked before retry validation; attempts must be a non-bool int with 0 <= attempts < integer non-bool retry_limit; returns stable {ok,value,reason} objects without input mutation. Generated report.json from current policy.json and requests.json; no evidence.json was present. Verified syntax, report equality, input immutability, role-before-retry precedence, and retry boundaries/types.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "report.json",
+              "policy.json",
+              "requests.json"
+            ]
+          }
+        },
+        {
+          "id": "ec650d4c4901895fbf4433e0e738d944a7b5784e",
+          "text": "Unresolved limits: behavior for structurally invalid policies (for example, non-object edges or edge definitions) is unspecified by TASK.md and was not broadened beyond valid policy-shaped inputs.",
+          "payload": {
+            "agent": "agent"
+          }
+        },
+        {
+          "id": "b311f7033cd16a15cf103a8164f40adecb438a7e",
+          "text": "Milestone complete: implemented and verified evaluate(request, policy) in work.py and generated report.json for current requests/policy. Checks passed for syntax, expected report results, no input mutation, blocked edges, role-before-retry precedence, valid retry bounds, and rejection of bool/non-integer/out-of-range attempts. No evidence.json was present. Remaining unspecified limit: malformed policy structures are outside the stated contract.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "report.json",
+              "policy.json",
+              "requests.json"
+            ],
+            "summary": true
+          }
+        },
+        {
+          "id": "a3f397bdeebeb295734dfce413af8da1df2b8406",
+          "text": "Stage 2 work sample 0 completed. work.py implements evaluate(request, policy): edge lookup via from>to; missing edge => blocked; required edge role checked before retries => permission; any request carrying attempts requires a non-bool int with 0 <= attempts < integer non-bool policy.retry_limit, otherwise retry_limit; success returns requested to with reason ok; inputs remain unchanged. report.json matches evaluating all current requests.json entries under policy.json. Actual checks passed for report equality, blocked edge, role precedence, bool/negative/at-limit attempts, valid retry, and input immutability. No evidence.json is present. Unresolved limit: wording may leave ambiguous whether retry validation should depend on edge.retry, but current behavior treats presence of attempts as marking a retry, consistent with the implemented docstring and tested cases.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "report.json",
+              "requests.json",
+              "policy.json",
+              "TASK.md"
+            ]
+          }
+        },
+        {
+          "id": "ecd90a9dab2521c819d22264c510d49858917e1c",
+          "text": "Verified final Stage 2 implementation: work.py looks up policy.edges[from>to], blocks missing edges, enforces an edge role before retry validation, and validates attempts only for edges marked retry. Retry attempts must be an int but not bool and satisfy 0 <= attempts < retry_limit; retry edges also fail when attempts is absent. Success/failure shapes and reasons match the task, inputs remain unchanged, and non-retry edges preserve prior behavior even if an attempts field is present. report.json equals evaluation of all requests.json entries with policy.json. Actual local checks passed; evidence.json is absent. No unresolved questions.",
+          "payload": {
+            "agent": "agent",
+            "covers": [
+              "55dfc7e6a9f9cecd09db67e3a412b58c0c5a3a41",
+              "ec650d4c4901895fbf4433e0e738d944a7b5784e",
+              "b311f7033cd16a15cf103a8164f40adecb438a7e",
+              "a3f397bdeebeb295734dfce413af8da1df2b8406"
+            ],
+            "files": [
+              "work.py",
+              "report.json",
+              "requests.json",
+              "policy.json",
+              "TASK.md"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "grade": {
+    "full_pass": true,
+    "passed": 143,
+    "total": 143,
+    "checks": [
+      {
+        "check": "case_0",
+        "passed": true
+      },
+      {
+        "check": "case_1",
+        "passed": true
+      },
+      {
+        "check": "case_2",
+        "passed": true
+      },
+      {
+        "check": "case_3",
+        "passed": true
+      },
+      {
+        "check": "case_4",
+        "passed": true
+      },
+      {
+        "check": "case_5",
+        "passed": true
+      },
+      {
+        "check": "case_6",
+        "passed": true
+      },
+      {
+        "check": "case_7",
+        "passed": true
+      },
+      {
+        "check": "case_8",
+        "passed": true
+      },
+      {
+        "check": "case_9",
+        "passed": true
+      },
+      {
+        "check": "case_10",
+        "passed": true
+      },
+      {
+        "check": "case_11",
+        "passed": true
+      },
+      {
+        "check": "case_12",
+        "passed": true
+      },
+      {
+        "check": "case_13",
+        "passed": true
+      },
+      {
+        "check": "case_14",
+        "passed": true
+      },
+      {
+        "check": "case_15",
+        "passed": true
+      },
+      {
+        "check": "case_16",
+        "passed": true
+      },
+      {
+        "check": "case_17",
+        "passed": true
+      },
+      {
+        "check": "case_18",
+        "passed": true
+      },
+      {
+        "check": "case_19",
+        "passed": true
+      },
+      {
+        "check": "case_20",
+        "passed": true
+      },
+      {
+        "check": "case_21",
+        "passed": true
+      },
+      {
+        "check": "case_22",
+        "passed": true
+      },
+      {
+        "check": "case_23",
+        "passed": true
+      },
+      {
+        "check": "case_24",
+        "passed": true
+      },
+      {
+        "check": "case_25",
+        "passed": true
+      },
+      {
+        "check": "case_26",
+        "passed": true
+      },
+      {
+        "check": "case_27",
+        "passed": true
+      },
+      {
+        "check": "case_28",
+        "passed": true
+      },
+      {
+        "check": "case_29",
+        "passed": true
+      },
+      {
+        "check": "case_30",
+        "passed": true
+      },
+      {
+        "check": "case_31",
+        "passed": true
+      },
+      {
+        "check": "case_32",
+        "passed": true
+      },
+      {
+        "check": "case_33",
+        "passed": true
+      },
+      {
+        "check": "case_34",
+        "passed": true
+      },
+      {
+        "check": "case_35",
+        "passed": true
+      },
+      {
+        "check": "case_36",
+        "passed": true
+      },
+      {
+        "check": "case_37",
+        "passed": true
+      },
+      {
+        "check": "case_38",
+        "passed": true
+      },
+      {
+        "check": "case_39",
+        "passed": true
+      },
+      {
+        "check": "case_40",
+        "passed": true
+      },
+      {
+        "check": "case_41",
+        "passed": true
+      },
+      {
+        "check": "case_42",
+        "passed": true
+      },
+      {
+        "check": "case_43",
+        "passed": true
+      },
+      {
+        "check": "case_44",
+        "passed": true
+      },
+      {
+        "check": "case_45",
+        "passed": true
+      },
+      {
+        "check": "case_46",
+        "passed": true
+      },
+      {
+        "check": "case_47",
+        "passed": true
+      },
+      {
+        "check": "case_48",
+        "passed": true
+      },
+      {
+        "check": "case_49",
+        "passed": true
+      },
+      {
+        "check": "case_50",
+        "passed": true
+      },
+      {
+        "check": "case_51",
+        "passed": true
+      },
+      {
+        "check": "case_52",
+        "passed": true
+      },
+      {
+        "check": "case_53",
+        "passed": true
+      },
+      {
+        "check": "case_54",
+        "passed": true
+      },
+      {
+        "check": "case_55",
+        "passed": true
+      },
+      {
+        "check": "case_56",
+        "passed": true
+      },
+      {
+        "check": "case_57",
+        "passed": true
+      },
+      {
+        "check": "case_58",
+        "passed": true
+      },
+      {
+        "check": "case_59",
+        "passed": true
+      },
+      {
+        "check": "case_60",
+        "passed": true
+      },
+      {
+        "check": "case_61",
+        "passed": true
+      },
+      {
+        "check": "case_62",
+        "passed": true
+      },
+      {
+        "check": "case_63",
+        "passed": true
+      },
+      {
+        "check": "case_64",
+        "passed": true
+      },
+      {
+        "check": "case_65",
+        "passed": true
+      },
+      {
+        "check": "case_66",
+        "passed": true
+      },
+      {
+        "check": "case_67",
+        "passed": true
+      },
+      {
+        "check": "case_68",
+        "passed": true
+      },
+      {
+        "check": "case_69",
+        "passed": true
+      },
+      {
+        "check": "case_70",
+        "passed": true
+      },
+      {
+        "check": "case_71",
+        "passed": true
+      },
+      {
+        "check": "case_72",
+        "passed": true
+      },
+      {
+        "check": "case_73",
+        "passed": true
+      },
+      {
+        "check": "case_74",
+        "passed": true
+      },
+      {
+        "check": "case_75",
+        "passed": true
+      },
+      {
+        "check": "case_76",
+        "passed": true
+      },
+      {
+        "check": "case_77",
+        "passed": true
+      },
+      {
+        "check": "case_78",
+        "passed": true
+      },
+      {
+        "check": "case_79",
+        "passed": true
+      },
+      {
+        "check": "case_80",
+        "passed": true
+      },
+      {
+        "check": "case_81",
+        "passed": true
+      },
+      {
+        "check": "case_82",
+        "passed": true
+      },
+      {
+        "check": "case_83",
+        "passed": true
+      },
+      {
+        "check": "case_84",
+        "passed": true
+      },
+      {
+        "check": "case_85",
+        "passed": true
+      },
+      {
+        "check": "case_86",
+        "passed": true
+      },
+      {
+        "check": "case_87",
+        "passed": true
+      },
+      {
+        "check": "case_88",
+        "passed": true
+      },
+      {
+        "check": "case_89",
+        "passed": true
+      },
+      {
+        "check": "case_90",
+        "passed": true
+      },
+      {
+        "check": "case_91",
+        "passed": true
+      },
+      {
+        "check": "case_92",
+        "passed": true
+      },
+      {
+        "check": "case_93",
+        "passed": true
+      },
+      {
+        "check": "case_94",
+        "passed": true
+      },
+      {
+        "check": "case_95",
+        "passed": true
+      },
+      {
+        "check": "case_96",
+        "passed": true
+      },
+      {
+        "check": "case_97",
+        "passed": true
+      },
+      {
+        "check": "case_98",
+        "passed": true
+      },
+      {
+        "check": "case_99",
+        "passed": true
+      },
+      {
+        "check": "case_100",
+        "passed": true
+      },
+      {
+        "check": "case_101",
+        "passed": true
+      },
+      {
+        "check": "case_102",
+        "passed": true
+      },
+      {
+        "check": "case_103",
+        "passed": true
+      },
+      {
+        "check": "case_104",
+        "passed": true
+      },
+      {
+        "check": "case_105",
+        "passed": true
+      },
+      {
+        "check": "case_106",
+        "passed": true
+      },
+      {
+        "check": "case_107",
+        "passed": true
+      },
+      {
+        "check": "case_108",
+        "passed": true
+      },
+      {
+        "check": "case_109",
+        "passed": true
+      },
+      {
+        "check": "case_110",
+        "passed": true
+      },
+      {
+        "check": "case_111",
+        "passed": true
+      },
+      {
+        "check": "case_112",
+        "passed": true
+      },
+      {
+        "check": "case_113",
+        "passed": true
+      },
+      {
+        "check": "case_114",
+        "passed": true
+      },
+      {
+        "check": "case_115",
+        "passed": true
+      },
+      {
+        "check": "case_116",
+        "passed": true
+      },
+      {
+        "check": "case_117",
+        "passed": true
+      },
+      {
+        "check": "case_118",
+        "passed": true
+      },
+      {
+        "check": "case_119",
+        "passed": true
+      },
+      {
+        "check": "case_120",
+        "passed": true
+      },
+      {
+        "check": "case_121",
+        "passed": true
+      },
+      {
+        "check": "case_122",
+        "passed": true
+      },
+      {
+        "check": "case_123",
+        "passed": true
+      },
+      {
+        "check": "case_124",
+        "passed": true
+      },
+      {
+        "check": "case_125",
+        "passed": true
+      },
+      {
+        "check": "case_126",
+        "passed": true
+      },
+      {
+        "check": "case_127",
+        "passed": true
+      },
+      {
+        "check": "case_128",
+        "passed": true
+      },
+      {
+        "check": "case_129",
+        "passed": true
+      },
+      {
+        "check": "case_130",
+        "passed": true
+      },
+      {
+        "check": "case_131",
+        "passed": true
+      },
+      {
+        "check": "case_132",
+        "passed": true
+      },
+      {
+        "check": "case_133",
+        "passed": true
+      },
+      {
+        "check": "case_134",
+        "passed": true
+      },
+      {
+        "check": "case_135",
+        "passed": true
+      },
+      {
+        "check": "case_136",
+        "passed": true
+      },
+      {
+        "check": "case_137",
+        "passed": true
+      },
+      {
+        "check": "case_138",
+        "passed": true
+      },
+      {
+        "check": "case_139",
+        "passed": true
+      },
+      {
+        "check": "case_140",
+        "passed": true
+      },
+      {
+        "check": "all_cases_returned",
+        "passed": true
+      },
+      {
+        "check": "current_source_report",
+        "passed": true
+      }
+    ],
+    "unsupported_conclusions": 0,
+    "missed_source_changes": 0
+  },
+  "recovered_after_abort": true
+}

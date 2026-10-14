@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "memory",
+          "arguments": {
+            "action": "save",
+            "text": "Stage 3 milestone complete: work.py implements the required evaluation API without mutating inputs, and report.json matches evaluation of every current request with current evidence and policy. Local checks covered missing required conditions, absent calibration versus zero, verified filtering before supersession, eligible supersession, canonical typed disagreement, withdrawal/claim filtering, sorted sources, input immutability, fixture report equality, and Python compilation.",
+            "payload": {
+              "files": [
+                "work.py",
+                "report.json",
+                "TASK.md",
+                "requests.json",
+                "evidence.json",
+                "policy.json"
+              ]
+            },
+            "summary": true
+          }
+        },
+        {
+          "action": "memory",
+          "arguments": {
+            "action": "save",
+            "text": "Unresolved contract limits: malformed/non-JSON inputs, non-dictionary records, duplicate or non-string required-condition names, and missing/non-sortable source IDs are unspecified. Cyclic, duplicate-source, and unusual supersession graphs are not fully specified; implementation removes source IDs named by another eligible record and ignores ordinary self-supersession. Stored predictive rules remain limited to recorded fixtures and independently checked boundaries.",
+            "payload": {
+              "files": [
+                "work.py",
+                "TASK.md"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 33021,
+    "output_tokens": 638,
+    "cached_input_tokens": 9088,
+    "reasoning_output_tokens": 375
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 22.188906708033755,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

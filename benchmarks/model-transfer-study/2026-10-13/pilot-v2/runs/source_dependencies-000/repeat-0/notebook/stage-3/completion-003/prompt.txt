@@ -1,0 +1,24 @@
+You are an agent in a controlled work study. Use only the study tool protocol.
+Do not call any native Codex tool. The completion process has no project files.
+Return one JSON object: action plus arguments_json (a JSON-encoded object).
+Actions:
+read {path}; write {path,content}; list {path}; run {command:[program,arg,...]};
+memory {action:save|find|history|open_questions|delete,text?,query?,ids?,payload?};
+finish {}. Commands run offline in the project container, with Python and Git.
+Use current files and local tests. Complete work.py and report.json. Save durable
+findings and unresolved questions before finish. You may store concise reusable
+rules in ordinary notes. Do not invent observations. Tool errors can be repaired.
+Save source-bound findings with payload {files:[relative_source_paths]} when useful.
+The history below contains every previous study tool call and its full result.
+
+Current task:
+Stage 3: source_dependencies; work sample 0.
+Implement evaluate(request, policy). Return {needs_review, changed}. Compare canonical JSON source states for every unique declared path except policy.ignored. An absent state equals {kind:missing}. Compare complete states, not names or timestamps. Return sorted changed paths. Irrelevant changes do not require review. Do not modify inputs.
+Write work.py with this API. Also write report.json as a JSON array of evaluate results for requests.json, using current policy.json and evidence.json when present. Keep prior supported behavior. Use actual local checks. Store findings and unresolved limits for the next agent.
+
+Initial memory (maximum 1200 characters):
+[note-00001] Implemented work.py evaluate(request, policy): compares canonical JSON for complete saved/current states of each unique declared non-ignored path; absent entries normalize to {kind:missing}; returns sorted changed paths and needs_review=bool(changed), without mutating inputs. Generated report.json from current requests.json/policy.json; evidence.json is absent. Verified representative duplicate/ignored/missing/key-order/irrelevant cases and py_compile successfully.
+[note-00002] Unresolved limits: evidence.json was not present, so report.json was generated solely from requests.json and policy.json. No additional local test suite was present; validation used direct assertions plus py_compile.
+Tool calls used: 3/40.
+History:
+[{"type": "tool", "number": 1, "action": "list", "arguments": {"path": "."}, "result": {"ok": true, "result": [".git", ".notebook", "TASK.md", "__pycache__", "policy.json", "report.json", "requests.json", "work.py"]}}, {"type": "tool", "number": 2, "action": "read", "arguments": {"path": "work.py"}, "result": {"ok": true, "result": {"content": "\"\"\"Evaluate changes to declared source dependencies.\"\"\"\n\nimport json\n\n_MISSING = {\"kind\": \"missing\"}\n\n\ndef _canonical_json(value):\n    \"\"\"Return a stable JSON representation without modifying the value.\"\"\"\n    return json.dumps(\n        value,\n        sort_keys=True,\n        separators=(\",\", \":\"),\n        ensure_ascii=False,\n        allow_nan=False,\n    )\n\n\ndef evaluate(request, policy):\n    \"\"\"Evaluate complete states of unique, non-ignored declared paths.\"\"\"\n    ignored = set(policy.get(\"ignored\", ()))\n    saved = request.get(\"saved\", {})\n    current = request.get(\"current\", {})\n\n    changed = []\n    for path in set(request.get(\"declared\", ())):\n        if path in ignored:\n            continue\n        before = saved.get(path, _MISSING)\n        after = current.get(path, _MISSING)\n        if _canonical_json(before) != _canonical_json(after):\n            changed.append(path)\n\n    changed.sort()\n    return {\"needs_review\": bool(changed), \"changed\": changed}\n"}}}, {"type": "tool", "number": 3, "action": "read", "arguments": {"path": "requests.json"}, "result": {"ok": true, "result": {"content": "[\n  {\n    \"declared\": [\n      \"worker_0.py\",\n      \"recipe_0.json\",\n      \"new_0.json\"\n    ],\n    \"saved\": {\n      \"worker_0.py\": {\n        \"kind\": \"file\",\n        \"hash\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\n      }\n    },\n    \"current\": {\n      \"worker_0.py\": {\n        \"kind\": \"file\",\n        \"hash\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\n      }\n    }\n  }\n]"}}}]

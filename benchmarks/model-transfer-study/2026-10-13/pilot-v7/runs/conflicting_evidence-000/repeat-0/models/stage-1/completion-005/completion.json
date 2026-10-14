@@ -1,0 +1,57 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import json\nfrom work import evaluate\nwith open('requests.json') as f: requests=json.load(f)\nwith open('evidence.json') as f: evidence=json.load(f)\nwith open('policy.json') as f: policy=json.load(f)\nwith open('report.json') as f: report=json.load(f)\nactual=[evaluate(r,evidence,policy) for r in requests]\nassert actual==report, (actual,report)\nassert all(set(x)=={'status','value','sources','unknowns'} for x in actual)\nprint(json.dumps(actual,sort_keys=True))"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-m",
+              "pytest",
+              "-q"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "diff",
+              "--",
+              "work.py",
+              "report.json"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 27902,
+    "output_tokens": 604,
+    "cached_input_tokens": 13056,
+    "reasoning_output_tokens": 351
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 16.90149970795028,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

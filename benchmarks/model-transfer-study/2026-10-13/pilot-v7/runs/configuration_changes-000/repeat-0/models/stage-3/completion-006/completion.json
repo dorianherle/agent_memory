@@ -1,0 +1,85 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "model_handoff",
+      "id": "b1c7ea021b4703b8eb1b3371174f2c263a4ef9bd",
+      "payload": {
+        "observations": [
+          {
+            "id": "stage3-unknown-key-precedence",
+            "target": "status",
+            "inputs": {
+              "unknown_key": true,
+              "environment_error": true,
+              "type_error": true
+            },
+            "expected": "unknown_key",
+            "evidence": [
+              "7b0897b4"
+            ],
+            "challenge": true
+          },
+          {
+            "id": "stage3-environment-error",
+            "target": "status",
+            "inputs": {
+              "unknown_key": false,
+              "environment_error": true,
+              "type_error": false
+            },
+            "expected": "environment",
+            "evidence": [
+              "7b0897b4"
+            ],
+            "challenge": false
+          },
+          {
+            "id": "stage3-exact-type-error",
+            "target": "status",
+            "inputs": {
+              "unknown_key": false,
+              "environment_error": false,
+              "type_error": true
+            },
+            "expected": "type",
+            "evidence": [
+              "7b0897b4"
+            ],
+            "challenge": false
+          },
+          {
+            "id": "stage3-success-boundary",
+            "target": "status",
+            "inputs": {
+              "unknown_key": false,
+              "environment_error": false,
+              "type_error": false
+            },
+            "expected": "ok",
+            "evidence": [
+              "7b0897b4",
+              "d704f8b7"
+            ],
+            "challenge": true
+          }
+        ]
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 30469,
+    "output_tokens": 618,
+    "cached_input_tokens": 21376,
+    "reasoning_output_tokens": 306
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 12.828101749997586,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

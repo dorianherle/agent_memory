@@ -1,0 +1,10 @@
+2026-10-13T20:47:54.166915Z ERROR codex_models_manager::manager: failed to refresh available models: timeout waiting for child process to exit
+2026-10-13T20:47:54.186104Z ERROR codex_models_manager::manager: failed to refresh available models: timeout waiting for child process to exit
+2026-10-13T20:47:54.268651Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
+2026-10-13T20:47:54.287074Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
+2026-10-13T20:47:54.323530Z  WARN codex_core::shell_snapshot: Failed to delete shell snapshot at "/Users/dorianherle/.codex/shell_snapshots/01a13705-8864-7901-ab7b-8613ea957423.1791924471943003000.sh": Os { code: 2, kind: NotFound, message: "No such file or directory" }
+2026-10-13T20:47:54.350955Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
+2026-10-13T20:47:54.367756Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
+2026-10-13T20:47:54.699145Z  WARN codex_core_plugins::manifest: ignoring interface.defaultPrompt[0]: prompt must be at most 128 characters path=file:///Users/dorianherle/.codex/.tmp/plugins/plugins/ngs-analysis/.codex-plugin/plugin.json
+2026-10-13T20:47:54.701076Z  WARN codex_core_plugins::manifest: ignoring interface.defaultPrompt[0]: prompt must be at most 128 characters path=file:///Users/dorianherle/.codex/.tmp/plugins/plugins/ngs-analysis/.codex-plugin/plugin.json
+2026-10-13T20:47:59.881126Z  WARN codex_core::shell_snapshot: Failed to delete shell snapshot at AbsolutePathBuf("/Users/dorianherle/.codex/shell_snapshots/01a13705-914a-7401-9dd5-a068273c4324.1791924474240370000.sh"): Os { code: 2, kind: NotFound, message: "No such file or directory" }

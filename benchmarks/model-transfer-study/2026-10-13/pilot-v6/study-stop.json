@@ -1,0 +1,10 @@
+{
+  "reason": "worker_contract_fault",
+  "scored_comparison_valid": false,
+  "time_utc": "2026-10-13T17:05:28.530279+00:00",
+  "details": [
+    "Accepted record fields were not specified, but the grader required exactly id and amount.",
+    "Duplicate valid IDs did not specify whether only accepted rows populate the seen set."
+  ],
+  "action": "Stop controller dispatch; allow current model completions to finish; preserve original logs and grades. Freeze explicit output contracts before new scored workers."
+}

@@ -1,0 +1,12 @@
+{
+  "stop": "completion_protocol_failure",
+  "tool_calls": 15,
+  "elapsed_seconds": 366.82194554107264,
+  "usage_complete": true,
+  "tokens": 90252,
+  "known_tokens": 90252,
+  "input_tokens": 86348,
+  "output_tokens": 3904,
+  "cached_input_tokens": 54272,
+  "reasoning_output_tokens": 1991
+}

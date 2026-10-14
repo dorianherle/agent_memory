@@ -1,0 +1,30 @@
+You prepare memory for a fresh agent. The agent must answer later questions about the same workflow. Use ASD-STE100 style. Use at most 220 tokens. Return only the memory packet. Write an ordinary concise handoff summary of the history. Preserve important facts, outcomes, corrections, and uncertainty. Do not invent evidence.
+HISTORY:
+The following chat records describe a release workflow. The tool checks are reliable. A content token identifies exact file bytes. Equal tokens mean equal bytes. Each build records which inputs it used. The word 'usable' is the tool's result, not an assistant opinion.
+User: Build the atlas package. Use map (m1) and style (s1). Notes are not an input.
+Tool: Atlas output exists. The build recorded map=m1, style=s1. Usability check: usable.
+User: Change style to s2. Do not rebuild.
+Tool: Atlas output still exists. Map=m1, style=s2. Usability check: unusable.
+Assistant: Perhaps any earlier edit permanently invalidates a package.
+User: Restore style to its original bytes s1. Do not rebuild.
+Tool: Atlas output still exists. Map=m1, style=s1. Usability check: usable.
+User: Change notes from n1 to n2. Do not rebuild.
+Tool: Atlas output still exists. Map=m1, style=s1, notes=n2. Usability check: usable.
+User: Delete map. Do not rebuild.
+Tool: Atlas output still exists. Map is absent, style=s1. Usability check: unusable.
+User: Restore map=m1. Then remove the atlas output itself.
+Tool: Map=m1, style=s1. Atlas output is absent. Usability check: unusable.
+User: Build beacon. Use scene=c7 and lighting=l2. The README is not an input.
+Tool: Beacon output exists. The build recorded scene=c7, lighting=l2. Usability check: usable.
+User: Change scene to c8. Do not rebuild.
+Tool: Beacon output exists. Scene=c8, lighting=l2. Usability check: unusable.
+User: Rebuild beacon with scene=c8 and lighting=l2.
+Tool: Beacon output exists. The build recorded scene=c8, lighting=l2. Usability check: usable.
+User: Change lighting to l3. Do not rebuild.
+Tool: Beacon output exists. Scene=c8, lighting=l3. Usability check: unusable.
+User: Restore lighting=l2. Change the README. Do not rebuild.
+Tool: Beacon output exists. Scene=c8, lighting=l2. Usability check: usable.
+User: Build comet from one input, mesh=q4.
+Tool: Comet output exists. The build recorded mesh=q4. Usability check: usable.
+User: Change mesh=q5, then restore q4. Do not rebuild.
+Tool: Comet output exists. Mesh=q4. Usability check: usable.

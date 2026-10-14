@@ -1,0 +1,55 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 801B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:22-bookworm
+#2 DONE 0.3s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/9] FROM docker.io/library/node:22-bookworm@sha256:0e5f906573693feaa1e21057ebdcfdb5bd5021f050b2dc7c9deceb629c7da2a8
+#4 resolve docker.io/library/node:22-bookworm@sha256:0e5f906573693feaa1e21057ebdcfdb5bd5021f050b2dc7c9deceb629c7da2a8 done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 499.09kB done
+#5 DONE 0.0s
+
+#6 [2/9] RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-venv python3-dev g++ git && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [3/9] RUN python3 -m venv /opt/venv && /opt/venv/bin/pip install numpy==2.2.6 hnswlib==0.8.0
+#7 CACHED
+
+#8 [4/9] RUN npm install --global @openai/codex@0.155.1
+#8 CACHED
+
+#9 [5/9] RUN mkdir -p /opt/backend /agent /workspace && chmod 777 /workspace
+#9 CACHED
+
+#10 [6/9] COPY agent_memory /opt/backend/agent_memory
+#10 DONE 0.0s
+
+#11 [7/9] COPY worker.py /opt/backend/worker.py
+#11 DONE 0.0s
+
+#12 [8/9] RUN chmod 700 /opt/backend && git config --system user.email study@localhost && git config --system user.name "Study Worker" && git config --system --add safe.directory /workspace
+#12 DONE 0.1s
+
+#13 [9/9] WORKDIR /agent
+#13 DONE 0.0s
+
+#14 exporting to image
+#14 exporting layers 0.1s done
+#14 exporting manifest sha256:e0a17491751269c349b097d820d7fc47eb1cb085084f68252fe14f09b626b3cf done
+#14 exporting config sha256:d11068b94947e4a6b259c0abbca8585d43f6cde3270c667dd22670934c5731ad done
+#14 exporting attestation manifest sha256:209572ec80d3cb208cc6ef5e5cab17f1ee32112a89b975eda4962c71781265d6 done
+#14 exporting manifest list sha256:9fc4a2aa0ff0102f31ca465035e73fcb3addc571fd6b96f353c5474a55954fd8
+#14 exporting manifest list sha256:9fc4a2aa0ff0102f31ca465035e73fcb3addc571fd6b96f353c5474a55954fd8 done
+#14 naming to docker.io/library/agent-memory-study:2026-10-13 done
+#14 unpacking to docker.io/library/agent-memory-study:2026-10-13 0.0s done
+#14 DONE 0.1s

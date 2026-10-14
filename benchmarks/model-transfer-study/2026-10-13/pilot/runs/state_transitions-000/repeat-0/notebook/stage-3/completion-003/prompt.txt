@@ -1,0 +1,24 @@
+You are an agent in a controlled work study. Use only the study tool protocol.
+Do not call any native Codex tool. The completion process has no project files.
+Return one JSON object: action plus arguments_json (a JSON-encoded object).
+Actions:
+read {path}; write {path,content}; list {path}; run {command:[program,arg,...]};
+memory {action:save|find|history|open_questions|delete,text?,query?,ids?,payload?};
+finish {}. Commands run offline in the project container, with Python and Git.
+Use current files and local tests. Complete work.py and report.json. Save durable
+findings and unresolved questions before finish. You may store concise reusable
+rules in ordinary notes. Do not invent observations. Tool errors can be repaired.
+Save source-bound findings with payload {files:[relative_source_paths]} when useful.
+The history below contains every previous study tool call and its full result.
+
+Current task:
+Stage 3: state_transitions; work sample 0.
+Implement evaluate(request, policy). Return {ok, value, reason}. Look up from>to in policy.edges. Missing edges are blocked. Enforce each edge's role before retry checks. A retry needs an actual integer attempts (not bool), in [0, retry_limit). On success value is to and reason is ok. On failure value is null and reason is blocked, permission, or retry_limit. Do not modify inputs.
+Write work.py with this API. Also write report.json as a JSON array of evaluate results for requests.json, using current policy.json and evidence.json when present. Keep prior supported behavior. Use actual local checks. Store findings and unresolved limits for the next agent.
+
+Initial memory (maximum 1200 characters):
+[note-00001] Implemented evaluate in work.py: edge lookup uses from>to; missing edge => blocked; required role is checked before retry validation; retry attempts must be int but not bool and satisfy 0 <= attempts < retry_limit; success returns target with reason ok; inputs remain unchanged. Generated report.json from requests.json and policy.json. Local boundary, precedence, report consistency, and immutability checks passed. No evidence.json was present. No unresolved limits observed.
+[note-00002] Stage 2 work sample 0 is complete. work.py implements edge lookup by from>to, blocked missing edges, role precedence before retry validation, strict non-bool integer attempts in [0, retry_limit), standard result shape, and no input mutation. report.json matches evaluation of current requests.json/policy.json. Actual local checks passed for report consistency, immutability, missing edges, permission precedence, retry boundaries/types, and successful transitions. evidence.json was absent. No unresolved limits observed.
+Tool calls used: 3/40.
+History:
+[{"type": "tool", "number": 1, "action": "list", "arguments": {"path": "."}, "result": {"ok": true, "result": [".git", ".notebook", "TASK.md", "policy.json", "report.json", "requests.json", "work.py"]}}, {"type": "tool", "number": 2, "action": "read", "arguments": {"path": "work.py"}, "result": {"ok": true, "result": {"content": "\"\"\"Evaluate policy-controlled state transition requests.\"\"\"\n\n\ndef evaluate(request, policy):\n    \"\"\"Return the result of evaluating *request* against *policy*.\n\n    Inputs are only inspected and are never modified.\n    \"\"\"\n    source = request.get(\"from\")\n    target = request.get(\"to\")\n    edge = policy.get(\"edges\", {}).get(f\"{source}>{target}\")\n\n    if edge is None:\n        return {\"ok\": False, \"value\": None, \"reason\": \"blocked\"}\n\n    required_role = edge.get(\"role\")\n    if required_role is not None and request.get(\"role\") != required_role:\n        return {\"ok\": False, \"value\": None, \"reason\": \"permission\"}\n\n    if request.get(\"retry\"):\n        attempts = request.get(\"attempts\")\n        retry_limit = policy.get(\"retry_limit\")\n        if (\n            not isinstance(attempts, int)\n            or isinstance(attempts, bool)\n            or not isinstance(retry_limit, int)\n            or isinstance(retry_limit, bool)\n            or attempts < 0\n            or attempts >= retry_limit\n        ):\n            return {\"ok\": False, \"value\": None, \"reason\": \"retry_limit\"}\n\n    return {\"ok\": True, \"value\": target, \"reason\": \"ok\"}\n"}}}, {"type": "tool", "number": 3, "action": "read", "arguments": {"path": "policy.json"}, "result": {"ok": true, "result": {"content": "{\n  \"variant\": 0,\n  \"edges\": {\n    \"draft>ready\": {},\n    \"ready>running\": {\n      \"role\": \"operator_0\"\n    },\n    \"running>done\": {},\n    \"failed>ready\": {\n      \"retry\": true\n    },\n    \"running>paused\": {\n      \"role\": \"operator_0\"\n    },\n    \"paused>running\": {\n      \"role\": \"supervisor_0\"\n    }\n  },\n  \"retry_limit\": 2\n}"}}}]

@@ -1,0 +1,53 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "write",
+          "arguments": {
+            "path": "report.json",
+            "content": "[\n  {\n    \"status\": \"supported\",\n    \"value\": 32,\n    \"sources\": [\"S2\"],\n    \"unknowns\": []\n  },\n  {\n    \"status\": \"unsupported\",\n    \"value\": false,\n    \"sources\": [\"D1\"],\n    \"unknowns\": []\n  }\n]\n"
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy,json\nfrom work import evaluate\n\ndef check(name, request, evidence, policy, expected):\n    before=copy.deepcopy((request,evidence,policy))\n    actual=evaluate(request,evidence,policy)\n    assert actual==expected,(name,actual,expected)\n    assert (request,evidence,policy)==before,(name,'mutated')\n\np={'required_conditions':['b','a'],'require_verified':True}\ncheck('missing',{'claim':'x','conditions':{'a':1}},[],p,{'status':'unknown','value':None,'sources':[],'unknowns':['b']})\ncheck('filters',{'claim':'x','conditions':{'a':1,'b':2}},[{'source':'wrong-claim','claim':'y','value':1,'conditions':{'a':1,'b':2},'verified':True},{'source':'withdrawn','claim':'x','value':1,'conditions':{'a':1,'b':2},'verified':True,'withdrawn':True},{'source':'unverified','claim':'x','value':1,'conditions':{'a':1,'b':2}},{'source':'wrong-condition','claim':'x','value':1,'conditions':{'a':1,'b':3},'verified':True}],p,{'status':'unknown','value':None,'sources':[],'unknowns':['no matching evidence']})\ncheck('eligible-supersession',{'claim':'x','conditions':{'a':1,'b':2}},[{'source':'old','claim':'x','value':1,'conditions':{'a':1,'b':2},'verified':True},{'source':'new','claim':'x','value':2,'conditions':{'a':1,'b':2},'verified':True,'supersedes':['old']},{'source':'ineligible','claim':'x','value':3,'conditions':{'a':9,'b':2},'verified':True,'supersedes':['new']}],p,{'status':'supported','value':2,'sources':['new'],'unknowns':[]})\ncheck('canonical-agreement',{'claim':'x','conditions':{}},[{'source':'z','claim':'x','value':{'b':2,'a':1},'conditions':{}},{'source':'a','claim':'x','value':{'a':1,'b':2},'conditions':{}}],{'required_conditions':[]}, {'status':'supported','value':{'b':2,'a':1},'sources':['a','z'],'unknowns':[]})\ncheck('conflict-count-no-authority',{'claim':'x','conditions':{}},[{'source':'a','claim':'x','value':1,'conditions':{}},{'source':'b','claim':'x','value':1,'conditions':{}},{'source':'c','claim':'x','value':2,'conditions':{}}],{'required_conditions':[]},{'status':'conflict','value':None,'sources':['a','b','c'],'unknowns':['source disagreement']})\ncheck('boolean-false',{'claim':'x','conditions':{}},[{'source':'f','claim':'x','value':False,'conditions':{}}],{'required_conditions':[]},{'status':'unsupported','value':False,'sources':['f'],'unknowns':[]})\ncheck('numeric-zero',{'claim':'x','conditions':{}},[{'source':'n','claim':'x','value':0,'conditions':{}}],{'required_conditions':[]},{'status':'supported','value':0,'sources':['n'],'unknowns':[]})\ncheck('absent-calibration',{'claim':'x','conditions':{}},[{'source':'n','claim':'x','conditions':{}}],{'required_conditions':[]},{'status':'supported','value':None,'sources':['n'],'unknowns':[]})\nwith open('requests.json') as f: requests=json.load(f)\nwith open('evidence.json') as f: evidence=json.load(f)\nwith open('policy.json') as f: policy=json.load(f)\nwith open('report.json') as f: report=json.load(f)\nactual=[evaluate(r,evidence,policy) for r in requests]\nassert actual==report,(actual,report)\nprint(json.dumps({'checks':9,'report':actual},sort_keys=True))"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "diff",
+              "--",
+              "work.py",
+              "report.json"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 12895,
+    "output_tokens": 1430,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 277
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 20.054845625068992,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

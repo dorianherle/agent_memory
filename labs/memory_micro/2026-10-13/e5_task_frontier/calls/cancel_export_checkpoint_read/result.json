@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "text": "{\"next_action\":\"recheck_current_source\",\"current_revision\":\"ui-18\",\"claims\":{\"earlier_tests_passed\":\"supported\",\"current_tests_passed\":\"not_established\",\"interrupted_operation_completed\":\"not_established\",\"task_complete\":\"not_established\",\"assistant_success_verified\":\"not_established\"},\"blocker\":\"current_revision_unverified\"}",
+  "errors": [],
+  "model": "gpt-5.6-sol",
+  "reasoning": "low",
+  "elapsed_seconds": 12.50969783286564,
+  "usage_complete": true,
+  "usage": {
+    "input_tokens": 13410,
+    "output_tokens": 126
+  },
+  "native_tools": [],
+  "prompt_sha256": "8c96bdcec254f63b3c13a08f73a0046eb1e1c50cb597e40ff5da83d227dbf443"
+}

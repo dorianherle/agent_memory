@@ -1,0 +1,422 @@
+{
+  "protocol_sha256": "fdb7d0d63cf6ce2fbdca80a931cd0b07cde157dabce6fef2ac08653f774575df",
+  "elapsed_seconds": 40.67171570798382,
+  "calls_attempted": 8,
+  "calls_completed": 8,
+  "errors": {},
+  "native_usage": {
+    "input_tokens": 102660,
+    "output_tokens": 1517,
+    "complete": true
+  },
+  "call_usage": {
+    "backfill_cache_checkpoint_read": {
+      "usage": {
+        "input_tokens": 10482,
+        "output_tokens": 84
+      },
+      "elapsed_seconds": 6.502545417053625,
+      "ok": true,
+      "errors": []
+    },
+    "backfill_cache_full": {
+      "usage": {
+        "input_tokens": 13765,
+        "output_tokens": 162
+      },
+      "elapsed_seconds": 12.535406541079283,
+      "ok": true,
+      "errors": []
+    },
+    "backfill_cache_knowledge_read": {
+      "usage": {
+        "input_tokens": 13367,
+        "output_tokens": 158
+      },
+      "elapsed_seconds": 13.125587125075981,
+      "ok": true,
+      "errors": []
+    },
+    "backfill_cache_write": {
+      "usage": {
+        "input_tokens": 10795,
+        "output_tokens": 332
+      },
+      "elapsed_seconds": 11.484688374912366,
+      "ok": true,
+      "errors": []
+    },
+    "cancel_export_checkpoint_read": {
+      "usage": {
+        "input_tokens": 13410,
+        "output_tokens": 126
+      },
+      "elapsed_seconds": 12.50969783286564,
+      "ok": true,
+      "errors": []
+    },
+    "cancel_export_full": {
+      "usage": {
+        "input_tokens": 13756,
+        "output_tokens": 172
+      },
+      "elapsed_seconds": 12.070255083031952,
+      "ok": true,
+      "errors": []
+    },
+    "cancel_export_knowledge_read": {
+      "usage": {
+        "input_tokens": 13373,
+        "output_tokens": 165
+      },
+      "elapsed_seconds": 10.425603874959052,
+      "ok": true,
+      "errors": []
+    },
+    "cancel_export_write": {
+      "usage": {
+        "input_tokens": 13712,
+        "output_tokens": 318
+      },
+      "elapsed_seconds": 12.756777833914384,
+      "ok": true,
+      "errors": []
+    }
+  },
+  "packets": {
+    "cancel_export": {
+      "knowledge": "The export controller creates a temporary URL before worker completion. Cancellation could skip cleanup. Revision ui-17 runs cleanup on cancellation and clears the URL after release. This prevents double revocation. Its focused tests passed: 29/29. Its production build passed. Revision ui-18 adds a cancellation-flag check. This check prevents a late worker callback from replacing the last valid preview. No completed verification exists for ui-18. The parser.spec.ts fixture type error remains unresolved. It is not an acceptance blocker. Do not deploy.",
+      "checkpoint": "Objective: release temporary URLs after cancellation and keep the last valid preview. Current source: ui-18. Completed on ui-17: focused cancellation tests, 29 passed, exit 0; production build, exit 0. Typecheck on ui-17 failed with exit 2 because parser.spec.ts has an incompatible fixture type. Keep this failure visible. On ui-18, an npm run build started but was interrupted. No completion, exit status, or artifact was recorded. Next, run focused cancellation tests on ui-18. Then run the production build and inspect its exit status. Missing ui-18 verification blocks the draft review. Do not deploy."
+    },
+    "backfill_cache": {
+      "knowledge": "The migration changes old cache keys to tenant-scoped keys. New keys on cache-42 use a stable tenant identifier because tenant names can change during backfill. Reads prefer the new key. They use the old key only when the recorded owner matches the requested tenant. Keep old entries readable until backfill finishes. Do not publish a release. Completion requires current-source tests, a confirmed backfill result, and a successful consistency audit.",
+      "checkpoint": "Objective: complete the local cache-key migration. Current source revision: cache-42. Verification: cache-41 tests passed, 42 of 42, at cache-41. The cache-41 dry-run passed and found 12,400 candidates. No tests ran on cache-42. Job local-77 started on cache-42 and wrote its first batch. The terminal connection then failed. Its final result and completion marker are missing. First, check whether local-77 runs and inspect its status record. Do not start another apply operation until its state is known. Then test cache-42 and run the post-backfill consistency audit. The unknown job state is the immediate blocker."
+    }
+  },
+  "sizes": {
+    "cancel_export": {
+      "history_tokens_estimate": 490,
+      "history_utf8_bytes": 2410,
+      "knowledge": {
+        "packet_tokens_estimate": 107,
+        "packet_utf8_bytes": 556,
+        "within_target": true
+      },
+      "checkpoint": {
+        "packet_tokens_estimate": 133,
+        "packet_utf8_bytes": 606,
+        "within_target": true
+      }
+    },
+    "backfill_cache": {
+      "history_tokens_estimate": 499,
+      "history_utf8_bytes": 2305,
+      "knowledge": {
+        "packet_tokens_estimate": 86,
+        "packet_utf8_bytes": 450,
+        "within_target": true
+      },
+      "checkpoint": {
+        "packet_tokens_estimate": 138,
+        "packet_utf8_bytes": 618,
+        "within_target": true
+      }
+    }
+  },
+  "evaluations": {
+    "cancel_export_full": {
+      "answer": {
+        "next_action": "recheck_current_source",
+        "current_revision": "ui-18",
+        "claims": {
+          "earlier_tests_passed": "supported",
+          "current_tests_passed": "not_established",
+          "interrupted_operation_completed": "not_established",
+          "task_complete": "not_established",
+          "assistant_success_verified": "not_established"
+        },
+        "blocker": "current_revision_unverified"
+      },
+      "correct_fields": 8,
+      "total_fields": 8,
+      "failures": [],
+      "parse_error": null,
+      "all_pass": true
+    },
+    "cancel_export_knowledge": {
+      "answer": {
+        "next_action": "recheck_current_source",
+        "current_revision": "ui-18",
+        "claims": {
+          "earlier_tests_passed": "supported",
+          "current_tests_passed": "not_established",
+          "interrupted_operation_completed": "not_established",
+          "task_complete": "not_established",
+          "assistant_success_verified": "not_established"
+        },
+        "blocker": "current_revision_unverified"
+      },
+      "correct_fields": 8,
+      "total_fields": 8,
+      "failures": [],
+      "parse_error": null,
+      "all_pass": true
+    },
+    "cancel_export_checkpoint": {
+      "answer": {
+        "next_action": "recheck_current_source",
+        "current_revision": "ui-18",
+        "claims": {
+          "earlier_tests_passed": "supported",
+          "current_tests_passed": "not_established",
+          "interrupted_operation_completed": "not_established",
+          "task_complete": "not_established",
+          "assistant_success_verified": "not_established"
+        },
+        "blocker": "current_revision_unverified"
+      },
+      "correct_fields": 8,
+      "total_fields": 8,
+      "failures": [],
+      "parse_error": null,
+      "all_pass": true
+    },
+    "backfill_cache_full": {
+      "answer": {
+        "next_action": "resolve_interrupted_operation",
+        "current_revision": "cache-42",
+        "claims": {
+          "earlier_tests_passed": "supported",
+          "current_tests_passed": "not_established",
+          "interrupted_operation_completed": "not_established",
+          "task_complete": "not_established",
+          "assistant_success_verified": "not_established"
+        },
+        "blocker": "unknown_backfill_state"
+      },
+      "correct_fields": 8,
+      "total_fields": 8,
+      "failures": [],
+      "parse_error": null,
+      "all_pass": true
+    },
+    "backfill_cache_knowledge": {
+      "answer": {
+        "next_action": "retrieve_missing_state",
+        "current_revision": "unknown",
+        "claims": {
+          "earlier_tests_passed": "not_established",
+          "current_tests_passed": "not_established",
+          "interrupted_operation_completed": "not_established",
+          "task_complete": "not_established",
+          "assistant_success_verified": "not_established"
+        },
+        "blocker": "current_revision_unverified"
+      },
+      "correct_fields": 4,
+      "total_fields": 8,
+      "failures": [
+        {
+          "field": "next_action",
+          "expected": "resolve_interrupted_operation",
+          "actual": "retrieve_missing_state"
+        },
+        {
+          "field": "current_revision",
+          "expected": "cache-42",
+          "actual": "unknown"
+        },
+        {
+          "field": "blocker",
+          "expected": "unknown_backfill_state",
+          "actual": "current_revision_unverified"
+        },
+        {
+          "field": "claims.earlier_tests_passed",
+          "expected": "supported",
+          "actual": "not_established"
+        }
+      ],
+      "parse_error": null,
+      "all_pass": false
+    },
+    "backfill_cache_checkpoint": {
+      "answer": {
+        "next_action": "resolve_interrupted_operation",
+        "current_revision": "cache-42",
+        "claims": {
+          "earlier_tests_passed": "supported",
+          "current_tests_passed": "not_established",
+          "interrupted_operation_completed": "not_established",
+          "task_complete": "not_established",
+          "assistant_success_verified": "not_established"
+        },
+        "blocker": "unknown_backfill_state"
+      },
+      "correct_fields": 8,
+      "total_fields": 8,
+      "failures": [],
+      "parse_error": null,
+      "all_pass": true
+    }
+  },
+  "pass_rule": {
+    "cancel_export_knowledge": true,
+    "cancel_export_checkpoint": true,
+    "backfill_cache_knowledge": false,
+    "backfill_cache_checkpoint": true
+  },
+  "interpretation": [
+    {
+      "history": "cancel_export",
+      "knowledge_field_errors": 0,
+      "checkpoint_field_errors": 0,
+      "checkpoint_fewer_errors": false,
+      "correctness_tie": true
+    },
+    {
+      "history": "backfill_cache",
+      "knowledge_field_errors": 4,
+      "checkpoint_field_errors": 0,
+      "checkpoint_fewer_errors": true,
+      "correctness_tie": false
+    }
+  ],
+  "full_results": {
+    "backfill_cache_checkpoint_read": {
+      "ok": true,
+      "text": "{\"next_action\":\"resolve_interrupted_operation\",\"current_revision\":\"cache-42\",\"claims\":{\"earlier_tests_passed\":\"supported\",\"current_tests_passed\":\"not_established\",\"interrupted_operation_completed\":\"not_established\",\"task_complete\":\"not_established\",\"assistant_success_verified\":\"not_established\"},\"blocker\":\"unknown_backfill_state\"}",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 6.502545417053625,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 10482,
+        "output_tokens": 84
+      },
+      "native_tools": [],
+      "prompt_sha256": "e894efeef23f3babc7eff6e222149a6c14430b27289c9fb52930e490c8d3c9cb",
+      "call": "backfill_cache_checkpoint_read"
+    },
+    "backfill_cache_full": {
+      "ok": true,
+      "text": "{\"next_action\":\"resolve_interrupted_operation\",\"current_revision\":\"cache-42\",\"claims\":{\"earlier_tests_passed\":\"supported\",\"current_tests_passed\":\"not_established\",\"interrupted_operation_completed\":\"not_established\",\"task_complete\":\"not_established\",\"assistant_success_verified\":\"not_established\"},\"blocker\":\"unknown_backfill_state\"}",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 12.535406541079283,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 13765,
+        "output_tokens": 162
+      },
+      "native_tools": [],
+      "prompt_sha256": "463851248abf81f1345be3d71891a4c543b926317889eefedb71cbcf3367423f",
+      "call": "backfill_cache_full"
+    },
+    "backfill_cache_knowledge_read": {
+      "ok": true,
+      "text": "{\"next_action\":\"retrieve_missing_state\",\"current_revision\":\"unknown\",\"claims\":{\"earlier_tests_passed\":\"not_established\",\"current_tests_passed\":\"not_established\",\"interrupted_operation_completed\":\"not_established\",\"task_complete\":\"not_established\",\"assistant_success_verified\":\"not_established\"},\"blocker\":\"current_revision_unverified\"}",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 13.125587125075981,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 13367,
+        "output_tokens": 158
+      },
+      "native_tools": [],
+      "prompt_sha256": "3c45126d5b9eedde01cde586278b4b0a72c02eb984899ab8d86bb5c981af0bed",
+      "call": "backfill_cache_knowledge_read"
+    },
+    "backfill_cache_write": {
+      "ok": true,
+      "text": "{\"knowledge\":\"The migration changes old cache keys to tenant-scoped keys. New keys on cache-42 use a stable tenant identifier because tenant names can change during backfill. Reads prefer the new key. They use the old key only when the recorded owner matches the requested tenant. Keep old entries readable until backfill finishes. Do not publish a release. Completion requires current-source tests, a confirmed backfill result, and a successful consistency audit.\",\"checkpoint\":\"Objective: complete the local cache-key migration. Current source revision: cache-42. Verification: cache-41 tests passed, 42 of 42, at cache-41. The cache-41 dry-run passed and found 12,400 candidates. No tests ran on cache-42. Job local-77 started on cache-42 and wrote its first batch. The terminal connection then failed. Its final result and completion marker are missing. First, check whether local-77 runs and inspect its status record. Do not start another apply operation until its state is known. Then test cache-42 and run the post-backfill consistency audit. The unknown job state is the immediate blocker.\"}",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 11.484688374912366,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 10795,
+        "output_tokens": 332
+      },
+      "native_tools": [],
+      "prompt_sha256": "62d8a839a06d6b9f644b9c9dab68fb7df0fefa36cee02c9ff31c33b6d66ec246",
+      "call": "backfill_cache_write"
+    },
+    "cancel_export_checkpoint_read": {
+      "ok": true,
+      "text": "{\"next_action\":\"recheck_current_source\",\"current_revision\":\"ui-18\",\"claims\":{\"earlier_tests_passed\":\"supported\",\"current_tests_passed\":\"not_established\",\"interrupted_operation_completed\":\"not_established\",\"task_complete\":\"not_established\",\"assistant_success_verified\":\"not_established\"},\"blocker\":\"current_revision_unverified\"}",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 12.50969783286564,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 13410,
+        "output_tokens": 126
+      },
+      "native_tools": [],
+      "prompt_sha256": "8c96bdcec254f63b3c13a08f73a0046eb1e1c50cb597e40ff5da83d227dbf443",
+      "call": "cancel_export_checkpoint_read"
+    },
+    "cancel_export_full": {
+      "ok": true,
+      "text": "{\"next_action\":\"recheck_current_source\",\"current_revision\":\"ui-18\",\"claims\":{\"earlier_tests_passed\":\"supported\",\"current_tests_passed\":\"not_established\",\"interrupted_operation_completed\":\"not_established\",\"task_complete\":\"not_established\",\"assistant_success_verified\":\"not_established\"},\"blocker\":\"current_revision_unverified\"}",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 12.070255083031952,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 13756,
+        "output_tokens": 172
+      },
+      "native_tools": [],
+      "prompt_sha256": "a44b5365e6ef7748ccf147444ad20c3240f4f9a682dc1586f4ece565810832d2",
+      "call": "cancel_export_full"
+    },
+    "cancel_export_knowledge_read": {
+      "ok": true,
+      "text": "{\"next_action\":\"recheck_current_source\",\"current_revision\":\"ui-18\",\"claims\":{\"earlier_tests_passed\":\"supported\",\"current_tests_passed\":\"not_established\",\"interrupted_operation_completed\":\"not_established\",\"task_complete\":\"not_established\",\"assistant_success_verified\":\"not_established\"},\"blocker\":\"current_revision_unverified\"}",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 10.425603874959052,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 13373,
+        "output_tokens": 165
+      },
+      "native_tools": [],
+      "prompt_sha256": "92fb441538f8c69f54bd42723411eb631a76af00a3c17af1f467baea543b4cee",
+      "call": "cancel_export_knowledge_read"
+    },
+    "cancel_export_write": {
+      "ok": true,
+      "text": "{\"knowledge\":\"The export controller creates a temporary URL before worker completion. Cancellation could skip cleanup. Revision ui-17 runs cleanup on cancellation and clears the URL after release. This prevents double revocation. Its focused tests passed: 29/29. Its production build passed. Revision ui-18 adds a cancellation-flag check. This check prevents a late worker callback from replacing the last valid preview. No completed verification exists for ui-18. The parser.spec.ts fixture type error remains unresolved. It is not an acceptance blocker. Do not deploy.\",\"checkpoint\":\"Objective: release temporary URLs after cancellation and keep the last valid preview. Current source: ui-18. Completed on ui-17: focused cancellation tests, 29 passed, exit 0; production build, exit 0. Typecheck on ui-17 failed with exit 2 because parser.spec.ts has an incompatible fixture type. Keep this failure visible. On ui-18, an npm run build started but was interrupted. No completion, exit status, or artifact was recorded. Next, run focused cancellation tests on ui-18. Then run the production build and inspect its exit status. Missing ui-18 verification blocks the draft review. Do not deploy.\"}",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 12.756777833914384,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 13712,
+        "output_tokens": 318
+      },
+      "native_tools": [],
+      "prompt_sha256": "aa7bff27d35d591d123a871824bbf3f50ed1f36cd5bbf031fdd7a016dc0d5334",
+      "call": "cancel_export_write"
+    }
+  },
+  "posthoc_content_review": {
+    "status": "Not a frozen scoring criterion. No prompts or expected outputs changed.",
+    "backfill_checkpoint_omits_explicit_publication_prohibition": true,
+    "backfill_knowledge_receiver_requested_missing_state": true,
+    "backfill_knowledge_receiver_made_false_completion_claim": false,
+    "interpretation": "The checkpoint preserved the scored task frontier. It did not preserve every user constraint. A safe request for more information was counted as a resumption failure under the frozen exact-action rule."
+  }
+}

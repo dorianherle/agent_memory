@@ -1,0 +1,11 @@
+........................................................................ [ 26%]
+..................................................................... [ 51%]
+................................................s....................... [ 77%]
+.............................................................            [100%]
+=============================== warnings summary ===============================
+agent_memory/tests/test_cursor.py::McpServerTests::test_build_server_registers_tools
+  /Users/dorianherle/Documents/Personal/agent_memory/.venv/lib/python3.14/site-packages/pydantic_settings/sources/utils.py:47: IncompleteFieldDefinitionWarning: Field 'lifespan' has an incomplete definition: its annotation contains an unresolved forward reference, so settings sources may fail to correctly resolve its value. Call `model_rebuild()` on the model where the field is defined, once all the referenced types are defined.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+273 passed, 1 skipped, 1 warning, 3 subtests passed in 100.14s (0:01:40)

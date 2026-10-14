@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "text": "{\"T1\":\"usable\",\"T2\":\"unusable\",\"T3\":\"usable\",\"U1\":\"unknown\",\"U2\":\"unknown\",\"U3\":\"unknown\",\"U4\":\"unknown\"}",
+  "errors": [],
+  "model": "gpt-5.6-sol",
+  "reasoning": "low",
+  "elapsed_seconds": 9.36735275015235,
+  "usage_complete": true,
+  "usage": {
+    "input_tokens": 10580,
+    "output_tokens": 52
+  },
+  "native_tools": [],
+  "prompt_sha256": "bfedaa10706aabbaf42f9813a126516218f7a345db16d0a2eb42b1d858540ef3"
+}

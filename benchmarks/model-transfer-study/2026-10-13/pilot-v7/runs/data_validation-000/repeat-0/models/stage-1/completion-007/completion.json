@@ -1,0 +1,56 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy,json\nfrom work import evaluate\nwith open('requests.json') as f: requests=json.load(f)\nwith open('policy.json') as f: policy=json.load(f)\nwith open('report.json') as f: report=json.load(f)\nactual=[evaluate(r,policy) for r in requests]\nassert actual==report,(actual,report)\nassert set(report[0])=={'ok','records','errors'}\nassert set(report[0]['records'][0])=={'id','amount'}\nprint(json.dumps(actual,sort_keys=True))"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy,json\nfrom work import evaluate\nprobes=[\n({'rows':[{'id':'a','amount':1},{'id':'a','amount':2}]},{'base_unit':'u','units':{'u':2},'unique':True}),\n({'rows':[{'id':'x','amount':True,'unit':[]},{'id':'x','amount':1,'unit':[]},{'id':'x','amount':1},{'id':'x','amount':2}]},{'base_unit':'u','units':{'u':1},'unique':True}),\n({'rows':[{'id':'','amount':-1,'unit':'bad'},{'id':'z','amount':float('nan')},{'id':'q','amount':-0.0}]},{'base_unit':'u','units':{'u':3},'unique':False})]\nfor request,policy in probes:\n rb,pb=copy.deepcopy(request),copy.deepcopy(policy)\n result=evaluate(request,policy)\n assert request==rb and policy==pb\n print(json.dumps(result,sort_keys=True,allow_nan=False))"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "diff",
+              "--",
+              "work.py",
+              "report.json"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 26084,
+    "output_tokens": 1540,
+    "cached_input_tokens": 18560,
+    "reasoning_output_tokens": 573
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 31.97413624986075,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

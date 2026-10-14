@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy,json; from work import evaluate; p={'ignored':['skip']}; r={'declared':['b','a','b','skip','missing'],'saved':{'a':{'kind':'file','name':'same','hash':'1'},'b':{'kind':'file','hash':'x'},'skip':{'kind':'file','hash':'old'},'extra':{'kind':'file','hash':'old'}},'current':{'a':{'kind':'file','name':'same','hash':'2'},'b':{'hash':'x','kind':'file'},'skip':{'kind':'file','hash':'new'},'extra':{'kind':'file','hash':'new'},'missing':{'kind':'missing'}}}; rb=copy.deepcopy(r); pb=copy.deepcopy(p); assert evaluate(r,p)=={'needs_review':True,'changed':['a']}; assert r==rb and p==pb; data=json.load(open('requests.json')); policy=json.load(open('policy.json')); expected=[evaluate(x,policy) for x in data]; actual=json.load(open('report.json')); assert actual==expected, (actual,expected); print('checks passed',actual)"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 9336,
+    "output_tokens": 347,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 74
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 11.483843790832907,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

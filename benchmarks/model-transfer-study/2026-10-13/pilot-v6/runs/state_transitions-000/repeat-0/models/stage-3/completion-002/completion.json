@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy,json\nfrom work import evaluate\npolicy=json.load(open('policy.json'))\nrequests=json.load(open('requests.json'))\nresults=[evaluate(r,policy) for r in requests]\nprint(json.dumps(results,sort_keys=True))\nchecks=[\n ({'from':'missing','to':'edge','role':'x','attempts':0},{'ok':False,'value':None,'reason':'blocked'}),\n ({'from':'ready','to':'running','role':'wrong','attempts':'bad'},{'ok':False,'value':None,'reason':'permission'}),\n ({'from':'failed','to':'ready','attempts':True},{'ok':False,'value':None,'reason':'retry_limit'}),\n ({'from':'failed','to':'ready','attempts':-1},{'ok':False,'value':None,'reason':'retry_limit'}),\n ({'from':'failed','to':'ready','attempts':1},{'ok':True,'value':'ready','reason':'ok'}),\n ({'from':'failed','to':'ready','attempts':2},{'ok':False,'value':None,'reason':'retry_limit'}),\n]\nfor req,expected in checks:\n before_req=copy.deepcopy(req); before_policy=copy.deepcopy(policy); actual=evaluate(req,policy); assert actual==expected,(req,actual,expected); assert req==before_req and policy==before_policy\nprint('boundary checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 11532,
+    "output_tokens": 475,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 124
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 10.698091792175546,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

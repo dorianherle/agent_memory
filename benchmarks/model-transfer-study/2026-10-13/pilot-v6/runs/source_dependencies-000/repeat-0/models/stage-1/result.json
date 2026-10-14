@@ -1,0 +1,1422 @@
+{
+  "stop": "finished",
+  "tool_calls": 27,
+  "elapsed_seconds": 170.9375792921055,
+  "usage_complete": true,
+  "tokens": 190164,
+  "known_tokens": 190164,
+  "input_tokens": 184409,
+  "output_tokens": 5755,
+  "cached_input_tokens": 121472,
+  "reasoning_output_tokens": 2424,
+  "model_probes": {
+    "target": "needs_review",
+    "predictions": {
+      "ok": true,
+      "result": [
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": false,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": true,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": true,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": true,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": false,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": false,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": true,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": true,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": true,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": false,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": false,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": true,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": true,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": true,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": false,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": false,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": true,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": true,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": true,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": false,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": false,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": true,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": true,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": true,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": false,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": true,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        },
+        {
+          "model_id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "status": "predicted",
+          "value": false,
+          "rules": [
+            "review_on_any_relevant_complete_state_change"
+          ]
+        }
+      ]
+    },
+    "expected": [
+      false,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      true,
+      false
+    ]
+  },
+  "stage": 1,
+  "grade": {
+    "full_pass": true,
+    "passed": 30,
+    "total": 30,
+    "checks": [
+      {
+        "check": "case_0",
+        "passed": true
+      },
+      {
+        "check": "case_1",
+        "passed": true
+      },
+      {
+        "check": "case_2",
+        "passed": true
+      },
+      {
+        "check": "case_3",
+        "passed": true
+      },
+      {
+        "check": "case_4",
+        "passed": true
+      },
+      {
+        "check": "case_5",
+        "passed": true
+      },
+      {
+        "check": "case_6",
+        "passed": true
+      },
+      {
+        "check": "case_7",
+        "passed": true
+      },
+      {
+        "check": "case_8",
+        "passed": true
+      },
+      {
+        "check": "case_9",
+        "passed": true
+      },
+      {
+        "check": "case_10",
+        "passed": true
+      },
+      {
+        "check": "case_11",
+        "passed": true
+      },
+      {
+        "check": "case_12",
+        "passed": true
+      },
+      {
+        "check": "case_13",
+        "passed": true
+      },
+      {
+        "check": "case_14",
+        "passed": true
+      },
+      {
+        "check": "case_15",
+        "passed": true
+      },
+      {
+        "check": "case_16",
+        "passed": true
+      },
+      {
+        "check": "case_17",
+        "passed": true
+      },
+      {
+        "check": "case_18",
+        "passed": true
+      },
+      {
+        "check": "case_19",
+        "passed": true
+      },
+      {
+        "check": "case_20",
+        "passed": true
+      },
+      {
+        "check": "case_21",
+        "passed": true
+      },
+      {
+        "check": "case_22",
+        "passed": true
+      },
+      {
+        "check": "case_23",
+        "passed": true
+      },
+      {
+        "check": "case_24",
+        "passed": true
+      },
+      {
+        "check": "case_25",
+        "passed": true
+      },
+      {
+        "check": "case_26",
+        "passed": true
+      },
+      {
+        "check": "case_27",
+        "passed": true
+      },
+      {
+        "check": "all_cases_returned",
+        "passed": true
+      },
+      {
+        "check": "current_source_report",
+        "passed": true
+      }
+    ],
+    "unsupported_conclusions": 0,
+    "missed_source_changes": 0
+  },
+  "memory": {
+    "ok": true,
+    "result": {
+      "notes": 4,
+      "model": {
+        "id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+        "event": "accepted",
+        "checks": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": false,
+              "expected": false,
+              "id": "fixture_unchanged_file",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "review_on_any_relevant_complete_state_change"
+                ],
+                "status": "predicted",
+                "value": false
+              }
+            },
+            {
+              "challenge": true,
+              "expected": true,
+              "id": "challenge_complete_state_timestamp_change",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "review_on_any_relevant_complete_state_change"
+                ],
+                "status": "predicted",
+                "value": true
+              }
+            },
+            {
+              "challenge": false,
+              "expected": false,
+              "id": "missing_equals_explicit_missing",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "review_on_any_relevant_complete_state_change"
+                ],
+                "status": "predicted",
+                "value": false
+              }
+            },
+            {
+              "challenge": false,
+              "expected": false,
+              "id": "ignored_changed_path",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "review_on_any_relevant_complete_state_change"
+                ],
+                "status": "predicted",
+                "value": false
+              }
+            }
+          ],
+          "changed_dependencies": [],
+          "complexity": {
+            "cases": 4,
+            "complete_bytes": 2391,
+            "rules": 1,
+            "working_bytes": 843
+          },
+          "id": "23015e62c161f1147dad3d5a20adb0e81e2ced43",
+          "issues": [],
+          "missing_evidence": [],
+          "status": "tested",
+          "uncovered_rules": [],
+          "unresolved": [
+            "Malformed or non-JSON-compatible input behavior is outside the tested contract."
+          ]
+        },
+        "complexity": {
+          "cases": 4,
+          "complete_bytes": 2391,
+          "rules": 1,
+          "working_bytes": 843
+        },
+        "fingerprints": {
+          "TASK.md": {
+            "sha256": "2279d6e04bd2a865d662ddfb66489ba2d5c18b65fffb3d73935cd302e02cc1e2",
+            "state": "file"
+          },
+          "policy.json": {
+            "sha256": "fa58ad697dc2195b0854c0577164e3400ecca9300dc6bf7c25ff4f4000c196ac",
+            "state": "file"
+          },
+          "report.json": {
+            "sha256": "cd5f4dd3e24be317071ce439fb1e9fe1c053fa6c004e27d0ba40447f7ee69638",
+            "state": "file"
+          },
+          "requests.json": {
+            "sha256": "513fbfebac58790db0e365623dce3567b4d751c8cc9fff11309356c765e37231",
+            "state": "file"
+          },
+          "work.py": {
+            "sha256": "ccc447c5831f85bf68f3703e49a524c51f15b57911873eb10b9774edc379933a",
+            "state": "file"
+          }
+        },
+        "model": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": false,
+              "evidence": [
+                "d593fa0d35106e45592303f9c46368cc1a2ccbf2"
+              ],
+              "expected": false,
+              "id": "fixture_unchanged_file",
+              "inputs": {
+                "policy": {
+                  "ignored": [],
+                  "variant": 0
+                },
+                "request": {
+                  "current": {
+                    "worker_0.py": {
+                      "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                      "kind": "file"
+                    }
+                  },
+                  "declared": [
+                    "worker_0.py"
+                  ],
+                  "saved": {
+                    "worker_0.py": {
+                      "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                      "kind": "file"
+                    }
+                  }
+                }
+              },
+              "target": "needs_review"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "d593fa0d35106e45592303f9c46368cc1a2ccbf2"
+              ],
+              "expected": true,
+              "id": "challenge_complete_state_timestamp_change",
+              "inputs": {
+                "policy": {
+                  "ignored": []
+                },
+                "request": {
+                  "current": {
+                    "x": {
+                      "hash": "h",
+                      "kind": "file",
+                      "timestamp": 2
+                    }
+                  },
+                  "declared": [
+                    "x"
+                  ],
+                  "saved": {
+                    "x": {
+                      "hash": "h",
+                      "kind": "file",
+                      "timestamp": 1
+                    }
+                  }
+                }
+              },
+              "target": "needs_review"
+            },
+            {
+              "challenge": false,
+              "evidence": [
+                "d593fa0d35106e45592303f9c46368cc1a2ccbf2"
+              ],
+              "expected": false,
+              "id": "missing_equals_explicit_missing",
+              "inputs": {
+                "policy": {
+                  "ignored": []
+                },
+                "request": {
+                  "current": {
+                    "x": {
+                      "kind": "missing"
+                    }
+                  },
+                  "declared": [
+                    "x"
+                  ],
+                  "saved": {}
+                }
+              },
+              "target": "needs_review"
+            },
+            {
+              "challenge": false,
+              "evidence": [
+                "d593fa0d35106e45592303f9c46368cc1a2ccbf2"
+              ],
+              "expected": false,
+              "id": "ignored_changed_path",
+              "inputs": {
+                "policy": {
+                  "ignored": [
+                    "x"
+                  ]
+                },
+                "request": {
+                  "current": {
+                    "x": {
+                      "hash": "new",
+                      "kind": "file"
+                    }
+                  },
+                  "declared": [
+                    "x"
+                  ],
+                  "saved": {
+                    "x": {
+                      "hash": "old",
+                      "kind": "file"
+                    }
+                  }
+                }
+              },
+              "target": "needs_review"
+            }
+          ],
+          "inputs": {
+            "policy": "object",
+            "request": "object"
+          },
+          "resolutions": [],
+          "rules": [
+            {
+              "claim": "Review is needed exactly when at least one unique declared, non-ignored path has unequal complete saved and current JSON states, with an absent entry represented as {kind:missing}.",
+              "dependencies": [
+                "work.py",
+                "TASK.md"
+              ],
+              "evidence": [
+                "d593fa0d35106e45592303f9c46368cc1a2ccbf2"
+              ],
+              "id": "review_on_any_relevant_complete_state_change",
+              "target": "needs_review",
+              "then": {
+                "as": "path",
+                "items": {
+                  "var": "request.declared"
+                },
+                "op": "any",
+                "test": {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "path"
+                            },
+                            {
+                              "var": "policy.ignored"
+                            }
+                          ],
+                          "op": "in"
+                        }
+                      ],
+                      "op": "not"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "request.saved"
+                            },
+                            {
+                              "var": "path"
+                            },
+                            {
+                              "value": {
+                                "kind": "missing"
+                              }
+                            }
+                          ],
+                          "op": "get"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "request.current"
+                            },
+                            {
+                              "var": "path"
+                            },
+                            {
+                              "value": {
+                                "kind": "missing"
+                              }
+                            }
+                          ],
+                          "op": "get"
+                        }
+                      ],
+                      "op": "ne"
+                    }
+                  ],
+                  "op": "and"
+                }
+              },
+              "when": {
+                "value": true
+              }
+            }
+          ],
+          "schema": 1,
+          "title": "Declared source dependency review",
+          "unresolved": [
+            "Malformed or non-JSON-compatible input behavior is outside the tested contract."
+          ]
+        },
+        "parent": null,
+        "proposal": "23015e62c161f1147dad3d5a20adb0e81e2ced43",
+        "reason": "Agent proposed a model revision",
+        "revision": 1
+      },
+      "checks": {
+        "id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+        "status": "tested",
+        "issues": [],
+        "cases": [
+          {
+            "id": "fixture_unchanged_file",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": false,
+              "rules": [
+                "review_on_any_relevant_complete_state_change"
+              ]
+            },
+            "expected": false,
+            "challenge": false
+          },
+          {
+            "id": "challenge_complete_state_timestamp_change",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "review_on_any_relevant_complete_state_change"
+              ]
+            },
+            "expected": true,
+            "challenge": true
+          },
+          {
+            "id": "missing_equals_explicit_missing",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": false,
+              "rules": [
+                "review_on_any_relevant_complete_state_change"
+              ]
+            },
+            "expected": false,
+            "challenge": false
+          },
+          {
+            "id": "ignored_changed_path",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": false,
+              "rules": [
+                "review_on_any_relevant_complete_state_change"
+              ]
+            },
+            "expected": false,
+            "challenge": false
+          }
+        ],
+        "uncovered_rules": [],
+        "missing_evidence": [],
+        "changed_dependencies": [],
+        "alternatives": [],
+        "complexity": {
+          "cases": 4,
+          "complete_bytes": 2391,
+          "rules": 1,
+          "working_bytes": 843
+        },
+        "unresolved": [
+          "Malformed or non-JSON-compatible input behavior is outside the tested contract."
+        ]
+      },
+      "evidence": [
+        {
+          "id": "d593fa0d35106e45592303f9c46368cc1a2ccbf2",
+          "text": "Implemented source dependency evaluation: de-duplicate declared paths, exclude policy.ignored, treat absent saved/current entries as {kind:missing}, compare complete states via canonical JSON, sort changed paths, and set needs_review iff changed is nonempty. Verified six implementation cases plus three boundary cases and confirmed report.json matches the current fixture.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "requests.json",
+              "policy.json",
+              "report.json"
+            ]
+          }
+        },
+        {
+          "id": "56fcc601b7685b50587181405990fd678ba47351",
+          "text": "Unresolved limit: behavior for non-JSON values or malformed request/policy shapes is unspecified; implementation intentionally targets JSON-compatible inputs and rejects non-finite floats during canonicalization.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "TASK.md"
+            ]
+          }
+        },
+        {
+          "id": "23015e62c161f1147dad3d5a20adb0e81e2ced43",
+          "text": "Task model proposed: Declared source dependency review",
+          "payload": {
+            "agent": "agent",
+            "model_event": "proposed",
+            "task_model": {
+              "complexity": {
+                "cases": 4,
+                "complete_bytes": 2391,
+                "rules": 1,
+                "working_bytes": 843
+              },
+              "fingerprints": {
+                "TASK.md": {
+                  "sha256": "2279d6e04bd2a865d662ddfb66489ba2d5c18b65fffb3d73935cd302e02cc1e2",
+                  "state": "file"
+                },
+                "policy.json": {
+                  "sha256": "fa58ad697dc2195b0854c0577164e3400ecca9300dc6bf7c25ff4f4000c196ac",
+                  "state": "file"
+                },
+                "report.json": {
+                  "sha256": "cd5f4dd3e24be317071ce439fb1e9fe1c053fa6c004e27d0ba40447f7ee69638",
+                  "state": "file"
+                },
+                "requests.json": {
+                  "sha256": "513fbfebac58790db0e365623dce3567b4d751c8cc9fff11309356c765e37231",
+                  "state": "file"
+                },
+                "work.py": {
+                  "sha256": "ccc447c5831f85bf68f3703e49a524c51f15b57911873eb10b9774edc379933a",
+                  "state": "file"
+                }
+              },
+              "model": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "d593fa0d35106e45592303f9c46368cc1a2ccbf2"
+                    ],
+                    "expected": false,
+                    "id": "fixture_unchanged_file",
+                    "inputs": {
+                      "policy": {
+                        "ignored": [],
+                        "variant": 0
+                      },
+                      "request": {
+                        "current": {
+                          "worker_0.py": {
+                            "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                            "kind": "file"
+                          }
+                        },
+                        "declared": [
+                          "worker_0.py"
+                        ],
+                        "saved": {
+                          "worker_0.py": {
+                            "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                            "kind": "file"
+                          }
+                        }
+                      }
+                    },
+                    "target": "needs_review"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "d593fa0d35106e45592303f9c46368cc1a2ccbf2"
+                    ],
+                    "expected": true,
+                    "id": "challenge_complete_state_timestamp_change",
+                    "inputs": {
+                      "policy": {
+                        "ignored": []
+                      },
+                      "request": {
+                        "current": {
+                          "x": {
+                            "hash": "h",
+                            "kind": "file",
+                            "timestamp": 2
+                          }
+                        },
+                        "declared": [
+                          "x"
+                        ],
+                        "saved": {
+                          "x": {
+                            "hash": "h",
+                            "kind": "file",
+                            "timestamp": 1
+                          }
+                        }
+                      }
+                    },
+                    "target": "needs_review"
+                  },
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "d593fa0d35106e45592303f9c46368cc1a2ccbf2"
+                    ],
+                    "expected": false,
+                    "id": "missing_equals_explicit_missing",
+                    "inputs": {
+                      "policy": {
+                        "ignored": []
+                      },
+                      "request": {
+                        "current": {
+                          "x": {
+                            "kind": "missing"
+                          }
+                        },
+                        "declared": [
+                          "x"
+                        ],
+                        "saved": {}
+                      }
+                    },
+                    "target": "needs_review"
+                  },
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "d593fa0d35106e45592303f9c46368cc1a2ccbf2"
+                    ],
+                    "expected": false,
+                    "id": "ignored_changed_path",
+                    "inputs": {
+                      "policy": {
+                        "ignored": [
+                          "x"
+                        ]
+                      },
+                      "request": {
+                        "current": {
+                          "x": {
+                            "hash": "new",
+                            "kind": "file"
+                          }
+                        },
+                        "declared": [
+                          "x"
+                        ],
+                        "saved": {
+                          "x": {
+                            "hash": "old",
+                            "kind": "file"
+                          }
+                        }
+                      }
+                    },
+                    "target": "needs_review"
+                  }
+                ],
+                "inputs": {
+                  "policy": "object",
+                  "request": "object"
+                },
+                "resolutions": [],
+                "rules": [
+                  {
+                    "claim": "Review is needed exactly when at least one unique declared, non-ignored path has unequal complete saved and current JSON states, with an absent entry represented as {kind:missing}.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "d593fa0d35106e45592303f9c46368cc1a2ccbf2"
+                    ],
+                    "id": "review_on_any_relevant_complete_state_change",
+                    "target": "needs_review",
+                    "then": {
+                      "as": "path",
+                      "items": {
+                        "var": "request.declared"
+                      },
+                      "op": "any",
+                      "test": {
+                        "args": [
+                          {
+                            "args": [
+                              {
+                                "args": [
+                                  {
+                                    "var": "path"
+                                  },
+                                  {
+                                    "var": "policy.ignored"
+                                  }
+                                ],
+                                "op": "in"
+                              }
+                            ],
+                            "op": "not"
+                          },
+                          {
+                            "args": [
+                              {
+                                "args": [
+                                  {
+                                    "var": "request.saved"
+                                  },
+                                  {
+                                    "var": "path"
+                                  },
+                                  {
+                                    "value": {
+                                      "kind": "missing"
+                                    }
+                                  }
+                                ],
+                                "op": "get"
+                              },
+                              {
+                                "args": [
+                                  {
+                                    "var": "request.current"
+                                  },
+                                  {
+                                    "var": "path"
+                                  },
+                                  {
+                                    "value": {
+                                      "kind": "missing"
+                                    }
+                                  }
+                                ],
+                                "op": "get"
+                              }
+                            ],
+                            "op": "ne"
+                          }
+                        ],
+                        "op": "and"
+                      }
+                    },
+                    "when": {
+                      "value": true
+                    }
+                  }
+                ],
+                "schema": 1,
+                "title": "Declared source dependency review",
+                "unresolved": [
+                  "Malformed or non-JSON-compatible input behavior is outside the tested contract."
+                ]
+              },
+              "parent": null,
+              "reason": "Agent proposed a model revision",
+              "revision": 1
+            }
+          }
+        },
+        {
+          "id": "c17705d9f8d54e73c71dd4d25356beb10774469a",
+          "text": "Task model active: Declared source dependency review",
+          "payload": {
+            "agent": "agent",
+            "model_event": "accepted",
+            "task_model": {
+              "checks": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": false,
+                    "expected": false,
+                    "id": "fixture_unchanged_file",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "review_on_any_relevant_complete_state_change"
+                      ],
+                      "status": "predicted",
+                      "value": false
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": true,
+                    "id": "challenge_complete_state_timestamp_change",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "review_on_any_relevant_complete_state_change"
+                      ],
+                      "status": "predicted",
+                      "value": true
+                    }
+                  },
+                  {
+                    "challenge": false,
+                    "expected": false,
+                    "id": "missing_equals_explicit_missing",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "review_on_any_relevant_complete_state_change"
+                      ],
+                      "status": "predicted",
+                      "value": false
+                    }
+                  },
+                  {
+                    "challenge": false,
+                    "expected": false,
+                    "id": "ignored_changed_path",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "review_on_any_relevant_complete_state_change"
+                      ],
+                      "status": "predicted",
+                      "value": false
+                    }
+                  }
+                ],
+                "changed_dependencies": [],
+                "complexity": {
+                  "cases": 4,
+                  "complete_bytes": 2391,
+                  "rules": 1,
+                  "working_bytes": 843
+                },
+                "id": "23015e62c161f1147dad3d5a20adb0e81e2ced43",
+                "issues": [],
+                "missing_evidence": [],
+                "status": "tested",
+                "uncovered_rules": [],
+                "unresolved": [
+                  "Malformed or non-JSON-compatible input behavior is outside the tested contract."
+                ]
+              },
+              "complexity": {
+                "cases": 4,
+                "complete_bytes": 2391,
+                "rules": 1,
+                "working_bytes": 843
+              },
+              "fingerprints": {
+                "TASK.md": {
+                  "sha256": "2279d6e04bd2a865d662ddfb66489ba2d5c18b65fffb3d73935cd302e02cc1e2",
+                  "state": "file"
+                },
+                "policy.json": {
+                  "sha256": "fa58ad697dc2195b0854c0577164e3400ecca9300dc6bf7c25ff4f4000c196ac",
+                  "state": "file"
+                },
+                "report.json": {
+                  "sha256": "cd5f4dd3e24be317071ce439fb1e9fe1c053fa6c004e27d0ba40447f7ee69638",
+                  "state": "file"
+                },
+                "requests.json": {
+                  "sha256": "513fbfebac58790db0e365623dce3567b4d751c8cc9fff11309356c765e37231",
+                  "state": "file"
+                },
+                "work.py": {
+                  "sha256": "ccc447c5831f85bf68f3703e49a524c51f15b57911873eb10b9774edc379933a",
+                  "state": "file"
+                }
+              },
+              "model": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "d593fa0d35106e45592303f9c46368cc1a2ccbf2"
+                    ],
+                    "expected": false,
+                    "id": "fixture_unchanged_file",
+                    "inputs": {
+                      "policy": {
+                        "ignored": [],
+                        "variant": 0
+                      },
+                      "request": {
+                        "current": {
+                          "worker_0.py": {
+                            "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                            "kind": "file"
+                          }
+                        },
+                        "declared": [
+                          "worker_0.py"
+                        ],
+                        "saved": {
+                          "worker_0.py": {
+                            "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                            "kind": "file"
+                          }
+                        }
+                      }
+                    },
+                    "target": "needs_review"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "d593fa0d35106e45592303f9c46368cc1a2ccbf2"
+                    ],
+                    "expected": true,
+                    "id": "challenge_complete_state_timestamp_change",
+                    "inputs": {
+                      "policy": {
+                        "ignored": []
+                      },
+                      "request": {
+                        "current": {
+                          "x": {
+                            "hash": "h",
+                            "kind": "file",
+                            "timestamp": 2
+                          }
+                        },
+                        "declared": [
+                          "x"
+                        ],
+                        "saved": {
+                          "x": {
+                            "hash": "h",
+                            "kind": "file",
+                            "timestamp": 1
+                          }
+                        }
+                      }
+                    },
+                    "target": "needs_review"
+                  },
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "d593fa0d35106e45592303f9c46368cc1a2ccbf2"
+                    ],
+                    "expected": false,
+                    "id": "missing_equals_explicit_missing",
+                    "inputs": {
+                      "policy": {
+                        "ignored": []
+                      },
+                      "request": {
+                        "current": {
+                          "x": {
+                            "kind": "missing"
+                          }
+                        },
+                        "declared": [
+                          "x"
+                        ],
+                        "saved": {}
+                      }
+                    },
+                    "target": "needs_review"
+                  },
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "d593fa0d35106e45592303f9c46368cc1a2ccbf2"
+                    ],
+                    "expected": false,
+                    "id": "ignored_changed_path",
+                    "inputs": {
+                      "policy": {
+                        "ignored": [
+                          "x"
+                        ]
+                      },
+                      "request": {
+                        "current": {
+                          "x": {
+                            "hash": "new",
+                            "kind": "file"
+                          }
+                        },
+                        "declared": [
+                          "x"
+                        ],
+                        "saved": {
+                          "x": {
+                            "hash": "old",
+                            "kind": "file"
+                          }
+                        }
+                      }
+                    },
+                    "target": "needs_review"
+                  }
+                ],
+                "inputs": {
+                  "policy": "object",
+                  "request": "object"
+                },
+                "resolutions": [],
+                "rules": [
+                  {
+                    "claim": "Review is needed exactly when at least one unique declared, non-ignored path has unequal complete saved and current JSON states, with an absent entry represented as {kind:missing}.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "d593fa0d35106e45592303f9c46368cc1a2ccbf2"
+                    ],
+                    "id": "review_on_any_relevant_complete_state_change",
+                    "target": "needs_review",
+                    "then": {
+                      "as": "path",
+                      "items": {
+                        "var": "request.declared"
+                      },
+                      "op": "any",
+                      "test": {
+                        "args": [
+                          {
+                            "args": [
+                              {
+                                "args": [
+                                  {
+                                    "var": "path"
+                                  },
+                                  {
+                                    "var": "policy.ignored"
+                                  }
+                                ],
+                                "op": "in"
+                              }
+                            ],
+                            "op": "not"
+                          },
+                          {
+                            "args": [
+                              {
+                                "args": [
+                                  {
+                                    "var": "request.saved"
+                                  },
+                                  {
+                                    "var": "path"
+                                  },
+                                  {
+                                    "value": {
+                                      "kind": "missing"
+                                    }
+                                  }
+                                ],
+                                "op": "get"
+                              },
+                              {
+                                "args": [
+                                  {
+                                    "var": "request.current"
+                                  },
+                                  {
+                                    "var": "path"
+                                  },
+                                  {
+                                    "value": {
+                                      "kind": "missing"
+                                    }
+                                  }
+                                ],
+                                "op": "get"
+                              }
+                            ],
+                            "op": "ne"
+                          }
+                        ],
+                        "op": "and"
+                      }
+                    },
+                    "when": {
+                      "value": true
+                    }
+                  }
+                ],
+                "schema": 1,
+                "title": "Declared source dependency review",
+                "unresolved": [
+                  "Malformed or non-JSON-compatible input behavior is outside the tested contract."
+                ]
+              },
+              "parent": null,
+              "proposal": "23015e62c161f1147dad3d5a20adb0e81e2ced43",
+              "reason": "Agent proposed a model revision",
+              "revision": 1
+            }
+          }
+        }
+      ]
+    }
+  }
+}

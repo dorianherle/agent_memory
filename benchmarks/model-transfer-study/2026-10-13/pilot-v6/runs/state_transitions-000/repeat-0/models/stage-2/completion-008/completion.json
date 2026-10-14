@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "memory",
+          "arguments": {
+            "action": "save",
+            "text": "Stage 2 finding: policy edges mark retry transitions. evaluate now checks edge.get('retry'), not a request retry marker. Actual boundary checks show missing edge -> blocked; role mismatch -> permission before retry validation; retry edge rejects missing, bool, negative, and attempts == limit; accepts integer attempts 0 and limit-1; a non-retry edge succeeds even if the request contains retry=true. Inputs remained unchanged in all checks, and report.json matches evaluating current requests.json with policy.json.",
+            "payload": {
+              "files": [
+                "work.py",
+                "policy.json",
+                "requests.json",
+                "report.json"
+              ]
+            }
+          }
+        },
+        {
+          "action": "memory",
+          "arguments": {
+            "action": "save",
+            "text": "Unresolved limits: behavior for malformed non-object requests, policies, edge definitions, or non-integer retry_limit is outside the stated contract and current supported tests. evidence.json is absent in this work sample. Truthy non-boolean edge retry markers are not independently specified; implementation follows normal truthiness for edge.get('retry').",
+            "payload": {
+              "files": [
+                "work.py",
+                "policy.json"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 31505,
+    "output_tokens": 772,
+    "cached_input_tokens": 21888,
+    "reasoning_output_tokens": 489
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 19.963878208072856,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

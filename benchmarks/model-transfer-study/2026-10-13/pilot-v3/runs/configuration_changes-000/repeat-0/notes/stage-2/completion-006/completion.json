@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import json; from work import evaluate; p=json.load(open('policy.json')); r=json.load(open('requests.json')); expected=json.load(open('report.json')); actual=[evaluate(x,p) for x in r]; assert actual==expected,(actual,expected); tests=[({'layers':[{'enabled':False,'retries':0,'label':''}]},{'ok':True,'config':{'enabled':False,'retries':0,'label':''},'error':None}),({'layers':[{'bogus':1}]},{'ok':False,'config':{},'error':'unknown_key'}),({'layers':[{'retries':None}]},{'ok':True,'config':{'enabled':True,'retries':3,'label':'job_0'},'error':None}),({'layers':[{'retries':True}]},{'ok':False,'config':{},'error':'type'})]; [(_ for _ in ()).throw(AssertionError((q,e,evaluate(q,p)))) if evaluate(q,p)!=e else None for q,e in tests]; pe=dict(p,environment=True); assert evaluate({'environment':{'enabled':'false','retries':'-2','label':''}},pe)=={'ok':True,'config':{'enabled':False,'retries':-2,'label':''},'error':None}; assert evaluate({'environment':{'enabled':'False'}},pe)['error']=='environment'; assert evaluate({'environment':{'retries':' 2'}},pe)['error']=='environment'; assert evaluate({'environment':{'bogus':'1'}},pe)['error']=='unknown_key'; assert evaluate({'environment':{'enabled':'true'}},p)['error']=='environment'; print('all checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 9676,
+    "output_tokens": 411,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 30
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 11.876696666004136,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

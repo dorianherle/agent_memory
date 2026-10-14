@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy,json\nfrom work import evaluate\n\ndef check(name, request, evidence, policy, expected):\n    before=copy.deepcopy((request,evidence,policy))\n    got=evaluate(request,evidence,policy)\n    assert got==expected,(name,got,expected)\n    assert (request,evidence,policy)==before,(name,'inputs modified')\n\np={'required_conditions':['b','a'],'require_verified':True}\ncheck('missing',{'claim':'c','conditions':{}},[],p,{'status':'unknown','value':None,'sources':[],'unknowns':['a','b']})\nreq={'claim':'c','conditions':{'a':1,'b':2,'extra':9}}\ncheck('filters',req,[{'source':'wrong-claim','claim':'x','value':7,'conditions':{'a':1,'b':2},'verified':True},{'source':'withdrawn','claim':'c','value':7,'conditions':{'a':1,'b':2},'verified':True,'withdrawn':True},{'source':'unverified','claim':'c','value':7,'conditions':{'a':1,'b':2}},{'source':'wrong-condition','claim':'c','value':7,'conditions':{'a':1,'b':3},'verified':True}],p,{'status':'unknown','value':None,'sources':[],'unknowns':['no matching evidence']})\ncheck('supersession',req,[{'source':'old','claim':'c','value':1,'conditions':{'a':1,'b':2},'verified':True},{'source':'new','claim':'c','value':2,'conditions':{'a':1,'b':2},'verified':True,'supersedes':'old'}],p,{'status':'supported','value':2,'sources':['new'],'unknowns':[]})\ncheck('count-not-authority',req,[{'source':'z','claim':'c','value':1,'conditions':{'a':1,'b':2},'verified':True},{'source':'a','claim':'c','value':1,'conditions':{'a':1,'b':2},'verified':True},{'source':'m','claim':'c','value':2,'conditions':{'a':1,'b':2},'verified':True}],p,{'status':'conflict','value':None,'sources':['a','m','z'],'unknowns':['source disagreement']})\ncheck('canonical-object-agreement',req,[{'source':'b','claim':'c','value':{'y':[2,3],'x':1},'conditions':{'a':1,'b':2},'verified':True},{'source':'a','claim':'c','value':{'x':1,'y':[2,3]},'conditions':{'a':1,'b':2},'verified':True}],p,{'status':'supported','value':{'y':[2,3],'x':1},'sources':['a','b'],'unknowns':[]})\ncheck('false',req,[{'source':'s','claim':'c','value':False,'conditions':{'a':1,'b':2},'verified':True}],p,{'status':'unsupported','value':False,'sources':['s'],'unknowns':[]})\ncheck('absent-calibration',req,[{'source':'s','claim':'c','conditions':{'a':1,'b':2},'verified':True}],p,{'status':'supported','value':None,'sources':['s'],'unknowns':[]})\npolicy=json.load(open('policy.json')); evidence=json.load(open('evidence.json')); requests=json.load(open('requests.json')); actual=[evaluate(r,evidence,policy) for r in requests]; stored=json.load(open('report.json')); assert actual==stored,(actual,stored)\nprint(json.dumps({'checks':8,'fixture_results':actual},sort_keys=True))"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 31818,
+    "output_tokens": 1309,
+    "cached_input_tokens": 22016,
+    "reasoning_output_tokens": 399
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 23.874639707850292,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

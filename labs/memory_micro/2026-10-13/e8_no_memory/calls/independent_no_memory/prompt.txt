@@ -1,0 +1,5 @@
+You are a fresh receiver. Use only the supplied memory and each question. Answer usable, unusable, or unknown. Use unknown when the memory does not support a conclusion. New objects in the questions use the same workflow. Do not use tools. Return a JSON object whose keys are question IDs and whose values are those exact labels. Do not include explanations.
+MEMORY:
+
+QUESTIONS:
+[{"id": "T1", "split": "observed", "question": "Tool n17 converts CSV with operator blue. Is the result usable?"}, {"id": "T2", "split": "observed", "question": "Tool m42 converts CSV with operator blue. Is the result usable?"}, {"id": "T3", "split": "observed", "question": "Tool p09 converts XML with operator red. Is the result usable?"}, {"id": "U1", "split": "unseen", "question": "Tool n17 converts CSV with operator green. Is the result usable?"}, {"id": "U2", "split": "unseen", "question": "Tool m42 converts JSON with operator blue. Is the result usable?"}, {"id": "U3", "split": "unseen", "question": "Tool p09 converts JSON with operator red. Is the result usable?"}, {"id": "U4", "split": "unseen", "question": "A new tool z88 converts CSV with operator blue. Is the result usable?"}]

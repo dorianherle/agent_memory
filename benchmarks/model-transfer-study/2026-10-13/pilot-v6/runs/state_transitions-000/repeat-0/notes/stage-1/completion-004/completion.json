@@ -1,0 +1,59 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "work.py"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy, json; from work import evaluate; p={'edges':{'a>b':{},'b>c':{'role':'op'}},'retry_limit':2}; cases=[({'from':'a','to':'b'},{'ok':True,'value':'b','reason':'ok'}),({'from':'x','to':'y'},{'ok':False,'value':None,'reason':'blocked'}),({'from':'b','to':'c','retry':True,'attempts':0},{'ok':False,'value':None,'reason':'permission'}),({'from':'b','to':'c','role':'op','retry':True,'attempts':1},{'ok':True,'value':'c','reason':'ok'}),({'from':'b','to':'c','role':'op','retry':True,'attempts':2},{'ok':False,'value':None,'reason':'retry_limit'}),({'from':'a','to':'b','retry':True,'attempts':True},{'ok':False,'value':None,'reason':'retry_limit'}),({'from':'a','to':'b','retry':True,'attempts':-1},{'ok':False,'value':None,'reason':'retry_limit'})]; before=copy.deepcopy(p); [(_ for _ in ()).throw(AssertionError((r,evaluate(r,p),e))) for r,e in cases if evaluate(r,p)!=e]; assert p==before; print('checks passed')"
+            ]
+          }
+        },
+        {
+          "action": "read",
+          "arguments": {
+            "path": "report.json"
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "diff",
+              "--check"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 20099,
+    "output_tokens": 786,
+    "cached_input_tokens": 9728,
+    "reasoning_output_tokens": 343
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 27.996655042050406,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

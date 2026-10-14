@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy,json; from work import evaluate; p=json.load(open('policy.json')); rs=json.load(open('requests.json')); expected=json.load(open('report.json')); assert [evaluate(r,p) for r in rs]==expected; cases=[({'from':'x','to':'y'},p,{'ok':False,'value':None,'reason':'blocked'}),({'from':'ready','to':'running','role':'wrong','attempts':False},p,{'ok':False,'value':None,'reason':'permission'}),({'from':'failed','to':'ready','attempts':0},p,{'ok':True,'value':'ready','reason':'ok'}),({'from':'failed','to':'ready','attempts':1},p,{'ok':True,'value':'ready','reason':'ok'}),({'from':'failed','to':'ready','attempts':2},p,{'ok':False,'value':None,'reason':'retry_limit'}),({'from':'failed','to':'ready','attempts':True},p,{'ok':False,'value':None,'reason':'retry_limit'}),({'from':'failed','to':'ready','attempts':-1},p,{'ok':False,'value':None,'reason':'retry_limit'})];\nfor r,pol,want in cases:\n rb,pb=copy.deepcopy(r),copy.deepcopy(pol); assert evaluate(r,pol)==want,(r,evaluate(r,pol),want); assert r==rb and pol==pb\nprint('all checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 9621,
+    "output_tokens": 408,
+    "cached_input_tokens": 0,
+    "reasoning_output_tokens": 57
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 15.35590683389455,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

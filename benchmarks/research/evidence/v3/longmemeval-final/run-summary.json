@@ -1,0 +1,57 @@
+{
+  "assessment": "All eligible LongMemEval-S cleaned session retrieval questions",
+  "raw_result_sha256": "746ac873011627039729673a19854af355b0841ad2f9b487a27905519a311dc0",
+  "questions": 470,
+  "excluded_abstentions": 30,
+  "all_evidence_at_5": {
+    "memory": 390,
+    "notebook": 390
+  },
+  "all_evidence_at_10": {
+    "memory": 424,
+    "notebook": 424
+  },
+  "exact_rank_disagreements": 0,
+  "by_question_type": {
+    "knowledge-update": {
+      "questions": 72,
+      "memory_all_evidence_at_10": 71,
+      "notebook_all_evidence_at_10": 71
+    },
+    "multi-session": {
+      "questions": 121,
+      "memory_all_evidence_at_10": 98,
+      "notebook_all_evidence_at_10": 98
+    },
+    "single-session-assistant": {
+      "questions": 56,
+      "memory_all_evidence_at_10": 56,
+      "notebook_all_evidence_at_10": 56
+    },
+    "single-session-preference": {
+      "questions": 30,
+      "memory_all_evidence_at_10": 29,
+      "notebook_all_evidence_at_10": 29
+    },
+    "single-session-user": {
+      "questions": 64,
+      "memory_all_evidence_at_10": 64,
+      "notebook_all_evidence_at_10": 64
+    },
+    "temporal-reasoning": {
+      "questions": 127,
+      "memory_all_evidence_at_10": 106,
+      "notebook_all_evidence_at_10": 106
+    }
+  },
+  "source_version": "Final v6; frozen before replay",
+  "input_integrity_passed_before_all_queries": true,
+  "histories_restored_from_input_in_final_replay": 1,
+  "no_model_calls": true,
+  "answer_quality_tested": false,
+  "native_tokens_or_cost_tested": false,
+  "decoded_note_text_integrity_verified": true,
+  "sessions_verified": 22419,
+  "ingestion_time_measured": false,
+  "timing_limit": "One query per case on one macOS host with concurrent copy and catalog rebuild. Not a production latency distribution."
+}

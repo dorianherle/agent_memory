@@ -94,6 +94,8 @@ class StudioTests(MemoryTestCase):
         self.assertIn("+ Goal", html)
         self.assertIn("Next agent", html)
         self.assertIn("Steer this goal", html)
+        self.assertIn('id="file-body"', html)
+        self.assertIn("Files", html)
         self.assertNotIn('id="token-saved"', html)
         self.assertNotIn('id="show-all"', html)
         self.assertNotIn('id="prompt-dialog"', html)
@@ -466,3 +468,22 @@ class StudioTests(MemoryTestCase):
         self.assertEqual(status, 200)
         self.assertTrue(data["ok"])
         self.assertIn("login", data["hint"].lower())
+
+    def test_workspace_files_round_trip_and_stay_inside(self) -> None:
+        from pathlib import Path
+        from agent_memory.goals import create_goal, resolve_goal
+
+        self._json("POST", "/api/open", {"project": str(self.path)})
+        record = create_goal(self.path, "tiny file edit")
+        work = Path(resolve_goal(self.path, record["id"])["workspace"])
+        (work / "hello.py").write_text("x = 1\n")
+        status, data = self._json("GET", f"/api/files?goal={record['id']}")
+        self.assertEqual(status, 200)
+        self.assertTrue(any(row["path"] == "hello.py" for row in data["files"]))
+        status, data = self._json("GET", f"/api/file?goal={record['id']}&path=hello.py")
+        self.assertEqual(data["text"], "x = 1\n")
+        status, data = self._json("POST", "/api/file", {"goal": record["id"], "path": "hello.py", "text": "x = 2\n"})
+        self.assertEqual(status, 200)
+        self.assertEqual((work / "hello.py").read_text(), "x = 2\n")
+        status, data = self._json("GET", f"/api/file?goal={record['id']}&path=../secrets.txt")
+        self.assertEqual(status, 400)

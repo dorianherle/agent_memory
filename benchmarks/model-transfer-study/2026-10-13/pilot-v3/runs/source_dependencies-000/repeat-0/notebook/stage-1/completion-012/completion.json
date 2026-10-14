@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import json, copy, pathlib; from work import evaluate; requests=json.load(open('requests.json')); policy=json.load(open('policy.json')); expected=[evaluate(r, policy) for r in requests]; actual=json.load(open('report.json')); assert actual == expected, (actual, expected); r={'declared':['z','a','a','ignored'],'saved':{'a':{'kind':'file','hash':'old'},'z':{'kind':'missing'},'ignored':{'v':1}},'current':{'a':{'kind':'file','hash':'new'},'ignored':{'v':2}}}; p={'ignored':['ignored']}; rb=copy.deepcopy(r); pb=copy.deepcopy(p); assert evaluate(r,p)=={'needs_review':True,'changed':['a']}; assert r==rb and p==pb; print('all checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 20759,
+    "output_tokens": 429,
+    "cached_input_tokens": 18304,
+    "reasoning_output_tokens": 199
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 13.889156917110085,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

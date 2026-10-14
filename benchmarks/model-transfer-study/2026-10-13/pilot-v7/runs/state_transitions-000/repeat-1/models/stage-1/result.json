@@ -1,0 +1,2461 @@
+{
+  "stop": "finished",
+  "tool_calls": 18,
+  "elapsed_seconds": 280.83461379189976,
+  "usage_complete": true,
+  "tokens": 180297,
+  "known_tokens": 180297,
+  "input_tokens": 170262,
+  "output_tokens": 10035,
+  "cached_input_tokens": 126336,
+  "reasoning_output_tokens": 5608,
+  "model_probes": {
+    "status": "unprobed",
+    "reason": "Model uses other inputs or targets; no feature extractor was validated"
+  },
+  "stage": 1,
+  "grade": {
+    "full_pass": false,
+    "passed": 47,
+    "total": 49,
+    "checks": [
+      {
+        "check": "case_0",
+        "passed": true
+      },
+      {
+        "check": "case_1",
+        "passed": true
+      },
+      {
+        "check": "case_2",
+        "passed": true
+      },
+      {
+        "check": "case_3",
+        "passed": false
+      },
+      {
+        "check": "case_4",
+        "passed": false
+      },
+      {
+        "check": "case_5",
+        "passed": true
+      },
+      {
+        "check": "case_6",
+        "passed": true
+      },
+      {
+        "check": "case_7",
+        "passed": true
+      },
+      {
+        "check": "case_8",
+        "passed": true
+      },
+      {
+        "check": "case_9",
+        "passed": true
+      },
+      {
+        "check": "case_10",
+        "passed": true
+      },
+      {
+        "check": "case_11",
+        "passed": true
+      },
+      {
+        "check": "case_12",
+        "passed": true
+      },
+      {
+        "check": "case_13",
+        "passed": true
+      },
+      {
+        "check": "case_14",
+        "passed": true
+      },
+      {
+        "check": "case_15",
+        "passed": true
+      },
+      {
+        "check": "case_16",
+        "passed": true
+      },
+      {
+        "check": "case_17",
+        "passed": true
+      },
+      {
+        "check": "case_18",
+        "passed": true
+      },
+      {
+        "check": "case_19",
+        "passed": true
+      },
+      {
+        "check": "case_20",
+        "passed": true
+      },
+      {
+        "check": "case_21",
+        "passed": true
+      },
+      {
+        "check": "case_22",
+        "passed": true
+      },
+      {
+        "check": "case_23",
+        "passed": true
+      },
+      {
+        "check": "case_24",
+        "passed": true
+      },
+      {
+        "check": "case_25",
+        "passed": true
+      },
+      {
+        "check": "case_26",
+        "passed": true
+      },
+      {
+        "check": "case_27",
+        "passed": true
+      },
+      {
+        "check": "case_28",
+        "passed": true
+      },
+      {
+        "check": "case_29",
+        "passed": true
+      },
+      {
+        "check": "case_30",
+        "passed": true
+      },
+      {
+        "check": "case_31",
+        "passed": true
+      },
+      {
+        "check": "case_32",
+        "passed": true
+      },
+      {
+        "check": "case_33",
+        "passed": true
+      },
+      {
+        "check": "case_34",
+        "passed": true
+      },
+      {
+        "check": "case_35",
+        "passed": true
+      },
+      {
+        "check": "case_36",
+        "passed": true
+      },
+      {
+        "check": "case_37",
+        "passed": true
+      },
+      {
+        "check": "case_38",
+        "passed": true
+      },
+      {
+        "check": "case_39",
+        "passed": true
+      },
+      {
+        "check": "case_40",
+        "passed": true
+      },
+      {
+        "check": "case_41",
+        "passed": true
+      },
+      {
+        "check": "case_42",
+        "passed": true
+      },
+      {
+        "check": "case_43",
+        "passed": true
+      },
+      {
+        "check": "case_44",
+        "passed": true
+      },
+      {
+        "check": "case_45",
+        "passed": true
+      },
+      {
+        "check": "case_46",
+        "passed": true
+      },
+      {
+        "check": "all_cases_returned",
+        "passed": true
+      },
+      {
+        "check": "current_source_report",
+        "passed": true
+      }
+    ],
+    "unsupported_conclusions": 0,
+    "missed_source_changes": 0
+  },
+  "memory": {
+    "ok": true,
+    "result": {
+      "notes": 4,
+      "model": {
+        "id": "50cbfa4cbb032909246a996eb867149e61bb79f1",
+        "event": "accepted",
+        "checks": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": true,
+              "expected": {
+                "ok": false,
+                "reason": "blocked",
+                "value": null
+              },
+              "id": "challenge_missing_edge",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "blocked_missing_probe"
+                ],
+                "status": "predicted",
+                "value": {
+                  "ok": false,
+                  "reason": "blocked",
+                  "value": null
+                }
+              }
+            },
+            {
+              "challenge": true,
+              "expected": {
+                "ok": false,
+                "reason": "permission",
+                "value": null
+              },
+              "id": "challenge_role_precedence",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "permission_precedes_retry_probe"
+                ],
+                "status": "predicted",
+                "value": {
+                  "ok": false,
+                  "reason": "permission",
+                  "value": null
+                }
+              }
+            },
+            {
+              "challenge": true,
+              "expected": {
+                "ok": false,
+                "reason": "retry_limit",
+                "value": null
+              },
+              "id": "challenge_bool_attempts",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "boolean_attempt_rejected_probe"
+                ],
+                "status": "predicted",
+                "value": {
+                  "ok": false,
+                  "reason": "retry_limit",
+                  "value": null
+                }
+              }
+            },
+            {
+              "challenge": true,
+              "expected": {
+                "ok": true,
+                "reason": "ok",
+                "value": "t"
+              },
+              "id": "challenge_upper_valid_attempt",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "upper_in_range_attempt_probe"
+                ],
+                "status": "predicted",
+                "value": {
+                  "ok": true,
+                  "reason": "ok",
+                  "value": "t"
+                }
+              }
+            }
+          ],
+          "changed_dependencies": [],
+          "complexity": {
+            "cases": 4,
+            "complete_bytes": 4690,
+            "rules": 4,
+            "working_bytes": 3225
+          },
+          "id": "7b2b91ac3058184853503b0297b25db9242f68ac",
+          "issues": [],
+          "missing_evidence": [],
+          "status": "tested",
+          "uncovered_rules": [],
+          "unresolved": [
+            "The executable model records verified boundary probes; behavior for malformed non-mapping inputs is outside the contract and untested."
+          ]
+        },
+        "complexity": {
+          "cases": 4,
+          "complete_bytes": 4690,
+          "rules": 4,
+          "working_bytes": 3225
+        },
+        "fingerprints": {
+          "OUTPUT_SCHEMA.json": {
+            "sha256": "cbdc36d2b4017786c42db68f60db0c6bab5051b497944c453f6db026aa00f89d",
+            "state": "file"
+          },
+          "TASK.md": {
+            "sha256": "a62d9100d07c46684d30641b430a96224a75adb528604f86a48968475941d60c",
+            "state": "file"
+          },
+          "policy.json": {
+            "sha256": "afb4bb721f21a3e6eb9ce1fedd28cb685016662b49d7918d95e38dd8d82cb922",
+            "state": "file"
+          },
+          "report.json": {
+            "sha256": "408a25e7fe43ed6375ab655147ef46dab8fa338cfe48648bef58f6c00d98c03a",
+            "state": "file"
+          },
+          "requests.json": {
+            "sha256": "d5b882035d3077c52a11db089dae1e277bbb0d88d63f8be3ed532731436a4f8d",
+            "state": "file"
+          },
+          "work.py": {
+            "sha256": "340c50f5a2f1742ec06d620d94a32a17bfd70d91ebb06d19ea5b864217354367",
+            "state": "file"
+          }
+        },
+        "model": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": true,
+              "evidence": [
+                "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+              ],
+              "expected": {
+                "ok": false,
+                "reason": "blocked",
+                "value": null
+              },
+              "id": "challenge_missing_edge",
+              "inputs": {
+                "evidence": [],
+                "policy": {
+                  "edges": {
+                    "s>t": {}
+                  },
+                  "retry_limit": 2
+                },
+                "request": {
+                  "from": "s",
+                  "to": "u"
+                }
+              },
+              "target": "result"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+              ],
+              "expected": {
+                "ok": false,
+                "reason": "permission",
+                "value": null
+              },
+              "id": "challenge_role_precedence",
+              "inputs": {
+                "evidence": [],
+                "policy": {
+                  "edges": {
+                    "s>t": {
+                      "role": "admin"
+                    }
+                  },
+                  "retry_limit": 2
+                },
+                "request": {
+                  "attempts": 99,
+                  "from": "s",
+                  "role": "wrong",
+                  "to": "t"
+                }
+              },
+              "target": "result"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+              ],
+              "expected": {
+                "ok": false,
+                "reason": "retry_limit",
+                "value": null
+              },
+              "id": "challenge_bool_attempts",
+              "inputs": {
+                "evidence": [],
+                "policy": {
+                  "edges": {
+                    "s>t": {}
+                  },
+                  "retry_limit": 2
+                },
+                "request": {
+                  "attempts": true,
+                  "from": "s",
+                  "to": "t"
+                }
+              },
+              "target": "result"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+              ],
+              "expected": {
+                "ok": true,
+                "reason": "ok",
+                "value": "t"
+              },
+              "id": "challenge_upper_valid_attempt",
+              "inputs": {
+                "evidence": [],
+                "policy": {
+                  "edges": {
+                    "s>t": {}
+                  },
+                  "retry_limit": 2
+                },
+                "request": {
+                  "attempts": 1,
+                  "from": "s",
+                  "to": "t"
+                }
+              },
+              "target": "result"
+            }
+          ],
+          "inputs": {
+            "evidence": "array",
+            "policy": "object",
+            "request": "object"
+          },
+          "resolutions": [],
+          "rules": [
+            {
+              "claim": "For the verified s-to-u request, the absent edge is blocked.",
+              "dependencies": [
+                "work.py",
+                "TASK.md"
+              ],
+              "evidence": [
+                "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+              ],
+              "id": "blocked_missing_probe",
+              "target": "result",
+              "then": {
+                "value": {
+                  "ok": false,
+                  "reason": "blocked",
+                  "value": null
+                }
+              },
+              "when": {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "var": "request"
+                          },
+                          {
+                            "value": "from"
+                          },
+                          {
+                            "value": null
+                          }
+                        ],
+                        "op": "get"
+                      },
+                      {
+                        "value": "s"
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "var": "request"
+                          },
+                          {
+                            "value": "to"
+                          },
+                          {
+                            "value": null
+                          }
+                        ],
+                        "op": "get"
+                      },
+                      {
+                        "value": "u"
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "args": [
+                              {
+                                "var": "policy"
+                              },
+                              {
+                                "value": "edges"
+                              },
+                              {
+                                "value": {}
+                              }
+                            ],
+                            "op": "get"
+                          },
+                          {
+                            "value": "s>u"
+                          },
+                          {
+                            "value": null
+                          }
+                        ],
+                        "op": "get"
+                      },
+                      {
+                        "value": null
+                      }
+                    ],
+                    "op": "eq"
+                  }
+                ],
+                "op": "and"
+              }
+            },
+            {
+              "claim": "For the verified protected s-to-t edge, a wrong role returns permission before the invalid retry count is considered.",
+              "dependencies": [
+                "work.py",
+                "TASK.md"
+              ],
+              "evidence": [
+                "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+              ],
+              "id": "permission_precedes_retry_probe",
+              "target": "result",
+              "then": {
+                "value": {
+                  "ok": false,
+                  "reason": "permission",
+                  "value": null
+                }
+              },
+              "when": {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "var": "request"
+                          },
+                          {
+                            "value": "from"
+                          },
+                          {
+                            "value": null
+                          }
+                        ],
+                        "op": "get"
+                      },
+                      {
+                        "value": "s"
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "var": "request"
+                          },
+                          {
+                            "value": "to"
+                          },
+                          {
+                            "value": null
+                          }
+                        ],
+                        "op": "get"
+                      },
+                      {
+                        "value": "t"
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "var": "request"
+                          },
+                          {
+                            "value": "role"
+                          },
+                          {
+                            "value": null
+                          }
+                        ],
+                        "op": "get"
+                      },
+                      {
+                        "value": "wrong"
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "args": [
+                              {
+                                "args": [
+                                  {
+                                    "var": "policy"
+                                  },
+                                  {
+                                    "value": "edges"
+                                  },
+                                  {
+                                    "value": {}
+                                  }
+                                ],
+                                "op": "get"
+                              },
+                              {
+                                "value": "s>t"
+                              },
+                              {
+                                "value": {}
+                              }
+                            ],
+                            "op": "get"
+                          },
+                          {
+                            "value": "role"
+                          },
+                          {
+                            "value": null
+                          }
+                        ],
+                        "op": "get"
+                      },
+                      {
+                        "value": "admin"
+                      }
+                    ],
+                    "op": "eq"
+                  }
+                ],
+                "op": "and"
+              }
+            },
+            {
+              "claim": "For the verified unprotected s-to-t edge, boolean attempts is rejected as retry_limit.",
+              "dependencies": [
+                "work.py",
+                "TASK.md"
+              ],
+              "evidence": [
+                "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+              ],
+              "id": "boolean_attempt_rejected_probe",
+              "target": "result",
+              "then": {
+                "value": {
+                  "ok": false,
+                  "reason": "retry_limit",
+                  "value": null
+                }
+              },
+              "when": {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "var": "request"
+                          },
+                          {
+                            "value": "from"
+                          },
+                          {
+                            "value": null
+                          }
+                        ],
+                        "op": "get"
+                      },
+                      {
+                        "value": "s"
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "var": "request"
+                          },
+                          {
+                            "value": "to"
+                          },
+                          {
+                            "value": null
+                          }
+                        ],
+                        "op": "get"
+                      },
+                      {
+                        "value": "t"
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "var": "request"
+                          },
+                          {
+                            "value": "attempts"
+                          },
+                          {
+                            "value": null
+                          }
+                        ],
+                        "op": "get"
+                      },
+                      {
+                        "value": true
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "var": "policy"
+                          },
+                          {
+                            "value": "retry_limit"
+                          },
+                          {
+                            "value": null
+                          }
+                        ],
+                        "op": "get"
+                      },
+                      {
+                        "value": 2
+                      }
+                    ],
+                    "op": "eq"
+                  }
+                ],
+                "op": "and"
+              }
+            },
+            {
+              "claim": "For the verified unprotected s-to-t edge with retry_limit 2, integer attempts 1 succeeds.",
+              "dependencies": [
+                "work.py",
+                "TASK.md"
+              ],
+              "evidence": [
+                "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+              ],
+              "id": "upper_in_range_attempt_probe",
+              "target": "result",
+              "then": {
+                "value": {
+                  "ok": true,
+                  "reason": "ok",
+                  "value": "t"
+                }
+              },
+              "when": {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "var": "request"
+                          },
+                          {
+                            "value": "from"
+                          },
+                          {
+                            "value": null
+                          }
+                        ],
+                        "op": "get"
+                      },
+                      {
+                        "value": "s"
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "var": "request"
+                          },
+                          {
+                            "value": "to"
+                          },
+                          {
+                            "value": null
+                          }
+                        ],
+                        "op": "get"
+                      },
+                      {
+                        "value": "t"
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "var": "request"
+                          },
+                          {
+                            "value": "attempts"
+                          },
+                          {
+                            "value": null
+                          }
+                        ],
+                        "op": "get"
+                      },
+                      {
+                        "value": 1
+                      }
+                    ],
+                    "op": "eq"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "var": "policy"
+                          },
+                          {
+                            "value": "retry_limit"
+                          },
+                          {
+                            "value": null
+                          }
+                        ],
+                        "op": "get"
+                      },
+                      {
+                        "value": 2
+                      }
+                    ],
+                    "op": "eq"
+                  }
+                ],
+                "op": "and"
+              }
+            }
+          ],
+          "schema": 1,
+          "title": "State transition evaluator verified boundary behavior",
+          "unresolved": [
+            "The executable model records verified boundary probes; behavior for malformed non-mapping inputs is outside the contract and untested."
+          ]
+        },
+        "parent": null,
+        "proposal": "7b2b91ac3058184853503b0297b25db9242f68ac",
+        "reason": "Agent proposed a model revision",
+        "revision": 1
+      },
+      "checks": {
+        "id": "50cbfa4cbb032909246a996eb867149e61bb79f1",
+        "status": "tested",
+        "issues": [],
+        "cases": [
+          {
+            "id": "challenge_missing_edge",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": {
+                "ok": false,
+                "reason": "blocked",
+                "value": null
+              },
+              "rules": [
+                "blocked_missing_probe"
+              ]
+            },
+            "expected": {
+              "ok": false,
+              "reason": "blocked",
+              "value": null
+            },
+            "challenge": true
+          },
+          {
+            "id": "challenge_role_precedence",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": {
+                "ok": false,
+                "reason": "permission",
+                "value": null
+              },
+              "rules": [
+                "permission_precedes_retry_probe"
+              ]
+            },
+            "expected": {
+              "ok": false,
+              "reason": "permission",
+              "value": null
+            },
+            "challenge": true
+          },
+          {
+            "id": "challenge_bool_attempts",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": {
+                "ok": false,
+                "reason": "retry_limit",
+                "value": null
+              },
+              "rules": [
+                "boolean_attempt_rejected_probe"
+              ]
+            },
+            "expected": {
+              "ok": false,
+              "reason": "retry_limit",
+              "value": null
+            },
+            "challenge": true
+          },
+          {
+            "id": "challenge_upper_valid_attempt",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": {
+                "ok": true,
+                "reason": "ok",
+                "value": "t"
+              },
+              "rules": [
+                "upper_in_range_attempt_probe"
+              ]
+            },
+            "expected": {
+              "ok": true,
+              "reason": "ok",
+              "value": "t"
+            },
+            "challenge": true
+          }
+        ],
+        "uncovered_rules": [],
+        "missing_evidence": [],
+        "changed_dependencies": [],
+        "alternatives": [],
+        "complexity": {
+          "cases": 4,
+          "complete_bytes": 4690,
+          "rules": 4,
+          "working_bytes": 3225
+        },
+        "unresolved": [
+          "The executable model records verified boundary probes; behavior for malformed non-mapping inputs is outside the contract and untested."
+        ]
+      },
+      "evidence": [
+        {
+          "id": "e23e6fe2f1700ddf182ed483441d478227f8ac11",
+          "text": "Verified work.py against 9 local cases: allowed and missing edges; role denial before retry validation; bool, float, negative, and limit attempts rejected; attempts 0 and limit-1 accepted. Inputs remained unchanged. report.json exactly matches evaluate(request, current policy) for requests.json and every output has exactly ok/value/reason.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "report.json",
+              "policy.json",
+              "requests.json",
+              "OUTPUT_SCHEMA.json"
+            ]
+          }
+        },
+        {
+          "id": "68589723ee417fe3f12a40707706ea0d8f40e7f0",
+          "text": "Implementation scope/limits: evaluate assumes mapping-like request/policy and edge values, as required by the supplied API contract. No behavior is claimed for malformed non-mapping inputs. Retry validation applies only when the request contains attempts; role checks take precedence. No evidence.json is present in this sample.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "TASK.md",
+              "policy.json",
+              "requests.json"
+            ]
+          }
+        },
+        {
+          "id": "7b2b91ac3058184853503b0297b25db9242f68ac",
+          "text": "Task model proposed: State transition evaluator verified boundary behavior",
+          "payload": {
+            "agent": "agent",
+            "model_event": "proposed",
+            "task_model": {
+              "complexity": {
+                "cases": 4,
+                "complete_bytes": 4690,
+                "rules": 4,
+                "working_bytes": 3225
+              },
+              "fingerprints": {
+                "OUTPUT_SCHEMA.json": {
+                  "sha256": "cbdc36d2b4017786c42db68f60db0c6bab5051b497944c453f6db026aa00f89d",
+                  "state": "file"
+                },
+                "TASK.md": {
+                  "sha256": "a62d9100d07c46684d30641b430a96224a75adb528604f86a48968475941d60c",
+                  "state": "file"
+                },
+                "policy.json": {
+                  "sha256": "afb4bb721f21a3e6eb9ce1fedd28cb685016662b49d7918d95e38dd8d82cb922",
+                  "state": "file"
+                },
+                "report.json": {
+                  "sha256": "408a25e7fe43ed6375ab655147ef46dab8fa338cfe48648bef58f6c00d98c03a",
+                  "state": "file"
+                },
+                "requests.json": {
+                  "sha256": "d5b882035d3077c52a11db089dae1e277bbb0d88d63f8be3ed532731436a4f8d",
+                  "state": "file"
+                },
+                "work.py": {
+                  "sha256": "340c50f5a2f1742ec06d620d94a32a17bfd70d91ebb06d19ea5b864217354367",
+                  "state": "file"
+                }
+              },
+              "model": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+                    ],
+                    "expected": {
+                      "ok": false,
+                      "reason": "blocked",
+                      "value": null
+                    },
+                    "id": "challenge_missing_edge",
+                    "inputs": {
+                      "evidence": [],
+                      "policy": {
+                        "edges": {
+                          "s>t": {}
+                        },
+                        "retry_limit": 2
+                      },
+                      "request": {
+                        "from": "s",
+                        "to": "u"
+                      }
+                    },
+                    "target": "result"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+                    ],
+                    "expected": {
+                      "ok": false,
+                      "reason": "permission",
+                      "value": null
+                    },
+                    "id": "challenge_role_precedence",
+                    "inputs": {
+                      "evidence": [],
+                      "policy": {
+                        "edges": {
+                          "s>t": {
+                            "role": "admin"
+                          }
+                        },
+                        "retry_limit": 2
+                      },
+                      "request": {
+                        "attempts": 99,
+                        "from": "s",
+                        "role": "wrong",
+                        "to": "t"
+                      }
+                    },
+                    "target": "result"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+                    ],
+                    "expected": {
+                      "ok": false,
+                      "reason": "retry_limit",
+                      "value": null
+                    },
+                    "id": "challenge_bool_attempts",
+                    "inputs": {
+                      "evidence": [],
+                      "policy": {
+                        "edges": {
+                          "s>t": {}
+                        },
+                        "retry_limit": 2
+                      },
+                      "request": {
+                        "attempts": true,
+                        "from": "s",
+                        "to": "t"
+                      }
+                    },
+                    "target": "result"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+                    ],
+                    "expected": {
+                      "ok": true,
+                      "reason": "ok",
+                      "value": "t"
+                    },
+                    "id": "challenge_upper_valid_attempt",
+                    "inputs": {
+                      "evidence": [],
+                      "policy": {
+                        "edges": {
+                          "s>t": {}
+                        },
+                        "retry_limit": 2
+                      },
+                      "request": {
+                        "attempts": 1,
+                        "from": "s",
+                        "to": "t"
+                      }
+                    },
+                    "target": "result"
+                  }
+                ],
+                "inputs": {
+                  "evidence": "array",
+                  "policy": "object",
+                  "request": "object"
+                },
+                "resolutions": [],
+                "rules": [
+                  {
+                    "claim": "For the verified s-to-u request, the absent edge is blocked.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+                    ],
+                    "id": "blocked_missing_probe",
+                    "target": "result",
+                    "then": {
+                      "value": {
+                        "ok": false,
+                        "reason": "blocked",
+                        "value": null
+                      }
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "from"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": "s"
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "to"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": "u"
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "args": [
+                                    {
+                                      "var": "policy"
+                                    },
+                                    {
+                                      "value": "edges"
+                                    },
+                                    {
+                                      "value": {}
+                                    }
+                                  ],
+                                  "op": "get"
+                                },
+                                {
+                                  "value": "s>u"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": null
+                            }
+                          ],
+                          "op": "eq"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "For the verified protected s-to-t edge, a wrong role returns permission before the invalid retry count is considered.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+                    ],
+                    "id": "permission_precedes_retry_probe",
+                    "target": "result",
+                    "then": {
+                      "value": {
+                        "ok": false,
+                        "reason": "permission",
+                        "value": null
+                      }
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "from"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": "s"
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "to"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": "t"
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "role"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": "wrong"
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "args": [
+                                    {
+                                      "args": [
+                                        {
+                                          "var": "policy"
+                                        },
+                                        {
+                                          "value": "edges"
+                                        },
+                                        {
+                                          "value": {}
+                                        }
+                                      ],
+                                      "op": "get"
+                                    },
+                                    {
+                                      "value": "s>t"
+                                    },
+                                    {
+                                      "value": {}
+                                    }
+                                  ],
+                                  "op": "get"
+                                },
+                                {
+                                  "value": "role"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": "admin"
+                            }
+                          ],
+                          "op": "eq"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "For the verified unprotected s-to-t edge, boolean attempts is rejected as retry_limit.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+                    ],
+                    "id": "boolean_attempt_rejected_probe",
+                    "target": "result",
+                    "then": {
+                      "value": {
+                        "ok": false,
+                        "reason": "retry_limit",
+                        "value": null
+                      }
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "from"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": "s"
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "to"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": "t"
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "attempts"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": true
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "policy"
+                                },
+                                {
+                                  "value": "retry_limit"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": 2
+                            }
+                          ],
+                          "op": "eq"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "For the verified unprotected s-to-t edge with retry_limit 2, integer attempts 1 succeeds.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+                    ],
+                    "id": "upper_in_range_attempt_probe",
+                    "target": "result",
+                    "then": {
+                      "value": {
+                        "ok": true,
+                        "reason": "ok",
+                        "value": "t"
+                      }
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "from"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": "s"
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "to"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": "t"
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "attempts"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": 1
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "policy"
+                                },
+                                {
+                                  "value": "retry_limit"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": 2
+                            }
+                          ],
+                          "op": "eq"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  }
+                ],
+                "schema": 1,
+                "title": "State transition evaluator verified boundary behavior",
+                "unresolved": [
+                  "The executable model records verified boundary probes; behavior for malformed non-mapping inputs is outside the contract and untested."
+                ]
+              },
+              "parent": null,
+              "reason": "Agent proposed a model revision",
+              "revision": 1
+            }
+          }
+        },
+        {
+          "id": "50cbfa4cbb032909246a996eb867149e61bb79f1",
+          "text": "Task model active: State transition evaluator verified boundary behavior",
+          "payload": {
+            "agent": "agent",
+            "model_event": "accepted",
+            "task_model": {
+              "checks": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": true,
+                    "expected": {
+                      "ok": false,
+                      "reason": "blocked",
+                      "value": null
+                    },
+                    "id": "challenge_missing_edge",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "blocked_missing_probe"
+                      ],
+                      "status": "predicted",
+                      "value": {
+                        "ok": false,
+                        "reason": "blocked",
+                        "value": null
+                      }
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": {
+                      "ok": false,
+                      "reason": "permission",
+                      "value": null
+                    },
+                    "id": "challenge_role_precedence",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "permission_precedes_retry_probe"
+                      ],
+                      "status": "predicted",
+                      "value": {
+                        "ok": false,
+                        "reason": "permission",
+                        "value": null
+                      }
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": {
+                      "ok": false,
+                      "reason": "retry_limit",
+                      "value": null
+                    },
+                    "id": "challenge_bool_attempts",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "boolean_attempt_rejected_probe"
+                      ],
+                      "status": "predicted",
+                      "value": {
+                        "ok": false,
+                        "reason": "retry_limit",
+                        "value": null
+                      }
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": {
+                      "ok": true,
+                      "reason": "ok",
+                      "value": "t"
+                    },
+                    "id": "challenge_upper_valid_attempt",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "upper_in_range_attempt_probe"
+                      ],
+                      "status": "predicted",
+                      "value": {
+                        "ok": true,
+                        "reason": "ok",
+                        "value": "t"
+                      }
+                    }
+                  }
+                ],
+                "changed_dependencies": [],
+                "complexity": {
+                  "cases": 4,
+                  "complete_bytes": 4690,
+                  "rules": 4,
+                  "working_bytes": 3225
+                },
+                "id": "7b2b91ac3058184853503b0297b25db9242f68ac",
+                "issues": [],
+                "missing_evidence": [],
+                "status": "tested",
+                "uncovered_rules": [],
+                "unresolved": [
+                  "The executable model records verified boundary probes; behavior for malformed non-mapping inputs is outside the contract and untested."
+                ]
+              },
+              "complexity": {
+                "cases": 4,
+                "complete_bytes": 4690,
+                "rules": 4,
+                "working_bytes": 3225
+              },
+              "fingerprints": {
+                "OUTPUT_SCHEMA.json": {
+                  "sha256": "cbdc36d2b4017786c42db68f60db0c6bab5051b497944c453f6db026aa00f89d",
+                  "state": "file"
+                },
+                "TASK.md": {
+                  "sha256": "a62d9100d07c46684d30641b430a96224a75adb528604f86a48968475941d60c",
+                  "state": "file"
+                },
+                "policy.json": {
+                  "sha256": "afb4bb721f21a3e6eb9ce1fedd28cb685016662b49d7918d95e38dd8d82cb922",
+                  "state": "file"
+                },
+                "report.json": {
+                  "sha256": "408a25e7fe43ed6375ab655147ef46dab8fa338cfe48648bef58f6c00d98c03a",
+                  "state": "file"
+                },
+                "requests.json": {
+                  "sha256": "d5b882035d3077c52a11db089dae1e277bbb0d88d63f8be3ed532731436a4f8d",
+                  "state": "file"
+                },
+                "work.py": {
+                  "sha256": "340c50f5a2f1742ec06d620d94a32a17bfd70d91ebb06d19ea5b864217354367",
+                  "state": "file"
+                }
+              },
+              "model": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+                    ],
+                    "expected": {
+                      "ok": false,
+                      "reason": "blocked",
+                      "value": null
+                    },
+                    "id": "challenge_missing_edge",
+                    "inputs": {
+                      "evidence": [],
+                      "policy": {
+                        "edges": {
+                          "s>t": {}
+                        },
+                        "retry_limit": 2
+                      },
+                      "request": {
+                        "from": "s",
+                        "to": "u"
+                      }
+                    },
+                    "target": "result"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+                    ],
+                    "expected": {
+                      "ok": false,
+                      "reason": "permission",
+                      "value": null
+                    },
+                    "id": "challenge_role_precedence",
+                    "inputs": {
+                      "evidence": [],
+                      "policy": {
+                        "edges": {
+                          "s>t": {
+                            "role": "admin"
+                          }
+                        },
+                        "retry_limit": 2
+                      },
+                      "request": {
+                        "attempts": 99,
+                        "from": "s",
+                        "role": "wrong",
+                        "to": "t"
+                      }
+                    },
+                    "target": "result"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+                    ],
+                    "expected": {
+                      "ok": false,
+                      "reason": "retry_limit",
+                      "value": null
+                    },
+                    "id": "challenge_bool_attempts",
+                    "inputs": {
+                      "evidence": [],
+                      "policy": {
+                        "edges": {
+                          "s>t": {}
+                        },
+                        "retry_limit": 2
+                      },
+                      "request": {
+                        "attempts": true,
+                        "from": "s",
+                        "to": "t"
+                      }
+                    },
+                    "target": "result"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+                    ],
+                    "expected": {
+                      "ok": true,
+                      "reason": "ok",
+                      "value": "t"
+                    },
+                    "id": "challenge_upper_valid_attempt",
+                    "inputs": {
+                      "evidence": [],
+                      "policy": {
+                        "edges": {
+                          "s>t": {}
+                        },
+                        "retry_limit": 2
+                      },
+                      "request": {
+                        "attempts": 1,
+                        "from": "s",
+                        "to": "t"
+                      }
+                    },
+                    "target": "result"
+                  }
+                ],
+                "inputs": {
+                  "evidence": "array",
+                  "policy": "object",
+                  "request": "object"
+                },
+                "resolutions": [],
+                "rules": [
+                  {
+                    "claim": "For the verified s-to-u request, the absent edge is blocked.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+                    ],
+                    "id": "blocked_missing_probe",
+                    "target": "result",
+                    "then": {
+                      "value": {
+                        "ok": false,
+                        "reason": "blocked",
+                        "value": null
+                      }
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "from"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": "s"
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "to"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": "u"
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "args": [
+                                    {
+                                      "var": "policy"
+                                    },
+                                    {
+                                      "value": "edges"
+                                    },
+                                    {
+                                      "value": {}
+                                    }
+                                  ],
+                                  "op": "get"
+                                },
+                                {
+                                  "value": "s>u"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": null
+                            }
+                          ],
+                          "op": "eq"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "For the verified protected s-to-t edge, a wrong role returns permission before the invalid retry count is considered.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+                    ],
+                    "id": "permission_precedes_retry_probe",
+                    "target": "result",
+                    "then": {
+                      "value": {
+                        "ok": false,
+                        "reason": "permission",
+                        "value": null
+                      }
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "from"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": "s"
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "to"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": "t"
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "role"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": "wrong"
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "args": [
+                                    {
+                                      "args": [
+                                        {
+                                          "var": "policy"
+                                        },
+                                        {
+                                          "value": "edges"
+                                        },
+                                        {
+                                          "value": {}
+                                        }
+                                      ],
+                                      "op": "get"
+                                    },
+                                    {
+                                      "value": "s>t"
+                                    },
+                                    {
+                                      "value": {}
+                                    }
+                                  ],
+                                  "op": "get"
+                                },
+                                {
+                                  "value": "role"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": "admin"
+                            }
+                          ],
+                          "op": "eq"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "For the verified unprotected s-to-t edge, boolean attempts is rejected as retry_limit.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+                    ],
+                    "id": "boolean_attempt_rejected_probe",
+                    "target": "result",
+                    "then": {
+                      "value": {
+                        "ok": false,
+                        "reason": "retry_limit",
+                        "value": null
+                      }
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "from"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": "s"
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "to"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": "t"
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "attempts"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": true
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "policy"
+                                },
+                                {
+                                  "value": "retry_limit"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": 2
+                            }
+                          ],
+                          "op": "eq"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "For the verified unprotected s-to-t edge with retry_limit 2, integer attempts 1 succeeds.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "e23e6fe2f1700ddf182ed483441d478227f8ac11"
+                    ],
+                    "id": "upper_in_range_attempt_probe",
+                    "target": "result",
+                    "then": {
+                      "value": {
+                        "ok": true,
+                        "reason": "ok",
+                        "value": "t"
+                      }
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "from"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": "s"
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "to"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": "t"
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "attempts"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": 1
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "policy"
+                                },
+                                {
+                                  "value": "retry_limit"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "value": 2
+                            }
+                          ],
+                          "op": "eq"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  }
+                ],
+                "schema": 1,
+                "title": "State transition evaluator verified boundary behavior",
+                "unresolved": [
+                  "The executable model records verified boundary probes; behavior for malformed non-mapping inputs is outside the contract and untested."
+                ]
+              },
+              "parent": null,
+              "proposal": "7b2b91ac3058184853503b0297b25db9242f68ac",
+              "reason": "Agent proposed a model revision",
+              "revision": 1
+            }
+          }
+        }
+      ]
+    }
+  }
+}

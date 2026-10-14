@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "text": "Memory packet:\n\nObserved results:\n- n17 + CSV + blue: usable.\n- n17 + JSON + blue: unusable.\n- m42 + CSV + blue: unusable.\n- m42 + JSON + green: usable.\n- p09 + XML + red: usable.\n- p09 + CSV + green: unusable.\n\nInferred rule: Treat each tool, format, and operator combination as a separate case. Use a recorded result only when all three values match. Exception: None is supported.\n\nLimits: The data does not show that operator color controls the result. Blue gives both results. Green gives both results. Red has only one trial. Tool and format effects are also not isolated. For an untested combination, report that the result is unknown.",
+  "errors": [],
+  "model": "gpt-5.6-sol",
+  "reasoning": "low",
+  "elapsed_seconds": 13.77502379193902,
+  "usage_complete": true,
+  "usage": {
+    "input_tokens": 10198,
+    "output_tokens": 244
+  },
+  "native_tools": [],
+  "prompt_sha256": "7d4aebbbcb3d46bfea8693b1aa656d5297d7f5966f5c09b628fda8d176c6aff8"
+}

@@ -1,0 +1,34 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "save",
+      "text": "Stage 2 work sample 0 is complete. work.py implements evaluate(request,evidence,policy) using only supplied arguments: sorted missing required conditions; claim/withdrawn/required-condition/verified filtering; eligible-source supersession; canonical JSON agreement/conflict; Boolean false maps to unsupported; unknown results have null value and empty sources; inputs remain unmodified. report.json matches evaluating requests.json with current evidence.json and policy.json. Actual baseline and extended Python checks passed, including immutability, filtering, transitive supersession, canonical object equality, conflicts, false, sorted unknowns, schema keys, and report regeneration. Unresolved limit: malformed/non-JSON values and missing/non-string source IDs are outside the specified data contract and were not specially validated.",
+      "payload": {
+        "files": [
+          "work.py",
+          "report.json",
+          "OUTPUT_SCHEMA.json",
+          "requests.json",
+          "policy.json",
+          "evidence.json"
+        ]
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 25165,
+    "output_tokens": 537,
+    "cached_input_tokens": 18816,
+    "reasoning_output_tokens": 303
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 14.798362541943789,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

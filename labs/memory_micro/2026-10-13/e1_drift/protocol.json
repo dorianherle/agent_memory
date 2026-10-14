@@ -1,0 +1,193 @@
+{
+  "experiment": "E1 recursive handoff drift",
+  "synthetic": true,
+  "hypothesis": "At five recursive handoffs, the typed ledger retains all tested task-critical facts while ordinary recursive prose loses at least one.",
+  "histories": [
+    "SOURCE H1. This is a constructed simulator history. Goal: qualify controller version 2.6 for the next engineer. General operating settings are speed 0.80 m/s, PWM period 2.50 ms, maximum load 4.00 kg, and ambient temperature from 18.0 to 28.0 degrees C. Rare exception: motor serial M17 has a maximum load of 2.75 kg when ambient temperature is strictly greater than 26.0 degrees C. At exactly 26.0 degrees C the general limit applies. The engineer must retain this exception. An early note says version 2.5 passed the timing test. The timing acceptance limit is a 99th percentile of 3.00 ms. Routine work: rename chart headings, align table borders, remove duplicate log lines, archive scratch plots, and clean the test directory. These routine tasks have no effect on qualification.",
+    "SOURCE H2. Correction: the early claim that version 2.5 passed timing is withdrawn. Corrected measurement: version 2.5 has a 99th percentile of 3.20 ms. This exceeds the 3.00 ms acceptance limit. Version 2.6 is the target version, but its timing has not been tested. Release is on hold. Release requires passing timing and resolving the watchdog fault. The team completed chart headings and table borders. Routine work: compare blue and green plot markers, move legend labels, shorten chart titles, standardize filenames, and remove obsolete temporary notes. Those changes do not affect measurements or operating limits.",
+    "SOURCE H3. The watchdog fault occurred in 3 of 5 simulator runs at a load of 3.60 kg. The cause is unknown. Do not report a cause as established. Do not replace an unknown quantity with zero to make a check pass. Release remains on hold. Routine work: the team selected green markers, moved legends to the right, used the same font for every chart, added a one-line caption to the overview, and removed empty scratch folders. A proposed extra test remains optional. No change was made to the operating settings or motor exception.",
+    "SOURCE H4. Timing qualification must use test B, a load of 2.00 kg, and a warmup of 120 s before measurement. These conditions apply to timing qualification. A proposed shorter warmup was rejected. There is still no timing result for version 2.6. Routine work: sort report pages, add page numbers, wrap long labels, use a lighter plot grid, check heading spacing, align decimal columns, and check that the overview opens. A colleague suggested that a watchdog reset might explain the fault, but that is an untested hypothesis. No cause is established.",
+    "SOURCE H5. Prepare the handoff to the next engineer. Version 2.6 remains the qualification target. Timing is still untested for version 2.6. The watchdog fault remains unresolved. Release remains on hold until timing passes and the watchdog fault is resolved. The overview, charts, captions, and filenames are complete. Routine work: create a clean index, link the summary page, close duplicate windows, archive the draft cover, and choose a short report title. Do not let completed presentation work imply that qualification passed. No operating limit or qualification condition was changed."
+  ],
+  "variants": [
+    "prose",
+    "ledger"
+  ],
+  "compactor_shared_instruction": "You prepare accumulated memory for the next engineer. Merge the previous packet and the new history. Preserve the goal, current facts, corrected conclusions, exact values with units, applicable conditions, failures, and unknowns that the next engineer needs. Omit completed presentation work that has no effect on qualification. Do not add facts or turn a hypothesis into a fact. Do not replace unknowns with guesses. Use source identifiers where useful. Target 220 tokens for the complete packet. Use no more than 260 tokens. Return only the packet. Use short, direct sentences.",
+  "variant_instructions": {
+    "prose": "Write one ordinary prose summary. Do not use field labels, lists, or a ledger.",
+    "ledger": "Write a typed ledger. Use these six fields: goal, current_facts, superseded_facts, failures, conditions, unknowns. Keep stable facts from the previous packet unless the new history explicitly changes them. A field can be empty. Use compact text entries."
+  },
+  "handoffs": 5,
+  "packet_token_target": 220,
+  "packet_token_maximum": 260,
+  "packet_count_encoding": "o200k_base",
+  "questions_hidden_from_compactors": [
+    {
+      "id": "Q1",
+      "question": "Which controller version is the qualification target?",
+      "fields": {
+        "goal_version": "string, or UNKNOWN"
+      }
+    },
+    {
+      "id": "Q2",
+      "question": "What is the release state, and what must be completed before release?",
+      "fields": {
+        "release_state": "hold, released, or UNKNOWN",
+        "release_requires_timing_pass": "boolean, or UNKNOWN",
+        "release_requires_watchdog_resolution": "boolean, or UNKNOWN"
+      }
+    },
+    {
+      "id": "Q3",
+      "question": "What are the exact general operating settings?",
+      "fields": {
+        "speed_m_per_s": "number, or UNKNOWN",
+        "pwm_period_ms": "number, or UNKNOWN",
+        "normal_max_load_kg": "number, or UNKNOWN",
+        "ambient_min_c": "number, or UNKNOWN",
+        "ambient_max_c": "number, or UNKNOWN"
+      }
+    },
+    {
+      "id": "Q4",
+      "question": "What rare motor exception applies? Give its serial, maximum load, temperature boundary, comparison, and whether the exception applies at the boundary.",
+      "fields": {
+        "exception_serial": "string, or UNKNOWN",
+        "exception_max_load_kg": "number, or UNKNOWN",
+        "exception_temperature_c": "number, or UNKNOWN",
+        "exception_temperature_comparison": "strictly_greater, greater_or_equal, or UNKNOWN",
+        "exception_applies_at_boundary": "boolean, or UNKNOWN"
+      }
+    },
+    {
+      "id": "Q5",
+      "question": "Was the original version 2.5 timing pass claim retained or withdrawn? Give the corrected 99th percentile and the acceptance limit.",
+      "fields": {
+        "v25_original_pass_claim": "withdrawn, retained, or UNKNOWN",
+        "v25_corrected_p99_ms": "number, or UNKNOWN",
+        "timing_limit_p99_ms": "number, or UNKNOWN"
+      }
+    },
+    {
+      "id": "Q6",
+      "question": "What is the timing test state for version 2.6?",
+      "fields": {
+        "v26_timing_state": "untested, passed, failed, or UNKNOWN"
+      }
+    },
+    {
+      "id": "Q7",
+      "question": "What are the watchdog failure count, total run count, load, and established cause?",
+      "fields": {
+        "watchdog_failure_count": "number, or UNKNOWN",
+        "watchdog_total_runs": "number, or UNKNOWN",
+        "watchdog_test_load_kg": "number, or UNKNOWN",
+        "watchdog_cause": "unknown, reset, or UNKNOWN"
+      }
+    },
+    {
+      "id": "Q8",
+      "question": "Which test, load, and warmup are required for timing qualification?",
+      "fields": {
+        "timing_test_id": "string, or UNKNOWN",
+        "timing_test_load_kg": "number, or UNKNOWN",
+        "timing_warmup_s": "number, or UNKNOWN"
+      }
+    },
+    {
+      "id": "Q9",
+      "question": "May an unknown quantity be replaced by zero to make a check pass?",
+      "fields": {
+        "zero_substitution_allowed": "boolean, or UNKNOWN"
+      }
+    }
+  ],
+  "expectations_hidden_from_all_model_calls": {
+    "goal_version": "2.6",
+    "release_state": "hold",
+    "release_requires_timing_pass": true,
+    "release_requires_watchdog_resolution": true,
+    "speed_m_per_s": 0.8,
+    "pwm_period_ms": 2.5,
+    "normal_max_load_kg": 4.0,
+    "ambient_min_c": 18.0,
+    "ambient_max_c": 28.0,
+    "exception_serial": "M17",
+    "exception_max_load_kg": 2.75,
+    "exception_temperature_c": 26.0,
+    "exception_temperature_comparison": "strictly_greater",
+    "exception_applies_at_boundary": false,
+    "v25_original_pass_claim": "withdrawn",
+    "v25_corrected_p99_ms": 3.2,
+    "timing_limit_p99_ms": 3.0,
+    "v26_timing_state": "untested",
+    "watchdog_failure_count": 3,
+    "watchdog_total_runs": 5,
+    "watchdog_test_load_kg": 3.6,
+    "watchdog_cause": "unknown",
+    "timing_test_id": "B",
+    "timing_test_load_kg": 2.0,
+    "timing_warmup_s": 120,
+    "zero_substitution_allowed": false
+  },
+  "source_map": {
+    "Q1": [
+      "H1",
+      "H5"
+    ],
+    "Q2": [
+      "H2",
+      "H5"
+    ],
+    "Q3": [
+      "H1"
+    ],
+    "Q4": [
+      "H1"
+    ],
+    "Q5": [
+      "H1",
+      "H2"
+    ],
+    "Q6": [
+      "H2",
+      "H4",
+      "H5"
+    ],
+    "Q7": [
+      "H3",
+      "H4",
+      "H5"
+    ],
+    "Q8": [
+      "H4"
+    ],
+    "Q9": [
+      "H3"
+    ]
+  },
+  "controls": [
+    "Identical history chunks, model, reasoning, and packet budget.",
+    "Fresh packet-only receiver for each arm.",
+    "Fresh full-history receiver.",
+    "No receiver sees expected answers.",
+    "No repair, truncation, retries, or post-hoc input changes."
+  ],
+  "pass_rule": "The full-history control and the ledger receiver must pass all nine question groups. Prose must fail at least one group. All compactor packets must be at most 260 tokens in the o200k_base estimate. All calls must have native usage and no tools. Report failed for a valid, complete run that does not meet this result pattern. Report inconclusive for invalid controls, budget violations, call errors, or incomplete runs.",
+  "resource_cap": {
+    "maximum_calls": 16,
+    "planned_calls": 13,
+    "maximum_wall_seconds": 420,
+    "model": "gpt-5.6-sol",
+    "reasoning": "low",
+    "call_timeout_seconds": 75
+  },
+  "limits": [
+    "One constructed history. Two method variants. No repeated trials or second independent history within this call cap.",
+    "No causal or general performance claim.",
+    "Packet tokens and native total tokens are reported separately."
+  ],
+  "frozen_input_sha256": "56233e52c8fa417a9e3ebc6d39d2c0619cb3fa7c8648ff74ffcb70362fe313ff"
+}

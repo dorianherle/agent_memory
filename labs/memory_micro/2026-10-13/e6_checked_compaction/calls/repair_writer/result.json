@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "text": "Rev 4 handoff: Do not overwrite raw captures. CSV columns 1–2 must be wavelength_nm, intensity_counts, in that order. Missing calibration remains UNKNOWN; never use zero. Limit: 8.50 counts (12.0 superseded). Trial: 9.10 counts; fail. Prior pass claim withdrawn. Minimum exposure: 0.50 ms. Exception: batch K9 can use 0.20 ms at temperature ≤18.0 °C, including 18.0 °C. Above 18.0 °C, use 0.50 ms. Other batches: 0.50 ms. Rev 4 is untested. Release is on hold pending verification. Noise is unresolved; cause unknown. Proposed cable cause is untested and not established.",
+  "errors": [],
+  "model": "gpt-5.6-sol",
+  "reasoning": "low",
+  "elapsed_seconds": 9.119238917017356,
+  "usage_complete": true,
+  "usage": {
+    "input_tokens": 10900,
+    "output_tokens": 215
+  },
+  "native_tools": [],
+  "prompt_sha256": "41dd42d12752f115076813218c2169e6fd85d72b55f180d13cf118c6c6978409"
+}

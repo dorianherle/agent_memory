@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import json, copy; from work import evaluate; evidence=json.load(open('evidence.json')); policy=json.load(open('policy.json')); requests=json.load(open('requests.json')); before=copy.deepcopy((requests,evidence,policy)); results=[evaluate(r,evidence,policy) for r in requests]; assert (requests,evidence,policy)==before; assert results==[{'status':'supported','value':30,'sources':['S1'],'unknowns':[]},{'status':'unsupported','value':False,'sources':['D1'],'unknowns':[]}]; print(json.dumps(results,sort_keys=True))"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 10566,
+    "output_tokens": 229,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 75
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 7.854542874963954,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

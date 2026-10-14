@@ -1,0 +1,12 @@
+{
+  "v1-complete-study.zip": {
+    "sha256": "12fc7f3e94b08cdf19b8249dd6085c32605e92268db6026d0dae97cbfdb20925",
+    "bytes": 949297,
+    "scope": "Complete private synthetic study; Python caches excluded."
+  },
+  "v2-complete-study.zip": {
+    "sha256": "b2861832ed0579c618fd0898bc6dd459ffe67d8dc7762b9dc1156d4a14976402",
+    "bytes": 958882,
+    "scope": "Complete private synthetic study; Python caches excluded."
+  }
+}

@@ -1,0 +1,269 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "model_propose",
+      "id": null,
+      "payload": {
+        "schema": 1,
+        "title": "Declared source dependency review",
+        "inputs": {
+          "request": "object",
+          "policy": "object",
+          "evidence": "array"
+        },
+        "rules": [
+          {
+            "id": "review_if_relevant_change",
+            "target": "needs_review",
+            "claim": "Review is required if any declared, non-ignored path has unequal complete normalized source states.",
+            "when": {
+              "value": true
+            },
+            "then": {
+              "op": "any",
+              "items": {
+                "var": "evidence"
+              },
+              "as": "item",
+              "test": {
+                "var": "item.changed"
+              }
+            },
+            "evidence": [
+              "426e31ec"
+            ],
+            "dependencies": [
+              "work.py",
+              "TASK.md"
+            ]
+          }
+        ],
+        "cases": [
+          {
+            "id": "recorded_request_unchanged",
+            "target": "needs_review",
+            "inputs": {
+              "request": {
+                "declared": [
+                  "worker_0.py"
+                ],
+                "saved": {
+                  "worker_0.py": {
+                    "kind": "file",
+                    "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                },
+                "current": {
+                  "worker_0.py": {
+                    "kind": "file",
+                    "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                }
+              },
+              "policy": {
+                "variant": 0,
+                "ignored": []
+              },
+              "evidence": [
+                {
+                  "path": "worker_0.py",
+                  "declared": true,
+                  "ignored": false,
+                  "saved": {
+                    "kind": "file",
+                    "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  },
+                  "current": {
+                    "kind": "file",
+                    "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  },
+                  "changed": false
+                }
+              ]
+            },
+            "expected": false,
+            "evidence": [
+              "426e31ec"
+            ],
+            "challenge": false
+          },
+          {
+            "id": "complete_state_change_challenge",
+            "target": "needs_review",
+            "inputs": {
+              "request": {
+                "declared": [
+                  "meta"
+                ],
+                "saved": {
+                  "meta": {
+                    "kind": "file",
+                    "name": "n",
+                    "timestamp": 1
+                  }
+                },
+                "current": {
+                  "meta": {
+                    "kind": "file",
+                    "name": "n",
+                    "timestamp": 2
+                  }
+                }
+              },
+              "policy": {
+                "ignored": []
+              },
+              "evidence": [
+                {
+                  "path": "meta",
+                  "declared": true,
+                  "ignored": false,
+                  "saved": {
+                    "kind": "file",
+                    "name": "n",
+                    "timestamp": 1
+                  },
+                  "current": {
+                    "kind": "file",
+                    "name": "n",
+                    "timestamp": 2
+                  },
+                  "changed": true
+                }
+              ]
+            },
+            "expected": true,
+            "evidence": [
+              "426e31ec"
+            ],
+            "challenge": true
+          },
+          {
+            "id": "ignored_change_challenge",
+            "target": "needs_review",
+            "inputs": {
+              "request": {
+                "declared": [
+                  "skip"
+                ],
+                "saved": {
+                  "skip": {
+                    "kind": "file",
+                    "hash": "a"
+                  }
+                },
+                "current": {
+                  "skip": {
+                    "kind": "file",
+                    "hash": "b"
+                  }
+                }
+              },
+              "policy": {
+                "ignored": [
+                  "skip"
+                ]
+              },
+              "evidence": [
+                {
+                  "path": "skip",
+                  "declared": true,
+                  "ignored": true,
+                  "saved": {
+                    "kind": "file",
+                    "hash": "a"
+                  },
+                  "current": {
+                    "kind": "file",
+                    "hash": "b"
+                  },
+                  "changed": false
+                }
+              ]
+            },
+            "expected": false,
+            "evidence": [
+              "426e31ec"
+            ],
+            "challenge": true
+          },
+          {
+            "id": "missing_equivalence_challenge",
+            "target": "needs_review",
+            "inputs": {
+              "request": {
+                "declared": [
+                  "gone"
+                ],
+                "saved": {},
+                "current": {
+                  "gone": {
+                    "kind": "missing"
+                  }
+                }
+              },
+              "policy": {
+                "ignored": []
+              },
+              "evidence": [
+                {
+                  "path": "gone",
+                  "declared": true,
+                  "ignored": false,
+                  "saved": {
+                    "kind": "missing"
+                  },
+                  "current": {
+                    "kind": "missing"
+                  },
+                  "changed": false
+                }
+              ]
+            },
+            "expected": false,
+            "evidence": [
+              "426e31ec"
+            ],
+            "challenge": true
+          }
+        ],
+        "alternatives": [
+          {
+            "id": "selected_fields",
+            "claim": "Comparing selected metadata fields can miss complete-state changes.",
+            "rules": [
+              "review_if_relevant_change"
+            ]
+          },
+          {
+            "id": "all_paths",
+            "claim": "Including undeclared or ignored paths treats irrelevant changes as review-worthy.",
+            "rules": [
+              "review_if_relevant_change"
+            ]
+          }
+        ],
+        "unresolved": [
+          "Per-path evidence must be normalized before prediction because the expression language cannot dynamically index mappings by path.",
+          "Malformed non-JSON-serializable states are unspecified and untested."
+        ]
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 29506,
+    "output_tokens": 2209,
+    "cached_input_tokens": 20352,
+    "reasoning_output_tokens": 590
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 37.984816084150225,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "wheel_sha256": "32bfa9fd645f5b1a957bb200869748e190ab6f715c8f284983ab46215d89a92e",
+  "loaded_module": "/Users/dorianherle/Documents/Personal/Application_California/benchmark-v3/installed-wheel-check/lib/python3.14/site-packages/agent_memory/__init__.py",
+  "exact_note_round_trip": true,
+  "local_search": true,
+  "stale_declared_config_detected": true,
+  "reopen": true,
+  "studio_assets_present": true,
+  "dependency_limit": "Reuses existing dependency packages. This is not a fully clean dependency installation.",
+  "python": "3.14.3"
+}

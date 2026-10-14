@@ -1,0 +1,316 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "model_handoff",
+      "id": null,
+      "payload": {
+        "schema": 1,
+        "title": "Layered configuration evaluation outcomes",
+        "inputs": {
+          "request": "object",
+          "policy": "object",
+          "evidence": "array"
+        },
+        "rules": [
+          {
+            "id": "unknown-key",
+            "target": "status",
+            "claim": "A detected unknown layer or environment key produces unknown_key (after any earlier environment-policy gate applicable to that request).",
+            "when": {
+              "op": "in",
+              "args": [
+                {
+                  "value": "unknown_key_detected"
+                },
+                {
+                  "var": "evidence"
+                }
+              ]
+            },
+            "then": {
+              "value": "unknown_key"
+            },
+            "evidence": [
+              "0e64f700"
+            ],
+            "dependencies": [
+              "work.py"
+            ]
+          },
+          {
+            "id": "environment-error",
+            "target": "status",
+            "claim": "A disabled environment override or invalid exact boolean/integer environment representation produces environment.",
+            "when": {
+              "op": "in",
+              "args": [
+                {
+                  "value": "environment_invalid"
+                },
+                {
+                  "var": "evidence"
+                }
+              ]
+            },
+            "then": {
+              "value": "environment"
+            },
+            "evidence": [
+              "0e64f700"
+            ],
+            "dependencies": [
+              "work.py"
+            ]
+          },
+          {
+            "id": "type-error",
+            "target": "status",
+            "claim": "After all layers and environment overrides, an exact policy-type mismatch produces type.",
+            "when": {
+              "op": "in",
+              "args": [
+                {
+                  "value": "final_type_invalid"
+                },
+                {
+                  "var": "evidence"
+                }
+              ]
+            },
+            "then": {
+              "value": "type"
+            },
+            "evidence": [
+              "0e64f700"
+            ],
+            "dependencies": [
+              "work.py"
+            ]
+          },
+          {
+            "id": "success",
+            "target": "status",
+            "claim": "When keys and environment representations are valid and the final values have exact policy types, evaluation succeeds while preserving false, zero, and empty strings.",
+            "when": {
+              "op": "in",
+              "args": [
+                {
+                  "value": "valid"
+                },
+                {
+                  "var": "evidence"
+                }
+              ]
+            },
+            "then": {
+              "value": "ok"
+            },
+            "evidence": [
+              "0e64f700"
+            ],
+            "dependencies": [
+              "work.py"
+            ]
+          }
+        ],
+        "cases": [
+          {
+            "id": "preserve-falsy",
+            "target": "status",
+            "inputs": {
+              "request": {
+                "layers": [
+                  {
+                    "enabled": false
+                  },
+                  {
+                    "retries": 0
+                  }
+                ]
+              },
+              "policy": {
+                "defaults": {
+                  "enabled": true,
+                  "retries": 3,
+                  "label": "job_0"
+                },
+                "types": {
+                  "enabled": "boolean",
+                  "retries": "integer",
+                  "label": "string"
+                },
+                "null_resets": false,
+                "environment": false
+              },
+              "evidence": [
+                "valid"
+              ]
+            },
+            "expected": "ok",
+            "evidence": [
+              "0e64f700"
+            ],
+            "challenge": false
+          },
+          {
+            "id": "unknown-layer-key",
+            "target": "status",
+            "inputs": {
+              "request": {
+                "layers": [
+                  {
+                    "z": 1
+                  }
+                ]
+              },
+              "policy": {
+                "defaults": {
+                  "b": true,
+                  "i": 2,
+                  "s": "x"
+                },
+                "types": {
+                  "b": "boolean",
+                  "i": "integer",
+                  "s": "string"
+                },
+                "null_resets": true,
+                "environment": true
+              },
+              "evidence": [
+                "unknown_key_detected"
+              ]
+            },
+            "expected": "unknown_key",
+            "evidence": [
+              "0e64f700"
+            ],
+            "challenge": false
+          },
+          {
+            "id": "disabled-environment",
+            "target": "status",
+            "inputs": {
+              "request": {
+                "environment": {
+                  "i": "2"
+                }
+              },
+              "policy": {
+                "defaults": {
+                  "b": true,
+                  "i": 2,
+                  "s": "x"
+                },
+                "types": {
+                  "b": "boolean",
+                  "i": "integer",
+                  "s": "string"
+                },
+                "null_resets": false,
+                "environment": false
+              },
+              "evidence": [
+                "environment_invalid"
+              ]
+            },
+            "expected": "environment",
+            "evidence": [
+              "0e64f700"
+            ],
+            "challenge": false
+          },
+          {
+            "id": "bool-not-integer",
+            "target": "status",
+            "inputs": {
+              "request": {
+                "layers": [
+                  {
+                    "i": true
+                  }
+                ]
+              },
+              "policy": {
+                "defaults": {
+                  "b": true,
+                  "i": 2,
+                  "s": "x"
+                },
+                "types": {
+                  "b": "boolean",
+                  "i": "integer",
+                  "s": "string"
+                },
+                "null_resets": true,
+                "environment": true
+              },
+              "evidence": [
+                "final_type_invalid"
+              ]
+            },
+            "expected": "type",
+            "evidence": [
+              "0e64f700"
+            ],
+            "challenge": false
+          },
+          {
+            "id": "unicode-digit-rejected",
+            "target": "status",
+            "inputs": {
+              "request": {
+                "environment": {
+                  "count": "\u0661"
+                }
+              },
+              "policy": {
+                "defaults": {
+                  "flag": true,
+                  "count": 5,
+                  "name": "base"
+                },
+                "types": {
+                  "flag": "boolean",
+                  "count": "integer",
+                  "name": "string"
+                },
+                "null_resets": true,
+                "environment": true
+              },
+              "evidence": [
+                "environment_invalid"
+              ]
+            },
+            "expected": "environment",
+            "evidence": [
+              "0e64f700"
+            ],
+            "challenge": true
+          }
+        ],
+        "alternatives": [],
+        "unresolved": [
+          "The executable model consumes independently classified evidence tokens because its expression language cannot express arbitrary object-key comparison or the full ASCII integer grammar; arbitrary raw requests outside these classifications remain unprobed.",
+          "Combined-error precedence is implemented in work.py but not exhaustively represented by the single-condition stored cases."
+        ]
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 13315,
+    "output_tokens": 2550,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 1539
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 43.291541791986674,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

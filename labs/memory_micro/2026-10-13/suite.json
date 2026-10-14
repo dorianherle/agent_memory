@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-13",
+  "purpose": "Screen memory mechanisms for long-running agent tasks.",
+  "status": "screen_complete",
+  "claims": "Private, constructed development tests. No breakthrough or general performance claim.",
+  "model_calls": {
+    "model": "gpt-5.6-sol",
+    "reasoning": "low",
+    "fresh_context": true,
+    "native_tools": "disabled",
+    "native_usage": "required",
+    "note": "The preflight used 13080 input tokens for a short prompt. Packet size is separate from total native usage."
+  },
+  "experiments": [
+    {"id": "E1", "path": "e1_drift", "hypothesis": "A typed ledger preserves critical information better than recursive prose at the same token target.", "owner": "compaction_check", "call_cap": 16},
+    {"id": "E2", "path": "e2_abstraction", "hypothesis": "A rule-and-exception packet predicts unseen cases better than an ordinary summary, while retaining uncertainty in unsupported cases.", "owner": "discovery_design", "call_cap": 12},
+    {"id": "E3", "path": "e3_weight_memory", "hypothesis": "A small pretrained model updated on verified answers provides useful queryable memory after a small training budget.", "owner": "weight_memory", "time_cap_minutes": 12},
+    {"id": "E4", "path": "e4_query_memory", "hypothesis": "Query-conditioned retrieval preserves more answer-relevant facts than one global compact packet at a matched reader-context target.", "owner": "weight_memory", "call_cap": 8},
+    {"id": "E5", "path": "e5_task_frontier", "hypothesis": "A checkpoint with pending actions and verification state supports correct task resumption better than a knowledge-only summary.", "owner": "discovery_design", "call_cap": 8},
+    {"id": "E6", "path": "e6_checked_compaction", "hypothesis": "A source-backed preservation check followed by repair reduces errors on independent questions after aggressive compaction.", "owner": "compaction_check", "call_cap": 10},
+    {"id": "E7", "path": "e7_isolated_retrieval", "hypothesis": "E4's retrieval answers remain correct when each query and context are isolated from all other queries.", "owner": "weight_memory", "call_cap": 12, "phase": "adaptive diagnostic on the known E4 fixture"},
+    {"id": "E8", "path": "e8_no_memory", "hypothesis": "E2's prediction questions require the transferred memory rather than the questions and prior knowledge alone.", "owner": "compaction_check", "call_cap": 2, "phase": "adaptive control on the known E2 fixture"}
+  ],
+  "shared_limits": [
+    "Researchers construct both tasks and graders; this is not an independent benchmark.",
+    "Tests do not reproduce an entire native IDE agent workflow.",
+    "Small samples screen mechanisms; they do not establish statistical superiority.",
+    "All calls, failures, setup costs, and unavailable usage remain in records.",
+    "A random tiny model is not evidence for a capable pretrained tiny LLM.",
+    "Training and reader inference costs must be reported separately from packet tokens."
+  ]
+}

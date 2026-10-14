@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy, json\nfrom work import evaluate\nwith open('policy.json') as f: policy=json.load(f)\nwith open('requests.json') as f: requests=json.load(f)\nwith open('report.json') as f: report=json.load(f)\npolicy_before=copy.deepcopy(policy); requests_before=copy.deepcopy(requests)\nassert report == [evaluate(r, policy) for r in requests]\nassert policy == policy_before and requests == requests_before\ncases=[\n ({'from':'missing','to':'edge','retry':True,'attempts':0}, {'edges':{},'retry_limit':2}, {'ok':False,'value':None,'reason':'blocked'}),\n ({'from':'a','to':'b','role':'wrong','retry':True,'attempts':99}, {'edges':{'a>b':{'role':'allowed'}},'retry_limit':2}, {'ok':False,'value':None,'reason':'permission'}),\n ({'from':'a','to':'b','retry':True,'attempts':True}, {'edges':{'a>b':{}},'retry_limit':2}, {'ok':False,'value':None,'reason':'retry_limit'}),\n ({'from':'a','to':'b','retry':True,'attempts':-1}, {'edges':{'a>b':{}},'retry_limit':2}, {'ok':False,'value':None,'reason':'retry_limit'}),\n ({'from':'a','to':'b','retry':True,'attempts':1}, {'edges':{'a>b':{}},'retry_limit':2}, {'ok':True,'value':'b','reason':'ok'}),\n ({'from':'a','to':'b','retry':True,'attempts':2}, {'edges':{'a>b':{}},'retry_limit':2}, {'ok':False,'value':None,'reason':'retry_limit'})]\nfor request, policy_case, expected in cases:\n rb=copy.deepcopy(request); pb=copy.deepcopy(policy_case)\n assert evaluate(request, policy_case)==expected\n assert request==rb and policy_case==pb\nprint('all checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 10327,
+    "output_tokens": 702,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 202
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 19.066616958007216,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

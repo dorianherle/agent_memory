@@ -1,0 +1,67 @@
+{
+  "ok": false,
+  "errors": [
+    "Reconnecting... 2/5 (stream disconnected before completion: failed to lookup address information: Name does not resolve)",
+    "Reconnecting... 3/5 (stream disconnected before completion: failed to lookup address information: Name does not resolve)",
+    "Reconnecting... 4/5 (stream disconnected before completion: failed to lookup address information: Name does not resolve)",
+    "Reconnecting... 5/5 (stream disconnected before completion: failed to lookup address information: Name does not resolve)",
+    "Falling back from WebSockets to HTTPS transport. stream disconnected before completion: failed to lookup address information: Name does not resolve",
+    "Reconnecting... waiting for network (Connection failed: error sending request)",
+    "Reconnecting... waiting for network (Connection failed: error sending request)",
+    "Reconnecting... waiting for network (Connection failed: error sending request)",
+    "Reconnecting... waiting for network (Connection failed: error sending request)",
+    "Reconnecting... waiting for network (Connection failed: error sending request)",
+    "Reconnecting... waiting for network (Connection failed: error sending request)",
+    "Reconnecting... waiting for network (Connection failed: error sending request)"
+  ],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "memory",
+          "arguments": {
+            "action": "save",
+            "text": "Stage 2 implementation verified from current files and independent boundary checks: evaluate validates rows in order with one prioritized error (id, amount, unit, duplicate), rejects bool/nonfinite/negative amounts, defaults units, marks IDs seen only after full acceptance, clears records on any batch error, preserves input objects, and emits exact output fields. report.json equals evaluate(request, current policy) for every current request.",
+            "payload": {
+              "files": [
+                "TASK.md",
+                "OUTPUT_SCHEMA.json",
+                "work.py",
+                "requests.json",
+                "policy.json",
+                "report.json"
+              ]
+            }
+          }
+        },
+        {
+          "action": "memory",
+          "arguments": {
+            "action": "save",
+            "text": "Unresolved contract limits: behavior is unspecified for malformed top-level requests, non-object rows, absent/malformed policy keys, and nonnumeric or nonfinite unit multipliers. Current implementation assumes structurally valid request rows and policy inputs.",
+            "payload": {
+              "files": [
+                "TASK.md",
+                "work.py"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 29025,
+    "output_tokens": 590,
+    "cached_input_tokens": 14208,
+    "reasoning_output_tokens": 336
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 16,
+  "elapsed_seconds": 312.2772356250789,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

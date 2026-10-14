@@ -1,0 +1,218 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "model_handoff",
+      "id": "4208ee69d90edd1d2adb7423800860eb9c18f0e1",
+      "payload": {
+        "observations": [
+          {
+            "id": "current-superseded-rate-supported",
+            "target": "status",
+            "inputs": {
+              "request": {
+                "claim": "vertical_rate",
+                "conditions": {
+                  "recipe": "R0",
+                  "material": "SiN",
+                  "regime": "dry"
+                }
+              },
+              "evidence": [
+                {
+                  "source": "S1",
+                  "claim": "vertical_rate",
+                  "value": 30,
+                  "conditions": {
+                    "recipe": "R0",
+                    "material": "SiN",
+                    "regime": "dry"
+                  },
+                  "verified": true
+                },
+                {
+                  "source": "S2",
+                  "claim": "vertical_rate",
+                  "value": 32,
+                  "conditions": {
+                    "recipe": "R0",
+                    "material": "SiN",
+                    "regime": "dry"
+                  },
+                  "verified": true,
+                  "supersedes": [
+                    "S1"
+                  ]
+                }
+              ],
+              "policy": {
+                "required_conditions": [
+                  "recipe",
+                  "material",
+                  "regime"
+                ],
+                "require_verified": true
+              },
+              "missing_required": [],
+              "eligible_source_count": 1,
+              "distinct_value_count": 1,
+              "agreed_value_is_false": false
+            },
+            "expected": "supported",
+            "evidence": [
+              "23f8264c"
+            ],
+            "challenge": true
+          },
+          {
+            "id": "current-boolean-false-unsupported",
+            "target": "status",
+            "inputs": {
+              "request": {
+                "claim": "device_validated",
+                "conditions": {
+                  "recipe": "R0",
+                  "material": "SiN",
+                  "regime": "dry"
+                }
+              },
+              "evidence": [
+                {
+                  "source": "D1",
+                  "claim": "device_validated",
+                  "value": false,
+                  "conditions": {
+                    "recipe": "R0",
+                    "material": "SiN",
+                    "regime": "dry"
+                  },
+                  "verified": true
+                }
+              ],
+              "policy": {
+                "required_conditions": [
+                  "recipe",
+                  "material",
+                  "regime"
+                ],
+                "require_verified": true
+              },
+              "missing_required": [],
+              "eligible_source_count": 1,
+              "distinct_value_count": 1,
+              "agreed_value_is_false": true
+            },
+            "expected": "unsupported",
+            "evidence": [
+              "23f8264c"
+            ],
+            "challenge": true
+          },
+          {
+            "id": "boundary-eligible-cycle-is-unknown",
+            "target": "status",
+            "inputs": {
+              "request": {
+                "claim": "x",
+                "conditions": {}
+              },
+              "evidence": [
+                {
+                  "source": "a",
+                  "claim": "x",
+                  "conditions": {},
+                  "value": 1,
+                  "supersedes": [
+                    "b"
+                  ]
+                },
+                {
+                  "source": "b",
+                  "claim": "x",
+                  "conditions": {},
+                  "value": 1,
+                  "supersedes": [
+                    "a"
+                  ]
+                }
+              ],
+              "policy": {
+                "required_conditions": []
+              },
+              "missing_required": [],
+              "eligible_source_count": 0,
+              "distinct_value_count": 0,
+              "agreed_value_is_false": false
+            },
+            "expected": "unknown",
+            "evidence": [
+              "48f83d3a"
+            ],
+            "challenge": true
+          },
+          {
+            "id": "boundary-nested-array-order-conflicts",
+            "target": "status",
+            "inputs": {
+              "request": {
+                "claim": "x",
+                "conditions": {}
+              },
+              "evidence": [
+                {
+                  "source": "a",
+                  "claim": "x",
+                  "conditions": {},
+                  "value": {
+                    "x": [
+                      1,
+                      2
+                    ]
+                  }
+                },
+                {
+                  "source": "b",
+                  "claim": "x",
+                  "conditions": {},
+                  "value": {
+                    "x": [
+                      2,
+                      1
+                    ]
+                  }
+                }
+              ],
+              "policy": {
+                "required_conditions": []
+              },
+              "missing_required": [],
+              "eligible_source_count": 2,
+              "distinct_value_count": 2,
+              "agreed_value_is_false": false
+            },
+            "expected": "conflict",
+            "evidence": [
+              "48f83d3a"
+            ],
+            "challenge": true
+          }
+        ]
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 37737,
+    "output_tokens": 5271,
+    "cached_input_tokens": 24320,
+    "reasoning_output_tokens": 2087
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 59.400802083080634,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

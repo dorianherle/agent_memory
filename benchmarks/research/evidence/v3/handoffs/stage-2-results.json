@@ -1,0 +1,1461 @@
+{
+  "stage": 2,
+  "summary": {
+    "memory": {
+      "complete_tasks": 3,
+      "attempted_tasks": 4,
+      "full_case_passes": 55,
+      "cases": 56,
+      "mean_partial_score": 99.25
+    },
+    "notebook": {
+      "complete_tasks": 3,
+      "attempted_tasks": 4,
+      "full_case_passes": 55,
+      "cases": 56,
+      "mean_partial_score": 99.25
+    }
+  },
+  "rows": [
+    {
+      "trial": 1,
+      "condition": "memory",
+      "stage": 2,
+      "task": "research",
+      "source_sha256": "92e0973c6e77adb52d69ad96255c5128a85c120f7179e9287217d6be7fd7fe1a",
+      "grade": {
+        "task": "research",
+        "max_stage": 2,
+        "cases": 15,
+        "full_passes": 14,
+        "score": 97.0,
+        "category_passes": {
+          "schema": 15,
+          "numeric": 15,
+          "decisions": 14
+        },
+        "category_weights": {
+          "schema": 10,
+          "numeric": 45,
+          "decisions": 45
+        },
+        "details": [
+          {
+            "name": "independent_pass",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "one_sided_pass_two_sided_fail",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "known_sigma_not_residual_scaled",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "gain_only",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "fit_only",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "both_gates",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "equality_pass",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": false
+            },
+            "all_pass": false,
+            "error": null
+          },
+          {
+            "name": "correlation_overrides_sigma",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "correlated_bad_fit",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "correlated_gain_gate",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "selected_rows_and_columns",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "included_outlier_is_kept",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "mask_dof_and_gain",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "heteroscedastic_weights",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "general_spd_covariance",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "trial": 1,
+      "condition": "memory",
+      "stage": 2,
+      "task": "software",
+      "source_sha256": "c209b3b232977c71eafbc8d2350efacd07ec837f2ccf9fe51af9e9e9fab0548a",
+      "grade": {
+        "task": "software",
+        "max_stage": 2,
+        "cases": 13,
+        "full_passes": 13,
+        "score": 100.0,
+        "category_passes": {
+          "schema": 13,
+          "responses": 13,
+          "state": 13
+        },
+        "category_weights": {
+          "schema": 10,
+          "responses": 50,
+          "state": 40
+        },
+        "details": [
+          {
+            "name": "reserve_buy_release",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "failed_response_is_cached",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "hold_id_is_never_reused",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "sort_holds_and_stock",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "old_policy_replays_changed_payload",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "expiry_before_replay_at_deadline",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "expiry_keeps_id_and_failed_cache",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "no_expiry_beyond_last_event",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "atomic_failed_amend_and_keep_deadline",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "conflict_does_not_replace_cache",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "failed_amend_preserves_hold",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "conflict_after_expiry",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "amend_decrease_then_release",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "trial": 1,
+      "condition": "notebook",
+      "stage": 2,
+      "task": "research",
+      "source_sha256": "4ca5144bbbdef112eca2c32ece1020dfe4856a38aff8eb8d62e92c50fc54ed50",
+      "grade": {
+        "task": "research",
+        "max_stage": 2,
+        "cases": 15,
+        "full_passes": 14,
+        "score": 97.0,
+        "category_passes": {
+          "schema": 15,
+          "numeric": 15,
+          "decisions": 14
+        },
+        "category_weights": {
+          "schema": 10,
+          "numeric": 45,
+          "decisions": 45
+        },
+        "details": [
+          {
+            "name": "independent_pass",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "one_sided_pass_two_sided_fail",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "known_sigma_not_residual_scaled",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "gain_only",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "fit_only",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "both_gates",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "equality_pass",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": false
+            },
+            "all_pass": false,
+            "error": null
+          },
+          {
+            "name": "correlation_overrides_sigma",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "correlated_bad_fit",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "correlated_gain_gate",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "selected_rows_and_columns",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "included_outlier_is_kept",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "mask_dof_and_gain",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "heteroscedastic_weights",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "general_spd_covariance",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "trial": 1,
+      "condition": "notebook",
+      "stage": 2,
+      "task": "software",
+      "source_sha256": "ef3784d485efc32efb3bc2674be456734826759b577a57483dbf614857f18fa7",
+      "grade": {
+        "task": "software",
+        "max_stage": 2,
+        "cases": 13,
+        "full_passes": 13,
+        "score": 100.0,
+        "category_passes": {
+          "schema": 13,
+          "responses": 13,
+          "state": 13
+        },
+        "category_weights": {
+          "schema": 10,
+          "responses": 50,
+          "state": 40
+        },
+        "details": [
+          {
+            "name": "reserve_buy_release",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "failed_response_is_cached",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "hold_id_is_never_reused",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "sort_holds_and_stock",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "old_policy_replays_changed_payload",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "expiry_before_replay_at_deadline",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "expiry_keeps_id_and_failed_cache",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "no_expiry_beyond_last_event",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "atomic_failed_amend_and_keep_deadline",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "conflict_does_not_replace_cache",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "failed_amend_preserves_hold",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "conflict_after_expiry",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "amend_decrease_then_release",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "trial": 2,
+      "condition": "memory",
+      "stage": 2,
+      "task": "research",
+      "source_sha256": "262f937fa957a3ee06efff4e760cf1713c5accc955e66a530b8bd721ba5bf4d1",
+      "grade": {
+        "task": "research",
+        "max_stage": 2,
+        "cases": 15,
+        "full_passes": 15,
+        "score": 100.0,
+        "category_passes": {
+          "schema": 15,
+          "numeric": 15,
+          "decisions": 15
+        },
+        "category_weights": {
+          "schema": 10,
+          "numeric": 45,
+          "decisions": 45
+        },
+        "details": [
+          {
+            "name": "independent_pass",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "one_sided_pass_two_sided_fail",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "known_sigma_not_residual_scaled",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "gain_only",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "fit_only",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "both_gates",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "equality_pass",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "correlation_overrides_sigma",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "correlated_bad_fit",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "correlated_gain_gate",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "selected_rows_and_columns",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "included_outlier_is_kept",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "mask_dof_and_gain",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "heteroscedastic_weights",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "general_spd_covariance",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "trial": 2,
+      "condition": "memory",
+      "stage": 2,
+      "task": "software",
+      "source_sha256": "cf235a8b24eb13a36613a55cd76f8bfc1dbb0f71716f16b3c7f5c3a79df20cc4",
+      "grade": {
+        "task": "software",
+        "max_stage": 2,
+        "cases": 13,
+        "full_passes": 13,
+        "score": 100.0,
+        "category_passes": {
+          "schema": 13,
+          "responses": 13,
+          "state": 13
+        },
+        "category_weights": {
+          "schema": 10,
+          "responses": 50,
+          "state": 40
+        },
+        "details": [
+          {
+            "name": "reserve_buy_release",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "failed_response_is_cached",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "hold_id_is_never_reused",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "sort_holds_and_stock",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "old_policy_replays_changed_payload",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "expiry_before_replay_at_deadline",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "expiry_keeps_id_and_failed_cache",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "no_expiry_beyond_last_event",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "atomic_failed_amend_and_keep_deadline",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "conflict_does_not_replace_cache",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "failed_amend_preserves_hold",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "conflict_after_expiry",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "amend_decrease_then_release",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "trial": 2,
+      "condition": "notebook",
+      "stage": 2,
+      "task": "research",
+      "source_sha256": "f339911359290a59a37b43fc065c6957dac16d3e8f7d6268d9720526ccbac3bb",
+      "grade": {
+        "task": "research",
+        "max_stage": 2,
+        "cases": 15,
+        "full_passes": 15,
+        "score": 100.0,
+        "category_passes": {
+          "schema": 15,
+          "numeric": 15,
+          "decisions": 15
+        },
+        "category_weights": {
+          "schema": 10,
+          "numeric": 45,
+          "decisions": 45
+        },
+        "details": [
+          {
+            "name": "independent_pass",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "one_sided_pass_two_sided_fail",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "known_sigma_not_residual_scaled",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "gain_only",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "fit_only",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "both_gates",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "equality_pass",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "correlation_overrides_sigma",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "correlated_bad_fit",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "correlated_gain_gate",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "selected_rows_and_columns",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "included_outlier_is_kept",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "mask_dof_and_gain",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "heteroscedastic_weights",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "general_spd_covariance",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "numeric": true,
+              "decisions": true
+            },
+            "all_pass": true,
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "trial": 2,
+      "condition": "notebook",
+      "stage": 2,
+      "task": "software",
+      "source_sha256": "ddc6a0a88be61b34474ad924e96e466fb2e2ac5569d139aa6bb9fd53533fe262",
+      "grade": {
+        "task": "software",
+        "max_stage": 2,
+        "cases": 13,
+        "full_passes": 13,
+        "score": 100.0,
+        "category_passes": {
+          "schema": 13,
+          "responses": 13,
+          "state": 13
+        },
+        "category_weights": {
+          "schema": 10,
+          "responses": 50,
+          "state": 40
+        },
+        "details": [
+          {
+            "name": "reserve_buy_release",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "failed_response_is_cached",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "hold_id_is_never_reused",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "sort_holds_and_stock",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "old_policy_replays_changed_payload",
+            "stage": 0,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "expiry_before_replay_at_deadline",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "expiry_keeps_id_and_failed_cache",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "no_expiry_beyond_last_event",
+            "stage": 1,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "atomic_failed_amend_and_keep_deadline",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "conflict_does_not_replace_cache",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "failed_amend_preserves_hold",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "conflict_after_expiry",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          },
+          {
+            "name": "amend_decrease_then_release",
+            "stage": 2,
+            "checks": {
+              "schema": true,
+              "responses": true,
+              "state": true
+            },
+            "all_pass": true,
+            "error": null
+          }
+        ]
+      }
+    }
+  ]
+}

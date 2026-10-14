@@ -1,0 +1,64 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "write",
+          "arguments": {
+            "path": "report.json",
+            "content": "[\n  {\n    \"needs_review\": false,\n    \"changed\": []\n  }\n]\n"
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy,json; from work import evaluate; cases=[({'declared':['b','a','a'],'saved':{'a':{'kind':'file','hash':'1'},'b':{'kind':'file','hash':'2'}},'current':{'a':{'hash':'9','kind':'file'},'b':{'hash':'2','kind':'file'}}},{'ignored':[]},{'needs_review':True,'changed':['a']}),({'declared':['x','y'],'saved':{},'current':{'x':{'kind':'missing'},'y':{'kind':'file','hash':'z'}}},{'ignored':['y']},{'needs_review':False,'changed':[]})]; [(lambda rb,pb,r,p,e: (assert_equal(r,e),assert_equal(rq,rb),assert_equal(po,pb)))(copy.deepcopy(rq),copy.deepcopy(po),evaluate(rq,po),ex) for rq,po,ex in cases for assert_equal in [lambda a,b: (_ for _ in ()).throw(AssertionError((a,b))) if a!=b else None]]; reqs=json.load(open('requests.json')); policy=json.load(open('policy.json')); report=json.load(open('report.json')); expected=[evaluate(r,policy) for r in reqs]; assert report==expected,(report,expected); assert all(set(x)=={'needs_review','changed'} for x in report); print('all checks passed')"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-m",
+              "py_compile",
+              "work.py"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "diff",
+              "--",
+              "work.py",
+              "report.json"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 19945,
+    "output_tokens": 1024,
+    "cached_input_tokens": 17920,
+    "reasoning_output_tokens": 513
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 33.74255962506868,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

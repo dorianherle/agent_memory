@@ -1,0 +1,762 @@
+{
+  "task": "calibration_limits-000",
+  "domain": "research",
+  "family": "calibration_limits",
+  "repeat": 0,
+  "arm": "notes",
+  "comparison": "main",
+  "complete": true,
+  "isolated": true,
+  "run_valid": true,
+  "model_transfer_complete": true,
+  "every_stage_passed": true,
+  "usage_complete": true,
+  "tokens": 398686,
+  "known_tokens": 398686,
+  "stages": [
+    {
+      "stop": "finished",
+      "tool_calls": 19,
+      "elapsed_seconds": 174.58403387502767,
+      "usage_complete": true,
+      "tokens": 189157,
+      "known_tokens": 189157,
+      "input_tokens": 181543,
+      "output_tokens": 7614,
+      "cached_input_tokens": 124160,
+      "reasoning_output_tokens": 2805,
+      "stage": 1,
+      "grade": {
+        "full_pass": true,
+        "passed": 23,
+        "total": 23,
+        "checks": [
+          {
+            "check": "case_0",
+            "passed": true
+          },
+          {
+            "check": "case_1",
+            "passed": true
+          },
+          {
+            "check": "case_2",
+            "passed": true
+          },
+          {
+            "check": "case_3",
+            "passed": true
+          },
+          {
+            "check": "case_4",
+            "passed": true
+          },
+          {
+            "check": "case_5",
+            "passed": true
+          },
+          {
+            "check": "case_6",
+            "passed": true
+          },
+          {
+            "check": "case_7",
+            "passed": true
+          },
+          {
+            "check": "case_8",
+            "passed": true
+          },
+          {
+            "check": "case_9",
+            "passed": true
+          },
+          {
+            "check": "case_10",
+            "passed": true
+          },
+          {
+            "check": "case_11",
+            "passed": true
+          },
+          {
+            "check": "case_12",
+            "passed": true
+          },
+          {
+            "check": "case_13",
+            "passed": true
+          },
+          {
+            "check": "case_14",
+            "passed": true
+          },
+          {
+            "check": "case_15",
+            "passed": true
+          },
+          {
+            "check": "case_16",
+            "passed": true
+          },
+          {
+            "check": "case_17",
+            "passed": true
+          },
+          {
+            "check": "case_18",
+            "passed": true
+          },
+          {
+            "check": "case_19",
+            "passed": true
+          },
+          {
+            "check": "case_20",
+            "passed": true
+          },
+          {
+            "check": "all_cases_returned",
+            "passed": true
+          },
+          {
+            "check": "current_source_report",
+            "passed": true
+          }
+        ],
+        "unsupported_conclusions": 0,
+        "missed_source_changes": 0
+      },
+      "memory": {
+        "ok": true,
+        "result": {
+          "notes": 2,
+          "model": null,
+          "checks": {
+            "status": "absent"
+          },
+          "evidence": [
+            {
+              "id": "c0da9c67a389aef01d2102d3e280c1019cc99bc0",
+              "text": "Implemented Stage 1 evaluate in work.py: missing required request fields return sorted unknowns; evidence is filtered by matching claim, withdrawal, required-condition equality, and optional verification; eligible superseded source IDs are removed; canonical JSON values determine agreement; outcomes include sorted sources and distinguish Boolean false as unsupported. Generated report.json from current inputs. Checks cover compilation/current output, immutability, filtering, supersession, canonical object agreement, false-vs-zero conflict, missing fields, and no evidence. Unresolved limit: inputs are assumed schema-valid, with sortable source IDs and JSON-serializable values.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py",
+                  "report.json",
+                  "TASK.md",
+                  "requests.json",
+                  "policy.json",
+                  "evidence.json"
+                ]
+              }
+            },
+            {
+              "id": "6f03b85c6e579dda0f2273026f455b6e6c405cb2",
+              "text": "Milestone complete: work.py implements evaluate and report.json matches all current requests. Verified py_compile, generated-result equality, git diff hygiene, and custom cases for missing conditions, no evidence, verification/withdrawal filtering, supersession, canonical object agreement, false-vs-zero conflict, and input immutability. Remaining limit: behavior assumes schema-valid inputs with sortable source IDs and JSON-serializable values; the task does not define malformed-input handling.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py",
+                  "report.json",
+                  "TASK.md",
+                  "requests.json",
+                  "policy.json",
+                  "evidence.json"
+                ],
+                "summary": true
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stop": "finished",
+      "tool_calls": 14,
+      "elapsed_seconds": 70.84427841589786,
+      "usage_complete": true,
+      "tokens": 79249,
+      "known_tokens": 79249,
+      "input_tokens": 76454,
+      "output_tokens": 2795,
+      "cached_input_tokens": 50048,
+      "reasoning_output_tokens": 901,
+      "stage": 2,
+      "grade": {
+        "full_pass": true,
+        "passed": 23,
+        "total": 23,
+        "checks": [
+          {
+            "check": "case_0",
+            "passed": true
+          },
+          {
+            "check": "case_1",
+            "passed": true
+          },
+          {
+            "check": "case_2",
+            "passed": true
+          },
+          {
+            "check": "case_3",
+            "passed": true
+          },
+          {
+            "check": "case_4",
+            "passed": true
+          },
+          {
+            "check": "case_5",
+            "passed": true
+          },
+          {
+            "check": "case_6",
+            "passed": true
+          },
+          {
+            "check": "case_7",
+            "passed": true
+          },
+          {
+            "check": "case_8",
+            "passed": true
+          },
+          {
+            "check": "case_9",
+            "passed": true
+          },
+          {
+            "check": "case_10",
+            "passed": true
+          },
+          {
+            "check": "case_11",
+            "passed": true
+          },
+          {
+            "check": "case_12",
+            "passed": true
+          },
+          {
+            "check": "case_13",
+            "passed": true
+          },
+          {
+            "check": "case_14",
+            "passed": true
+          },
+          {
+            "check": "case_15",
+            "passed": true
+          },
+          {
+            "check": "case_16",
+            "passed": true
+          },
+          {
+            "check": "case_17",
+            "passed": true
+          },
+          {
+            "check": "case_18",
+            "passed": true
+          },
+          {
+            "check": "case_19",
+            "passed": true
+          },
+          {
+            "check": "case_20",
+            "passed": true
+          },
+          {
+            "check": "all_cases_returned",
+            "passed": true
+          },
+          {
+            "check": "current_source_report",
+            "passed": true
+          }
+        ],
+        "unsupported_conclusions": 0,
+        "missed_source_changes": 0
+      },
+      "memory": {
+        "ok": true,
+        "result": {
+          "notes": 5,
+          "model": null,
+          "checks": {
+            "status": "absent"
+          },
+          "evidence": [
+            {
+              "id": "c0da9c67a389aef01d2102d3e280c1019cc99bc0",
+              "text": "Implemented Stage 1 evaluate in work.py: missing required request fields return sorted unknowns; evidence is filtered by matching claim, withdrawal, required-condition equality, and optional verification; eligible superseded source IDs are removed; canonical JSON values determine agreement; outcomes include sorted sources and distinguish Boolean false as unsupported. Generated report.json from current inputs. Checks cover compilation/current output, immutability, filtering, supersession, canonical object agreement, false-vs-zero conflict, missing fields, and no evidence. Unresolved limit: inputs are assumed schema-valid, with sortable source IDs and JSON-serializable values.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py",
+                  "report.json",
+                  "TASK.md",
+                  "requests.json",
+                  "policy.json",
+                  "evidence.json"
+                ]
+              }
+            },
+            {
+              "id": "6f03b85c6e579dda0f2273026f455b6e6c405cb2",
+              "text": "Milestone complete: work.py implements evaluate and report.json matches all current requests. Verified py_compile, generated-result equality, git diff hygiene, and custom cases for missing conditions, no evidence, verification/withdrawal filtering, supersession, canonical object agreement, false-vs-zero conflict, and input immutability. Remaining limit: behavior assumes schema-valid inputs with sortable source IDs and JSON-serializable values; the task does not define malformed-input handling.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py",
+                  "report.json",
+                  "TASK.md",
+                  "requests.json",
+                  "policy.json",
+                  "evidence.json"
+                ],
+                "summary": true
+              }
+            },
+            {
+              "id": "c3a2a4c0c829ec52ec5a1e46a2447c30822aa7ca",
+              "text": "Stage 2 work sample 0 verified: work.py filters by claim, withdrawal, required-condition equality, and verification policy; applies eligible-only supersession; compares canonical JSON; preserves false-vs-zero status behavior; sorts sources/unknowns; and does not mutate inputs. report.json equals evaluation of all current requests. Extended local checks passed.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py",
+                  "report.json",
+                  "requests.json",
+                  "evidence.json",
+                  "policy.json"
+                ]
+              }
+            },
+            {
+              "id": "451b7b31421f62df79ada2f1b9962d61e3dd0652",
+              "text": "Unresolved limits: none observed for the supplied Stage 2 contract and fixtures. Assumes evidence source IDs are sortable as provided and evidence values are valid finite JSON values, consistent with canonical-JSON input expectations.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py"
+                ]
+              }
+            },
+            {
+              "id": "be17a83012b2c7c29e03a6c62a0c022bd8b4874a",
+              "text": "Milestone complete: Stage 2 work sample 0 is implemented and verified. work.py satisfies eligibility, verification, exact required-condition matching, eligible-only supersession, canonical JSON agreement/conflict, Boolean-false unsupported status, sorting, and input immutability. report.json matches evaluation of current fixtures. Extended checks passed. No unresolved limits for supplied contract; inputs are assumed to contain sortable source IDs and finite JSON values.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py",
+                  "report.json",
+                  "requests.json",
+                  "evidence.json",
+                  "policy.json"
+                ],
+                "summary": true
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stop": "finished",
+      "tool_calls": 18,
+      "elapsed_seconds": 107.21434145909734,
+      "usage_complete": true,
+      "tokens": 130280,
+      "known_tokens": 130280,
+      "input_tokens": 126173,
+      "output_tokens": 4107,
+      "cached_input_tokens": 95488,
+      "reasoning_output_tokens": 1825,
+      "stage": 3,
+      "grade": {
+        "full_pass": true,
+        "passed": 65,
+        "total": 65,
+        "checks": [
+          {
+            "check": "case_0",
+            "passed": true
+          },
+          {
+            "check": "case_1",
+            "passed": true
+          },
+          {
+            "check": "case_2",
+            "passed": true
+          },
+          {
+            "check": "case_3",
+            "passed": true
+          },
+          {
+            "check": "case_4",
+            "passed": true
+          },
+          {
+            "check": "case_5",
+            "passed": true
+          },
+          {
+            "check": "case_6",
+            "passed": true
+          },
+          {
+            "check": "case_7",
+            "passed": true
+          },
+          {
+            "check": "case_8",
+            "passed": true
+          },
+          {
+            "check": "case_9",
+            "passed": true
+          },
+          {
+            "check": "case_10",
+            "passed": true
+          },
+          {
+            "check": "case_11",
+            "passed": true
+          },
+          {
+            "check": "case_12",
+            "passed": true
+          },
+          {
+            "check": "case_13",
+            "passed": true
+          },
+          {
+            "check": "case_14",
+            "passed": true
+          },
+          {
+            "check": "case_15",
+            "passed": true
+          },
+          {
+            "check": "case_16",
+            "passed": true
+          },
+          {
+            "check": "case_17",
+            "passed": true
+          },
+          {
+            "check": "case_18",
+            "passed": true
+          },
+          {
+            "check": "case_19",
+            "passed": true
+          },
+          {
+            "check": "case_20",
+            "passed": true
+          },
+          {
+            "check": "case_21",
+            "passed": true
+          },
+          {
+            "check": "case_22",
+            "passed": true
+          },
+          {
+            "check": "case_23",
+            "passed": true
+          },
+          {
+            "check": "case_24",
+            "passed": true
+          },
+          {
+            "check": "case_25",
+            "passed": true
+          },
+          {
+            "check": "case_26",
+            "passed": true
+          },
+          {
+            "check": "case_27",
+            "passed": true
+          },
+          {
+            "check": "case_28",
+            "passed": true
+          },
+          {
+            "check": "case_29",
+            "passed": true
+          },
+          {
+            "check": "case_30",
+            "passed": true
+          },
+          {
+            "check": "case_31",
+            "passed": true
+          },
+          {
+            "check": "case_32",
+            "passed": true
+          },
+          {
+            "check": "case_33",
+            "passed": true
+          },
+          {
+            "check": "case_34",
+            "passed": true
+          },
+          {
+            "check": "case_35",
+            "passed": true
+          },
+          {
+            "check": "case_36",
+            "passed": true
+          },
+          {
+            "check": "case_37",
+            "passed": true
+          },
+          {
+            "check": "case_38",
+            "passed": true
+          },
+          {
+            "check": "case_39",
+            "passed": true
+          },
+          {
+            "check": "case_40",
+            "passed": true
+          },
+          {
+            "check": "case_41",
+            "passed": true
+          },
+          {
+            "check": "case_42",
+            "passed": true
+          },
+          {
+            "check": "case_43",
+            "passed": true
+          },
+          {
+            "check": "case_44",
+            "passed": true
+          },
+          {
+            "check": "case_45",
+            "passed": true
+          },
+          {
+            "check": "case_46",
+            "passed": true
+          },
+          {
+            "check": "case_47",
+            "passed": true
+          },
+          {
+            "check": "case_48",
+            "passed": true
+          },
+          {
+            "check": "case_49",
+            "passed": true
+          },
+          {
+            "check": "case_50",
+            "passed": true
+          },
+          {
+            "check": "case_51",
+            "passed": true
+          },
+          {
+            "check": "case_52",
+            "passed": true
+          },
+          {
+            "check": "case_53",
+            "passed": true
+          },
+          {
+            "check": "case_54",
+            "passed": true
+          },
+          {
+            "check": "case_55",
+            "passed": true
+          },
+          {
+            "check": "case_56",
+            "passed": true
+          },
+          {
+            "check": "case_57",
+            "passed": true
+          },
+          {
+            "check": "case_58",
+            "passed": true
+          },
+          {
+            "check": "case_59",
+            "passed": true
+          },
+          {
+            "check": "case_60",
+            "passed": true
+          },
+          {
+            "check": "case_61",
+            "passed": true
+          },
+          {
+            "check": "case_62",
+            "passed": true
+          },
+          {
+            "check": "all_cases_returned",
+            "passed": true
+          },
+          {
+            "check": "current_source_report",
+            "passed": true
+          }
+        ],
+        "unsupported_conclusions": 0,
+        "missed_source_changes": 0
+      },
+      "memory": {
+        "ok": true,
+        "result": {
+          "notes": 7,
+          "model": null,
+          "checks": {
+            "status": "absent"
+          },
+          "evidence": [
+            {
+              "id": "c0da9c67a389aef01d2102d3e280c1019cc99bc0",
+              "text": "Implemented Stage 1 evaluate in work.py: missing required request fields return sorted unknowns; evidence is filtered by matching claim, withdrawal, required-condition equality, and optional verification; eligible superseded source IDs are removed; canonical JSON values determine agreement; outcomes include sorted sources and distinguish Boolean false as unsupported. Generated report.json from current inputs. Checks cover compilation/current output, immutability, filtering, supersession, canonical object agreement, false-vs-zero conflict, missing fields, and no evidence. Unresolved limit: inputs are assumed schema-valid, with sortable source IDs and JSON-serializable values.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py",
+                  "report.json",
+                  "TASK.md",
+                  "requests.json",
+                  "policy.json",
+                  "evidence.json"
+                ]
+              }
+            },
+            {
+              "id": "6f03b85c6e579dda0f2273026f455b6e6c405cb2",
+              "text": "Milestone complete: work.py implements evaluate and report.json matches all current requests. Verified py_compile, generated-result equality, git diff hygiene, and custom cases for missing conditions, no evidence, verification/withdrawal filtering, supersession, canonical object agreement, false-vs-zero conflict, and input immutability. Remaining limit: behavior assumes schema-valid inputs with sortable source IDs and JSON-serializable values; the task does not define malformed-input handling.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py",
+                  "report.json",
+                  "TASK.md",
+                  "requests.json",
+                  "policy.json",
+                  "evidence.json"
+                ],
+                "summary": true
+              }
+            },
+            {
+              "id": "c3a2a4c0c829ec52ec5a1e46a2447c30822aa7ca",
+              "text": "Stage 2 work sample 0 verified: work.py filters by claim, withdrawal, required-condition equality, and verification policy; applies eligible-only supersession; compares canonical JSON; preserves false-vs-zero status behavior; sorts sources/unknowns; and does not mutate inputs. report.json equals evaluation of all current requests. Extended local checks passed.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py",
+                  "report.json",
+                  "requests.json",
+                  "evidence.json",
+                  "policy.json"
+                ]
+              }
+            },
+            {
+              "id": "451b7b31421f62df79ada2f1b9962d61e3dd0652",
+              "text": "Unresolved limits: none observed for the supplied Stage 2 contract and fixtures. Assumes evidence source IDs are sortable as provided and evidence values are valid finite JSON values, consistent with canonical-JSON input expectations.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py"
+                ]
+              }
+            },
+            {
+              "id": "be17a83012b2c7c29e03a6c62a0c022bd8b4874a",
+              "text": "Milestone complete: Stage 2 work sample 0 is implemented and verified. work.py satisfies eligibility, verification, exact required-condition matching, eligible-only supersession, canonical JSON agreement/conflict, Boolean-false unsupported status, sorting, and input immutability. report.json matches evaluation of current fixtures. Extended checks passed. No unresolved limits for supplied contract; inputs are assumed to contain sortable source IDs and finite JSON values.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py",
+                  "report.json",
+                  "requests.json",
+                  "evidence.json",
+                  "policy.json"
+                ],
+                "summary": true
+              }
+            },
+            {
+              "id": "7b1bccc69b70292c3c938aceb997717ce5ac1e3c",
+              "text": "Stage 3 calibration_limits work sample 0 is complete. work.py implements evaluate with missing required-condition reporting, eligibility filtering (claim, withdrawal, verification, exact required-condition values), eligible-source supersession, canonical JSON agreement/conflict, Boolean-false unsupported status, sorted sources, and no input mutation. report.json equals evaluation of current requests.json against evidence.json and policy.json. Targeted Stage 3 edge checks passed, including absent calibration vs explicit null, zero vs false, supersession, conflict, verification, and input immutability.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py",
+                  "report.json",
+                  "requests.json",
+                  "evidence.json",
+                  "policy.json"
+                ]
+              }
+            },
+            {
+              "id": "5e9789bcc9f72c76bd0fe11dea9d12ad784fcad6",
+              "text": "Unresolved limits for Stage 3: none observed under the supplied contract and JSON fixtures. The implementation assumes evidence records have sortable source IDs and values are valid canonical JSON (NaN/Infinity are rejected).",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "repeated_identical_file_reads": 6,
+  "file_reads": 19,
+  "elapsed_seconds": 352.6426537500229
+}

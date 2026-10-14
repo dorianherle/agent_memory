@@ -52,6 +52,9 @@ Pass `agent` on save/summarize. MEMORY STATE is `agent-memory-state.mdc`.
 - `memory_find` — headlines; `ids=` for bodies
 - `memory_summarize` / `memory_delete` / `memory_open_questions`
 - `memory_history` — work notes, not the chat transcript
+- `memory_model` — get the active model; propose, check, accept, reduce, or predict
+- Use actual test observations as model cases. Keep conditions and alternatives.
+- After new evidence, revise the model. Reduction must retain earlier cases.
 - `memory_branch` / `memory_inspect` — restore a snapshot
 - Live: `.agent_memory/live/index.html`
 """

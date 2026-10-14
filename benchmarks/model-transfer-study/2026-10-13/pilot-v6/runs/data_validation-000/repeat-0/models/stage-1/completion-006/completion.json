@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy, json\nfrom work import evaluate\n\ndef check(req, pol, exp):\n    req0, pol0 = copy.deepcopy(req), copy.deepcopy(pol)\n    got = evaluate(req, pol)\n    assert got == exp, (got, exp)\n    assert req == req0 and pol == pol0\n\np = {'base_unit':'m','units':{'m':1,'cm':0.01},'unique':True}\ncheck({'rows':[{'id':'a','amount':100,'unit':'cm'},{'id':'b','amount':2}]},p,{'ok':True,'records':[{'id':'a','amount':1.0,'unit':'m'},{'id':'b','amount':2,'unit':'m'}],'errors':[]})\ncheck({'rows':[{'id':'x','amount':-1},{'id':'x','amount':2}]},p,{'ok':False,'records':[],'errors':[{'row':0,'cause':'amount'},{'row':1,'cause':'duplicate'}]})\ncheck({'rows':[{'id':'x','amount':1},{'id':'x','amount':-1,'unit':'bad'}]},p,{'ok':False,'records':[],'errors':[{'row':1,'cause':'amount'}]})\ncheck({'rows':[{'id':'x','amount':1},{'id':'x','amount':2,'unit':'bad'}]},p,{'ok':False,'records':[],'errors':[{'row':1,'cause':'unit'}]})\ncheck({'rows':[{'id':'','amount':-1,'unit':'bad'}]},p,{'ok':False,'records':[],'errors':[{'row':0,'cause':'id'}]})\ncheck({'rows':[{'id':'a','amount':True},{'id':'b','amount':float('inf')},{'id':'c','amount':float('nan')}]},p,{'ok':False,'records':[],'errors':[{'row':0,'cause':'amount'},{'row':1,'cause':'amount'},{'row':2,'cause':'amount'}]})\nwith open('policy.json') as f: policy=json.load(f)\nwith open('requests.json') as f: requests=json.load(f)\nwith open('report.json') as f: report=json.load(f)\nassert report == [evaluate(r, policy) for r in requests]\nprint('checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 25001,
+    "output_tokens": 900,
+    "cached_input_tokens": 18688,
+    "reasoning_output_tokens": 297
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 18.403579500038177,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

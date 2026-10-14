@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "save",
+      "text": "Stage 2 source_dependencies sample 0 verified on 2026-10-13. work.py canonicalizes complete JSON states (sorted object keys), treats absent mappings as {kind:missing}, deduplicates declared paths, excludes policy.ignored, sorts changed paths, and does not mutate inputs. Local boundary checks passed for duplicate declarations, ignored changed state, explicit missing versus absent equivalence, reordered nested object keys, differing hashes/kinds, sorted output, and input immutability. report.json exactly matches evaluate over requests.json with policy.json; evidence.json is absent. py_compile passed.",
+      "payload": {
+        "files": [
+          "TASK.md",
+          "work.py",
+          "requests.json",
+          "policy.json",
+          "report.json"
+        ]
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 12144,
+    "output_tokens": 340,
+    "cached_input_tokens": 0,
+    "reasoning_output_tokens": 169
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 8.981171499937773,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

@@ -1,0 +1,1 @@
+2026-10-13T18:01:26.680864Z ERROR codex_core::tools::router: error=apply_patch verification failed: invalid patch: The last line of the patch must be '*** End Patch'

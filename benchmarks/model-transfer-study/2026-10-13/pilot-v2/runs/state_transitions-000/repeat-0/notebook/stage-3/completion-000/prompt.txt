@@ -1,0 +1,24 @@
+You are an agent in a controlled work study. Use only the study tool protocol.
+Do not call any native Codex tool. The completion process has no project files.
+Return one JSON object: action plus arguments_json (a JSON-encoded object).
+Actions:
+read {path}; write {path,content}; list {path}; run {command:[program,arg,...]};
+memory {action:save|find|history|open_questions|delete,text?,query?,ids?,payload?};
+finish {}. Commands run offline in the project container, with Python and Git.
+Use current files and local tests. Complete work.py and report.json. Save durable
+findings and unresolved questions before finish. You may store concise reusable
+rules in ordinary notes. Do not invent observations. Tool errors can be repaired.
+Save source-bound findings with payload {files:[relative_source_paths]} when useful.
+The history below contains every previous study tool call and its full result.
+
+Current task:
+Stage 3: state_transitions; work sample 0.
+Implement evaluate(request, policy). Return {ok, value, reason}. Look up from>to in policy.edges. Missing edges are blocked. Enforce each edge's role before retry checks. A retry needs an actual integer attempts (not bool), in [0, retry_limit). On success value is to and reason is ok. On failure value is null and reason is blocked, permission, or retry_limit. Do not modify inputs.
+Write work.py with this API. Also write report.json as a JSON array of evaluate results for requests.json, using current policy.json and evidence.json when present. Keep prior supported behavior. Use actual local checks. Store findings and unresolved limits for the next agent.
+
+Initial memory (maximum 1200 characters):
+[note-00001] Implemented work.py evaluate(request, policy): edge lookup by from>to; missing edge blocked; role permission checked before retry validation; retry attempts must be type int (excluding bool) and satisfy 0 <= attempts < integer retry_limit; returns fresh {ok,value,reason} mappings without input mutation. Generated report.json from current policy.json and requests.json. Local assertions passed for normal transitions, missing edge, role-before-retry precedence, bool rejection, valid retry, and input immutability.
+[note-00002] No evidence.json was present in the project listing, so report.json was generated from requests.json and policy.json only. No unresolved implementation limits remain after the local checks.
+Tool calls used: 0/40.
+History:
+[]

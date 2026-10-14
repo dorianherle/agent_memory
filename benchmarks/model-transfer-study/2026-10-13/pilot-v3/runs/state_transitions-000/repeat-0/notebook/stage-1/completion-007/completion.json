@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy,json; from work import evaluate\np=json.load(open('policy.json')); rs=json.load(open('requests.json')); before=copy.deepcopy((p,rs)); out=[evaluate(r,p) for r in rs]; assert (p,rs)==before; assert out==json.load(open('report.json')); cases=[({'from':'x','to':'y'},p,{'ok':False,'value':None,'reason':'blocked'}),({'from':'ready','to':'running','retry':True,'attempts':0},p,{'ok':False,'value':None,'reason':'permission'}),({'from':'ready','to':'running','role':'operator_0','retry':True,'attempts':True},p,{'ok':False,'value':None,'reason':'retry_limit'}),({'from':'draft','to':'ready','retry':True,'attempts':-1},p,{'ok':False,'value':None,'reason':'retry_limit'}),({'from':'draft','to':'ready','retry':True,'attempts':1},p,{'ok':True,'value':'ready','reason':'ok'})]\nfor req,pol,want in cases: assert evaluate(req,pol)==want,(req,evaluate(req,pol),want)\nprint('ok',out)"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 19364,
+    "output_tokens": 835,
+    "cached_input_tokens": 13056,
+    "reasoning_output_tokens": 227
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 15.317152957897633,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

@@ -1,0 +1,19 @@
+E7 isolated retrieval diagnostic
+Status: completed
+Adaptive diagnostic on the known E4 fixture. Not an independent confirmation or abstraction test.
+Each call received one query and one memory packet. No cross-query batch context was supplied.
+global: semantic answers 3/4; exact sources 2/4; joint 2/4; total memory 656 estimated tokens; largest packet 164 tokens; native usage {"input_tokens": 53254, "output_tokens": 106}.
+retrieval: semantic answers 4/4; exact sources 4/4; joint 4/4; total memory 715 estimated tokens; largest packet 180 tokens; native usage {"input_tokens": 40266, "output_tokens": 105}.
+full_history: semantic answers 4/4; exact sources 4/4; joint 4/4; total memory 4052 estimated tokens; largest packet 1013 tokens; native usage {"input_tokens": 56633, "output_tokens": 105}.
+Native usage total: {"input_tokens": 150153, "output_tokens": 316}.
+Elapsed seconds: 26.99. Original E4 sources unchanged: True. E7 protocol unchanged: True.
+Limit: Known fixture selected after E4 outcomes
+Limit: Four questions
+Limit: One model
+Limit: One repetition
+Limit: Fixed project-name lexical retrieval
+Limit: Global packet produced by an earlier adaptive writer
+Limit: No new writer or training
+Limit: No native task continuation
+Limit: No fundamental-rule discovery
+Limit: No statistical confirmation

@@ -1,0 +1,1 @@
+2026-10-13T17:03:05.527232Z ERROR codex_core::tools::router: error=apply_patch verification failed: invalid hunk at line 2, Update file hunk for path '/dev/null' is empty

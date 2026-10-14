@@ -1,0 +1,72 @@
+Memory experiment screen. 13 October 2026.
+
+The screens found useful local mechanisms and important failure modes. They did not establish a breakthrough or a generally reliable memory system.
+
+E1 Five recursive handoffs
+Hypothesis: A typed ledger preserves critical facts better than recursive prose under the same size limit.
+Finding: Prose passed 9/9 groups. The ledger passed 8/9. It missed a new constraint when first introduced. Both formats exceeded the frozen size maximum.
+Classification: Inconclusive: budget control failed. No ledger advantage was observed.
+Evidence: /Users/dorianherle/Documents/Personal/agent_memory/labs/memory_micro/2026-10-13/e1_drift/results.json
+
+E2 Rule-focused compaction
+Hypothesis: A rule-and-exception packet transfers useful relationships to unseen cases within a small packet.
+Finding: Both packets answered all 8 unseen release cases correctly. Rule packet: 145 estimated tokens. Summary: 232, above the 220 target. On independent trials, rules used 156 tokens versus 108 for summary. Both retained unknown results.
+Classification: Local size benefit on patterned evidence. No prediction advantage. Not a valid equal-size comparison.
+Evidence: /Users/dorianherle/Documents/Personal/agent_memory/labs/memory_micro/2026-10-13/e2_abstraction/results.json
+
+E3 Tiny-model weight memory
+Hypothesis: A small pretrained model can become useful memory after a short local update.
+Finding: Setup reached its time limit before SmolLM2-135M-Instruct weights arrived. No model was loaded. No training or answer generation occurred.
+Classification: Inconclusive: setup only. No evidence for or against weight memory.
+Evidence: /Users/dorianherle/Documents/Personal/agent_memory/labs/memory_micro/2026-10-13/e3_weight_memory/results.json
+
+E4 Query-conditioned retrieval
+Hypothesis: Query-shaped source retrieval preserves needed facts better than one compact global packet.
+Finding: Retrieval answered all 12 questions with exact sources. The first global packet exceeded its cap. The adaptive capped-packet reader had one substantive answer error after the packet omitted the cooling hold. Batched retrieval exposed a larger union of source records.
+Classification: Original comparison is budget-invalid. Adaptive batch result has a context confound.
+Evidence: /Users/dorianherle/Documents/Personal/agent_memory/labs/memory_micro/2026-10-13/e4_query_memory/results.json
+
+E5 Task-frontier checkpoint
+Hypothesis: A checkpoint preserves resumption state better than a knowledge-focused summary.
+Finding: Both arms passed 8/8 fields on one task. On backfill, the checkpoint passed 8/8 and the summary 4/8. All packets met the cap. The checkpoint omitted an unscored instruction not to publish a release.
+Classification: Local improvement in scored resumption state. Full requirement preservation failed.
+Evidence: /Users/dorianherle/Documents/Personal/agent_memory/labs/memory_micro/2026-10-13/e5_task_frontier/results.json
+
+E6 Checked compaction and repair
+Hypothesis: A source-backed check and one repair improve aggressive compaction.
+Finding: Initial and repaired packets both answered 10/10 hidden groups. The initial packet had 174 estimated tokens. Repair produced 161 against a 160 cap. The repaired packet was rejected.
+Classification: Inconclusive: budget failure. No accuracy improvement. Rejection gate enforced the cap.
+Evidence: /Users/dorianherle/Documents/Personal/agent_memory/labs/memory_micro/2026-10-13/e6_checked_compaction/results.json
+
+E7 Isolated retrieval control
+Hypothesis: E4 retrieval remains useful when readers cannot see other queries or contexts.
+Finding: Separate readers answered 4/4 with retrieval and full history, versus 3/4 with the global packet. The global reader safely returned unknown for an omitted fact. Retrieval used 715 estimated context tokens in total, versus 656 for the global packets.
+Classification: Positive local diagnostic. Four selected known queries. No independent confirmation.
+Evidence: /Users/dorianherle/Documents/Personal/agent_memory/labs/memory_micro/2026-10-13/e7_isolated_retrieval/results.json
+
+E8 No-memory control
+Hypothesis: The receiver reproduces all E2 release labels without memory.
+Finding: Without memory, release answers scored 0/3 observed and 0/8 unseen. Independent trials scored 0/3 observed and 4/4 unseen because those unseen labels were unknown. Every response was unknown.
+Classification: The frozen no-memory hypothesis failed. This does not isolate prior knowledge once a packet is supplied.
+Evidence: /Users/dorianherle/Documents/Personal/agent_memory/labs/memory_micro/2026-10-13/e8_no_memory/results.json
+
+57 worker calls. Recorded native input tokens: 698,515. Recorded native output tokens: 10,089.
+These counts exclude parent and subagent orchestration. The successful setup probe is separate. Packet sizes use o200k_base estimates. They are not total model-call costs.
+
+Limits:
+- The fixtures are constructed. Researchers authored their contracts and graders.
+- Samples are small. No statistical superiority or general reliability is established.
+- Only E1 tests repeated handoffs. The other behavior tests mainly use one handoff.
+- The receivers answer controlled questions. They do not execute full native agent tasks.
+- E4's exact-format scores reject some semantically correct answers. The unchanged scores and manual review remain available.
+- E4's capped arm, E7, and E8 are adaptive diagnostics on known fixtures.
+- A passing grader can miss important source requirements, as E5 demonstrated.
+- All packet sizes use o200k_base estimates. Native usage includes substantial CLI overhead.
+- Orchestration, setup, training, storage, and worker inference are separate resource categories.
+- No experiment establishes extraction of unique fundamental truths or equations.
+
+Next experiments:
+- Test a protected requirement store plus task frontier over ten actual interrupted tasks. Check every user constraint.
+- Compare adaptive choice of prose, rules, and retrieval on new task families. Keep each receiver isolated.
+- With pretrained weights available before the timer starts, compare raw-history and verified-answer updates under an equal training-token budget.
+- Add late exceptions to an apparent shared rule. Measure correction, uncertainty, and retention across further handoffs.

@@ -1,0 +1,36 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "save",
+      "text": "Completed Stage 2 work sample 0. work.py implements caller-supplied evaluation with required-condition, verification, withdrawal, eligible supersession, canonical-value conflict, false-as-unsupported, exact output fields, and input immutability behavior. report.json was regenerated from current requests/policy/evidence: vertical_rate is conflict from S1/X1; device_validated is unsupported false from D1. Independent boundary and report-reproducibility checks passed. Remaining limit: malformed non-JSON inputs and non-string/missing source IDs are outside tested contract.",
+      "payload": {
+        "files": [
+          "work.py",
+          "report.json",
+          "TASK.md",
+          "OUTPUT_SCHEMA.json",
+          "requests.json",
+          "policy.json",
+          "evidence.json"
+        ]
+      },
+      "summary": true
+    }
+  },
+  "usage": {
+    "input_tokens": 16912,
+    "output_tokens": 529,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 352
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 13.849510540952906,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

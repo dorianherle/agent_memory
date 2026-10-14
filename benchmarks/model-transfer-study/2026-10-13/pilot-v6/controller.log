@@ -1,0 +1,79 @@
+Run state_transitions-000 repeat=0 method=notebook
+Run source_dependencies-000 repeat=0 method=notebook
+Run configuration_changes-000 repeat=0 method=notes
+Stage done: state_transitions-000 repeat=0 method=notebook stage=1 stop=finished pass=False tokens=87583
+Stage done: state_transitions-000 repeat=0 method=notebook stage=2 stop=finished pass=False tokens=37606
+Stage done: source_dependencies-000 repeat=0 method=notebook stage=1 stop=finished pass=True tokens=108622
+Stage done: state_transitions-000 repeat=0 method=notebook stage=3 stop=finished pass=False tokens=40920
+Run state_transitions-000 repeat=0 method=notes
+Stage done: source_dependencies-000 repeat=0 method=notebook stage=2 stop=finished pass=True tokens=59756
+Stage done: source_dependencies-000 repeat=0 method=notebook stage=3 stop=finished pass=True tokens=68093
+Run source_dependencies-000 repeat=0 method=models
+Stage done: configuration_changes-000 repeat=0 method=notes stage=1 stop=finished pass=False tokens=202446
+Stage done: state_transitions-000 repeat=0 method=notes stage=1 stop=finished pass=True tokens=110820
+Stage done: configuration_changes-000 repeat=0 method=notes stage=2 stop=finished pass=False tokens=78364
+Stage done: configuration_changes-000 repeat=0 method=notes stage=3 stop=finished pass=False tokens=91030
+Run configuration_changes-000 repeat=0 method=notebook
+Stage done: state_transitions-000 repeat=0 method=notes stage=2 stop=finished pass=True tokens=135331
+Stage done: source_dependencies-000 repeat=0 method=models stage=1 stop=finished pass=True tokens=190164
+Stage done: state_transitions-000 repeat=0 method=notes stage=3 stop=finished pass=True tokens=74126
+Run state_transitions-000 repeat=0 method=models
+Stage done: source_dependencies-000 repeat=0 method=models stage=2 stop=finished pass=True tokens=81841
+Stage done: configuration_changes-000 repeat=0 method=notebook stage=1 stop=finished pass=False tokens=129162
+Stage done: configuration_changes-000 repeat=0 method=notebook stage=2 stop=finished pass=False tokens=69516
+Stage done: source_dependencies-000 repeat=0 method=models stage=3 stop=finished pass=True tokens=128721
+Run source_dependencies-000 repeat=0 method=notes
+Stage done: configuration_changes-000 repeat=0 method=notebook stage=3 stop=finished pass=False tokens=47890
+Run configuration_changes-000 repeat=0 method=models
+Stage done: state_transitions-000 repeat=0 method=models stage=1 stop=finished pass=True tokens=182621
+Stage done: source_dependencies-000 repeat=0 method=notes stage=1 stop=finished pass=True tokens=125826
+Stage done: source_dependencies-000 repeat=0 method=notes stage=2 stop=finished pass=True tokens=85757
+Stage done: state_transitions-000 repeat=0 method=models stage=2 stop=finished pass=True tokens=301966
+Stage done: source_dependencies-000 repeat=0 method=notes stage=3 stop=finished pass=True tokens=91259
+Stage done: configuration_changes-000 repeat=0 method=models stage=1 stop=finished pass=True tokens=241591
+Stage done: state_transitions-000 repeat=0 method=models stage=3 stop=finished pass=True tokens=95663
+Stage done: configuration_changes-000 repeat=0 method=models stage=2 stop=finished pass=True tokens=219225
+Stage done: configuration_changes-000 repeat=0 method=models stage=3 stop=finished pass=True tokens=125031
+Run data_validation-000 repeat=0 method=notes
+Run calibration_limits-000 repeat=0 method=models
+Run source_comparison-000 repeat=0 method=models
+Stage done: data_validation-000 repeat=0 method=notes stage=1 stop=finished pass=True tokens=139260
+Stage done: source_comparison-000 repeat=0 method=models stage=1 stop=finished pass=True tokens=199236
+Stage done: calibration_limits-000 repeat=0 method=models stage=1 stop=finished pass=True tokens=193982
+Stage done: data_validation-000 repeat=0 method=notes stage=2 stop=finished pass=True tokens=102108
+Stage done: data_validation-000 repeat=0 method=notes stage=3 stop=finished pass=True tokens=92982
+Run data_validation-000 repeat=0 method=models
+Stage done: source_comparison-000 repeat=0 method=models stage=2 stop=finished pass=True tokens=180737
+Stage done: source_comparison-000 repeat=0 method=models stage=3 stop=finished pass=True tokens=151996
+Run source_comparison-000 repeat=0 method=notebook
+Stage done: calibration_limits-000 repeat=0 method=models stage=2 stop=finished pass=True tokens=365470
+Stage done: source_comparison-000 repeat=0 method=notebook stage=1 stop=finished pass=False tokens=31073
+Stage done: data_validation-000 repeat=0 method=models stage=1 stop=finished pass=False tokens=282128
+Stage done: calibration_limits-000 repeat=0 method=models stage=3 stop=finished pass=True tokens=170459
+Run calibration_limits-000 repeat=0 method=notes
+Stage done: source_comparison-000 repeat=0 method=notebook stage=2 stop=finished pass=True tokens=150261
+Stage done: source_comparison-000 repeat=0 method=notebook stage=3 stop=finished pass=True tokens=89467
+Run source_comparison-000 repeat=0 method=notes
+Stage done: calibration_limits-000 repeat=0 method=notes stage=1 stop=finished pass=True tokens=189157
+Stage done: source_comparison-000 repeat=0 method=notes stage=1 stop=finished pass=True tokens=84890
+Stage done: data_validation-000 repeat=0 method=models stage=2 stop=finished pass=False tokens=313389
+Stage done: calibration_limits-000 repeat=0 method=notes stage=2 stop=finished pass=True tokens=79249
+Stage done: source_comparison-000 repeat=0 method=notes stage=2 stop=finished pass=True tokens=109719
+Stage done: calibration_limits-000 repeat=0 method=notes stage=3 stop=finished pass=True tokens=130280
+Run calibration_limits-000 repeat=0 method=notebook
+Stage done: data_validation-000 repeat=0 method=models stage=3 stop=finished pass=False tokens=122549
+Run data_validation-000 repeat=0 method=notebook
+Stage done: source_comparison-000 repeat=0 method=notes stage=3 stop=finished pass=True tokens=76272
+Stage done: calibration_limits-000 repeat=0 method=notebook stage=1 stop=finished pass=True tokens=101696
+Stage done: data_validation-000 repeat=0 method=notebook stage=1 stop=finished pass=False tokens=172377
+Stage done: calibration_limits-000 repeat=0 method=notebook stage=2 stop=finished pass=True tokens=66592
+Stage done: data_validation-000 repeat=0 method=notebook stage=2 stop=finished pass=False tokens=47968
+Stage done: calibration_limits-000 repeat=0 method=notebook stage=3 stop=finished pass=True tokens=53213
+Stage done: data_validation-000 repeat=0 method=notebook stage=3 stop=finished pass=False tokens=81248
+Run conflicting_evidence-000 repeat=0 method=notebook
+Run revised_conclusions-000 repeat=0 method=notebook
+Run state_transitions-000 repeat=1 method=notes
+Stage done: state_transitions-000 repeat=1 method=notes stage=1 stop=finished pass=False tokens=114302
+Stage done: revised_conclusions-000 repeat=0 method=notebook stage=1 stop=finished pass=True tokens=121148
+Stage done: state_transitions-000 repeat=1 method=notes stage=2 stop=finished pass=True tokens=106843
+Stage done: conflicting_evidence-000 repeat=0 method=notebook stage=1 stop=finished pass=True tokens=156872

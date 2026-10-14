@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import json\nfrom work import evaluate\n\np={\"defaults\":{\"b\":True,\"i\":3,\"s\":\"x\"},\"types\":{\"b\":\"boolean\",\"i\":\"integer\",\"s\":\"string\"},\"null_resets\":True,\"environment\":True}\ncases=[\n ({\"layers\":[{\"b\":False,\"i\":0,\"s\":\"\"}]},{\"ok\":True,\"config\":{\"b\":False,\"i\":0,\"s\":\"\"},\"error\":None}),\n ({\"layers\":[{\"i\":9},{\"i\":None}]},{\"ok\":True,\"config\":{\"b\":True,\"i\":3,\"s\":\"x\"},\"error\":None}),\n ({\"layers\":[{\"bad\":1}]},{\"ok\":False,\"config\":{},\"error\":\"unknown_key\"}),\n ({\"environment\":{\"b\":\"false\",\"i\":\"-12\",\"s\":\"\"}},{\"ok\":True,\"config\":{\"b\":False,\"i\":-12,\"s\":\"\"},\"error\":None}),\n ({\"environment\":{\"b\":\"False\"}},{\"ok\":False,\"config\":{},\"error\":\"environment\"}),\n ({\"environment\":{\"i\":\" 2\"}},{\"ok\":False,\"config\":{},\"error\":\"environment\"}),\n ({\"layers\":[{\"i\":True}]},{\"ok\":False,\"config\":{},\"error\":\"type\"}),\n ({\"layers\":[{\"i\":\"bad\"}],\"environment\":{\"i\":\"+4\"}},{\"ok\":True,\"config\":{\"b\":True,\"i\":4,\"s\":\"x\"},\"error\":None})]\nfor n,(req,want) in enumerate(cases):\n got=evaluate(req,p)\n assert got==want,(n,got,want)\npolicy=json.load(open('policy.json'))\nrequests=json.load(open('requests.json'))\nreport=json.load(open('report.json'))\nactual=[evaluate(r,policy) for r in requests]\nassert report==actual,(report,actual)\nprint('ok',len(cases),'edge cases; report matches',len(requests),'request(s)')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 20452,
+    "output_tokens": 947,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 180
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 16.06197699997574,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

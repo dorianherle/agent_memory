@@ -1,0 +1,1482 @@
+{
+  "task": "source_dependencies-050",
+  "domain": "code",
+  "family": "source_dependencies",
+  "repeat": 0,
+  "arm": "models",
+  "comparison": "main",
+  "complete": false,
+  "isolated": true,
+  "run_valid": true,
+  "model_transfer_complete": false,
+  "every_stage_passed": false,
+  "usage_complete": true,
+  "tokens": 354791,
+  "known_tokens": 354791,
+  "stages": [
+    {
+      "stop": "finished",
+      "tool_calls": 23,
+      "elapsed_seconds": 309.00154016702436,
+      "usage_complete": true,
+      "tokens": 354791,
+      "known_tokens": 354791,
+      "input_tokens": 346157,
+      "output_tokens": 8634,
+      "cached_input_tokens": 225536,
+      "reasoning_output_tokens": 3989,
+      "model_probes": {
+        "target": "needs_review",
+        "predictions": {
+          "ok": true,
+          "result": [
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            },
+            {
+              "status": "unknown",
+              "reason": "Inputs must include the declared model variables"
+            }
+          ]
+        },
+        "expected": [
+          false,
+          true,
+          true,
+          true,
+          false,
+          false,
+          true,
+          true,
+          true,
+          false,
+          false,
+          true,
+          true,
+          true,
+          false,
+          false,
+          true,
+          true,
+          true,
+          false,
+          false,
+          true,
+          true,
+          true,
+          false,
+          true,
+          false
+        ]
+      },
+      "stage": 1,
+      "grade": {
+        "full_pass": true,
+        "passed": 30,
+        "total": 30,
+        "checks": [
+          {
+            "check": "case_0",
+            "passed": true
+          },
+          {
+            "check": "case_1",
+            "passed": true
+          },
+          {
+            "check": "case_2",
+            "passed": true
+          },
+          {
+            "check": "case_3",
+            "passed": true
+          },
+          {
+            "check": "case_4",
+            "passed": true
+          },
+          {
+            "check": "case_5",
+            "passed": true
+          },
+          {
+            "check": "case_6",
+            "passed": true
+          },
+          {
+            "check": "case_7",
+            "passed": true
+          },
+          {
+            "check": "case_8",
+            "passed": true
+          },
+          {
+            "check": "case_9",
+            "passed": true
+          },
+          {
+            "check": "case_10",
+            "passed": true
+          },
+          {
+            "check": "case_11",
+            "passed": true
+          },
+          {
+            "check": "case_12",
+            "passed": true
+          },
+          {
+            "check": "case_13",
+            "passed": true
+          },
+          {
+            "check": "case_14",
+            "passed": true
+          },
+          {
+            "check": "case_15",
+            "passed": true
+          },
+          {
+            "check": "case_16",
+            "passed": true
+          },
+          {
+            "check": "case_17",
+            "passed": true
+          },
+          {
+            "check": "case_18",
+            "passed": true
+          },
+          {
+            "check": "case_19",
+            "passed": true
+          },
+          {
+            "check": "case_20",
+            "passed": true
+          },
+          {
+            "check": "case_21",
+            "passed": true
+          },
+          {
+            "check": "case_22",
+            "passed": true
+          },
+          {
+            "check": "case_23",
+            "passed": true
+          },
+          {
+            "check": "case_24",
+            "passed": true
+          },
+          {
+            "check": "case_25",
+            "passed": true
+          },
+          {
+            "check": "case_26",
+            "passed": true
+          },
+          {
+            "check": "case_27",
+            "passed": true
+          },
+          {
+            "check": "all_cases_returned",
+            "passed": true
+          },
+          {
+            "check": "current_source_report",
+            "passed": true
+          }
+        ],
+        "unsupported_conclusions": 0,
+        "missed_source_changes": 0
+      },
+      "memory": {
+        "ok": true,
+        "result": {
+          "notes": 6,
+          "model": {
+            "id": "f8c0bd8ec0ce147288ece64813dc04e4dccf2e1b",
+            "event": "accepted",
+            "checks": {
+              "alternatives": [],
+              "cases": [
+                {
+                  "challenge": false,
+                  "expected": false,
+                  "id": "unchanged_current_request",
+                  "pass": true,
+                  "result": {
+                    "rules": [
+                      "no_review_without_relevant_difference"
+                    ],
+                    "status": "predicted",
+                    "value": false
+                  }
+                },
+                {
+                  "challenge": true,
+                  "expected": true,
+                  "id": "hash_change_requires_review",
+                  "pass": true,
+                  "result": {
+                    "rules": [
+                      "review_when_relevant_state_differs"
+                    ],
+                    "status": "predicted",
+                    "value": true
+                  }
+                },
+                {
+                  "challenge": true,
+                  "expected": false,
+                  "id": "missing_equals_explicit_missing",
+                  "pass": true,
+                  "result": {
+                    "rules": [
+                      "no_review_without_relevant_difference"
+                    ],
+                    "status": "predicted",
+                    "value": false
+                  }
+                }
+              ],
+              "changed_dependencies": [],
+              "complexity": {
+                "cases": 3,
+                "complete_bytes": 3300,
+                "rules": 2,
+                "working_bytes": 1405
+              },
+              "id": "0686a6fd7ad69926bbbc801caf76e7a8c1d22415",
+              "issues": [],
+              "missing_evidence": [],
+              "status": "tested",
+              "uncovered_rules": [],
+              "unresolved": [
+                "The expression language does not expose dynamic object lookup, set deduplication, or sorting, so changed-list construction is preserved in rule claims and source-bound notes rather than encoded as a separate executable target."
+              ]
+            },
+            "complexity": {
+              "cases": 3,
+              "complete_bytes": 3300,
+              "rules": 2,
+              "working_bytes": 1405
+            },
+            "fingerprints": {
+              "TASK.md": {
+                "sha256": "885e2f39d72455747d134daca10a3f4fdd7a84ef29746c32c8282aecd1f7c21f",
+                "state": "file"
+              },
+              "policy.json": {
+                "sha256": "57a5f3a15eb280474d37847d6c5aa3252c46e0eaea95bbf6b658c2fb653fa186",
+                "state": "file"
+              },
+              "report.json": {
+                "sha256": "cd5f4dd3e24be317071ce439fb1e9fe1c053fa6c004e27d0ba40447f7ee69638",
+                "state": "file"
+              },
+              "requests.json": {
+                "sha256": "9eee203d7fa7131710a3195cfa2aaa1ac7f9ef8c9824b03e24bbf16d1e3e0487",
+                "state": "file"
+              },
+              "work.py": {
+                "sha256": "7df7a953a17dfe44b51e343de3bf68a0e12774f21b64fe031ac32fe35e5bdd76",
+                "state": "file"
+              }
+            },
+            "model": {
+              "alternatives": [],
+              "cases": [
+                {
+                  "challenge": false,
+                  "evidence": [
+                    "e78fdd92e60444ab4d56d27b06970cd56e96b916"
+                  ],
+                  "expected": false,
+                  "id": "unchanged_current_request",
+                  "inputs": {
+                    "evidence": [
+                      {
+                        "current": {
+                          "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                          "kind": "file"
+                        },
+                        "declared": true,
+                        "ignored": false,
+                        "path": "worker_50.py",
+                        "saved": {
+                          "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                          "kind": "file"
+                        }
+                      }
+                    ],
+                    "policy": {
+                      "ignored": [],
+                      "variant": 50
+                    },
+                    "request": {
+                      "current": {
+                        "worker_50.py": {
+                          "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                          "kind": "file"
+                        }
+                      },
+                      "declared": [
+                        "worker_50.py"
+                      ],
+                      "saved": {
+                        "worker_50.py": {
+                          "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                          "kind": "file"
+                        }
+                      }
+                    }
+                  },
+                  "target": "needs_review"
+                },
+                {
+                  "challenge": true,
+                  "evidence": [
+                    "8be8d99fe039a3cc933f8a46b09befdc00c2817c"
+                  ],
+                  "expected": true,
+                  "id": "hash_change_requires_review",
+                  "inputs": {
+                    "evidence": [
+                      {
+                        "current": {
+                          "hash": "9",
+                          "kind": "file"
+                        },
+                        "declared": true,
+                        "ignored": false,
+                        "path": "a",
+                        "saved": {
+                          "hash": "1",
+                          "kind": "file"
+                        }
+                      }
+                    ],
+                    "policy": {
+                      "ignored": []
+                    },
+                    "request": {
+                      "current": {
+                        "a": {
+                          "hash": "9",
+                          "kind": "file"
+                        }
+                      },
+                      "declared": [
+                        "a"
+                      ],
+                      "saved": {
+                        "a": {
+                          "hash": "1",
+                          "kind": "file"
+                        }
+                      }
+                    }
+                  },
+                  "target": "needs_review"
+                },
+                {
+                  "challenge": true,
+                  "evidence": [
+                    "8be8d99fe039a3cc933f8a46b09befdc00c2817c"
+                  ],
+                  "expected": false,
+                  "id": "missing_equals_explicit_missing",
+                  "inputs": {
+                    "evidence": [
+                      {
+                        "current": {
+                          "kind": "missing"
+                        },
+                        "declared": true,
+                        "ignored": false,
+                        "path": "x",
+                        "saved": {
+                          "kind": "missing"
+                        }
+                      }
+                    ],
+                    "policy": {
+                      "ignored": []
+                    },
+                    "request": {
+                      "current": {
+                        "x": {
+                          "kind": "missing"
+                        }
+                      },
+                      "declared": [
+                        "x"
+                      ],
+                      "saved": {}
+                    }
+                  },
+                  "target": "needs_review"
+                }
+              ],
+              "inputs": {
+                "evidence": "array",
+                "policy": "object",
+                "request": "object"
+              },
+              "resolutions": [],
+              "rules": [
+                {
+                  "claim": "Review is required when any unique declared, non-ignored path has unequal complete canonical JSON states after absent states are normalized to {kind:missing}.",
+                  "dependencies": [
+                    "TASK.md",
+                    "work.py"
+                  ],
+                  "evidence": [
+                    "e78fdd92e60444ab4d56d27b06970cd56e96b916",
+                    "8be8d99fe039a3cc933f8a46b09befdc00c2817c"
+                  ],
+                  "id": "review_when_relevant_state_differs",
+                  "target": "needs_review",
+                  "then": {
+                    "value": true
+                  },
+                  "when": {
+                    "as": "item",
+                    "items": {
+                      "var": "evidence"
+                    },
+                    "op": "any",
+                    "test": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "item.declared"
+                            },
+                            {
+                              "value": true
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "item.ignored"
+                            },
+                            {
+                              "value": false
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "item.saved"
+                            },
+                            {
+                              "var": "item.current"
+                            }
+                          ],
+                          "op": "ne"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  }
+                },
+                {
+                  "claim": "No review is required when every normalized declared path is ignored, undeclared, or has an equal complete canonical JSON state.",
+                  "dependencies": [
+                    "TASK.md",
+                    "work.py"
+                  ],
+                  "evidence": [
+                    "e78fdd92e60444ab4d56d27b06970cd56e96b916",
+                    "8be8d99fe039a3cc933f8a46b09befdc00c2817c"
+                  ],
+                  "id": "no_review_without_relevant_difference",
+                  "target": "needs_review",
+                  "then": {
+                    "value": false
+                  },
+                  "when": {
+                    "as": "item",
+                    "items": {
+                      "var": "evidence"
+                    },
+                    "op": "all",
+                    "test": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "item.declared"
+                            },
+                            {
+                              "value": false
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "item.ignored"
+                            },
+                            {
+                              "value": true
+                            }
+                          ],
+                          "op": "eq"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "item.saved"
+                            },
+                            {
+                              "var": "item.current"
+                            }
+                          ],
+                          "op": "eq"
+                        }
+                      ],
+                      "op": "or"
+                    }
+                  }
+                }
+              ],
+              "schema": 1,
+              "title": "Source dependency review from normalized per-path evidence",
+              "unresolved": [
+                "The expression language does not expose dynamic object lookup, set deduplication, or sorting, so changed-list construction is preserved in rule claims and source-bound notes rather than encoded as a separate executable target."
+              ]
+            },
+            "parent": null,
+            "proposal": "0686a6fd7ad69926bbbc801caf76e7a8c1d22415",
+            "reason": "Agent proposed a model revision",
+            "revision": 1
+          },
+          "checks": {
+            "id": "f8c0bd8ec0ce147288ece64813dc04e4dccf2e1b",
+            "status": "tested",
+            "issues": [],
+            "cases": [
+              {
+                "id": "unchanged_current_request",
+                "pass": true,
+                "result": {
+                  "status": "predicted",
+                  "value": false,
+                  "rules": [
+                    "no_review_without_relevant_difference"
+                  ]
+                },
+                "expected": false,
+                "challenge": false
+              },
+              {
+                "id": "hash_change_requires_review",
+                "pass": true,
+                "result": {
+                  "status": "predicted",
+                  "value": true,
+                  "rules": [
+                    "review_when_relevant_state_differs"
+                  ]
+                },
+                "expected": true,
+                "challenge": true
+              },
+              {
+                "id": "missing_equals_explicit_missing",
+                "pass": true,
+                "result": {
+                  "status": "predicted",
+                  "value": false,
+                  "rules": [
+                    "no_review_without_relevant_difference"
+                  ]
+                },
+                "expected": false,
+                "challenge": true
+              }
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [],
+            "alternatives": [],
+            "complexity": {
+              "cases": 3,
+              "complete_bytes": 3300,
+              "rules": 2,
+              "working_bytes": 1405
+            },
+            "unresolved": [
+              "The expression language does not expose dynamic object lookup, set deduplication, or sorting, so changed-list construction is preserved in rule claims and source-bound notes rather than encoded as a separate executable target."
+            ]
+          },
+          "evidence": [
+            {
+              "id": "e78fdd92e60444ab4d56d27b06970cd56e96b916",
+              "text": "Implemented and locally verified source-dependency evaluation: relevant paths are unique request.declared entries excluding policy.ignored; absent saved/current entries normalize to {\"kind\":\"missing\"}; complete JSON states are compared canonically with recursive object-key ordering; changed is lexicographically sorted and needs_review is bool(changed); inputs remain unmodified. report.json equals evaluation of current requests.json under policy.json.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "TASK.md",
+                  "work.py",
+                  "requests.json",
+                  "policy.json",
+                  "report.json"
+                ]
+              }
+            },
+            {
+              "id": "8be8d99fe039a3cc933f8a46b09befdc00c2817c",
+              "text": "Observed local checks: four assertions passed. Exact saved/current state despite object key reordering yields no review; a complete-state hash change yields review with changed=[\"a\"]; timestamp-only change also yields review, confirming full-state comparison; missing entry equals explicit {\"kind\":\"missing\"}; ignored changed paths are irrelevant; duplicate declarations collapse; evaluated inputs remained unchanged.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py",
+                  "TASK.md"
+                ]
+              }
+            },
+            {
+              "id": "0686a6fd7ad69926bbbc801caf76e7a8c1d22415",
+              "text": "Task model proposed: Source dependency review from normalized per-path evidence",
+              "payload": {
+                "agent": "agent",
+                "model_event": "proposed",
+                "task_model": {
+                  "complexity": {
+                    "cases": 3,
+                    "complete_bytes": 3300,
+                    "rules": 2,
+                    "working_bytes": 1405
+                  },
+                  "fingerprints": {
+                    "TASK.md": {
+                      "sha256": "885e2f39d72455747d134daca10a3f4fdd7a84ef29746c32c8282aecd1f7c21f",
+                      "state": "file"
+                    },
+                    "policy.json": {
+                      "sha256": "57a5f3a15eb280474d37847d6c5aa3252c46e0eaea95bbf6b658c2fb653fa186",
+                      "state": "file"
+                    },
+                    "report.json": {
+                      "sha256": "cd5f4dd3e24be317071ce439fb1e9fe1c053fa6c004e27d0ba40447f7ee69638",
+                      "state": "file"
+                    },
+                    "requests.json": {
+                      "sha256": "9eee203d7fa7131710a3195cfa2aaa1ac7f9ef8c9824b03e24bbf16d1e3e0487",
+                      "state": "file"
+                    },
+                    "work.py": {
+                      "sha256": "7df7a953a17dfe44b51e343de3bf68a0e12774f21b64fe031ac32fe35e5bdd76",
+                      "state": "file"
+                    }
+                  },
+                  "model": {
+                    "alternatives": [],
+                    "cases": [
+                      {
+                        "challenge": false,
+                        "evidence": [
+                          "e78fdd92e60444ab4d56d27b06970cd56e96b916"
+                        ],
+                        "expected": false,
+                        "id": "unchanged_current_request",
+                        "inputs": {
+                          "evidence": [
+                            {
+                              "current": {
+                                "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                                "kind": "file"
+                              },
+                              "declared": true,
+                              "ignored": false,
+                              "path": "worker_50.py",
+                              "saved": {
+                                "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                                "kind": "file"
+                              }
+                            }
+                          ],
+                          "policy": {
+                            "ignored": [],
+                            "variant": 50
+                          },
+                          "request": {
+                            "current": {
+                              "worker_50.py": {
+                                "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                                "kind": "file"
+                              }
+                            },
+                            "declared": [
+                              "worker_50.py"
+                            ],
+                            "saved": {
+                              "worker_50.py": {
+                                "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                                "kind": "file"
+                              }
+                            }
+                          }
+                        },
+                        "target": "needs_review"
+                      },
+                      {
+                        "challenge": true,
+                        "evidence": [
+                          "8be8d99fe039a3cc933f8a46b09befdc00c2817c"
+                        ],
+                        "expected": true,
+                        "id": "hash_change_requires_review",
+                        "inputs": {
+                          "evidence": [
+                            {
+                              "current": {
+                                "hash": "9",
+                                "kind": "file"
+                              },
+                              "declared": true,
+                              "ignored": false,
+                              "path": "a",
+                              "saved": {
+                                "hash": "1",
+                                "kind": "file"
+                              }
+                            }
+                          ],
+                          "policy": {
+                            "ignored": []
+                          },
+                          "request": {
+                            "current": {
+                              "a": {
+                                "hash": "9",
+                                "kind": "file"
+                              }
+                            },
+                            "declared": [
+                              "a"
+                            ],
+                            "saved": {
+                              "a": {
+                                "hash": "1",
+                                "kind": "file"
+                              }
+                            }
+                          }
+                        },
+                        "target": "needs_review"
+                      },
+                      {
+                        "challenge": true,
+                        "evidence": [
+                          "8be8d99fe039a3cc933f8a46b09befdc00c2817c"
+                        ],
+                        "expected": false,
+                        "id": "missing_equals_explicit_missing",
+                        "inputs": {
+                          "evidence": [
+                            {
+                              "current": {
+                                "kind": "missing"
+                              },
+                              "declared": true,
+                              "ignored": false,
+                              "path": "x",
+                              "saved": {
+                                "kind": "missing"
+                              }
+                            }
+                          ],
+                          "policy": {
+                            "ignored": []
+                          },
+                          "request": {
+                            "current": {
+                              "x": {
+                                "kind": "missing"
+                              }
+                            },
+                            "declared": [
+                              "x"
+                            ],
+                            "saved": {}
+                          }
+                        },
+                        "target": "needs_review"
+                      }
+                    ],
+                    "inputs": {
+                      "evidence": "array",
+                      "policy": "object",
+                      "request": "object"
+                    },
+                    "resolutions": [],
+                    "rules": [
+                      {
+                        "claim": "Review is required when any unique declared, non-ignored path has unequal complete canonical JSON states after absent states are normalized to {kind:missing}.",
+                        "dependencies": [
+                          "TASK.md",
+                          "work.py"
+                        ],
+                        "evidence": [
+                          "e78fdd92e60444ab4d56d27b06970cd56e96b916",
+                          "8be8d99fe039a3cc933f8a46b09befdc00c2817c"
+                        ],
+                        "id": "review_when_relevant_state_differs",
+                        "target": "needs_review",
+                        "then": {
+                          "value": true
+                        },
+                        "when": {
+                          "as": "item",
+                          "items": {
+                            "var": "evidence"
+                          },
+                          "op": "any",
+                          "test": {
+                            "args": [
+                              {
+                                "args": [
+                                  {
+                                    "var": "item.declared"
+                                  },
+                                  {
+                                    "value": true
+                                  }
+                                ],
+                                "op": "eq"
+                              },
+                              {
+                                "args": [
+                                  {
+                                    "var": "item.ignored"
+                                  },
+                                  {
+                                    "value": false
+                                  }
+                                ],
+                                "op": "eq"
+                              },
+                              {
+                                "args": [
+                                  {
+                                    "var": "item.saved"
+                                  },
+                                  {
+                                    "var": "item.current"
+                                  }
+                                ],
+                                "op": "ne"
+                              }
+                            ],
+                            "op": "and"
+                          }
+                        }
+                      },
+                      {
+                        "claim": "No review is required when every normalized declared path is ignored, undeclared, or has an equal complete canonical JSON state.",
+                        "dependencies": [
+                          "TASK.md",
+                          "work.py"
+                        ],
+                        "evidence": [
+                          "e78fdd92e60444ab4d56d27b06970cd56e96b916",
+                          "8be8d99fe039a3cc933f8a46b09befdc00c2817c"
+                        ],
+                        "id": "no_review_without_relevant_difference",
+                        "target": "needs_review",
+                        "then": {
+                          "value": false
+                        },
+                        "when": {
+                          "as": "item",
+                          "items": {
+                            "var": "evidence"
+                          },
+                          "op": "all",
+                          "test": {
+                            "args": [
+                              {
+                                "args": [
+                                  {
+                                    "var": "item.declared"
+                                  },
+                                  {
+                                    "value": false
+                                  }
+                                ],
+                                "op": "eq"
+                              },
+                              {
+                                "args": [
+                                  {
+                                    "var": "item.ignored"
+                                  },
+                                  {
+                                    "value": true
+                                  }
+                                ],
+                                "op": "eq"
+                              },
+                              {
+                                "args": [
+                                  {
+                                    "var": "item.saved"
+                                  },
+                                  {
+                                    "var": "item.current"
+                                  }
+                                ],
+                                "op": "eq"
+                              }
+                            ],
+                            "op": "or"
+                          }
+                        }
+                      }
+                    ],
+                    "schema": 1,
+                    "title": "Source dependency review from normalized per-path evidence",
+                    "unresolved": [
+                      "The expression language does not expose dynamic object lookup, set deduplication, or sorting, so changed-list construction is preserved in rule claims and source-bound notes rather than encoded as a separate executable target."
+                    ]
+                  },
+                  "parent": null,
+                  "reason": "Agent proposed a model revision",
+                  "revision": 1
+                }
+              }
+            },
+            {
+              "id": "f8c0bd8ec0ce147288ece64813dc04e4dccf2e1b",
+              "text": "Task model active: Source dependency review from normalized per-path evidence",
+              "payload": {
+                "agent": "agent",
+                "model_event": "accepted",
+                "task_model": {
+                  "checks": {
+                    "alternatives": [],
+                    "cases": [
+                      {
+                        "challenge": false,
+                        "expected": false,
+                        "id": "unchanged_current_request",
+                        "pass": true,
+                        "result": {
+                          "rules": [
+                            "no_review_without_relevant_difference"
+                          ],
+                          "status": "predicted",
+                          "value": false
+                        }
+                      },
+                      {
+                        "challenge": true,
+                        "expected": true,
+                        "id": "hash_change_requires_review",
+                        "pass": true,
+                        "result": {
+                          "rules": [
+                            "review_when_relevant_state_differs"
+                          ],
+                          "status": "predicted",
+                          "value": true
+                        }
+                      },
+                      {
+                        "challenge": true,
+                        "expected": false,
+                        "id": "missing_equals_explicit_missing",
+                        "pass": true,
+                        "result": {
+                          "rules": [
+                            "no_review_without_relevant_difference"
+                          ],
+                          "status": "predicted",
+                          "value": false
+                        }
+                      }
+                    ],
+                    "changed_dependencies": [],
+                    "complexity": {
+                      "cases": 3,
+                      "complete_bytes": 3300,
+                      "rules": 2,
+                      "working_bytes": 1405
+                    },
+                    "id": "0686a6fd7ad69926bbbc801caf76e7a8c1d22415",
+                    "issues": [],
+                    "missing_evidence": [],
+                    "status": "tested",
+                    "uncovered_rules": [],
+                    "unresolved": [
+                      "The expression language does not expose dynamic object lookup, set deduplication, or sorting, so changed-list construction is preserved in rule claims and source-bound notes rather than encoded as a separate executable target."
+                    ]
+                  },
+                  "complexity": {
+                    "cases": 3,
+                    "complete_bytes": 3300,
+                    "rules": 2,
+                    "working_bytes": 1405
+                  },
+                  "fingerprints": {
+                    "TASK.md": {
+                      "sha256": "885e2f39d72455747d134daca10a3f4fdd7a84ef29746c32c8282aecd1f7c21f",
+                      "state": "file"
+                    },
+                    "policy.json": {
+                      "sha256": "57a5f3a15eb280474d37847d6c5aa3252c46e0eaea95bbf6b658c2fb653fa186",
+                      "state": "file"
+                    },
+                    "report.json": {
+                      "sha256": "cd5f4dd3e24be317071ce439fb1e9fe1c053fa6c004e27d0ba40447f7ee69638",
+                      "state": "file"
+                    },
+                    "requests.json": {
+                      "sha256": "9eee203d7fa7131710a3195cfa2aaa1ac7f9ef8c9824b03e24bbf16d1e3e0487",
+                      "state": "file"
+                    },
+                    "work.py": {
+                      "sha256": "7df7a953a17dfe44b51e343de3bf68a0e12774f21b64fe031ac32fe35e5bdd76",
+                      "state": "file"
+                    }
+                  },
+                  "model": {
+                    "alternatives": [],
+                    "cases": [
+                      {
+                        "challenge": false,
+                        "evidence": [
+                          "e78fdd92e60444ab4d56d27b06970cd56e96b916"
+                        ],
+                        "expected": false,
+                        "id": "unchanged_current_request",
+                        "inputs": {
+                          "evidence": [
+                            {
+                              "current": {
+                                "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                                "kind": "file"
+                              },
+                              "declared": true,
+                              "ignored": false,
+                              "path": "worker_50.py",
+                              "saved": {
+                                "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                                "kind": "file"
+                              }
+                            }
+                          ],
+                          "policy": {
+                            "ignored": [],
+                            "variant": 50
+                          },
+                          "request": {
+                            "current": {
+                              "worker_50.py": {
+                                "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                                "kind": "file"
+                              }
+                            },
+                            "declared": [
+                              "worker_50.py"
+                            ],
+                            "saved": {
+                              "worker_50.py": {
+                                "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                                "kind": "file"
+                              }
+                            }
+                          }
+                        },
+                        "target": "needs_review"
+                      },
+                      {
+                        "challenge": true,
+                        "evidence": [
+                          "8be8d99fe039a3cc933f8a46b09befdc00c2817c"
+                        ],
+                        "expected": true,
+                        "id": "hash_change_requires_review",
+                        "inputs": {
+                          "evidence": [
+                            {
+                              "current": {
+                                "hash": "9",
+                                "kind": "file"
+                              },
+                              "declared": true,
+                              "ignored": false,
+                              "path": "a",
+                              "saved": {
+                                "hash": "1",
+                                "kind": "file"
+                              }
+                            }
+                          ],
+                          "policy": {
+                            "ignored": []
+                          },
+                          "request": {
+                            "current": {
+                              "a": {
+                                "hash": "9",
+                                "kind": "file"
+                              }
+                            },
+                            "declared": [
+                              "a"
+                            ],
+                            "saved": {
+                              "a": {
+                                "hash": "1",
+                                "kind": "file"
+                              }
+                            }
+                          }
+                        },
+                        "target": "needs_review"
+                      },
+                      {
+                        "challenge": true,
+                        "evidence": [
+                          "8be8d99fe039a3cc933f8a46b09befdc00c2817c"
+                        ],
+                        "expected": false,
+                        "id": "missing_equals_explicit_missing",
+                        "inputs": {
+                          "evidence": [
+                            {
+                              "current": {
+                                "kind": "missing"
+                              },
+                              "declared": true,
+                              "ignored": false,
+                              "path": "x",
+                              "saved": {
+                                "kind": "missing"
+                              }
+                            }
+                          ],
+                          "policy": {
+                            "ignored": []
+                          },
+                          "request": {
+                            "current": {
+                              "x": {
+                                "kind": "missing"
+                              }
+                            },
+                            "declared": [
+                              "x"
+                            ],
+                            "saved": {}
+                          }
+                        },
+                        "target": "needs_review"
+                      }
+                    ],
+                    "inputs": {
+                      "evidence": "array",
+                      "policy": "object",
+                      "request": "object"
+                    },
+                    "resolutions": [],
+                    "rules": [
+                      {
+                        "claim": "Review is required when any unique declared, non-ignored path has unequal complete canonical JSON states after absent states are normalized to {kind:missing}.",
+                        "dependencies": [
+                          "TASK.md",
+                          "work.py"
+                        ],
+                        "evidence": [
+                          "e78fdd92e60444ab4d56d27b06970cd56e96b916",
+                          "8be8d99fe039a3cc933f8a46b09befdc00c2817c"
+                        ],
+                        "id": "review_when_relevant_state_differs",
+                        "target": "needs_review",
+                        "then": {
+                          "value": true
+                        },
+                        "when": {
+                          "as": "item",
+                          "items": {
+                            "var": "evidence"
+                          },
+                          "op": "any",
+                          "test": {
+                            "args": [
+                              {
+                                "args": [
+                                  {
+                                    "var": "item.declared"
+                                  },
+                                  {
+                                    "value": true
+                                  }
+                                ],
+                                "op": "eq"
+                              },
+                              {
+                                "args": [
+                                  {
+                                    "var": "item.ignored"
+                                  },
+                                  {
+                                    "value": false
+                                  }
+                                ],
+                                "op": "eq"
+                              },
+                              {
+                                "args": [
+                                  {
+                                    "var": "item.saved"
+                                  },
+                                  {
+                                    "var": "item.current"
+                                  }
+                                ],
+                                "op": "ne"
+                              }
+                            ],
+                            "op": "and"
+                          }
+                        }
+                      },
+                      {
+                        "claim": "No review is required when every normalized declared path is ignored, undeclared, or has an equal complete canonical JSON state.",
+                        "dependencies": [
+                          "TASK.md",
+                          "work.py"
+                        ],
+                        "evidence": [
+                          "e78fdd92e60444ab4d56d27b06970cd56e96b916",
+                          "8be8d99fe039a3cc933f8a46b09befdc00c2817c"
+                        ],
+                        "id": "no_review_without_relevant_difference",
+                        "target": "needs_review",
+                        "then": {
+                          "value": false
+                        },
+                        "when": {
+                          "as": "item",
+                          "items": {
+                            "var": "evidence"
+                          },
+                          "op": "all",
+                          "test": {
+                            "args": [
+                              {
+                                "args": [
+                                  {
+                                    "var": "item.declared"
+                                  },
+                                  {
+                                    "value": false
+                                  }
+                                ],
+                                "op": "eq"
+                              },
+                              {
+                                "args": [
+                                  {
+                                    "var": "item.ignored"
+                                  },
+                                  {
+                                    "value": true
+                                  }
+                                ],
+                                "op": "eq"
+                              },
+                              {
+                                "args": [
+                                  {
+                                    "var": "item.saved"
+                                  },
+                                  {
+                                    "var": "item.current"
+                                  }
+                                ],
+                                "op": "eq"
+                              }
+                            ],
+                            "op": "or"
+                          }
+                        }
+                      }
+                    ],
+                    "schema": 1,
+                    "title": "Source dependency review from normalized per-path evidence",
+                    "unresolved": [
+                      "The expression language does not expose dynamic object lookup, set deduplication, or sorting, so changed-list construction is preserved in rule claims and source-bound notes rather than encoded as a separate executable target."
+                    ]
+                  },
+                  "parent": null,
+                  "proposal": "0686a6fd7ad69926bbbc801caf76e7a8c1d22415",
+                  "reason": "Agent proposed a model revision",
+                  "revision": 1
+                }
+              }
+            },
+            {
+              "id": "8982388baee1f511a43fc43d4892868863863bf0",
+              "text": "Unresolved limit: the executable model expression language cannot encode dynamic object lookup, path deduplication, or changed-path sorting; those requirements are implemented and tested in work.py and retained in source-bound findings. No evidence.json is present in the current workspace, so report.json was generated solely from requests.json and policy.json.",
+              "payload": {
+                "agent": "agent",
+                "files": [
+                  "work.py",
+                  "report.json",
+                  "requests.json",
+                  "policy.json"
+                ]
+              }
+            },
+            {
+              "id": "73e20cd96229e02a8deaad6ed679f19d53d2133d",
+              "text": "Milestone complete: work.py implements evaluate(request, policy) by deduplicating declared paths, excluding ignored paths, normalizing absent states to {\"kind\":\"missing\"}, canonically comparing complete JSON states, sorting changed paths, and preserving inputs. report.json matches the current request evaluation. Local behavioral assertions, report verification, py_compile, and git diff --check passed. Accepted model f8c0bd8ec0ce147288ece64813dc04e4dccf2e1b passed all recorded cases and reduction was unchanged. Remaining model-language limitation: dynamic lookup, deduplication, and sorting are source-tested but not executable model targets; evidence.json is absent.",
+              "payload": {
+                "agent": "agent",
+                "covers": [
+                  "e78fdd92e60444ab4d56d27b06970cd56e96b916",
+                  "8be8d99fe039a3cc933f8a46b09befdc00c2817c",
+                  "8982388baee1f511a43fc43d4892868863863bf0"
+                ],
+                "files": [
+                  "TASK.md",
+                  "work.py",
+                  "requests.json",
+                  "policy.json",
+                  "report.json"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "repeated_identical_file_reads": 0,
+  "file_reads": 4,
+  "elapsed_seconds": 309.00154016702436
+}

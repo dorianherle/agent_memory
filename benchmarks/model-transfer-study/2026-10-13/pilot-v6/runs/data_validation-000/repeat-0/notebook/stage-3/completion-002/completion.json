@@ -1,0 +1,67 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy,json,math; from work import evaluate; p={'base_unit':'m','units':{'m':1,'cm':0.01},'unique':True}; cases=[({'rows':[{'id':'a','amount':2,'unit':'cm'},{'id':'b','amount':3}]},{'ok':True,'records':[{'id':'a','amount':0.02,'unit':'m'},{'id':'b','amount':3,'unit':'m'}],'errors':[]}),({'rows':[{'id':'','amount':-1,'unit':'x'},{'id':'a','amount':True},{'id':'b','amount':float('inf')},{'id':'c','amount':1,'unit':'x'},{'id':'d','amount':1},{'id':'d','amount':2}]},{'ok':False,'records':[],'errors':[{'row':0,'cause':'id'},{'row':1,'cause':'amount'},{'row':2,'cause':'amount'},{'row':3,'cause':'unit'},{'row':5,'cause':'duplicate'}]})]; [(lambda before,r,expected: (assert_equal(r,expected),assert_equal(req,before)))(copy.deepcopy(req),evaluate(req,p),expected) for req,expected in cases]; print('edge and immutability checks passed')",
+              "-c"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import json; from work import evaluate; requests=json.load(open('requests.json')); policy=json.load(open('policy.json')); expected=[evaluate(r,policy) for r in requests]; actual=json.load(open('report.json')); assert actual==expected,(actual,expected); print('report consistency passed')"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "diff",
+              "--",
+              "work.py",
+              "report.json"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "status",
+              "--short"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 9836,
+    "output_tokens": 602,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 144
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 11.579829999944195,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": [
+        "read",
+        "write",
+        "list",
+        "run",
+        "memory",
+        "finish"
+      ]
+    },
+    "arguments_json": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "action",
+    "arguments_json"
+  ],
+  "additionalProperties": false
+}

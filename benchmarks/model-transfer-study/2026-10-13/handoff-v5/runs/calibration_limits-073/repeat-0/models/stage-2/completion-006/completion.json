@@ -1,0 +1,25 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "model_handoff",
+      "payload_file": "model.json",
+      "id": "8c03c7edffdc806d69f45c9acaf2c39703625a01"
+    }
+  },
+  "usage": {
+    "input_tokens": 17423,
+    "output_tokens": 176,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 114
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 8.683690750040114,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

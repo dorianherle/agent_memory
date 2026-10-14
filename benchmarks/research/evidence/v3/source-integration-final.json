@@ -1,0 +1,15 @@
+{
+  "backup": "/Users/dorianherle/Documents/Personal/Application_California/private-backups/agent-memory-before-final-text-fix",
+  "changed": {
+    "agent_memory/core.py": "211512c4a1fd3c21f8a78cd6bccd311706ce00ba2b13ec179f348ebcd6c72e6c",
+    "agent_memory/catalog.py": "91711fb89e7dd342a78e3d22df55cd43dee8fbfab8d8b282a0d980af524acf3a",
+    "agent_memory/tests/test_reliability_audit.py": "6b6821ed09fcb99974f1c535c8310e9550a728e55c1c2931b502f104728e830c"
+  },
+  "preserved": {
+    "agent_memory/runner.py": "369daa35d4d87cb89065151e08e72c631999d04b286a9acb7f93a2c1045b0e42",
+    "agent_memory/studio.py": "f653f0a7ccb79ec8ea9256ade4f0b66a7f04ea439b55803130a0ebaf3c7ca742",
+    "agent_memory/studio.html": "99b7be59a3dfc96b7bbf11234aecd1b939300d0769e3921807fb0e7cb20633fc",
+    "agent_memory/tests/test_runner.py": "d6e701b00ccd32fe22826cc4947f7925b48af7163fad123ed368072d32cee38a",
+    "agent_memory/tests/test_studio.py": "941b0d5db65cea4ad1bd69cc6d825083076295178d87bd5f5c0bf07b3e1bd4fd"
+  }
+}

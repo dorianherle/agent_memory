@@ -1,0 +1,43 @@
+{
+  "experiment": "E3 weight memory",
+  "status": "frozen before training",
+  "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+  "scope": "Small CPU screening study. No claim about general progressive compaction.",
+  "seed": 421,
+  "device": "cpu",
+  "adapter": {"rank": 8, "last_layers": 6, "modules": ["q_proj", "v_proj", "down_proj"], "alpha": 8},
+  "update_budget": {"steps": 40, "batch_size": 2, "max_training_tokens_per_example": 96, "learning_rate": 0.004},
+  "generation": {"do_sample": false, "max_new_tokens": 24},
+  "variants": ["baseline_no_history", "baseline_with_history", "raw_chat_update", "verified_qa_update", "qa_second_update"],
+  "source_history": [
+    "User: This is the fictional Neris project. Keep failed results in the report. You can publish only after all tests pass.",
+    "User: The normal power limit is 12 mW. In ice mode, the power limit is 3 mW.",
+    "Assistant: I will use the 12 mW limit for normal mode.",
+    "User: Correction: replace 12 mW with 17 mW for normal mode. The ice-mode exception is still 3 mW.",
+    "User: The width limit is 42 um. No release date has been set."
+  ],
+  "training_qa": [
+    ["What is the normal power limit for Neris?", "17 mW."],
+    ["What power limit applies to Neris in ice mode?", "3 mW."],
+    ["What should the Neris report do with failed results?", "Keep failed results."],
+    ["When is Neris publication permitted?", "Only after all tests pass."],
+    ["What is the Neris width limit?", "42 um."],
+    ["What is the Neris release date?", "Unknown."]
+  ],
+  "tests": [
+    {"id": "corrected_power", "query": "For Neris under ordinary conditions, what is the maximum power?", "required": ["17"], "forbidden": ["12", "3"], "critical": true},
+    {"id": "power_paraphrase", "query": "Give the latest allowed power in the normal Neris operating mode.", "required": ["17"], "forbidden": ["12", "3"], "critical": true},
+    {"id": "rare_exception", "query": "Neris is now in its ice operating mode. Which power ceiling must I use?", "required": ["3"], "forbidden": ["17", "12"], "critical": true},
+    {"id": "failure_constraint", "query": "A Neris run failed. Should its result remain in the report?", "required_any": ["keep", "remain", "yes", "include", "retain"], "forbidden": ["discard", "remove"], "critical": true},
+    {"id": "publish_constraint", "query": "Some Neris tests have not passed. Can I publish now?", "required_any": ["no", "not", "only after"], "forbidden": ["yes"], "critical": true},
+    {"id": "old_width", "query": "How wide can the Neris part be at most?", "required": ["42"], "critical": true},
+    {"id": "unknown_date", "query": "On which calendar day will Neris be released?", "required_any": ["unknown", "not set", "no release date", "not specified", "not known", "not provided"], "critical": true}
+  ],
+  "second_update_qa": [
+    ["What is the normal power limit for Neris now?", "19 mW."],
+    ["What is the required cleanup item for Neris?", "Gloves."]
+  ],
+  "second_update_semantics": "Normal power changes from 17 to 19 mW. All other rules remain. The original non-power tests measure forgetting. The two power tests expect 19 rather than 17.",
+  "scoring": "Frozen lexical checks are diagnostic only. All exact outputs are retained for human review. There is no source-validation score. A variant passes only if every critical check passes.",
+  "blind_spots": ["One fictional task", "One seed", "Short updates", "Small instruction model", "No downstream large-agent continuation", "No measured fundamental-rule extraction", "Adapter tied to one base", "Lexical scorer can misclassify meaning", "Fixed steps do not equal fixed training-token count", "No replay in second update"]
+}

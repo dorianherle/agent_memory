@@ -1,0 +1,34 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "save",
+      "text": "Stage 2 work sample 0 is implemented and locally verified. work.py evaluates only caller-supplied request/evidence/policy; checks sorted missing required conditions; filters claim, withdrawn, verification, and exact required-condition values; removes eligible superseded source IDs; compares canonical JSON values; returns schema-exact unknown/conflict/supported/unsupported results without mutating inputs. report.json equals evaluation of every current request using current evidence.json and policy.json. Actual checks passed, including missing conditions, supersession, structured canonical agreement, Boolean false, 0-vs-false conflict, no evidence, input immutability, exact fields, and report regeneration. Unresolved limits: none identified for the specified JSON inputs.",
+      "payload": {
+        "files": [
+          "work.py",
+          "report.json",
+          "OUTPUT_SCHEMA.json",
+          "requests.json",
+          "policy.json",
+          "evidence.json"
+        ]
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 23232,
+    "output_tokens": 526,
+    "cached_input_tokens": 17792,
+    "reasoning_output_tokens": 295
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 17.93229795782827,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

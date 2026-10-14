@@ -1,0 +1,20 @@
+{
+  "source": "/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v5",
+  "catalog_loaded": "/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v5/agent_memory/catalog.py",
+  "core_loaded": "/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v5/agent_memory/core.py",
+  "tests_run": 15,
+  "failure_entries": 1,
+  "error_entries": 0,
+  "passed": false,
+  "elapsed_seconds": 4.073063000105321,
+  "failures": [
+    {
+      "test": "test_unicode_noncharacters_do_not_change_other_text (audit_cases.ExactNoteStorageTests.test_unicode_noncharacters_do_not_change_other_text)",
+      "traceback": "Traceback (most recent call last):\n  File \"/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v6/agent_memory/tests/test_reliability_audit.py\", line 109, in test_unicode_noncharacters_do_not_change_other_text\n    self.assertEqual(self.memory.find(ids=target)[0].message, text)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'Unicode: caf\u00e9 \u6f22\u5b57 \u00ef\u00bf\u00be \u00ef\u00bf\u00bf \u00ef\u00b7\\x90 \ud83d\ude00\\n' != 'Unicode: caf\u00e9 \u6f22\u5b57 \\ufffe \\uffff \\ufdd0 \ud83d\ude00\\n'\n- Unicode: caf\u00e9 \u6f22\u5b57 \u00ef\u00bf\u00be \u00ef\u00bf\u00bf \u00ef\u00b7\u0090 \ud83d\ude00\n+ Unicode: caf\u00e9 \u6f22\u5b57 \ufffe \uffff \ufdd0 \ud83d\ude00\n\n"
+    }
+  ],
+  "source_sha256": {
+    "agent_memory/core.py": "1dd2adb15651a0241d6f839733e6a9a76ae571572b2a7e283f09b882d540932b",
+    "agent_memory/catalog.py": "91711fb89e7dd342a78e3d22df55cd43dee8fbfab8d8b282a0d980af524acf3a"
+  }
+}

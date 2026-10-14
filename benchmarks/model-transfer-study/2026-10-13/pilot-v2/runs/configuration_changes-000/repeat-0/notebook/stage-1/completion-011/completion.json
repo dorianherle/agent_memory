@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import work\n\np0={'defaults':{'b':True,'i':3,'s':'x'},'types':{'b':'boolean','i':'integer','s':'string'},'null_resets':False,'environment':False}\ndef chk(req, pol, want):\n r=work.evaluate(req,pol); assert r==want,(r,want)\nchk({'layers':[{'b':False,'i':0,'s':''}]},p0,{'ok':True,'config':{'b':False,'i':0,'s':''},'error':None})\nfor key,val in [('b',0),('i',False),('s',1),('i',None)]: chk({'layers':[{key:val}]},p0,{'ok':False,'config':{},'error':'type'})\nchk({'layers':[{'x':1}]},p0,{'ok':False,'config':{},'error':'unknown_key'})\np1={**p0,'null_resets':True}\nchk({'layers':[{'i':9},{'i':None}]},p1,{'ok':True,'config':{'b':True,'i':3,'s':'x'},'error':None})\np2={**p0,'environment':True}\nchk({'layers':[],'environment':{'b':'false','i':'-04','s':''}},p2,{'ok':True,'config':{'b':False,'i':-4,'s':''},'error':None})\nfor key,val in [('b','False'),('b','1'),('i',' 1'),('i','1.0'),('i',True),('s',3)]: chk({'environment':{key:val}},p2,{'ok':False,'config':{},'error':'environment'})\nchk({'environment':{'i':'1'}},p0,{'ok':False,'config':{},'error':'environment'})\nchk({'environment':{'x':'1'}},p2,{'ok':False,'config':{},'error':'unknown_key'})\nprint('all assertions passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 21572,
+    "output_tokens": 1129,
+    "cached_input_tokens": 18432,
+    "reasoning_output_tokens": 603
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 35.67100170790218,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

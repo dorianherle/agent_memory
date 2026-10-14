@@ -1,0 +1,58 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "status",
+              "--short"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "log",
+              "--oneline",
+              "--all",
+              "-10"
+            ]
+          }
+        },
+        {
+          "action": "memory",
+          "arguments": {
+            "action": "history"
+          }
+        },
+        {
+          "action": "memory",
+          "arguments": {
+            "action": "open_questions"
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 19155,
+    "output_tokens": 285,
+    "cached_input_tokens": 17664,
+    "reasoning_output_tokens": 150
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 12.019942041952163,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

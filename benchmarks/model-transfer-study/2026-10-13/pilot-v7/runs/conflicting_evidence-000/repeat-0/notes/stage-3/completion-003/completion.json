@@ -1,0 +1,63 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "work.py"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-m",
+              "py_compile",
+              "work.py"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "diff",
+              "--",
+              "work.py",
+              "report.json"
+            ]
+          }
+        },
+        {
+          "action": "memory",
+          "arguments": {
+            "action": "find",
+            "query": "canonical JSON supersedes calibration source IDs"
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 24770,
+    "output_tokens": 602,
+    "cached_input_tokens": 18560,
+    "reasoning_output_tokens": 457
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 16.76153279095888,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

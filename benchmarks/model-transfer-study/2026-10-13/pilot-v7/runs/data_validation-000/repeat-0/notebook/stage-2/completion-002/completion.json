@@ -1,0 +1,44 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy, json, math, work\nP={'base_unit':'m','units':{'m':1,'cm':0.01},'unique':True}\ncases=[\n({'rows':[{'id':'a','amount':2}]},{'ok':True,'records':[{'id':'a','amount':2}],'errors':[]}),\n({'rows':[{'id':'','amount':-1,'unit':'x'},{'id':'a','amount':True},{'id':'b','amount':float('inf')},{'id':'c','amount':1,'unit':'x'}]},{'ok':False,'records':[],'errors':[{'row':0,'cause':'id'},{'row':1,'cause':'amount'},{'row':2,'cause':'amount'},{'row':3,'cause':'unit'}]}),\n({'rows':[{'id':'a','amount':-1},{'id':'a','amount':1},{'id':'a','amount':2}]},{'ok':False,'records':[],'errors':[{'row':0,'cause':'amount'},{'row':2,'cause':'duplicate'}]}),\n({'rows':[{'id':'a','amount':3,'unit':'cm'}]},{'ok':True,'records':[{'id':'a','amount':0.03}],'errors':[]}),\n]\nfor req, expected in cases:\n before=copy.deepcopy(req); got=work.evaluate(req,P); assert got==expected,(got,expected); assert req==before\nwith open('requests.json') as f: requests=json.load(f)\nwith open('policy.json') as f: policy=json.load(f)\nwith open('report.json') as f: report=json.load(f)\nassert report==[work.evaluate(r,policy) for r in requests]\nfor result in report:\n assert set(result)=={'ok','records','errors'}\n for record in result['records']: assert set(record)=={'id','amount'}\n for error in result['errors']: assert set(error)=={'row','cause'}\nprint('all validation and report checks passed')"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "status",
+              "--short"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 21475,
+    "output_tokens": 731,
+    "cached_input_tokens": 17024,
+    "reasoning_output_tokens": 168
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 18.427919250214472,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

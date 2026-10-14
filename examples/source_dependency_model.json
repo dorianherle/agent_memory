@@ -1,0 +1,377 @@
+{
+  "schema": 1,
+  "title": "Review only changed declared sources",
+  "inputs": {
+    "request": "object",
+    "policy": "object"
+  },
+  "rules": [
+    {
+      "id": "declared-source-change",
+      "target": "needs_review",
+      "claim": "Review when a declared, nonignored source has a different complete JSON state.",
+      "when": {
+        "op": "le",
+        "args": [
+          {
+            "op": "len",
+            "args": [
+              {
+                "op": "get",
+                "args": [
+                  {
+                    "var": "request"
+                  },
+                  {
+                    "value": "declared"
+                  },
+                  {
+                    "value": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "value": 256
+          }
+        ]
+      },
+      "then": {
+        "op": "any",
+        "items": {
+          "op": "get",
+          "args": [
+            {
+              "var": "request"
+            },
+            {
+              "value": "declared"
+            },
+            {
+              "value": []
+            }
+          ]
+        },
+        "as": "path",
+        "test": {
+          "op": "and",
+          "args": [
+            {
+              "op": "not",
+              "args": [
+                {
+                  "op": "in",
+                  "args": [
+                    {
+                      "var": "path"
+                    },
+                    {
+                      "op": "get",
+                      "args": [
+                        {
+                          "var": "policy"
+                        },
+                        {
+                          "value": "ignored"
+                        },
+                        {
+                          "value": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "ne",
+              "args": [
+                {
+                  "op": "get",
+                  "args": [
+                    {
+                      "op": "get",
+                      "args": [
+                        {
+                          "var": "request"
+                        },
+                        {
+                          "value": "saved"
+                        },
+                        {
+                          "value": {}
+                        }
+                      ]
+                    },
+                    {
+                      "var": "path"
+                    },
+                    {
+                      "value": {
+                        "kind": "missing"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "op": "get",
+                  "args": [
+                    {
+                      "op": "get",
+                      "args": [
+                        {
+                          "var": "request"
+                        },
+                        {
+                          "value": "current"
+                        },
+                        {
+                          "value": {}
+                        }
+                      ]
+                    },
+                    {
+                      "var": "path"
+                    },
+                    {
+                      "value": {
+                        "kind": "missing"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "evidence": [
+        "EVIDENCE_NOTE_ID"
+      ],
+      "dependencies": []
+    }
+  ],
+  "cases": [
+    {
+      "id": "unchanged",
+      "target": "needs_review",
+      "inputs": {
+        "request": {
+          "declared": [
+            "a.py"
+          ],
+          "saved": {
+            "a.py": {
+              "kind": "file",
+              "hash": "a"
+            }
+          },
+          "current": {
+            "a.py": {
+              "kind": "file",
+              "hash": "a"
+            }
+          }
+        },
+        "policy": {}
+      },
+      "expected": false,
+      "evidence": [
+        "EVIDENCE_NOTE_ID"
+      ],
+      "challenge": false
+    },
+    {
+      "id": "changed",
+      "target": "needs_review",
+      "inputs": {
+        "request": {
+          "declared": [
+            "a.py"
+          ],
+          "saved": {
+            "a.py": {
+              "kind": "file",
+              "hash": "a"
+            }
+          },
+          "current": {
+            "a.py": {
+              "kind": "file",
+              "hash": "b"
+            }
+          }
+        },
+        "policy": {}
+      },
+      "expected": true,
+      "evidence": [
+        "EVIDENCE_NOTE_ID"
+      ],
+      "challenge": true
+    },
+    {
+      "id": "unrelated",
+      "target": "needs_review",
+      "inputs": {
+        "request": {
+          "declared": [
+            "a.py"
+          ],
+          "saved": {
+            "a.py": {
+              "kind": "file",
+              "hash": "a"
+            }
+          },
+          "current": {
+            "a.py": {
+              "kind": "file",
+              "hash": "a"
+            },
+            "log.txt": {
+              "kind": "file",
+              "hash": "b"
+            }
+          }
+        },
+        "policy": {}
+      },
+      "expected": false,
+      "evidence": [
+        "EVIDENCE_NOTE_ID"
+      ],
+      "challenge": true
+    },
+    {
+      "id": "ignored",
+      "target": "needs_review",
+      "inputs": {
+        "request": {
+          "declared": [
+            "a.py"
+          ],
+          "saved": {
+            "a.py": {
+              "kind": "file",
+              "hash": "a"
+            }
+          },
+          "current": {
+            "a.py": {
+              "kind": "file",
+              "hash": "b"
+            }
+          }
+        },
+        "policy": {
+          "ignored": [
+            "a.py"
+          ]
+        }
+      },
+      "expected": false,
+      "evidence": [
+        "EVIDENCE_NOTE_ID"
+      ],
+      "challenge": true
+    },
+    {
+      "id": "created",
+      "target": "needs_review",
+      "inputs": {
+        "request": {
+          "declared": [
+            "new.cfg"
+          ],
+          "saved": {},
+          "current": {
+            "new.cfg": {
+              "kind": "file",
+              "hash": "a"
+            }
+          }
+        },
+        "policy": {}
+      },
+      "expected": true,
+      "evidence": [
+        "EVIDENCE_NOTE_ID"
+      ],
+      "challenge": true
+    },
+    {
+      "id": "deleted",
+      "target": "needs_review",
+      "inputs": {
+        "request": {
+          "declared": [
+            "new.cfg"
+          ],
+          "saved": {
+            "new.cfg": {
+              "kind": "file",
+              "hash": "a"
+            }
+          },
+          "current": {}
+        },
+        "policy": {}
+      },
+      "expected": true,
+      "evidence": [
+        "EVIDENCE_NOTE_ID"
+      ],
+      "challenge": true
+    },
+    {
+      "id": "missing",
+      "target": "needs_review",
+      "inputs": {
+        "request": {
+          "declared": [
+            "new.cfg"
+          ],
+          "saved": {},
+          "current": {
+            "new.cfg": {
+              "kind": "missing"
+            }
+          }
+        },
+        "policy": {}
+      },
+      "expected": false,
+      "evidence": [
+        "EVIDENCE_NOTE_ID"
+      ],
+      "challenge": true
+    },
+    {
+      "id": "none_declared",
+      "target": "needs_review",
+      "inputs": {
+        "request": {
+          "saved": {},
+          "current": {
+            "unrelated.cfg": {
+              "kind": "file",
+              "hash": "b"
+            }
+          }
+        },
+        "policy": {}
+      },
+      "expected": false,
+      "evidence": [
+        "EVIDENCE_NOTE_ID"
+      ],
+      "challenge": true
+    }
+  ],
+  "alternatives": [],
+  "unresolved": [
+    "This rule requires JSON objects, string paths, and at most 256 declared paths."
+  ]
+}

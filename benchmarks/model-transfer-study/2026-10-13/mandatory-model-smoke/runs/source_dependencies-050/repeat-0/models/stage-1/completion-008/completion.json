@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import json, copy, work\n\ncases = [\n ({'declared':['b','a','a'],'saved':{'a':{'kind':'file','hash':'1'},'b':{'kind':'file','hash':'2'}},'current':{'a':{'hash':'9','kind':'file'},'b':{'kind':'file','hash':'2'}}},{'ignored':[]},{'needs_review':True,'changed':['a']}),\n ({'declared':['x','y'],'saved':{},'current':{'x':{'kind':'missing'},'y':{'kind':'file','name':'n','timestamp':1}}},{'ignored':['y']},{'needs_review':False,'changed':[]}),\n ({'declared':['x'],'saved':{'x':{'kind':'file','name':'same','timestamp':1}},'current':{'x':{'kind':'file','name':'same','timestamp':2}}},{},{'needs_review':True,'changed':['x']}),\n ({'declared':['x'],'saved':{'x':{'kind':'file','meta':{'b':2,'a':1}}},'current':{'x':{'meta':{'a':1,'b':2},'kind':'file'}}},{},{'needs_review':False,'changed':[]}),\n]\nfor req, pol, expected in cases:\n before=(copy.deepcopy(req),copy.deepcopy(pol)); got=work.evaluate(req,pol); assert got==expected,(got,expected); assert (req,pol)==before\nprint('ok',len(cases))"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 19779,
+    "output_tokens": 504,
+    "cached_input_tokens": 16128,
+    "reasoning_output_tokens": 108
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 13.58113216701895,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

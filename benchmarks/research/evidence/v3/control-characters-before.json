@@ -1,0 +1,24 @@
+{
+  "source": "/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v4",
+  "catalog_loaded": "/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v4/agent_memory/catalog.py",
+  "core_loaded": "/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v4/agent_memory/core.py",
+  "tests_run": 11,
+  "failure_entries": 0,
+  "error_entries": 2,
+  "passed": false,
+  "elapsed_seconds": 3.477799833053723,
+  "failures": [
+    {
+      "test": "test_null_character_in_note_round_trips (audit_cases.ExactNoteStorageTests.test_null_character_in_note_round_trips)",
+      "traceback": "Traceback (most recent call last):\n  File \"/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v4/agent_memory/tests/test_reliability_audit.py\", line 78, in test_null_character_in_note_round_trips\n    target = self.memory.save(text)\n  File \"/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v4/agent_memory/core.py\", line 396, in save\n    self._run(*arguments, \"-m\", body)\n    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v4/agent_memory/core.py\", line 127, in _run\n    result = subprocess.run(\n        command,\n    ...<2 lines>...\n        text=True,\n    )\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py\", line 1919, in _execute_child\n    self.pid = _fork_exec(\n               ~~~~~~~~~~^\n            args, executable_list,\n            ^^^^^^^^^^^^^^^^^^^^^^\n    ...<6 lines>...\n            process_group, gid, gids, uid, umask,\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n            preexec_fn)\n            ^^^^^^^^^^^\nValueError: embedded null byte\n"
+    },
+    {
+      "test": "test_record_separator_in_note_round_trips (audit_cases.ExactNoteStorageTests.test_record_separator_in_note_round_trips)",
+      "traceback": "Traceback (most recent call last):\n  File \"/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v4/agent_memory/tests/test_reliability_audit.py\", line 73, in test_record_separator_in_note_round_trips\n    target = self.memory.save(text)\n  File \"/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v4/agent_memory/core.py\", line 398, in save\n    self._sync_catalog()\n    ~~~~~~~~~~~~~~~~~~^^\n  File \"/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v4/agent_memory/core.py\", line 297, in _sync_catalog\n    records = self._read_records(changed_tips, list(known.values()))\n  File \"/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v4/agent_memory/core.py\", line 283, in _read_records\n    self._parse_record(record)\n    ~~~~~~~~~~~~~~~~~~^^^^^^^^\n  File \"/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v4/agent_memory/core.py\", line 247, in _parse_record\n    item_id, parents, timestamp, body = raw.split(FIELD_SEPARATOR, 3)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: not enough values to unpack (expected 4, got 1)\n"
+    }
+  ],
+  "source_sha256": {
+    "agent_memory/core.py": "b2d725170bc13b2cc5234d4451ad08407e30e6b827c82504a93c9064a110eadd",
+    "agent_memory/catalog.py": "77949a10f3e7022bcd2d8c32c5eb9ff7d0052852454df30243efe33d5481c515"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "from work import evaluate\np={'defaults':{'b':True,'i':3,'s':'x'},'types':{'b':'boolean','i':'integer','s':'string'},'null_resets':True,'environment':True}\ncases=[\n ({'layers':[{'b':False,'i':0,'s':''}]},{'ok':True,'config':{'b':False,'i':0,'s':''},'error':None}),\n ({'layers':[{'i':None}]},{'ok':True,'config':{'b':True,'i':3,'s':'x'},'error':None}),\n ({'layers':[{'i':'bad'},{'i':4}]},{'ok':True,'config':{'b':True,'i':4,'s':'x'},'error':None}),\n ({'layers':[{'i':True}]},{'ok':False,'config':{},'error':'type'}),\n ({'layers':[{'extra':1}]},{'ok':False,'config':{},'error':'unknown_key'}),\n ({'environment':{'b':'false','i':'-12','s':''}},{'ok':True,'config':{'b':False,'i':-12,'s':''},'error':None}),\n ({'environment':{'b':'False'}},{'ok':False,'config':{},'error':'environment'}),\n ({'environment':{'i':' 1'}},{'ok':False,'config':{},'error':'environment'}),\n ({'environment':{'i':'1.0'}},{'ok':False,'config':{},'error':'environment'}),\n]\nfor request, expected in cases:\n actual=evaluate(request,p)\n assert actual==expected,(request,actual,expected)\np2=dict(p, null_resets=False, environment=False)\nassert evaluate({'layers':[{'i':None}]},p2)=={'ok':False,'config':{},'error':'type'}\nassert evaluate({'environment':{'i':'1'}},p2)=={'ok':False,'config':{},'error':'environment'}\nprint('edge cases passed')"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import json\nfrom work import evaluate\nwith open('policy.json') as f: p=json.load(f)\nwith open('requests.json') as f: rs=json.load(f)\nwith open('report.json') as f: report=json.load(f)\nassert report == [evaluate(r,p) for r in rs]\nprint('report verified')"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "diff",
+              "--check"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "status",
+              "--short"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 27735,
+    "output_tokens": 1128,
+    "cached_input_tokens": 19968,
+    "reasoning_output_tokens": 453
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 35.809458249947056,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

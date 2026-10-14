@@ -1,0 +1,14 @@
+{
+  "probe": {
+    "ok": true,
+    "result": {
+      "exit_code": 0,
+      "stdout": "ISOLATED\n",
+      "stderr": ""
+    }
+  },
+  "outside_read": {
+    "ok": false,
+    "error": "ValueError: Path is outside the worker workspace"
+  }
+}

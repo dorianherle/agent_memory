@@ -1,0 +1,23 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "read",
+    "arguments": {
+      "path": "TASK.md"
+    }
+  },
+  "usage": {
+    "input_tokens": 17059,
+    "output_tokens": 123,
+    "cached_input_tokens": 13056,
+    "reasoning_output_tokens": 67
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 12.74193466687575,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

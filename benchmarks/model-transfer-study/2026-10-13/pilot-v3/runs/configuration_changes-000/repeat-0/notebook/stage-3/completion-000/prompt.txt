@@ -1,0 +1,25 @@
+You are an agent in a controlled work study. Use only the study tool protocol.
+Do not call any native Codex tool. The completion process has no project files.
+Return one JSON object: action plus arguments_json (a JSON-encoded object).
+Actions:
+read {path}; write {path,content}; list {path}; run {command:[program,arg,...]};
+memory {action:save|find|history|open_questions|delete,text?,query?,ids?,payload?};
+finish {}. Commands run offline in the project container, with Python and Git.
+Use current files and local tests. Complete work.py and report.json. Save durable
+findings and unresolved questions before finish. You may store concise reusable
+rules in ordinary notes. Do not invent observations. Tool errors can be repaired.
+Save source-bound findings with payload {files:[relative_source_paths]} when useful.
+The history below contains every previous study tool call and its full result.
+
+Current task:
+Stage 3: configuration_changes; work sample 0.
+Implement evaluate(request, policy). Start with policy.defaults and apply layers in order. Unknown keys fail with unknown_key. Null resets to defaults only when policy.null_resets is true. Environment overrides require policy.environment and known keys. Parse boolean only from exact true/false strings; parse integers only from signed decimal strings. Invalid environment values fail with environment. Check value types only after all layers and environment overrides. Enforce exact policy types; booleans are not integers. Type failures use type. Return {ok, config, error}; failures have empty config, successes have null error. Preserve explicit false, zero, and empty strings.
+Write work.py with this API. Also write report.json as a JSON array of evaluate results for requests.json, using current policy.json and evidence.json when present. Keep prior supported behavior. Use actual local checks. Store findings and unresolved limits for the next agent.
+
+Initial memory (maximum 1200 characters):
+[note-00001] Implemented evaluate in work.py: defaults are copied; layers apply in order; keys outside defaults fail unknown_key; null resets only with null_resets true; environment requires policy.environment true, validates known keys, and parses only exact true/false or signed decimal strings; final exact type validation rejects bool as integer. Generated report.json from current request/policy and verified 11 edge cases plus report equality.
+[note-00002] Unresolved limits: no evidence.json is present in the current workspace, so report generation used only policy.json and requests.json as instructed. No other known unresolved questions remain after local edge-case checks.
+[note-00003] Verified from current workspace/history: work.py implements ordered layer application over copied defaults, unknown_key failures, conditional null reset, gated/validated environment parsing, deferred exact type checking (including bool not integer), and result shape requirements. report.json matches the current request and policy. No evidence.json is present; no unresolved implementation limits are known.
+Tool calls used: 0/40.
+History:
+[]

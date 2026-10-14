@@ -1,0 +1,316 @@
+from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
+
+from agent_memory.core import Memory
+from agent_memory.runner import (
+    CODEX_MODELS_FALLBACK,
+    codex_command,
+    codex_worker,
+    detect_worker,
+    list_codex_models,
+    run_goal,
+    start_codex_login,
+    _call_worker,
+)
+from agent_memory.tests.helpers import MemoryTestCase
+
+
+def _write(path: Path, text: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text)
+
+
+class RunnerTests(MemoryTestCase):
+    def test_worker_internal_type_error_does_not_repeat_experiment(self) -> None:
+        calls = []
+
+        def worker(prompt, cwd, **kwargs):
+            calls.append((prompt, cwd, kwargs))
+            raise TypeError('experiment input is invalid')
+
+        with self.assertRaisesRegex(TypeError, 'experiment input is invalid'):
+            _call_worker(worker, 'run experiment', self.path, model='requested')
+        self.assertEqual(len(calls), 1)
+
+    def test_worker_signature_keeps_supported_model_option(self) -> None:
+        calls = []
+
+        def worker(prompt, cwd, *, model):
+            calls.append(model)
+
+        _call_worker(worker, 'run experiment', self.path, model='requested', on_line=None)
+        self.assertEqual(calls, ['requested'])
+
+    def test_legacy_worker_without_options_is_called_once(self) -> None:
+        calls = []
+
+        def worker(prompt, cwd):
+            calls.append((prompt, cwd))
+
+        _call_worker(worker, 'run experiment', self.path, model='requested', on_line=None)
+        self.assertEqual(calls, [('run experiment', self.path)])
+
+    def test_bootstrap_receives_full_goal_not_truncated_title(self) -> None:
+        goal = "Implement ledger. Preserve existing POSIX mode across compaction."
+
+        def worker(prompt: str, cwd: Path) -> None:
+            self.assertIn(goal, prompt)
+            _write(cwd / "tests" / "test_goal.py", "def test_red():\n    assert False\n")
+
+        run_goal(self.path, goal, worker=worker, max_agents=1)
+
+    def test_fake_agents_go_red_then_green(self) -> None:
+        def worker(prompt: str, cwd: Path) -> None:
+            tests = cwd / "tests" / "test_goal.py"
+            app = cwd / "app.py"
+            if "acceptance criteria" in prompt:
+                if not app.exists():
+                    app.write_text("VALUE = 1\n")
+                _write(
+                    tests,
+                    "from app import VALUE\n\ndef test_value():\n    assert VALUE == 2\n",
+                )
+            else:
+                app.write_text("VALUE = 2\n")
+
+        status = run_goal(
+            self.path,
+            "VALUE must be 2",
+            worker=worker,
+            max_agents=4,
+        )
+        self.assertEqual(status["state"], "passed")
+        self.assertEqual(status["agent"], 1)
+        self.assertTrue(status["pytest"]["ok"])
+        notes = [
+            item.message
+            for item in Memory(status["workspace"]).state()
+        ]
+        self.assertTrue(any("pytest fail" in text for text in notes))
+        self.assertTrue(any("pytest pass" in text for text in notes))
+
+    def test_vacuous_green_bootstrap_respawns(self) -> None:
+        calls = {"n": 0}
+
+        def worker(prompt: str, cwd: Path) -> None:
+            calls["n"] += 1
+            tests = cwd / "tests" / "test_goal.py"
+            if calls["n"] == 1:
+                _write(tests, "def test_ok():\n    assert True\n")
+                return
+            if "acceptance criteria" in prompt:
+                (cwd / "app.py").write_text("VALUE = 1\n")
+                _write(
+                    tests,
+                    "from app import VALUE\n\ndef test_value():\n    assert VALUE == 2\n",
+                )
+                return
+            (cwd / "app.py").write_text("VALUE = 2\n")
+
+        status = run_goal(
+            self.path,
+            "VALUE must be 2",
+            worker=worker,
+            max_agents=4,
+        )
+        self.assertGreaterEqual(calls["n"], 3)
+        self.assertEqual(status["state"], "passed")
+        self.assertGreaterEqual(status["agent"], 2)
+
+    def test_resume_keeps_cumulative_agent_number_and_applies_steering(self) -> None:
+        calls = {"n": 0}
+
+        def worker(prompt: str, cwd: Path) -> None:
+            calls["n"] += 1
+            self.assertIn(
+                "Treat every explicit requirement in the Goal and latest Steering section",
+                prompt,
+            )
+            (cwd / "app.py").write_text("VALUE = 2\n")
+
+        def bootstrap(prompt: str, cwd: Path) -> None:
+            _write(cwd / "tests" / "test_goal.py", "from app import VALUE\n\ndef test_value():\n    assert VALUE == 2\n")
+            (cwd / "app.py").write_text("VALUE = 1\n")
+
+        first = run_goal(self.path, "VALUE must be 2", worker=bootstrap, max_agents=1)
+        self.assertEqual(first["agent"], 0)
+        memory = Memory(first["workspace"])
+        steering_id = memory.save_user("Keep the API unchanged")
+        first["state"] = "needs_attention"
+        first["steering_pending"] = {"id": steering_id, "text": "Keep the API unchanged"}
+        from agent_memory.goals import write_status
+        write_status(self.path, first["goal_id"], first)
+
+        final = run_goal(self.path, goal_id=first["goal_id"], worker=worker, max_agents=4)
+        self.assertEqual(final["state"], "passed")
+        self.assertEqual(final["agent"], 1)
+        self.assertEqual(final["steering_applied"]["id"], steering_id)
+        self.assertNotIn("steering_pending", final)
+
+    def test_thinker_coder_alternates_and_records_models(self) -> None:
+        seen = []
+
+        def worker(prompt: str, cwd: Path) -> None:
+            seen.append("thinker" if "acceptance criteria" in prompt or "You are the Thinker" in prompt else "coder")
+            tests = cwd / "tests" / "test_goal.py"
+            app = cwd / "app.py"
+            if seen[-1] == "thinker" and len(seen) == 1:
+                app.write_text("VALUE = 1\n")
+                _write(tests, "from app import VALUE\n\ndef test_value():\n    assert VALUE == 2\n")
+            elif seen[-1] == "coder" and len(seen) == 2:
+                pass
+            elif seen[-1] == "thinker":
+                _write(tests, "from app import VALUE\n\ndef test_value():\n    assert VALUE == 2\n")
+            else:
+                app.write_text("VALUE = 2\n")
+
+        status = run_goal(
+            self.path,
+            "VALUE must be 2",
+            worker=worker,
+            max_agents=4,
+            thinker_model="gpt-5.6-luna",
+            coder_model="gpt-5.5",
+            worker_name="test",
+        )
+        self.assertEqual(status["state"], "passed")
+        self.assertGreaterEqual(len(status["turns"]), 3)
+        self.assertEqual(status["turns"][0]["role"], "thinker")
+        self.assertEqual(status["turns"][0]["model"], "gpt-5.6-luna")
+        self.assertEqual(status["turns"][1]["role"], "coder")
+        self.assertEqual(status["turns"][1]["model"], "gpt-5.5")
+        self.assertEqual(status["turns"][2]["role"], "thinker")
+        self.assertEqual(seen[:3], ["thinker", "coder", "thinker"])
+
+    def test_codex_worker_streams_stdout_lines(self) -> None:
+        lines = []
+
+        class FakeProc:
+            stdout = iter(["editing tests/test_goal.py\n", "\n", "done\n"])
+            def wait(self):
+                return 0
+            def poll(self):
+                return 0
+
+        with patch("agent_memory.runner.subprocess.Popen", return_value=FakeProc()):
+            codex_worker("go", self.path, model="gpt-5.6-luna", on_line=lines.append)
+        self.assertEqual(lines, ["editing tests/test_goal.py", "done"])
+
+    def test_codex_worker_times_out(self) -> None:
+        import time
+        from agent_memory.runner import TURN_SECONDS
+
+        class FakeProc:
+            def __init__(self):
+                self.stdout = iter(["working\n"])
+                self.killed = False
+            def poll(self):
+                return 1 if self.killed else None
+            def terminate(self):
+                self.killed = True
+            def wait(self):
+                while not self.killed:
+                    time.sleep(0.01)
+                return 1
+
+        with patch("agent_memory.runner.TURN_SECONDS", 0.05), patch(
+            "agent_memory.runner.subprocess.Popen", return_value=FakeProc()
+        ):
+            with self.assertRaises(RuntimeError) as err:
+                codex_worker("go", self.path)
+        self.assertIn("exceeded", str(err.exception))
+        self.assertGreater(TURN_SECONDS, 1)
+
+
+class WorkerDetectTests(MemoryTestCase):
+    def test_prefers_codex_when_logged_in(self) -> None:
+        name, worker = detect_worker(
+            "",
+            which=lambda _: "/usr/bin/codex",
+            run=lambda *a, **k: SimpleNamespace(returncode=0),
+        )
+        self.assertEqual(name, "codex")
+        self.assertIs(worker, codex_worker)
+
+    def test_cursor_key_when_codex_missing(self) -> None:
+        name, worker = detect_worker(
+            "cursor_test",
+            which=lambda _: None,
+            run=lambda *a, **k: SimpleNamespace(returncode=1),
+        )
+        self.assertEqual(name, "cursor")
+        self.assertTrue(callable(worker))
+
+    def test_none_without_login(self) -> None:
+        with patch.dict("os.environ", {"CURSOR_API_KEY": ""}, clear=False):
+            name, worker = detect_worker(
+                "",
+                which=lambda _: None,
+                run=lambda *a, **k: SimpleNamespace(returncode=1),
+            )
+        self.assertEqual(name, "none")
+        self.assertIsNone(worker)
+
+    def test_codex_command_shape(self) -> None:
+        cwd = self.path
+        seen = {}
+
+        def fake_run(command, cwd=None):
+            seen["command"] = command
+            seen["cwd"] = cwd
+            return SimpleNamespace(returncode=0)
+
+        prompt = "write failing tests"
+        command = codex_command(prompt, cwd, model="gpt-5.6-luna")
+        self.assertEqual(command[:5], ["codex", "exec", "--skip-git-repo-check", "--sandbox", "workspace-write"])
+        self.assertIn("--model", command)
+        self.assertIn("gpt-5.6-luna", command)
+        self.assertIn(str(cwd), command)
+        self.assertEqual(command[-1], prompt)
+        codex_worker(prompt, cwd, model="gpt-5.6-luna", run=fake_run)
+        self.assertEqual(seen["command"], command)
+        self.assertEqual(seen["cwd"], str(cwd))
+
+    def test_list_codex_models_parses_debug_and_falls_back(self) -> None:
+        import json
+
+        payload = json.dumps(
+            {
+                "models": [
+                    {
+                        "slug": "gpt-5.6-luna",
+                        "display_name": "GPT-5.6 Luna",
+                        "visibility": "list",
+                    },
+                    {"slug": "hidden-lab", "visibility": "hidden"},
+                ]
+            }
+        )
+        rows = list_codex_models(
+            run=lambda *a, **k: SimpleNamespace(stdout=payload, returncode=0)
+        )
+        self.assertEqual(rows, [{"id": "gpt-5.6-luna", "name": "GPT-5.6 Luna"}])
+        rows = list_codex_models(run=lambda *a, **k: (_ for _ in ()).throw(OSError("no")))
+        self.assertEqual(rows, [dict(row) for row in CODEX_MODELS_FALLBACK])
+
+    def test_connect_reports_dead_cli(self) -> None:
+        with patch("agent_memory.runner.codex_auth_present", return_value=False):
+            with self.assertRaises(RuntimeError) as ctx:
+                start_codex_login(
+                    which=lambda _: "/usr/bin/codex",
+                    run=lambda *a, **k: SimpleNamespace(
+                        returncode=1, stderr="ENOENT", stdout=""
+                    ),
+                    popen=lambda *a, **k: None,
+                    wait=lambda _: None,
+                )
+        self.assertIn("broken", str(ctx.exception).lower())
+
+    def test_connect_already_signed_in(self) -> None:
+        with patch("agent_memory.runner.codex_auth_present", return_value=True):
+            result = start_codex_login(
+                which=lambda _: "/usr/bin/codex",
+                run=lambda *a, **k: SimpleNamespace(returncode=0, stderr="", stdout="ok"),
+            )
+        self.assertIn("Already signed in", result["hint"])

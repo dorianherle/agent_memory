@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy, json\nfrom pathlib import Path\nfrom work import evaluate\n\nrequests = json.loads(Path('requests.json').read_text())\npolicy = json.loads(Path('policy.json').read_text())\nreport = json.loads(Path('report.json').read_text())\nassert report == [evaluate(r, policy) for r in requests]\n\n# Independent boundary probes: one relevant complete-state change among duplicates,\n# missing-state equivalence, ignored and undeclared noise, canonical key ordering,\n# and immutability.\nprobes = [\n    ({'declared':['b','a','b','gone'], 'saved':{'a':{'kind':'file','hash':'same'},'b':{'kind':'file','hash':'old'},'noise':{'v':1}}, 'current':{'a':{'hash':'same','kind':'file'},'b':{'kind':'file','hash':'new'},'gone':{'kind':'missing'},'noise':{'v':2}}}, {'ignored':[]}, {'needs_review':True,'changed':['b']}),\n    ({'declared':['skip','x'], 'saved':{'skip':{'kind':'file','hash':'1'},'x':{'kind':'file','hash':'2'}}, 'current':{'skip':{'kind':'file','hash':'9'},'x':{'kind':'file','hash':'2'}}}, {'ignored':['skip']}, {'needs_review':False,'changed':[]}),\n    ({'declared':['added','removed'], 'saved':{'removed':{'kind':'file','hash':'r'}}, 'current':{'added':{'kind':'file','hash':'a'}}}, {}, {'needs_review':True,'changed':['added','removed']}),\n]\nfor request, probe_policy, expected in probes:\n    before = copy.deepcopy((request, probe_policy))\n    assert evaluate(request, probe_policy) == expected\n    assert (request, probe_policy) == before\nprint(json.dumps({'report_ok': True, 'independent_probes_passed': len(probes)}))"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 13045,
+    "output_tokens": 1234,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 750
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 30.11501883296296,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

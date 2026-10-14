@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy,json; from work import evaluate; p=json.load(open('policy.json')); rs=json.load(open('requests.json')); expected=[evaluate(r,p) for r in rs]; assert json.load(open('report.json'))==expected; r={'from':'failed','to':'ready','retry':True,'attempts':True}; pc=copy.deepcopy(p); rc=copy.deepcopy(r); assert evaluate(r,p)=={'ok':False,'value':None,'reason':'retry_limit'}; assert r==rc and p==pc; assert evaluate({'from':'ready','to':'running','role':'wrong','retry':True,'attempts':99},p)['reason']=='permission'; assert evaluate({'from':'x','to':'y'},p)['reason']=='blocked'; assert evaluate({'from':'failed','to':'ready','retry':True,'attempts':1},p)=={'ok':True,'value':'ready','reason':'ok'}; print(json.dumps(expected))"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 9356,
+    "output_tokens": 266,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 38
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 12.024639082839713,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

@@ -11,7 +11,8 @@ from pathlib import Path
 import numpy
 
 CATALOG_FILE = "catalog.sqlite3"
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
+# Rebuild the Git projection after exact line-ending decoding changes.
 
 
 def locked(method):
@@ -39,11 +40,15 @@ def canonical_document(message: str, payload: dict) -> str:
 
 
 def vector_bytes(vector: list[float]) -> tuple[int, bytes]:
-    values = numpy.asarray(vector, dtype=numpy.float32)
-    length = numpy.linalg.norm(values)
-    if not length:
+    values = numpy.asarray(vector, dtype=numpy.float64)
+    if values.ndim != 1 or values.size == 0 or not numpy.isfinite(values).all():
+        raise ValueError("embedding provider must return a finite nonempty one-dimensional vector")
+    scale = numpy.max(numpy.abs(values))
+    if not scale:
         raise ValueError("embedding provider returned a zero vector")
-    values = values / length
+    # Scaling before the norm prevents overflow for large valid vectors.
+    values = values / scale
+    values = numpy.asarray(values / numpy.linalg.norm(values), dtype=numpy.float32)
     return len(values), values.tobytes()
 
 
@@ -282,6 +287,8 @@ class Catalog:
         until: datetime | None = None,
         include_historical: bool = False,
         limit: int | None = None,
+        fts_query: str | None = None,
+        sequence_order: bool = False,
     ) -> list[sqlite3.Row]:
         if ids == []:
             return []
@@ -343,11 +350,26 @@ class Catalog:
                 "AND fields.key = ? AND fields.value = ?)"
             )
             values.extend([key, json.dumps(value, sort_keys=True)])
+        search_join = ""
+        search_rank = ""
+        ordering = "memories.committed_us DESC, memories.sequence DESC"
+        if sequence_order:
+            ordering = "memories.sequence DESC"
+        if fts_query is not None:
+            words = [word for word in fts_query.replace('"', " ").split() if word]
+            if not words:
+                return []
+            where.append("memory_fts MATCH ?")
+            values.append(" OR ".join(f'"{word}"' for word in words))
+            search_join = "JOIN memory_fts ON memory_fts.memory_id = memories.id "
+            search_rank = ", bm25(memory_fts) AS fts_rank "
+            ordering = "fts_rank ASC, " + ordering
         sql = (
             "SELECT memories.*, contents.hash AS content_hash, contents.text AS document "
+            f"{search_rank}"
             "FROM memories JOIN contents ON contents.id = memories.content_id "
-            f"{scope_sql}WHERE {' AND '.join(where)} "
-            "ORDER BY memories.committed_us DESC, memories.sequence DESC"
+            f"{search_join}{scope_sql}WHERE {' AND '.join(where)} "
+            f"ORDER BY {ordering}"
         )
         if limit is not None:
             sql += " LIMIT ?"
@@ -363,6 +385,11 @@ class Catalog:
             JOIN ref_memories scope ON scope.memory_id = memories.id
                 AND scope.ref_name = ?
             WHERE memories.kind != 'delete'
+              AND NOT EXISTS (
+                  SELECT 1 FROM payload_fields model_fields
+                  WHERE model_fields.memory_id = memories.id
+                    AND model_fields.key = 'model_event'
+              )
               AND memories.id NOT IN (
                   SELECT covered.value
                   FROM payload_fields fields
@@ -412,20 +439,11 @@ class Catalog:
         return [by_id[item_id] for item_id in ids if item_id in by_id]
 
     @locked
-    def fts(self, query: str, limit: int) -> list[tuple[str, float]]:
-        words = [word for word in query.replace('"', " ").split() if word]
-        if not words:
-            return []
-        expression = " OR ".join(f'"{word}"' for word in words)
-        rows = self.connection.execute(
-            """
-            SELECT memory_id, bm25(memory_fts) AS rank
-            FROM memory_fts WHERE memory_fts MATCH ?
-            ORDER BY rank LIMIT ?
-            """,
-            (expression, limit),
-        ).fetchall()
-        return [(row["memory_id"], -float(row["rank"])) for row in rows]
+    def fts(self, query: str, limit: int, *, branch: str | None = None, **filters) -> list[tuple[str, float]]:
+        # Apply scope and evidence filters before LIMIT. Global top hits can
+        # otherwise hide all valid matches on a smaller branch.
+        rows = self.select(branch=branch, fts_query=query, limit=limit, **filters)
+        return [(row["id"], -float(row["fts_rank"])) for row in rows]
 
     @locked
     def missing_documents(self, provider: str) -> list[sqlite3.Row]:

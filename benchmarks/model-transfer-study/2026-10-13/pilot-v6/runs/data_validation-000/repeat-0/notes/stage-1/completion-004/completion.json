@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "write",
+    "arguments": {
+      "path": "work.py",
+      "content": "\"\"\"Validate and normalize batches of measurement rows.\"\"\"\n\nimport math\n\n\ndef evaluate(request, policy):\n    \"\"\"Return an atomic validation result without modifying either input.\"\"\"\n    records = []\n    errors = []\n    seen_ids = set()\n\n    for index, row in enumerate(request[\"rows\"]):\n        identifier = row.get(\"id\")\n        if not isinstance(identifier, str) or not identifier:\n            errors.append({\"row\": index, \"cause\": \"id\"})\n            continue\n\n        amount = row.get(\"amount\")\n        if (\n            isinstance(amount, bool)\n            or not isinstance(amount, (int, float))\n            or not math.isfinite(amount)\n            or amount < 0\n        ):\n            errors.append({\"row\": index, \"cause\": \"amount\"})\n            continue\n\n        unit = row.get(\"unit\", policy[\"base_unit\"])\n        if unit not in policy[\"units\"]:\n            errors.append({\"row\": index, \"cause\": \"unit\"})\n            continue\n\n        if policy.get(\"unique\", False) and identifier in seen_ids:\n            errors.append({\"row\": index, \"cause\": \"duplicate\"})\n            continue\n\n        seen_ids.add(identifier)\n        records.append({\"id\": identifier, \"amount\": amount * policy[\"units\"][unit]})\n\n    if errors:\n        records = []\n    return {\"ok\": not errors, \"records\": records, \"errors\": errors}\n"
+    }
+  },
+  "usage": {
+    "input_tokens": 20741,
+    "output_tokens": 2034,
+    "cached_input_tokens": 15872,
+    "reasoning_output_tokens": 938
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 57.7443814589642,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

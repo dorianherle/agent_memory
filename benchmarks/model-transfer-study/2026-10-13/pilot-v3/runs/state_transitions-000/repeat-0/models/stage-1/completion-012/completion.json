@@ -1,0 +1,499 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "model_propose",
+      "id": null,
+      "payload": {
+        "schema": 1,
+        "title": "Policy-controlled state transition evaluation",
+        "inputs": {
+          "request": "object",
+          "policy": "object",
+          "evidence": "array",
+          "edge_exists": "boolean",
+          "required_role": "string",
+          "is_retry": "boolean",
+          "attempts_is_integer": "boolean"
+        },
+        "rules": [
+          {
+            "id": "blocked_missing_edge",
+            "target": "status",
+            "claim": "A transition absent from policy.edges is blocked.",
+            "when": {
+              "op": "eq",
+              "args": [
+                {
+                  "var": "edge_exists"
+                },
+                {
+                  "value": false
+                }
+              ]
+            },
+            "then": {
+              "value": {
+                "ok": false,
+                "value": null,
+                "reason": "blocked"
+              }
+            },
+            "evidence": [
+              "89a660e2"
+            ],
+            "dependencies": [
+              "TASK.md",
+              "policy.json",
+              "work.py"
+            ]
+          },
+          {
+            "id": "permission_before_retry",
+            "target": "status",
+            "claim": "For an existing edge with a required role, a role mismatch fails with permission before retry validation.",
+            "when": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "eq",
+                  "args": [
+                    {
+                      "var": "edge_exists"
+                    },
+                    {
+                      "value": true
+                    }
+                  ]
+                },
+                {
+                  "op": "ne",
+                  "args": [
+                    {
+                      "var": "required_role"
+                    },
+                    {
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "op": "ne",
+                  "args": [
+                    {
+                      "var": "request.role"
+                    },
+                    {
+                      "var": "required_role"
+                    }
+                  ]
+                }
+              ]
+            },
+            "then": {
+              "value": {
+                "ok": false,
+                "value": null,
+                "reason": "permission"
+              }
+            },
+            "evidence": [
+              "89a660e2"
+            ],
+            "dependencies": [
+              "TASK.md",
+              "policy.json",
+              "work.py"
+            ]
+          },
+          {
+            "id": "retry_rejected",
+            "target": "status",
+            "claim": "After edge and role checks, retries require non-bool integer attempts in the half-open interval from zero to policy.retry_limit.",
+            "when": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "eq",
+                  "args": [
+                    {
+                      "var": "edge_exists"
+                    },
+                    {
+                      "value": true
+                    }
+                  ]
+                },
+                {
+                  "op": "or",
+                  "args": [
+                    {
+                      "op": "eq",
+                      "args": [
+                        {
+                          "var": "required_role"
+                        },
+                        {
+                          "value": ""
+                        }
+                      ]
+                    },
+                    {
+                      "op": "eq",
+                      "args": [
+                        {
+                          "var": "request.role"
+                        },
+                        {
+                          "var": "required_role"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "eq",
+                  "args": [
+                    {
+                      "var": "is_retry"
+                    },
+                    {
+                      "value": true
+                    }
+                  ]
+                },
+                {
+                  "op": "or",
+                  "args": [
+                    {
+                      "op": "eq",
+                      "args": [
+                        {
+                          "var": "attempts_is_integer"
+                        },
+                        {
+                          "value": false
+                        }
+                      ]
+                    },
+                    {
+                      "op": "lt",
+                      "args": [
+                        {
+                          "var": "request.attempts"
+                        },
+                        {
+                          "value": 0
+                        }
+                      ]
+                    },
+                    {
+                      "op": "ge",
+                      "args": [
+                        {
+                          "var": "request.attempts"
+                        },
+                        {
+                          "var": "policy.retry_limit"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "then": {
+              "value": {
+                "ok": false,
+                "value": null,
+                "reason": "retry_limit"
+              }
+            },
+            "evidence": [
+              "89a660e2"
+            ],
+            "dependencies": [
+              "TASK.md",
+              "policy.json",
+              "work.py"
+            ]
+          },
+          {
+            "id": "transition_succeeds",
+            "target": "status",
+            "claim": "An existing, permitted transition with no retry violation succeeds and returns the requested destination.",
+            "when": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "eq",
+                  "args": [
+                    {
+                      "var": "edge_exists"
+                    },
+                    {
+                      "value": true
+                    }
+                  ]
+                },
+                {
+                  "op": "or",
+                  "args": [
+                    {
+                      "op": "eq",
+                      "args": [
+                        {
+                          "var": "required_role"
+                        },
+                        {
+                          "value": ""
+                        }
+                      ]
+                    },
+                    {
+                      "op": "eq",
+                      "args": [
+                        {
+                          "var": "request.role"
+                        },
+                        {
+                          "var": "required_role"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "or",
+                  "args": [
+                    {
+                      "op": "eq",
+                      "args": [
+                        {
+                          "var": "is_retry"
+                        },
+                        {
+                          "value": false
+                        }
+                      ]
+                    },
+                    {
+                      "op": "and",
+                      "args": [
+                        {
+                          "op": "eq",
+                          "args": [
+                            {
+                              "var": "attempts_is_integer"
+                            },
+                            {
+                              "value": true
+                            }
+                          ]
+                        },
+                        {
+                          "op": "ge",
+                          "args": [
+                            {
+                              "var": "request.attempts"
+                            },
+                            {
+                              "value": 0
+                            }
+                          ]
+                        },
+                        {
+                          "op": "lt",
+                          "args": [
+                            {
+                              "var": "request.attempts"
+                            },
+                            {
+                              "var": "policy.retry_limit"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "then": {
+              "value": {
+                "ok": true,
+                "value": {
+                  "var": "request.to"
+                },
+                "reason": "ok"
+              }
+            },
+            "evidence": [
+              "89a660e2"
+            ],
+            "dependencies": [
+              "TASK.md",
+              "policy.json",
+              "work.py"
+            ]
+          }
+        ],
+        "cases": [
+          {
+            "id": "observed_allowed_edge",
+            "target": "status",
+            "inputs": {
+              "request": {
+                "from": "draft",
+                "to": "ready"
+              },
+              "policy": {
+                "variant": 0,
+                "retry_limit": 2
+              },
+              "evidence": [
+                "requests.json case 1"
+              ],
+              "edge_exists": true,
+              "required_role": "",
+              "is_retry": false,
+              "attempts_is_integer": false
+            },
+            "expected": {
+              "ok": true,
+              "value": "ready",
+              "reason": "ok"
+            },
+            "evidence": [
+              "89a660e2"
+            ],
+            "challenge": false
+          },
+          {
+            "id": "challenge_role_precedence",
+            "target": "status",
+            "inputs": {
+              "request": {
+                "from": "ready",
+                "to": "running",
+                "role": "wrong",
+                "retry": true,
+                "attempts": 0
+              },
+              "policy": {
+                "variant": 0,
+                "retry_limit": 2
+              },
+              "evidence": [
+                "local assertion"
+              ],
+              "edge_exists": true,
+              "required_role": "operator_0",
+              "is_retry": true,
+              "attempts_is_integer": true
+            },
+            "expected": {
+              "ok": false,
+              "value": null,
+              "reason": "permission"
+            },
+            "evidence": [
+              "89a660e2"
+            ],
+            "challenge": true
+          },
+          {
+            "id": "challenge_bool_attempts",
+            "target": "status",
+            "inputs": {
+              "request": {
+                "from": "running",
+                "to": "done",
+                "retry": true,
+                "attempts": true
+              },
+              "policy": {
+                "variant": 0,
+                "retry_limit": 2
+              },
+              "evidence": [
+                "local assertion"
+              ],
+              "edge_exists": true,
+              "required_role": "",
+              "is_retry": true,
+              "attempts_is_integer": false
+            },
+            "expected": {
+              "ok": false,
+              "value": null,
+              "reason": "retry_limit"
+            },
+            "evidence": [
+              "89a660e2"
+            ],
+            "challenge": true
+          },
+          {
+            "id": "challenge_missing_edge",
+            "target": "status",
+            "inputs": {
+              "request": {
+                "from": "x",
+                "to": "y"
+              },
+              "policy": {
+                "variant": 0,
+                "retry_limit": 2
+              },
+              "evidence": [
+                "local assertion"
+              ],
+              "edge_exists": false,
+              "required_role": "",
+              "is_retry": false,
+              "attempts_is_integer": false
+            },
+            "expected": {
+              "ok": false,
+              "value": null,
+              "reason": "blocked"
+            },
+            "evidence": [
+              "89a660e2"
+            ],
+            "challenge": true
+          }
+        ],
+        "alternatives": [
+          {
+            "id": "retry_flag_interpretation",
+            "claim": "Retry identification is modeled as request.retry being exactly true.",
+            "rules": [
+              "retry_rejected",
+              "transition_succeeds"
+            ]
+          }
+        ],
+        "unresolved": [
+          "No evidence.json file was present, so behavior involving external evidence is unobserved."
+        ]
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 26097,
+    "output_tokens": 2893,
+    "cached_input_tokens": 19840,
+    "reasoning_output_tokens": 326
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 79.32682504202239,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

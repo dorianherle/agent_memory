@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy, json\nfrom work import evaluate\n\ndef check(req, ev, pol, expected):\n    before = copy.deepcopy((req, ev, pol))\n    got = evaluate(req, ev, pol)\n    assert got == expected, (got, expected)\n    assert (req, ev, pol) == before\n    assert set(got) == {'status','value','sources','unknowns'}\n\np={'required_conditions':['recipe','material'],'require_verified':False}\ncheck({'claim':'x','conditions':{'recipe':'R'}}, [], p, {'status':'unknown','value':None,'sources':[],'unknowns':['material']})\ncheck({'claim':'x','conditions':{'recipe':'R','material':'M'}}, [], p, {'status':'unknown','value':None,'sources':[],'unknowns':['no matching evidence']})\ncheck({'claim':'x','conditions':{'recipe':'R','material':'M'}}, [{'source':'A','claim':'x','value':False,'conditions':{'recipe':'R','material':'M'}}], p, {'status':'unsupported','value':False,'sources':['A'],'unknowns':[]})\ncheck({'claim':'x','conditions':{'recipe':'R','material':'M'}}, [{'source':'A','claim':'x','value':1,'conditions':{'recipe':'R','material':'M'}},{'source':'B','claim':'x','value':2,'conditions':{'recipe':'R','material':'M'}}], p, {'status':'conflict','value':None,'sources':['A','B'],'unknowns':['source disagreement']})\ncheck({'claim':'x','conditions':{'recipe':'R','material':'M'}}, [{'source':'A','claim':'x','value':1,'conditions':{'recipe':'R','material':'M'}},{'source':'B','claim':'x','value':1,'conditions':{'recipe':'R','material':'M'},'supersedes':['A']}], p, {'status':'supported','value':1,'sources':['B'],'unknowns':[]})\ncheck({'claim':'x','conditions':{'recipe':'R','material':'M'}}, [{'source':'A','claim':'x','value':1,'conditions':{'recipe':'R','material':'M'}},{'source':'B','claim':'x','value':2,'conditions':{'recipe':'R','material':'M'},'verified':False,'supersedes':['A']}], {'required_conditions':['recipe','material'],'require_verified':True}, {'status':'unknown','value':None,'sources':[],'unknowns':['no matching evidence']})\ncheck({'claim':'x','conditions':{'recipe':'R','material':'M'}}, [{'source':'A','claim':'x','value':{'b':2,'a':1},'conditions':{'recipe':'R','material':'M'}},{'source':'B','claim':'x','value':{'a':1,'b':2},'conditions':{'recipe':'R','material':'M'}}], p, {'status':'supported','value':{'b':2,'a':1},'sources':['A','B'],'unknowns':[]})\nprint('all checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 22480,
+    "output_tokens": 1204,
+    "cached_input_tokens": 17280,
+    "reasoning_output_tokens": 440
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 27.261400499846786,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

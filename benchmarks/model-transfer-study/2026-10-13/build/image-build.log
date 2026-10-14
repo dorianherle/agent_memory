@@ -1,0 +1,288 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 746B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:22-bookworm
+#2 DONE 40.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [internal] load build context
+#4 transferring context: 492.15kB 0.0s done
+#4 DONE 0.0s
+
+#5 [1/9] FROM docker.io/library/node:22-bookworm@sha256:0e5f906573693feaa1e21057ebdcfdb5bd5021f050b2dc7c9deceb629c7da2a8
+#5 resolve docker.io/library/node:22-bookworm@sha256:0e5f906573693feaa1e21057ebdcfdb5bd5021f050b2dc7c9deceb629c7da2a8 done
+#5 sha256:5eabe5bac1ca88918c3a434ff6891f79a5e442d844e8cce29cd47430753f4a20 447B / 447B 0.1s done
+#5 sha256:f2f269f541ea9b2af2ca256cb32e9df4773d25165a12e300399088c1f193736f 0B / 58.58MB 0.2s
+#5 sha256:be515062341f6ee6675e4289d717814f372ca97fde11544a9cc90fd2de8dcfe3 0B / 1.25MB 0.2s
+#5 sha256:8139def24e494c7de5f5cdda325f4b3c224ee7252d08c8dbba861629bf594eb0 0B / 3.33kB 0.2s
+#5 sha256:4562cb873c99b9446ba4daee7180b2d40bbac13aefcf459f2e516776c1ed0458 0B / 203.25MB 0.2s
+#5 sha256:8139def24e494c7de5f5cdda325f4b3c224ee7252d08c8dbba861629bf594eb0 3.33kB / 3.33kB 0.4s done
+#5 sha256:f2f269f541ea9b2af2ca256cb32e9df4773d25165a12e300399088c1f193736f 3.15MB / 58.58MB 0.5s
+#5 sha256:99713dbe79ee22ead7509cd8c7c37d309206e5ddd834ba41611459b49e6ddc06 0B / 66.77MB 0.2s
+#5 sha256:f2f269f541ea9b2af2ca256cb32e9df4773d25165a12e300399088c1f193736f 9.44MB / 58.58MB 0.6s
+#5 sha256:be515062341f6ee6675e4289d717814f372ca97fde11544a9cc90fd2de8dcfe3 1.25MB / 1.25MB 0.6s done
+#5 sha256:f2f269f541ea9b2af2ca256cb32e9df4773d25165a12e300399088c1f193736f 14.68MB / 58.58MB 0.8s
+#5 sha256:bdc7363672c63abfefdedaf5e03be8e39cb662841d4f31237c4b7d7e3729f65c 0B / 23.44MB 0.2s
+#5 sha256:f2f269f541ea9b2af2ca256cb32e9df4773d25165a12e300399088c1f193736f 22.02MB / 58.58MB 1.1s
+#5 sha256:99713dbe79ee22ead7509cd8c7c37d309206e5ddd834ba41611459b49e6ddc06 4.19MB / 66.77MB 0.8s
+#5 sha256:f2f269f541ea9b2af2ca256cb32e9df4773d25165a12e300399088c1f193736f 26.21MB / 58.58MB 1.2s
+#5 sha256:f2f269f541ea9b2af2ca256cb32e9df4773d25165a12e300399088c1f193736f 29.36MB / 58.58MB 1.4s
+#5 sha256:f2f269f541ea9b2af2ca256cb32e9df4773d25165a12e300399088c1f193736f 32.51MB / 58.58MB 1.5s
+#5 sha256:99713dbe79ee22ead7509cd8c7c37d309206e5ddd834ba41611459b49e6ddc06 8.39MB / 66.77MB 1.2s
+#5 sha256:f2f269f541ea9b2af2ca256cb32e9df4773d25165a12e300399088c1f193736f 36.70MB / 58.58MB 1.7s
+#5 sha256:f2f269f541ea9b2af2ca256cb32e9df4773d25165a12e300399088c1f193736f 40.89MB / 58.58MB 1.8s
+#5 sha256:bdc7363672c63abfefdedaf5e03be8e39cb662841d4f31237c4b7d7e3729f65c 2.10MB / 23.44MB 1.2s
+#5 sha256:f2f269f541ea9b2af2ca256cb32e9df4773d25165a12e300399088c1f193736f 48.23MB / 58.58MB 2.1s
+#5 sha256:99713dbe79ee22ead7509cd8c7c37d309206e5ddd834ba41611459b49e6ddc06 12.58MB / 66.77MB 1.8s
+#5 sha256:f2f269f541ea9b2af2ca256cb32e9df4773d25165a12e300399088c1f193736f 52.43MB / 58.58MB 2.3s
+#5 sha256:bdc7363672c63abfefdedaf5e03be8e39cb662841d4f31237c4b7d7e3729f65c 4.19MB / 23.44MB 1.7s
+#5 sha256:f2f269f541ea9b2af2ca256cb32e9df4773d25165a12e300399088c1f193736f 55.57MB / 58.58MB 2.4s
+#5 sha256:f2f269f541ea9b2af2ca256cb32e9df4773d25165a12e300399088c1f193736f 58.58MB / 58.58MB 2.5s done
+#5 sha256:4562cb873c99b9446ba4daee7180b2d40bbac13aefcf459f2e516776c1ed0458 10.49MB / 203.25MB 2.4s
+#5 sha256:99713dbe79ee22ead7509cd8c7c37d309206e5ddd834ba41611459b49e6ddc06 17.83MB / 66.77MB 2.3s
+#5 sha256:bdc7363672c63abfefdedaf5e03be8e39cb662841d4f31237c4b7d7e3729f65c 6.29MB / 23.44MB 2.1s
+#5 sha256:2a02c40189e361a19e7cb07374fe9925f5c4f7db254ae2b9196348c27c286b03 0B / 48.40MB 0.2s
+#5 sha256:2a02c40189e361a19e7cb07374fe9925f5c4f7db254ae2b9196348c27c286b03 4.19MB / 48.40MB 0.3s
+#5 sha256:99713dbe79ee22ead7509cd8c7c37d309206e5ddd834ba41611459b49e6ddc06 22.02MB / 66.77MB 2.7s
+#5 sha256:2a02c40189e361a19e7cb07374fe9925f5c4f7db254ae2b9196348c27c286b03 10.49MB / 48.40MB 0.6s
+#5 sha256:bdc7363672c63abfefdedaf5e03be8e39cb662841d4f31237c4b7d7e3729f65c 8.39MB / 23.44MB 2.7s
+#5 sha256:2a02c40189e361a19e7cb07374fe9925f5c4f7db254ae2b9196348c27c286b03 14.68MB / 48.40MB 0.8s
+#5 sha256:99713dbe79ee22ead7509cd8c7c37d309206e5ddd834ba41611459b49e6ddc06 27.26MB / 66.77MB 3.3s
+#5 sha256:2a02c40189e361a19e7cb07374fe9925f5c4f7db254ae2b9196348c27c286b03 18.87MB / 48.40MB 1.1s
+#5 sha256:bdc7363672c63abfefdedaf5e03be8e39cb662841d4f31237c4b7d7e3729f65c 10.49MB / 23.44MB 3.2s
+#5 sha256:2a02c40189e361a19e7cb07374fe9925f5c4f7db254ae2b9196348c27c286b03 25.17MB / 48.40MB 1.2s
+#5 sha256:2a02c40189e361a19e7cb07374fe9925f5c4f7db254ae2b9196348c27c286b03 30.41MB / 48.40MB 1.4s
+#5 sha256:99713dbe79ee22ead7509cd8c7c37d309206e5ddd834ba41611459b49e6ddc06 31.46MB / 66.77MB 3.9s
+#5 sha256:2a02c40189e361a19e7cb07374fe9925f5c4f7db254ae2b9196348c27c286b03 37.75MB / 48.40MB 1.7s
+#5 sha256:4562cb873c99b9446ba4daee7180b2d40bbac13aefcf459f2e516776c1ed0458 20.97MB / 203.25MB 4.2s
+#5 sha256:bdc7363672c63abfefdedaf5e03be8e39cb662841d4f31237c4b7d7e3729f65c 12.58MB / 23.44MB 3.8s
+#5 sha256:2a02c40189e361a19e7cb07374fe9925f5c4f7db254ae2b9196348c27c286b03 41.94MB / 48.40MB 1.8s
+#5 sha256:2a02c40189e361a19e7cb07374fe9925f5c4f7db254ae2b9196348c27c286b03 45.09MB / 48.40MB 2.0s
+#5 sha256:99713dbe79ee22ead7509cd8c7c37d309206e5ddd834ba41611459b49e6ddc06 35.65MB / 66.77MB 4.4s
+#5 sha256:2a02c40189e361a19e7cb07374fe9925f5c4f7db254ae2b9196348c27c286b03 48.40MB / 48.40MB 2.1s done
+#5 extracting sha256:2a02c40189e361a19e7cb07374fe9925f5c4f7db254ae2b9196348c27c286b03
+#5 sha256:bdc7363672c63abfefdedaf5e03be8e39cb662841d4f31237c4b7d7e3729f65c 14.68MB / 23.44MB 4.2s
+#5 sha256:99713dbe79ee22ead7509cd8c7c37d309206e5ddd834ba41611459b49e6ddc06 39.85MB / 66.77MB 4.7s
+#5 sha256:bdc7363672c63abfefdedaf5e03be8e39cb662841d4f31237c4b7d7e3729f65c 16.78MB / 23.44MB 4.5s
+#5 sha256:bdc7363672c63abfefdedaf5e03be8e39cb662841d4f31237c4b7d7e3729f65c 18.87MB / 23.44MB 4.7s
+#5 extracting sha256:2a02c40189e361a19e7cb07374fe9925f5c4f7db254ae2b9196348c27c286b03 0.7s done
+#5 sha256:99713dbe79ee22ead7509cd8c7c37d309206e5ddd834ba41611459b49e6ddc06 49.28MB / 66.77MB 5.1s
+#5 sha256:bdc7363672c63abfefdedaf5e03be8e39cb662841d4f31237c4b7d7e3729f65c 20.97MB / 23.44MB 4.8s
+#5 sha256:4562cb873c99b9446ba4daee7180b2d40bbac13aefcf459f2e516776c1ed0458 31.46MB / 203.25MB 5.4s
+#5 sha256:bdc7363672c63abfefdedaf5e03be8e39cb662841d4f31237c4b7d7e3729f65c 23.44MB / 23.44MB 5.1s done
+#5 sha256:99713dbe79ee22ead7509cd8c7c37d309206e5ddd834ba41611459b49e6ddc06 56.62MB / 66.77MB 5.4s
+#5 extracting sha256:bdc7363672c63abfefdedaf5e03be8e39cb662841d4f31237c4b7d7e3729f65c
+#5 sha256:99713dbe79ee22ead7509cd8c7c37d309206e5ddd834ba41611459b49e6ddc06 60.82MB / 66.77MB 5.6s
+#5 extracting sha256:bdc7363672c63abfefdedaf5e03be8e39cb662841d4f31237c4b7d7e3729f65c 0.2s done
+#5 sha256:99713dbe79ee22ead7509cd8c7c37d309206e5ddd834ba41611459b49e6ddc06 66.77MB / 66.77MB 5.8s done
+#5 sha256:4562cb873c99b9446ba4daee7180b2d40bbac13aefcf459f2e516776c1ed0458 42.99MB / 203.25MB 6.2s
+#5 extracting sha256:99713dbe79ee22ead7509cd8c7c37d309206e5ddd834ba41611459b49e6ddc06
+#5 sha256:4562cb873c99b9446ba4daee7180b2d40bbac13aefcf459f2e516776c1ed0458 58.72MB / 203.25MB 6.6s
+#5 sha256:4562cb873c99b9446ba4daee7180b2d40bbac13aefcf459f2e516776c1ed0458 72.35MB / 203.25MB 6.9s
+#5 extracting sha256:99713dbe79ee22ead7509cd8c7c37d309206e5ddd834ba41611459b49e6ddc06 1.1s done
+#5 sha256:4562cb873c99b9446ba4daee7180b2d40bbac13aefcf459f2e516776c1ed0458 90.18MB / 203.25MB 7.4s
+#5 sha256:4562cb873c99b9446ba4daee7180b2d40bbac13aefcf459f2e516776c1ed0458 108.00MB / 203.25MB 7.8s
+#5 sha256:4562cb873c99b9446ba4daee7180b2d40bbac13aefcf459f2e516776c1ed0458 119.54MB / 203.25MB 8.1s
+#5 sha256:4562cb873c99b9446ba4daee7180b2d40bbac13aefcf459f2e516776c1ed0458 135.27MB / 203.25MB 8.4s
+#5 sha256:4562cb873c99b9446ba4daee7180b2d40bbac13aefcf459f2e516776c1ed0458 145.75MB / 203.25MB 8.7s
+#5 sha256:4562cb873c99b9446ba4daee7180b2d40bbac13aefcf459f2e516776c1ed0458 159.38MB / 203.25MB 9.0s
+#5 sha256:4562cb873c99b9446ba4daee7180b2d40bbac13aefcf459f2e516776c1ed0458 170.92MB / 203.25MB 9.3s
+#5 sha256:4562cb873c99b9446ba4daee7180b2d40bbac13aefcf459f2e516776c1ed0458 183.50MB / 203.25MB 9.6s
+#5 sha256:4562cb873c99b9446ba4daee7180b2d40bbac13aefcf459f2e516776c1ed0458 197.13MB / 203.25MB 9.9s
+#5 sha256:4562cb873c99b9446ba4daee7180b2d40bbac13aefcf459f2e516776c1ed0458 203.25MB / 203.25MB 10.1s done
+#5 extracting sha256:4562cb873c99b9446ba4daee7180b2d40bbac13aefcf459f2e516776c1ed0458
+#5 extracting sha256:4562cb873c99b9446ba4daee7180b2d40bbac13aefcf459f2e516776c1ed0458 2.4s done
+#5 DONE 12.6s
+
+#5 [1/9] FROM docker.io/library/node:22-bookworm@sha256:0e5f906573693feaa1e21057ebdcfdb5bd5021f050b2dc7c9deceb629c7da2a8
+#5 extracting sha256:8139def24e494c7de5f5cdda325f4b3c224ee7252d08c8dbba861629bf594eb0 0.0s done
+#5 extracting sha256:f2f269f541ea9b2af2ca256cb32e9df4773d25165a12e300399088c1f193736f
+#5 extracting sha256:f2f269f541ea9b2af2ca256cb32e9df4773d25165a12e300399088c1f193736f 0.8s done
+#5 DONE 13.5s
+
+#5 [1/9] FROM docker.io/library/node:22-bookworm@sha256:0e5f906573693feaa1e21057ebdcfdb5bd5021f050b2dc7c9deceb629c7da2a8
+#5 extracting sha256:be515062341f6ee6675e4289d717814f372ca97fde11544a9cc90fd2de8dcfe3 0.0s done
+#5 extracting sha256:5eabe5bac1ca88918c3a434ff6891f79a5e442d844e8cce29cd47430753f4a20 done
+#5 DONE 13.5s
+
+#6 [2/9] RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-venv python3-dev g++ git && rm -rf /var/lib/apt/lists/*
+#6 0.349 Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
+#6 0.392 Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+#6 0.411 Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [34.8 kB]
+#6 0.525 Get:4 http://deb.debian.org/debian bookworm/main arm64 Packages [8689 kB]
+#6 0.788 Get:5 http://deb.debian.org/debian bookworm-updates/main arm64 Packages [6936 B]
+#6 0.808 Get:6 http://deb.debian.org/debian-security bookworm-security/main arm64 Packages [347 kB]
+#6 1.484 Fetched 9285 kB in 1s (6762 kB/s)
+#6 1.484 Reading package lists...
+#6 1.846 Reading package lists...
+#6 2.201 Building dependency tree...
+#6 2.269 Reading state information...
+#6 2.354 python3 is already the newest version (3.11.2-1+b1).
+#6 2.354 python3 set to manually installed.
+#6 2.354 g++ is already the newest version (4:12.2.0-3).
+#6 2.354 git is already the newest version (1:2.39.5-0+deb12u3).
+#6 2.354 The following additional packages will be installed:
+#6 2.354   libjs-jquery libjs-sphinxdoc libjs-underscore libpython3-dev libpython3.11
+#6 2.355   libpython3.11-dev libpython3.11-minimal libpython3.11-stdlib python3-pip-whl
+#6 2.355   python3-setuptools-whl python3.11 python3.11-dev python3.11-minimal
+#6 2.355   python3.11-venv
+#6 2.355 Suggested packages:
+#6 2.355   python3.11-doc binfmt-support
+#6 2.355 Recommended packages:
+#6 2.355   javascript-common
+#6 2.493 The following NEW packages will be installed:
+#6 2.493   libjs-jquery libjs-sphinxdoc libjs-underscore libpython3-dev libpython3.11
+#6 2.493   libpython3.11-dev python3-dev python3-pip-whl python3-setuptools-whl
+#6 2.493   python3-venv python3.11-dev python3.11-venv
+#6 2.493 The following packages will be upgraded:
+#6 2.494   libpython3.11-minimal libpython3.11-stdlib python3.11 python3.11-minimal
+#6 2.628 4 upgraded, 12 newly installed, 0 to remove and 0 not upgraded.
+#6 2.628 Need to get 15.3 MB of archives.
+#6 2.628 After this operation, 37.6 MB of additional disk space will be used.
+#6 2.628 Get:1 http://deb.debian.org/debian-security bookworm-security/main arm64 python3.11 arm64 3.11.2-6+deb12u9 [575 kB]
+#6 2.760 Get:2 http://deb.debian.org/debian-security bookworm-security/main arm64 libpython3.11-stdlib arm64 3.11.2-6+deb12u9 [1750 kB]
+#6 2.878 Get:3 http://deb.debian.org/debian-security bookworm-security/main arm64 python3.11-minimal arm64 3.11.2-6+deb12u9 [1862 kB]
+#6 2.969 Get:4 http://deb.debian.org/debian-security bookworm-security/main arm64 libpython3.11-minimal arm64 3.11.2-6+deb12u9 [814 kB]
+#6 3.157 Get:5 http://deb.debian.org/debian bookworm/main arm64 libjs-jquery all 3.6.1+dfsg+~3.5.14-1 [326 kB]
+#6 3.180 Get:6 http://deb.debian.org/debian bookworm/main arm64 libjs-underscore all 1.13.4~dfsg+~1.11.4-3 [116 kB]
+#6 3.203 Get:7 http://deb.debian.org/debian bookworm/main arm64 libjs-sphinxdoc all 5.3.0-4 [130 kB]
+#6 3.222 Get:8 http://deb.debian.org/debian-security bookworm-security/main arm64 libpython3.11 arm64 3.11.2-6+deb12u9 [1841 kB]
+#6 3.302 Get:9 http://deb.debian.org/debian-security bookworm-security/main arm64 libpython3.11-dev arm64 3.11.2-6+deb12u9 [4391 kB]
+#6 3.498 Get:10 http://deb.debian.org/debian bookworm/main arm64 libpython3-dev arm64 3.11.2-1+b1 [9564 B]
+#6 3.521 Get:11 http://deb.debian.org/debian-security bookworm-security/main arm64 python3.11-dev arm64 3.11.2-6+deb12u9 [620 kB]
+#6 3.684 Get:12 http://deb.debian.org/debian bookworm/main arm64 python3-dev arm64 3.11.2-1+b1 [26.2 kB]
+#6 3.703 Get:13 http://deb.debian.org/debian bookworm/main arm64 python3-pip-whl all 23.0.1+dfsg-1 [1717 kB]
+#6 3.784 Get:14 http://deb.debian.org/debian bookworm/main arm64 python3-setuptools-whl all 66.1.1-1+deb12u2 [1112 kB]
+#6 3.861 Get:15 http://deb.debian.org/debian-security bookworm-security/main arm64 python3.11-venv arm64 3.11.2-6+deb12u9 [5896 B]
+#6 3.878 Get:16 http://deb.debian.org/debian bookworm/main arm64 python3-venv arm64 3.11.2-1+b1 [1200 B]
+#6 3.994 debconf: delaying package configuration, since apt-utils is not installed
+#6 4.014 Fetched 15.3 MB in 1s (11.1 MB/s)
+#6 4.032 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 23286 files and directories currently installed.)
+#6 4.041 Preparing to unpack .../00-python3.11_3.11.2-6+deb12u9_arm64.deb ...
+#6 4.105 Unpacking python3.11 (3.11.2-6+deb12u9) over (3.11.2-6+deb12u8) ...
+#6 4.147 Preparing to unpack .../01-libpython3.11-stdlib_3.11.2-6+deb12u9_arm64.deb ...
+#6 4.168 Unpacking libpython3.11-stdlib:arm64 (3.11.2-6+deb12u9) over (3.11.2-6+deb12u8) ...
+#6 4.531 Preparing to unpack .../02-python3.11-minimal_3.11.2-6+deb12u9_arm64.deb ...
+#6 4.539 Unpacking python3.11-minimal (3.11.2-6+deb12u9) over (3.11.2-6+deb12u8) ...
+#6 4.813 Preparing to unpack .../03-libpython3.11-minimal_3.11.2-6+deb12u9_arm64.deb ...
+#6 4.853 Unpacking libpython3.11-minimal:arm64 (3.11.2-6+deb12u9) over (3.11.2-6+deb12u8) ...
+#6 5.204 Selecting previously unselected package libjs-jquery.
+#6 5.206 Preparing to unpack .../04-libjs-jquery_3.6.1+dfsg+~3.5.14-1_all.deb ...
+#6 5.211 Unpacking libjs-jquery (3.6.1+dfsg+~3.5.14-1) ...
+#6 5.235 Selecting previously unselected package libjs-underscore.
+#6 5.237 Preparing to unpack .../05-libjs-underscore_1.13.4~dfsg+~1.11.4-3_all.deb ...
+#6 5.238 Unpacking libjs-underscore (1.13.4~dfsg+~1.11.4-3) ...
+#6 5.255 Selecting previously unselected package libjs-sphinxdoc.
+#6 5.256 Preparing to unpack .../06-libjs-sphinxdoc_5.3.0-4_all.deb ...
+#6 5.258 Unpacking libjs-sphinxdoc (5.3.0-4) ...
+#6 5.275 Selecting previously unselected package libpython3.11:arm64.
+#6 5.277 Preparing to unpack .../07-libpython3.11_3.11.2-6+deb12u9_arm64.deb ...
+#6 5.280 Unpacking libpython3.11:arm64 (3.11.2-6+deb12u9) ...
+#6 5.393 Selecting previously unselected package libpython3.11-dev:arm64.
+#6 5.395 Preparing to unpack .../08-libpython3.11-dev_3.11.2-6+deb12u9_arm64.deb ...
+#6 5.396 Unpacking libpython3.11-dev:arm64 (3.11.2-6+deb12u9) ...
+#6 5.659 Selecting previously unselected package libpython3-dev:arm64.
+#6 5.661 Preparing to unpack .../09-libpython3-dev_3.11.2-1+b1_arm64.deb ...
+#6 5.662 Unpacking libpython3-dev:arm64 (3.11.2-1+b1) ...
+#6 5.673 Selecting previously unselected package python3.11-dev.
+#6 5.675 Preparing to unpack .../10-python3.11-dev_3.11.2-6+deb12u9_arm64.deb ...
+#6 5.676 Unpacking python3.11-dev (3.11.2-6+deb12u9) ...
+#6 5.710 Selecting previously unselected package python3-dev.
+#6 5.712 Preparing to unpack .../11-python3-dev_3.11.2-1+b1_arm64.deb ...
+#6 5.713 Unpacking python3-dev (3.11.2-1+b1) ...
+#6 5.729 Selecting previously unselected package python3-pip-whl.
+#6 5.731 Preparing to unpack .../12-python3-pip-whl_23.0.1+dfsg-1_all.deb ...
+#6 5.732 Unpacking python3-pip-whl (23.0.1+dfsg-1) ...
+#6 5.804 Selecting previously unselected package python3-setuptools-whl.
+#6 5.806 Preparing to unpack .../13-python3-setuptools-whl_66.1.1-1+deb12u2_all.deb ...
+#6 5.808 Unpacking python3-setuptools-whl (66.1.1-1+deb12u2) ...
+#6 5.856 Selecting previously unselected package python3.11-venv.
+#6 5.858 Preparing to unpack .../14-python3.11-venv_3.11.2-6+deb12u9_arm64.deb ...
+#6 5.861 Unpacking python3.11-venv (3.11.2-6+deb12u9) ...
+#6 5.875 Selecting previously unselected package python3-venv.
+#6 5.877 Preparing to unpack .../15-python3-venv_3.11.2-1+b1_arm64.deb ...
+#6 5.878 Unpacking python3-venv (3.11.2-1+b1) ...
+#6 5.900 Setting up python3-setuptools-whl (66.1.1-1+deb12u2) ...
+#6 5.908 Setting up python3-pip-whl (23.0.1+dfsg-1) ...
+#6 5.920 Setting up libpython3.11-minimal:arm64 (3.11.2-6+deb12u9) ...
+#6 5.924 Setting up libjs-jquery (3.6.1+dfsg+~3.5.14-1) ...
+#6 5.931 Setting up libjs-underscore (1.13.4~dfsg+~1.11.4-3) ...
+#6 5.937 Setting up python3.11-minimal (3.11.2-6+deb12u9) ...
+#6 6.295 Setting up libpython3.11-stdlib:arm64 (3.11.2-6+deb12u9) ...
+#6 6.300 Setting up libjs-sphinxdoc (5.3.0-4) ...
+#6 6.312 Setting up python3.11 (3.11.2-6+deb12u9) ...
+#6 6.693 Setting up libpython3.11:arm64 (3.11.2-6+deb12u9) ...
+#6 6.696 Setting up python3.11-venv (3.11.2-6+deb12u9) ...
+#6 6.728 Setting up libpython3.11-dev:arm64 (3.11.2-6+deb12u9) ...
+#6 6.731 Setting up libpython3-dev:arm64 (3.11.2-1+b1) ...
+#6 6.743 Setting up python3.11-dev (3.11.2-6+deb12u9) ...
+#6 6.746 Setting up python3-venv (3.11.2-1+b1) ...
+#6 6.751 Setting up python3-dev (3.11.2-1+b1) ...
+#6 6.756 Processing triggers for libc-bin (2.36-9+deb12u14) ...
+#6 DONE 7.0s
+
+#7 [3/9] RUN python3 -m venv /opt/venv && /opt/venv/bin/pip install numpy==2.2.6 hnswlib==0.8.0
+#7 2.297 Collecting numpy==2.2.6
+#7 2.493   Downloading numpy-2.2.6-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (14.3 MB)
+#7 2.910      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 14.3/14.3 MB 38.9 MB/s eta 0:00:00
+#7 3.007 Collecting hnswlib==0.8.0
+#7 3.023   Downloading hnswlib-0.8.0.tar.gz (36 kB)
+#7 3.030   Installing build dependencies: started
+#7 6.149   Installing build dependencies: finished with status 'done'
+#7 6.150   Getting requirements to build wheel: started
+#7 6.279   Getting requirements to build wheel: finished with status 'done'
+#7 6.279   Preparing metadata (pyproject.toml): started
+#7 6.400   Preparing metadata (pyproject.toml): finished with status 'done'
+#7 6.404 Building wheels for collected packages: hnswlib
+#7 6.405   Building wheel for hnswlib (pyproject.toml): started
+#7 19.62   Building wheel for hnswlib (pyproject.toml): finished with status 'done'
+#7 19.63   Created wheel for hnswlib: filename=hnswlib-0.8.0-cp311-cp311-linux_aarch64.whl size=2649574 sha256=7f16fc0aea1b3d97e6313eab88e0480bf69f2222a59c3f53ce796a5b6620292c
+#7 19.63   Stored in directory: /root/.cache/pip/wheels/ea/4e/27/39aebca9958719776e36fada290845a7ef10f053ad70e22ceb
+#7 19.63 Successfully built hnswlib
+#7 19.65 Installing collected packages: numpy, hnswlib
+#7 20.72 Successfully installed hnswlib-0.8.0 numpy-2.2.6
+#7 DONE 20.8s
+
+#8 [4/9] RUN npm install --global @openai/codex@0.155.1
+#8 6.481 
+#8 6.481 added 2 packages in 6s
+#8 6.482 npm notice
+#8 6.482 npm notice New major version of npm available! 10.9.9 -> 12.2.0
+#8 6.482 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+#8 6.482 npm notice To update run: npm install -g npm@12.2.0
+#8 6.482 npm notice
+#8 DONE 6.6s
+
+#9 [5/9] RUN mkdir -p /opt/backend /agent /workspace && chmod 777 /workspace
+#9 DONE 0.1s
+
+#10 [6/9] COPY agent_memory /opt/backend/agent_memory
+#10 DONE 0.0s
+
+#11 [7/9] COPY worker.py /opt/backend/worker.py
+#11 DONE 0.0s
+
+#12 [8/9] RUN chmod 700 /opt/backend && git config --system user.email study@localhost && git config --system user.name "Study Worker"
+#12 DONE 0.1s
+
+#13 [9/9] WORKDIR /agent
+#13 DONE 0.0s
+
+#14 exporting to image
+#14 exporting layers
+#14 exporting layers 9.5s done
+#14 exporting manifest sha256:bf682ab8e5e072e5e003d81e8b84fea06f8103132151af6cd931bd9f450fd279
+#14 exporting manifest sha256:bf682ab8e5e072e5e003d81e8b84fea06f8103132151af6cd931bd9f450fd279 done
+#14 exporting config sha256:9a0786db7f6aa0580cafe8f4bdbf5608397887722662d56c0cf155d1b6d25a0e done
+#14 exporting attestation manifest sha256:95a7143ce630fcda7025f24de5ed26653e527668474fc713fe1177d69dc7c15b done
+#14 exporting manifest list sha256:fb86f271a094aef1a198325f5d9e3a2698b4a2a6518d5e3bef4a4987fe1fbbbb done
+#14 naming to docker.io/library/agent-memory-study:2026-10-13 done
+#14 unpacking to docker.io/library/agent-memory-study:2026-10-13
+#14 unpacking to docker.io/library/agent-memory-study:2026-10-13 2.5s done
+#14 DONE 12.1s

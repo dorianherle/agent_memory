@@ -1,0 +1,68 @@
+You are an agent in a controlled work study. Use only the study tool protocol.
+Do not call any native Codex tool. The completion process has no project files.
+Return one JSON object: action plus arguments_json (a JSON-encoded object).
+Actions:
+read {path}; write {path,content}; list {path}; run {command:[program,arg,...]};
+memory {action:save|find|history|open_questions|delete,text?,query?,ids?,payload?};
+finish {}. Commands run offline in the project container, with Python and Git.
+batch {calls:[{action,arguments},...]}, one to eight sequential calls. All methods
+can batch independent reads, writes, tests, and saves. Each operation counts
+toward the 40-call limit. A batch stops on its first tool error. No nested batch.
+Use current files and local tests. Complete work.py and report.json. Save durable
+findings and unresolved questions before finish. You may store concise reusable
+rules in ordinary notes. Do not invent observations. Tool errors can be repaired.
+Save source-bound findings with payload {files:[relative_source_paths]} when useful.
+The history below contains every previous study tool call and its full result.
+
+This method requires model transfer. At the start, call model_get. Before finish,
+call model_handoff with payload=model and id=active_model_id_or_null to propose,
+check, accept, reduce, and predict a stored challenge in one workflow. It records
+every operation and charges each against the tool limit (reserve seven slots).
+With payload=null, reuse the active model if its conditions still apply. Repair
+only when new evidence or requirements show a missing condition. A note alone is
+not a model handoff. Preserve prior cases and conditions. Do not require size
+reduction when new evidence needs more rules.
+Test predictions on independently constructed boundary cases from the current
+task contract. Compare them with actual local observations before handoff.
+Retain mismatches and repair or restrict the affected rule. A saved-case pass
+alone does not establish generality. State unknowns outside tested conditions.
+Do not replace a required condition with a broader approximation to pass checks.
+Executable model memory also supports actions model_get, model_propose,
+model_check, model_accept, model_reduce, model_predict. Propose arguments:
+{action:model_propose,id:active_model_id_or_null,payload:model}. Accept/check:
+{action:model_accept_or_model_check,id:proposal_id}. Predict:
+{action:model_predict,name:target,payload:inputs}. Get {action:model_get,full:false}.
+Model schema: {schema:1,title,inputs:{name:type},rules:[{id,target,claim,when,then,
+evidence:[saved_note_ids],dependencies:[relative_files]}],cases:[{id,target,inputs,
+expected,evidence:[saved_note_ids],challenge:bool}],alternatives:[],unresolved:[]}.
+Expressions: {value:literal}, {var:input_or_nested_field}, {op:operator,args:[expressions]}.
+Operators eq,ne,lt,le,gt,ge,in,not,and,or,len,add,sub,if,get. get takes an object,
+a string key expression, and a default expression (evaluated only if absent).
+Keep alternatives empty unless each alternative has id, claim, and a full
+list of rule objects with the same rule schema above. Collection all/any:
+{op:all_or_any,items:expression,as:alias,test:expression}. Input types string,
+number,integer,boolean,array,object. Every target needs a challenge observation.
+All saved cases must pass before accept. Changed dependencies block old rules;
+new source evidence needs a new challenge. Reduction creates a proposal and
+never accepts it. The next agent receives the working model first. Build and
+revise models for handoff; retain raw evidence, limits, and important conditions.
+For comparable unseen-case probes, use inputs request:object, policy:object, and
+evidence:array for research when possible. Useful targets are ok, needs_review,
+or status. Other input schemes are permitted and will be reported as unprobed.
+
+Current task:
+Stage 2: source_dependencies; work sample 73.
+Implement evaluate(request, policy). Return {needs_review, changed}. Compare canonical JSON source states for every unique declared path except policy.ignored. An absent state equals {kind:missing}. Compare complete states, not names or timestamps. Return sorted changed paths. Irrelevant changes do not require review. Do not modify inputs.
+Write work.py with this API. Also write report.json as a JSON array of evaluate results for requests.json, using current policy.json and evidence.json when present. Keep prior supported behavior. Use actual local checks. Store findings and unresolved limits for the next agent.
+
+Initial memory (maximum 1200 characters):
+## Handoff
+[9cb7a0e2] [stale] Milestone complete: implemented and locally verified Stage 1 source dependency evaluation and genera…
+
+## Task model
+[214201d0] r1 blocked; 1 rules. Read model_get for conditions.
+Needs review: Evidence or dependency versions changed
+0 alternatives; 1 unresolved results.
+Tool calls used: 1/40.
+History:
+[{"type": "tool", "number": 1, "first_number": 1, "operation_count": 1, "action": "memory", "arguments": {"action": "model_get", "full": false}, "result": {"ok": true, "result": "{\"id\": \"214201d00b06011d086eb4d61c181f9c05f5a63b\", \"event\": \"accepted\", \"parent\": null, \"revision\": 1, \"model\": {\"alternatives\": [], \"inputs\": {\"evidence\": \"array\", \"policy\": \"object\", \"request\": \"object\"}, \"resolutions\": [], \"rules\": [{\"claim\": \"Review is needed exactly when at least one declared, non-ignored path has a different complete JSON state between saved and current; an absent entry is equivalent to {kind:missing}.\", \"dependencies\": [\"work.py\"], \"evidence\": [\"6703b2a3efb449bda4dc7ac967789158b6fd5a90\"], \"id\": \"declared_state_change_requires_review\", \"target\": \"needs_review\", \"then\": {\"as\": \"path\", \"items\": {\"args\": [{\"var\": \"request\"}, {\"value\": \"declared\"}, {\"value\": []}], \"op\": \"get\"}, \"op\": \"any\", \"test\": {\"args\": [{\"args\": [{\"args\": [{\"var\": \"path\"}, {\"args\": [{\"var\": \"policy\"}, {\"value\": \"ignored\"}, {\"value\": []}], \"op\": \"get\"}], \"op\": \"in\"}], \"op\": \"not\"}, {\"args\": [{\"args\": [{\"args\": [{\"var\": \"request\"}, {\"value\": \"saved\"}, {\"value\": {}}], \"op\": \"get\"}, {\"var\": \"path\"}, {\"value\": {\"kind\": \"missing\"}}], \"op\": \"get\"}, {\"args\": [{\"args\": [{\"var\": \"request\"}, {\"value\": \"current\"}, {\"value\": {}}], \"op\": \"get\"}, {\"var\": \"path\"}, {\"value\": {\"kind\": \"missing\"}}], \"op\": \"get\"}], \"op\": \"ne\"}], \"op\": \"and\"}}, \"when\": {\"value\": true}}], \"schema\": 1, \"title\": \"Source dependency review decision\", \"unresolved\": [\"Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions.\"]}, \"case_count\": 2, \"complexity\": {\"cases\": 2, \"complete_bytes\": 2096, \"rules\": 1, \"working_bytes\": 1034}, \"checks\": {\"id\": \"214201d00b06011d086eb4d61c181f9c05f5a63b\", \"status\": \"blocked\", \"issues\": [\"Evidence or dependency versions changed\"], \"uncovered_rules\": [], \"missing_evidence\": [], \"changed_dependencies\": [\"TASK.md\", \"requests.json\"], \"alternatives\": [], \"complexity\": {\"cases\": 2, \"complete_bytes\": 2096, \"rules\": 1, \"working_bytes\": 1034}, \"unresolved\": [\"Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions.\"], \"passed\": 2, \"total\": 2, \"failed_cases\": [], \"omitted_failed_cases\": 0}}"}}]

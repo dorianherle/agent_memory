@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "from work import evaluate\nr={'claim':'c','conditions':{'mode':'x'}}\np={'required_conditions':['mode'],'require_verified':False}\ne=[{'source':'s','claim':'c','conditions':{'mode':'x'},'value':7,'supersedes':['s']}]\ngot=evaluate(r,e,p)\nprint(got)\nassert got=={'status':'supported','value':7,'sources':['s'],'unknowns':[]}, 'a record is not superseded by itself because the contract says other eligible records'"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 37654,
+    "output_tokens": 1388,
+    "cached_input_tokens": 24448,
+    "reasoning_output_tokens": 1076
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 42.36682745907456,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

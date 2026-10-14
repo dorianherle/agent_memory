@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy, json\nfrom work import evaluate\nwith open('policy.json') as f: policy=json.load(f)\nwith open('requests.json') as f: requests=json.load(f)\nwith open('report.json') as f: report=json.load(f)\nassert report == [evaluate(r, policy) for r in requests]\ncases=[\n ({'from':'x','to':'y'}, {'edges':{},'retry_limit':2}, {'ok':False,'value':None,'reason':'blocked'}),\n ({'from':'a','to':'b','role':'bad','attempts':0}, {'edges':{'a>b':{'role':'good','retry':True}},'retry_limit':2}, {'ok':False,'value':None,'reason':'permission'}),\n ({'from':'a','to':'b'}, {'edges':{'a>b':{'retry':True}},'retry_limit':2}, {'ok':False,'value':None,'reason':'retry_limit'}),\n ({'from':'a','to':'b','attempts':True}, {'edges':{'a>b':{'retry':True}},'retry_limit':2}, {'ok':False,'value':None,'reason':'retry_limit'}),\n ({'from':'a','to':'b','attempts':0}, {'edges':{'a>b':{'retry':True}},'retry_limit':2}, {'ok':True,'value':'b','reason':'ok'}),\n ({'from':'a','to':'b','attempts':1}, {'edges':{'a>b':{'retry':True}},'retry_limit':2}, {'ok':True,'value':'b','reason':'ok'}),\n ({'from':'a','to':'b','attempts':2}, {'edges':{'a>b':{'retry':True}},'retry_limit':2}, {'ok':False,'value':None,'reason':'retry_limit'}),\n ({'from':'a','to':'b','attempts':-1}, {'edges':{'a>b':{'retry':True}},'retry_limit':2}, {'ok':False,'value':None,'reason':'retry_limit'}),\n]\nfor request, pol, expected in cases:\n    before_request=copy.deepcopy(request); before_policy=copy.deepcopy(pol)\n    assert evaluate(request,pol)==expected\n    assert request==before_request and pol==before_policy\nprint('all checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 10496,
+    "output_tokens": 720,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 163
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 12.748468917096034,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

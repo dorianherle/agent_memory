@@ -1,0 +1,4869 @@
+{
+  "stop": "finished",
+  "tool_calls": 22,
+  "elapsed_seconds": 166.42193762492388,
+  "usage_complete": true,
+  "tokens": 161524,
+  "known_tokens": 161524,
+  "input_tokens": 154955,
+  "output_tokens": 6569,
+  "cached_input_tokens": 89216,
+  "reasoning_output_tokens": 2296,
+  "model_probes": {
+    "status": "unprobed",
+    "reason": "Model uses other inputs or targets; no feature extractor was validated"
+  },
+  "stage": 2,
+  "grade": {
+    "full_pass": true,
+    "passed": 23,
+    "total": 23,
+    "checks": [
+      {
+        "check": "case_0",
+        "passed": true
+      },
+      {
+        "check": "case_1",
+        "passed": true
+      },
+      {
+        "check": "case_2",
+        "passed": true
+      },
+      {
+        "check": "case_3",
+        "passed": true
+      },
+      {
+        "check": "case_4",
+        "passed": true
+      },
+      {
+        "check": "case_5",
+        "passed": true
+      },
+      {
+        "check": "case_6",
+        "passed": true
+      },
+      {
+        "check": "case_7",
+        "passed": true
+      },
+      {
+        "check": "case_8",
+        "passed": true
+      },
+      {
+        "check": "case_9",
+        "passed": true
+      },
+      {
+        "check": "case_10",
+        "passed": true
+      },
+      {
+        "check": "case_11",
+        "passed": true
+      },
+      {
+        "check": "case_12",
+        "passed": true
+      },
+      {
+        "check": "case_13",
+        "passed": true
+      },
+      {
+        "check": "case_14",
+        "passed": true
+      },
+      {
+        "check": "case_15",
+        "passed": true
+      },
+      {
+        "check": "case_16",
+        "passed": true
+      },
+      {
+        "check": "case_17",
+        "passed": true
+      },
+      {
+        "check": "case_18",
+        "passed": true
+      },
+      {
+        "check": "case_19",
+        "passed": true
+      },
+      {
+        "check": "case_20",
+        "passed": true
+      },
+      {
+        "check": "all_cases_returned",
+        "passed": true
+      },
+      {
+        "check": "current_source_report",
+        "passed": true
+      }
+    ],
+    "unsupported_conclusions": 0,
+    "missed_source_changes": 0
+  },
+  "memory": {
+    "ok": true,
+    "result": {
+      "notes": 11,
+      "model": {
+        "id": "39718ea3e86b00b5cae2ebaf719fc6203f3db320",
+        "event": "accepted",
+        "checks": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": true,
+              "expected": "unknown",
+              "id": "stage2-missing-condition",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "missing-required"
+                ],
+                "status": "predicted",
+                "value": "unknown"
+              }
+            },
+            {
+              "challenge": true,
+              "expected": "conflict",
+              "id": "stage2-eligible-conflict",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "disagreement"
+                ],
+                "status": "predicted",
+                "value": "conflict"
+              }
+            },
+            {
+              "challenge": true,
+              "expected": "unsupported",
+              "id": "stage2-agreed-false",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "agreed-false"
+                ],
+                "status": "predicted",
+                "value": "unsupported"
+              }
+            },
+            {
+              "challenge": true,
+              "expected": "supported",
+              "id": "stage2-ineligible-superseder-and-null",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "agreed-other"
+                ],
+                "status": "predicted",
+                "value": "supported"
+              }
+            },
+            {
+              "challenge": false,
+              "expected": "supported",
+              "id": "current-supported-rate",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "agreed-other"
+                ],
+                "status": "predicted",
+                "value": "supported"
+              }
+            },
+            {
+              "challenge": true,
+              "expected": "unknown",
+              "id": "boundary-missing-calibration",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "missing-required"
+                ],
+                "status": "predicted",
+                "value": "unknown"
+              }
+            },
+            {
+              "challenge": true,
+              "expected": "unknown",
+              "id": "boundary-no-matching-evidence",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "missing-required"
+                ],
+                "status": "predicted",
+                "value": "unknown"
+              }
+            },
+            {
+              "challenge": true,
+              "expected": "conflict",
+              "id": "boundary-counts-no-authority",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "disagreement"
+                ],
+                "status": "predicted",
+                "value": "conflict"
+              }
+            },
+            {
+              "challenge": true,
+              "expected": "unsupported",
+              "id": "boundary-boolean-false",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "agreed-false"
+                ],
+                "status": "predicted",
+                "value": "unsupported"
+              }
+            }
+          ],
+          "changed_dependencies": [],
+          "complexity": {
+            "cases": 9,
+            "complete_bytes": 6942,
+            "rules": 4,
+            "working_bytes": 1940
+          },
+          "id": "eb163316602904a2ccd3212122475bcbeb0260a5",
+          "issues": [],
+          "missing_evidence": [],
+          "status": "tested",
+          "uncovered_rules": [],
+          "unresolved": [
+            "Malformed inputs, duplicate or non-string source identifiers, and non-JSON values are outside tested conditions.",
+            "Only direct eligible supersession is defined and tested; transitive and cyclic semantics remain unresolved.",
+            "Extra non-required request and evidence conditions are ignored for matching because only policy-required conditions are specified by the contract."
+          ]
+        },
+        "complexity": {
+          "cases": 9,
+          "complete_bytes": 6942,
+          "rules": 4,
+          "working_bytes": 1940
+        },
+        "fingerprints": {
+          "OUTPUT_SCHEMA.json": {
+            "sha256": "5dd247296ca98fea77156dd74c41db05e85261cbdeac76819c8154068709c849",
+            "state": "file"
+          },
+          "TASK.md": {
+            "sha256": "7c59bd3f156b6faaedf5c81e4339c357985640092188e278315d075ba9aae6b8",
+            "state": "file"
+          },
+          "evidence.json": {
+            "sha256": "4d6a24e6af7038759331d5882d27391749655a23e7cf0aae00ffa7a521fee936",
+            "state": "file"
+          },
+          "policy.json": {
+            "sha256": "a5f19b6254f9aa6b1784895072ab211a78a2c1784bee3813da4a509899a8d359",
+            "state": "file"
+          },
+          "report.json": {
+            "sha256": "a3c2c4c2c37d5ab7fd9771ced7e61bc8ff7877ea6653a45f09cf74d31b8dc009",
+            "state": "file"
+          },
+          "requests.json": {
+            "sha256": "ed912a7959cfd7af04c0419d8cfa6f33c58c7cdef24a65f04ae6f7f61a2cbab5",
+            "state": "file"
+          },
+          "work.py": {
+            "sha256": "702b2de018f3b7787a3cd5e502df130e2859859091c356ed46d82aa01e58cdf6",
+            "state": "file"
+          }
+        },
+        "model": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": true,
+              "evidence": [
+                "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+              ],
+              "expected": "unknown",
+              "id": "stage2-missing-condition",
+              "inputs": {
+                "evidence": [],
+                "facts": {
+                  "agreed_boolean_false": false,
+                  "disagreement": false,
+                  "has_eligible": false,
+                  "missing_required": true
+                },
+                "policy": {
+                  "require_verified": true,
+                  "required_conditions": [
+                    "b",
+                    "a"
+                  ]
+                },
+                "request": {
+                  "claim": "c",
+                  "conditions": {
+                    "a": 1
+                  }
+                }
+              },
+              "target": "status"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+              ],
+              "expected": "conflict",
+              "id": "stage2-eligible-conflict",
+              "inputs": {
+                "evidence": [
+                  {
+                    "claim": "c",
+                    "conditions": {
+                      "a": 1,
+                      "b": null
+                    },
+                    "source": "z",
+                    "value": {
+                      "x": 1,
+                      "y": 2
+                    },
+                    "verified": true
+                  },
+                  {
+                    "claim": "c",
+                    "conditions": {
+                      "a": 1,
+                      "b": null
+                    },
+                    "source": "m",
+                    "value": false,
+                    "verified": true
+                  }
+                ],
+                "facts": {
+                  "agreed_boolean_false": false,
+                  "disagreement": true,
+                  "has_eligible": true,
+                  "missing_required": false
+                },
+                "policy": {
+                  "require_verified": true,
+                  "required_conditions": [
+                    "b",
+                    "a"
+                  ]
+                },
+                "request": {
+                  "claim": "c",
+                  "conditions": {
+                    "a": 1,
+                    "b": null
+                  }
+                }
+              },
+              "target": "status"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+              ],
+              "expected": "unsupported",
+              "id": "stage2-agreed-false",
+              "inputs": {
+                "evidence": [
+                  {
+                    "claim": "c",
+                    "conditions": {
+                      "a": 1,
+                      "b": null
+                    },
+                    "source": "f",
+                    "value": false,
+                    "verified": true
+                  }
+                ],
+                "facts": {
+                  "agreed_boolean_false": true,
+                  "disagreement": false,
+                  "has_eligible": true,
+                  "missing_required": false
+                },
+                "policy": {
+                  "require_verified": true,
+                  "required_conditions": [
+                    "b",
+                    "a"
+                  ]
+                },
+                "request": {
+                  "claim": "c",
+                  "conditions": {
+                    "a": 1,
+                    "b": null
+                  }
+                }
+              },
+              "target": "status"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+              ],
+              "expected": "supported",
+              "id": "stage2-ineligible-superseder-and-null",
+              "inputs": {
+                "evidence": [
+                  {
+                    "claim": "x",
+                    "conditions": {
+                      "site": "A"
+                    },
+                    "source": "old",
+                    "value": null,
+                    "verified": true
+                  },
+                  {
+                    "claim": "x",
+                    "conditions": {
+                      "site": "B"
+                    },
+                    "source": "bad-new",
+                    "supersedes": [
+                      "old"
+                    ],
+                    "value": 2,
+                    "verified": true
+                  }
+                ],
+                "facts": {
+                  "agreed_boolean_false": false,
+                  "disagreement": false,
+                  "has_eligible": true,
+                  "missing_required": false
+                },
+                "policy": {
+                  "require_verified": true,
+                  "required_conditions": [
+                    "site"
+                  ]
+                },
+                "request": {
+                  "claim": "x",
+                  "conditions": {
+                    "extra": 9,
+                    "site": "A"
+                  }
+                }
+              },
+              "target": "status"
+            },
+            {
+              "challenge": false,
+              "evidence": [
+                "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+              ],
+              "expected": "supported",
+              "id": "current-supported-rate",
+              "inputs": {
+                "evidence": [
+                  {
+                    "claim": "vertical_rate",
+                    "conditions": {
+                      "material": "SiN",
+                      "recipe": "R0",
+                      "regime": "dry"
+                    },
+                    "source": "S1",
+                    "value": 30,
+                    "verified": true
+                  }
+                ],
+                "facts": {
+                  "agreed_boolean_false": false,
+                  "disagreement": false,
+                  "has_eligible": true,
+                  "missing_required": false
+                },
+                "policy": {
+                  "require_verified": false,
+                  "required_conditions": [
+                    "recipe",
+                    "material"
+                  ]
+                },
+                "request": {
+                  "claim": "vertical_rate",
+                  "conditions": {
+                    "material": "SiN",
+                    "recipe": "R0",
+                    "regime": "dry"
+                  }
+                }
+              },
+              "target": "status"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+              ],
+              "expected": "unknown",
+              "id": "boundary-missing-calibration",
+              "inputs": {
+                "evidence": [
+                  {
+                    "claim": "c",
+                    "conditions": {
+                      "calibration": "x",
+                      "mode": "m"
+                    },
+                    "source": "A",
+                    "value": 0
+                  }
+                ],
+                "facts": {
+                  "agreed_boolean_false": false,
+                  "disagreement": false,
+                  "has_eligible": false,
+                  "missing_required": true
+                },
+                "policy": {
+                  "required_conditions": [
+                    "mode",
+                    "calibration"
+                  ]
+                },
+                "request": {
+                  "claim": "c",
+                  "conditions": {
+                    "mode": "m"
+                  }
+                }
+              },
+              "target": "status"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+              ],
+              "expected": "unknown",
+              "id": "boundary-no-matching-evidence",
+              "inputs": {
+                "evidence": [
+                  {
+                    "claim": "c",
+                    "conditions": {
+                      "mode": "m"
+                    },
+                    "source": "U",
+                    "value": 7
+                  }
+                ],
+                "facts": {
+                  "agreed_boolean_false": false,
+                  "disagreement": false,
+                  "has_eligible": false,
+                  "missing_required": false
+                },
+                "policy": {
+                  "require_verified": true,
+                  "required_conditions": [
+                    "mode"
+                  ]
+                },
+                "request": {
+                  "claim": "c",
+                  "conditions": {
+                    "mode": "m"
+                  }
+                }
+              },
+              "target": "status"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+              ],
+              "expected": "conflict",
+              "id": "boundary-counts-no-authority",
+              "inputs": {
+                "evidence": [
+                  {
+                    "claim": "c",
+                    "conditions": {
+                      "mode": "m"
+                    },
+                    "source": "A",
+                    "value": 1
+                  },
+                  {
+                    "claim": "c",
+                    "conditions": {
+                      "mode": "m"
+                    },
+                    "source": "B",
+                    "value": 1
+                  },
+                  {
+                    "claim": "c",
+                    "conditions": {
+                      "mode": "m"
+                    },
+                    "source": "C",
+                    "value": 2
+                  }
+                ],
+                "facts": {
+                  "agreed_boolean_false": false,
+                  "disagreement": true,
+                  "has_eligible": true,
+                  "missing_required": false
+                },
+                "policy": {
+                  "required_conditions": [
+                    "mode"
+                  ]
+                },
+                "request": {
+                  "claim": "c",
+                  "conditions": {
+                    "mode": "m"
+                  }
+                }
+              },
+              "target": "status"
+            },
+            {
+              "challenge": true,
+              "evidence": [
+                "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+              ],
+              "expected": "unsupported",
+              "id": "boundary-boolean-false",
+              "inputs": {
+                "evidence": [
+                  {
+                    "claim": "c",
+                    "conditions": {},
+                    "source": "F",
+                    "value": false
+                  }
+                ],
+                "facts": {
+                  "agreed_boolean_false": true,
+                  "disagreement": false,
+                  "has_eligible": true,
+                  "missing_required": false
+                },
+                "policy": {
+                  "required_conditions": []
+                },
+                "request": {
+                  "claim": "c",
+                  "conditions": {}
+                }
+              },
+              "target": "status"
+            }
+          ],
+          "inputs": {
+            "evidence": "array",
+            "facts": "object",
+            "policy": "object",
+            "request": "object"
+          },
+          "resolutions": [],
+          "rules": [
+            {
+              "claim": "A request missing any policy-required condition is unknown; otherwise, a request with no eligible evidence is also unknown.",
+              "dependencies": [
+                "work.py",
+                "TASK.md"
+              ],
+              "evidence": [
+                "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+              ],
+              "id": "missing-required",
+              "target": "status",
+              "then": {
+                "value": "unknown"
+              },
+              "when": {
+                "args": [
+                  {
+                    "var": "facts.missing_required"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "var": "facts.missing_required"
+                          }
+                        ],
+                        "op": "not"
+                      },
+                      {
+                        "args": [
+                          {
+                            "var": "facts.has_eligible"
+                          }
+                        ],
+                        "op": "not"
+                      }
+                    ],
+                    "op": "and"
+                  }
+                ],
+                "op": "or"
+              }
+            },
+            {
+              "claim": "More than one canonical JSON value among remaining eligible records yields conflict regardless of source counts.",
+              "dependencies": [
+                "work.py",
+                "TASK.md"
+              ],
+              "evidence": [
+                "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+              ],
+              "id": "disagreement",
+              "target": "status",
+              "then": {
+                "value": "conflict"
+              },
+              "when": {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "var": "facts.missing_required"
+                      }
+                    ],
+                    "op": "not"
+                  },
+                  {
+                    "var": "facts.has_eligible"
+                  },
+                  {
+                    "var": "facts.disagreement"
+                  }
+                ],
+                "op": "and"
+              }
+            },
+            {
+              "claim": "Agreement on Boolean false yields unsupported.",
+              "dependencies": [
+                "work.py",
+                "TASK.md"
+              ],
+              "evidence": [
+                "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+              ],
+              "id": "agreed-false",
+              "target": "status",
+              "then": {
+                "value": "unsupported"
+              },
+              "when": {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "var": "facts.missing_required"
+                      }
+                    ],
+                    "op": "not"
+                  },
+                  {
+                    "var": "facts.has_eligible"
+                  },
+                  {
+                    "args": [
+                      {
+                        "var": "facts.disagreement"
+                      }
+                    ],
+                    "op": "not"
+                  },
+                  {
+                    "var": "facts.agreed_boolean_false"
+                  }
+                ],
+                "op": "and"
+              }
+            },
+            {
+              "claim": "Agreement on any canonical JSON value other than Boolean false yields supported, including null.",
+              "dependencies": [
+                "work.py",
+                "TASK.md"
+              ],
+              "evidence": [
+                "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+              ],
+              "id": "agreed-other",
+              "target": "status",
+              "then": {
+                "value": "supported"
+              },
+              "when": {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "var": "facts.missing_required"
+                      }
+                    ],
+                    "op": "not"
+                  },
+                  {
+                    "var": "facts.has_eligible"
+                  },
+                  {
+                    "args": [
+                      {
+                        "var": "facts.disagreement"
+                      }
+                    ],
+                    "op": "not"
+                  },
+                  {
+                    "args": [
+                      {
+                        "var": "facts.agreed_boolean_false"
+                      }
+                    ],
+                    "op": "not"
+                  }
+                ],
+                "op": "and"
+              }
+            }
+          ],
+          "schema": 1,
+          "title": "Policy-governed evidence evaluation",
+          "unresolved": [
+            "Malformed inputs, duplicate or non-string source identifiers, and non-JSON values are outside tested conditions.",
+            "Only direct eligible supersession is defined and tested; transitive and cyclic semantics remain unresolved.",
+            "Extra non-required request and evidence conditions are ignored for matching because only policy-required conditions are specified by the contract."
+          ]
+        },
+        "parent": "c5fc2221264cbe3a892bf52e00ce5e48cd625ccd",
+        "proposal": "eb163316602904a2ccd3212122475bcbeb0260a5",
+        "reason": "Agent proposed a model revision",
+        "revision": 3
+      },
+      "checks": {
+        "id": "39718ea3e86b00b5cae2ebaf719fc6203f3db320",
+        "status": "tested",
+        "issues": [],
+        "cases": [
+          {
+            "id": "stage2-missing-condition",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "unknown",
+              "rules": [
+                "missing-required"
+              ]
+            },
+            "expected": "unknown",
+            "challenge": true
+          },
+          {
+            "id": "stage2-eligible-conflict",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "conflict",
+              "rules": [
+                "disagreement"
+              ]
+            },
+            "expected": "conflict",
+            "challenge": true
+          },
+          {
+            "id": "stage2-agreed-false",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "unsupported",
+              "rules": [
+                "agreed-false"
+              ]
+            },
+            "expected": "unsupported",
+            "challenge": true
+          },
+          {
+            "id": "stage2-ineligible-superseder-and-null",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "supported",
+              "rules": [
+                "agreed-other"
+              ]
+            },
+            "expected": "supported",
+            "challenge": true
+          },
+          {
+            "id": "current-supported-rate",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "supported",
+              "rules": [
+                "agreed-other"
+              ]
+            },
+            "expected": "supported",
+            "challenge": false
+          },
+          {
+            "id": "boundary-missing-calibration",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "unknown",
+              "rules": [
+                "missing-required"
+              ]
+            },
+            "expected": "unknown",
+            "challenge": true
+          },
+          {
+            "id": "boundary-no-matching-evidence",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "unknown",
+              "rules": [
+                "missing-required"
+              ]
+            },
+            "expected": "unknown",
+            "challenge": true
+          },
+          {
+            "id": "boundary-counts-no-authority",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "conflict",
+              "rules": [
+                "disagreement"
+              ]
+            },
+            "expected": "conflict",
+            "challenge": true
+          },
+          {
+            "id": "boundary-boolean-false",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "unsupported",
+              "rules": [
+                "agreed-false"
+              ]
+            },
+            "expected": "unsupported",
+            "challenge": true
+          }
+        ],
+        "uncovered_rules": [],
+        "missing_evidence": [],
+        "changed_dependencies": [],
+        "alternatives": [],
+        "complexity": {
+          "cases": 9,
+          "complete_bytes": 6942,
+          "rules": 4,
+          "working_bytes": 1940
+        },
+        "unresolved": [
+          "Malformed inputs, duplicate or non-string source identifiers, and non-JSON values are outside tested conditions.",
+          "Only direct eligible supersession is defined and tested; transitive and cyclic semantics remain unresolved.",
+          "Extra non-required request and evidence conditions are ignored for matching because only policy-required conditions are specified by the contract."
+        ]
+      },
+      "evidence": [
+        {
+          "id": "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d",
+          "text": "Implemented evaluate(request, evidence, policy) in work.py. Eligibility is determined only from supplied arguments: matching claim, not withdrawn, verified exactly true when required, and canonical-JSON equality for every policy-required condition. Missing required request conditions return unknown with sorted names; eligible superseders remove referenced source IDs; no evidence, conflict, supported, and Boolean-false unsupported outputs follow the exact four-field schema. report.json contains the two current request results. Local tests passed for input immutability, missing conditions, verification filtering, ineligible superseders, source-count conflicts, canonical object agreement, JSON numeric-form disagreement, absent calibration, report parity, compilation, and schema shape.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "report.json",
+              "OUTPUT_SCHEMA.json",
+              "requests.json",
+              "policy.json",
+              "evidence.json"
+            ]
+          }
+        },
+        {
+          "id": "e324f9defdaaa10b716ddc7d004511162fca93cf",
+          "text": "Unresolved limits: the task does not define malformed-input behavior (non-JSON values, missing/non-string source IDs, malformed conditions/supersedes, duplicate source IDs) or transitive/cyclic supersession semantics. Current implementation assumes valid JSON-shaped inputs and removes any eligible record whose source is directly named by another eligible record. Canonical JSON serialization intentionally distinguishes 1 from 1.0 and rejects NaN/Infinity.",
+          "payload": {
+            "agent": "agent"
+          }
+        },
+        {
+          "id": "3256c9bf58436bf1633a648a770ecdca539a3b61",
+          "text": "Task model proposed: Policy-governed evidence evaluation",
+          "payload": {
+            "agent": "agent",
+            "model_event": "proposed",
+            "task_model": {
+              "complexity": {
+                "cases": 4,
+                "complete_bytes": 4578,
+                "rules": 5,
+                "working_bytes": 2238
+              },
+              "fingerprints": {
+                "OUTPUT_SCHEMA.json": {
+                  "sha256": "5dd247296ca98fea77156dd74c41db05e85261cbdeac76819c8154068709c849",
+                  "state": "file"
+                },
+                "TASK.md": {
+                  "sha256": "db12b49dbf5f818a0831784fba505aa9d74120c96c7189e26a4d984fe05779ad",
+                  "state": "file"
+                },
+                "evidence.json": {
+                  "sha256": "4d6a24e6af7038759331d5882d27391749655a23e7cf0aae00ffa7a521fee936",
+                  "state": "file"
+                },
+                "policy.json": {
+                  "sha256": "98a0221d2e6e10b9d4b3d7c6209371ed1cf6039f8c2b0f0c9c219d8a26fedeea",
+                  "state": "file"
+                },
+                "report.json": {
+                  "sha256": "a3c2c4c2c37d5ab7fd9771ced7e61bc8ff7877ea6653a45f09cf74d31b8dc009",
+                  "state": "file"
+                },
+                "requests.json": {
+                  "sha256": "ed912a7959cfd7af04c0419d8cfa6f33c58c7cdef24a65f04ae6f7f61a2cbab5",
+                  "state": "file"
+                },
+                "work.py": {
+                  "sha256": "702b2de018f3b7787a3cd5e502df130e2859859091c356ed46d82aa01e58cdf6",
+                  "state": "file"
+                }
+              },
+              "model": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "supported",
+                    "id": "current-supported-rate",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "vertical_rate",
+                          "conditions": {
+                            "material": "SiN",
+                            "recipe": "R0",
+                            "regime": "dry"
+                          },
+                          "source": "S1",
+                          "value": 30,
+                          "verified": true
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "require_verified": false,
+                        "required_conditions": [
+                          "recipe",
+                          "material"
+                        ]
+                      },
+                      "request": {
+                        "claim": "vertical_rate",
+                        "conditions": {
+                          "material": "SiN",
+                          "recipe": "R0",
+                          "regime": "dry"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "unknown",
+                    "id": "boundary-missing-calibration",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "calibration": "x",
+                            "mode": "m"
+                          },
+                          "source": "A",
+                          "value": 0
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": false,
+                        "missing_required": true
+                      },
+                      "policy": {
+                        "required_conditions": [
+                          "mode",
+                          "calibration"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "mode": "m"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "conflict",
+                    "id": "boundary-counts-no-authority",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "A",
+                          "value": 1
+                        },
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "B",
+                          "value": 1
+                        },
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "C",
+                          "value": 2
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": true,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "required_conditions": [
+                          "mode"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "mode": "m"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "unsupported",
+                    "id": "boundary-boolean-false",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {},
+                          "source": "F",
+                          "value": false
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": true,
+                        "disagreement": false,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "required_conditions": []
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {}
+                      }
+                    },
+                    "target": "status"
+                  }
+                ],
+                "inputs": {
+                  "evidence": "array",
+                  "facts": "object",
+                  "policy": "object",
+                  "request": "object"
+                },
+                "resolutions": [],
+                "rules": [
+                  {
+                    "claim": "If any policy-required condition is absent from the request, status is unknown with sorted missing names; absent calibration is not zero.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "missing-required",
+                    "target": "status",
+                    "then": {
+                      "value": "unknown"
+                    },
+                    "when": {
+                      "var": "facts.missing_required"
+                    }
+                  },
+                  {
+                    "claim": "After exact claim, withdrawal, required-condition, verification, and direct eligible-supersession filtering, no remaining source yields unknown.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "no-eligible",
+                    "target": "status",
+                    "then": {
+                      "value": "unknown"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.has_eligible"
+                            }
+                          ],
+                          "op": "not"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "More than one canonical JSON value among remaining eligible records yields conflict regardless of source counts.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "disagreement",
+                    "target": "status",
+                    "then": {
+                      "value": "conflict"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.has_eligible"
+                        },
+                        {
+                          "var": "facts.disagreement"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "Agreement on Boolean false yields unsupported.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "agreed-false",
+                    "target": "status",
+                    "then": {
+                      "value": "unsupported"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.has_eligible"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.disagreement"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.agreed_boolean_false"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "Agreement on any canonical JSON value other than Boolean false yields supported.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "agreed-other",
+                    "target": "status",
+                    "then": {
+                      "value": "supported"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.has_eligible"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.disagreement"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.agreed_boolean_false"
+                            }
+                          ],
+                          "op": "not"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  }
+                ],
+                "schema": 1,
+                "title": "Policy-governed evidence evaluation",
+                "unresolved": [
+                  "Malformed inputs, duplicate or non-string source identifiers, and non-JSON values are outside tested conditions.",
+                  "Only direct eligible supersession is defined and tested; transitive and cyclic semantics remain unresolved."
+                ]
+              },
+              "parent": null,
+              "reason": "Agent proposed a model revision",
+              "revision": 1
+            }
+          }
+        },
+        {
+          "id": "33a5f90aabe60fd74b2ec798b9e05d9cea00e64e",
+          "text": "Task model proposed: Policy-governed evidence evaluation",
+          "payload": {
+            "agent": "agent",
+            "model_event": "proposed",
+            "task_model": {
+              "complexity": {
+                "cases": 5,
+                "complete_bytes": 5038,
+                "rules": 5,
+                "working_bytes": 2238
+              },
+              "fingerprints": {
+                "OUTPUT_SCHEMA.json": {
+                  "sha256": "5dd247296ca98fea77156dd74c41db05e85261cbdeac76819c8154068709c849",
+                  "state": "file"
+                },
+                "TASK.md": {
+                  "sha256": "db12b49dbf5f818a0831784fba505aa9d74120c96c7189e26a4d984fe05779ad",
+                  "state": "file"
+                },
+                "evidence.json": {
+                  "sha256": "4d6a24e6af7038759331d5882d27391749655a23e7cf0aae00ffa7a521fee936",
+                  "state": "file"
+                },
+                "policy.json": {
+                  "sha256": "98a0221d2e6e10b9d4b3d7c6209371ed1cf6039f8c2b0f0c9c219d8a26fedeea",
+                  "state": "file"
+                },
+                "report.json": {
+                  "sha256": "a3c2c4c2c37d5ab7fd9771ced7e61bc8ff7877ea6653a45f09cf74d31b8dc009",
+                  "state": "file"
+                },
+                "requests.json": {
+                  "sha256": "ed912a7959cfd7af04c0419d8cfa6f33c58c7cdef24a65f04ae6f7f61a2cbab5",
+                  "state": "file"
+                },
+                "work.py": {
+                  "sha256": "702b2de018f3b7787a3cd5e502df130e2859859091c356ed46d82aa01e58cdf6",
+                  "state": "file"
+                }
+              },
+              "model": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "supported",
+                    "id": "current-supported-rate",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "vertical_rate",
+                          "conditions": {
+                            "material": "SiN",
+                            "recipe": "R0",
+                            "regime": "dry"
+                          },
+                          "source": "S1",
+                          "value": 30,
+                          "verified": true
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "require_verified": false,
+                        "required_conditions": [
+                          "recipe",
+                          "material"
+                        ]
+                      },
+                      "request": {
+                        "claim": "vertical_rate",
+                        "conditions": {
+                          "material": "SiN",
+                          "recipe": "R0",
+                          "regime": "dry"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "unknown",
+                    "id": "boundary-missing-calibration",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "calibration": "x",
+                            "mode": "m"
+                          },
+                          "source": "A",
+                          "value": 0
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": false,
+                        "missing_required": true
+                      },
+                      "policy": {
+                        "required_conditions": [
+                          "mode",
+                          "calibration"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "mode": "m"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "unknown",
+                    "id": "boundary-no-matching-evidence",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "U",
+                          "value": 7
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": false,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "require_verified": true,
+                        "required_conditions": [
+                          "mode"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "mode": "m"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "conflict",
+                    "id": "boundary-counts-no-authority",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "A",
+                          "value": 1
+                        },
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "B",
+                          "value": 1
+                        },
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "C",
+                          "value": 2
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": true,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "required_conditions": [
+                          "mode"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "mode": "m"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "unsupported",
+                    "id": "boundary-boolean-false",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {},
+                          "source": "F",
+                          "value": false
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": true,
+                        "disagreement": false,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "required_conditions": []
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {}
+                      }
+                    },
+                    "target": "status"
+                  }
+                ],
+                "inputs": {
+                  "evidence": "array",
+                  "facts": "object",
+                  "policy": "object",
+                  "request": "object"
+                },
+                "resolutions": [],
+                "rules": [
+                  {
+                    "claim": "If any policy-required condition is absent from the request, status is unknown with sorted missing names; absent calibration is not zero.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "missing-required",
+                    "target": "status",
+                    "then": {
+                      "value": "unknown"
+                    },
+                    "when": {
+                      "var": "facts.missing_required"
+                    }
+                  },
+                  {
+                    "claim": "After exact claim, withdrawal, required-condition, verification, and direct eligible-supersession filtering, no remaining source yields unknown.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "no-eligible",
+                    "target": "status",
+                    "then": {
+                      "value": "unknown"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.has_eligible"
+                            }
+                          ],
+                          "op": "not"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "More than one canonical JSON value among remaining eligible records yields conflict regardless of source counts.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "disagreement",
+                    "target": "status",
+                    "then": {
+                      "value": "conflict"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.has_eligible"
+                        },
+                        {
+                          "var": "facts.disagreement"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "Agreement on Boolean false yields unsupported.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "agreed-false",
+                    "target": "status",
+                    "then": {
+                      "value": "unsupported"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.has_eligible"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.disagreement"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.agreed_boolean_false"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "Agreement on any canonical JSON value other than Boolean false yields supported.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "agreed-other",
+                    "target": "status",
+                    "then": {
+                      "value": "supported"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.has_eligible"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.disagreement"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.agreed_boolean_false"
+                            }
+                          ],
+                          "op": "not"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  }
+                ],
+                "schema": 1,
+                "title": "Policy-governed evidence evaluation",
+                "unresolved": [
+                  "Malformed inputs, duplicate or non-string source identifiers, and non-JSON values are outside tested conditions.",
+                  "Only direct eligible supersession is defined and tested; transitive and cyclic semantics remain unresolved."
+                ]
+              },
+              "parent": null,
+              "reason": "Agent proposed a model revision",
+              "revision": 1
+            }
+          }
+        },
+        {
+          "id": "622a83f77d889971942016692f18b8b98a4c4b5a",
+          "text": "Task model active: Policy-governed evidence evaluation",
+          "payload": {
+            "agent": "agent",
+            "model_event": "accepted",
+            "task_model": {
+              "checks": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": false,
+                    "expected": "supported",
+                    "id": "current-supported-rate",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "agreed-other"
+                      ],
+                      "status": "predicted",
+                      "value": "supported"
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": "unknown",
+                    "id": "boundary-missing-calibration",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "missing-required"
+                      ],
+                      "status": "predicted",
+                      "value": "unknown"
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": "unknown",
+                    "id": "boundary-no-matching-evidence",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "no-eligible"
+                      ],
+                      "status": "predicted",
+                      "value": "unknown"
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": "conflict",
+                    "id": "boundary-counts-no-authority",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "disagreement"
+                      ],
+                      "status": "predicted",
+                      "value": "conflict"
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": "unsupported",
+                    "id": "boundary-boolean-false",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "agreed-false"
+                      ],
+                      "status": "predicted",
+                      "value": "unsupported"
+                    }
+                  }
+                ],
+                "changed_dependencies": [],
+                "complexity": {
+                  "cases": 5,
+                  "complete_bytes": 5038,
+                  "rules": 5,
+                  "working_bytes": 2238
+                },
+                "id": "33a5f90aabe60fd74b2ec798b9e05d9cea00e64e",
+                "issues": [],
+                "missing_evidence": [],
+                "status": "tested",
+                "uncovered_rules": [],
+                "unresolved": [
+                  "Malformed inputs, duplicate or non-string source identifiers, and non-JSON values are outside tested conditions.",
+                  "Only direct eligible supersession is defined and tested; transitive and cyclic semantics remain unresolved."
+                ]
+              },
+              "complexity": {
+                "cases": 5,
+                "complete_bytes": 5038,
+                "rules": 5,
+                "working_bytes": 2238
+              },
+              "fingerprints": {
+                "OUTPUT_SCHEMA.json": {
+                  "sha256": "5dd247296ca98fea77156dd74c41db05e85261cbdeac76819c8154068709c849",
+                  "state": "file"
+                },
+                "TASK.md": {
+                  "sha256": "db12b49dbf5f818a0831784fba505aa9d74120c96c7189e26a4d984fe05779ad",
+                  "state": "file"
+                },
+                "evidence.json": {
+                  "sha256": "4d6a24e6af7038759331d5882d27391749655a23e7cf0aae00ffa7a521fee936",
+                  "state": "file"
+                },
+                "policy.json": {
+                  "sha256": "98a0221d2e6e10b9d4b3d7c6209371ed1cf6039f8c2b0f0c9c219d8a26fedeea",
+                  "state": "file"
+                },
+                "report.json": {
+                  "sha256": "a3c2c4c2c37d5ab7fd9771ced7e61bc8ff7877ea6653a45f09cf74d31b8dc009",
+                  "state": "file"
+                },
+                "requests.json": {
+                  "sha256": "ed912a7959cfd7af04c0419d8cfa6f33c58c7cdef24a65f04ae6f7f61a2cbab5",
+                  "state": "file"
+                },
+                "work.py": {
+                  "sha256": "702b2de018f3b7787a3cd5e502df130e2859859091c356ed46d82aa01e58cdf6",
+                  "state": "file"
+                }
+              },
+              "model": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "supported",
+                    "id": "current-supported-rate",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "vertical_rate",
+                          "conditions": {
+                            "material": "SiN",
+                            "recipe": "R0",
+                            "regime": "dry"
+                          },
+                          "source": "S1",
+                          "value": 30,
+                          "verified": true
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "require_verified": false,
+                        "required_conditions": [
+                          "recipe",
+                          "material"
+                        ]
+                      },
+                      "request": {
+                        "claim": "vertical_rate",
+                        "conditions": {
+                          "material": "SiN",
+                          "recipe": "R0",
+                          "regime": "dry"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "unknown",
+                    "id": "boundary-missing-calibration",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "calibration": "x",
+                            "mode": "m"
+                          },
+                          "source": "A",
+                          "value": 0
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": false,
+                        "missing_required": true
+                      },
+                      "policy": {
+                        "required_conditions": [
+                          "mode",
+                          "calibration"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "mode": "m"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "unknown",
+                    "id": "boundary-no-matching-evidence",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "U",
+                          "value": 7
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": false,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "require_verified": true,
+                        "required_conditions": [
+                          "mode"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "mode": "m"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "conflict",
+                    "id": "boundary-counts-no-authority",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "A",
+                          "value": 1
+                        },
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "B",
+                          "value": 1
+                        },
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "C",
+                          "value": 2
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": true,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "required_conditions": [
+                          "mode"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "mode": "m"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "unsupported",
+                    "id": "boundary-boolean-false",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {},
+                          "source": "F",
+                          "value": false
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": true,
+                        "disagreement": false,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "required_conditions": []
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {}
+                      }
+                    },
+                    "target": "status"
+                  }
+                ],
+                "inputs": {
+                  "evidence": "array",
+                  "facts": "object",
+                  "policy": "object",
+                  "request": "object"
+                },
+                "resolutions": [],
+                "rules": [
+                  {
+                    "claim": "If any policy-required condition is absent from the request, status is unknown with sorted missing names; absent calibration is not zero.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "missing-required",
+                    "target": "status",
+                    "then": {
+                      "value": "unknown"
+                    },
+                    "when": {
+                      "var": "facts.missing_required"
+                    }
+                  },
+                  {
+                    "claim": "After exact claim, withdrawal, required-condition, verification, and direct eligible-supersession filtering, no remaining source yields unknown.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "no-eligible",
+                    "target": "status",
+                    "then": {
+                      "value": "unknown"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.has_eligible"
+                            }
+                          ],
+                          "op": "not"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "More than one canonical JSON value among remaining eligible records yields conflict regardless of source counts.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "disagreement",
+                    "target": "status",
+                    "then": {
+                      "value": "conflict"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.has_eligible"
+                        },
+                        {
+                          "var": "facts.disagreement"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "Agreement on Boolean false yields unsupported.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "agreed-false",
+                    "target": "status",
+                    "then": {
+                      "value": "unsupported"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.has_eligible"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.disagreement"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.agreed_boolean_false"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "Agreement on any canonical JSON value other than Boolean false yields supported.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "agreed-other",
+                    "target": "status",
+                    "then": {
+                      "value": "supported"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.has_eligible"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.disagreement"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.agreed_boolean_false"
+                            }
+                          ],
+                          "op": "not"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  }
+                ],
+                "schema": 1,
+                "title": "Policy-governed evidence evaluation",
+                "unresolved": [
+                  "Malformed inputs, duplicate or non-string source identifiers, and non-JSON values are outside tested conditions.",
+                  "Only direct eligible supersession is defined and tested; transitive and cyclic semantics remain unresolved."
+                ]
+              },
+              "parent": null,
+              "proposal": "33a5f90aabe60fd74b2ec798b9e05d9cea00e64e",
+              "reason": "Agent proposed a model revision",
+              "revision": 1
+            }
+          }
+        },
+        {
+          "id": "e7c90ffdd2430810031cf447522daa886a50b705",
+          "text": "Task model proposed: Policy-governed evidence evaluation",
+          "payload": {
+            "agent": "agent",
+            "model_event": "proposed",
+            "task_model": {
+              "complexity": {
+                "cases": 5,
+                "complete_bytes": 4650,
+                "rules": 4,
+                "working_bytes": 1850
+              },
+              "fingerprints": {
+                "OUTPUT_SCHEMA.json": {
+                  "sha256": "5dd247296ca98fea77156dd74c41db05e85261cbdeac76819c8154068709c849",
+                  "state": "file"
+                },
+                "TASK.md": {
+                  "sha256": "db12b49dbf5f818a0831784fba505aa9d74120c96c7189e26a4d984fe05779ad",
+                  "state": "file"
+                },
+                "evidence.json": {
+                  "sha256": "4d6a24e6af7038759331d5882d27391749655a23e7cf0aae00ffa7a521fee936",
+                  "state": "file"
+                },
+                "policy.json": {
+                  "sha256": "98a0221d2e6e10b9d4b3d7c6209371ed1cf6039f8c2b0f0c9c219d8a26fedeea",
+                  "state": "file"
+                },
+                "report.json": {
+                  "sha256": "a3c2c4c2c37d5ab7fd9771ced7e61bc8ff7877ea6653a45f09cf74d31b8dc009",
+                  "state": "file"
+                },
+                "requests.json": {
+                  "sha256": "ed912a7959cfd7af04c0419d8cfa6f33c58c7cdef24a65f04ae6f7f61a2cbab5",
+                  "state": "file"
+                },
+                "work.py": {
+                  "sha256": "702b2de018f3b7787a3cd5e502df130e2859859091c356ed46d82aa01e58cdf6",
+                  "state": "file"
+                }
+              },
+              "model": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "supported",
+                    "id": "current-supported-rate",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "vertical_rate",
+                          "conditions": {
+                            "material": "SiN",
+                            "recipe": "R0",
+                            "regime": "dry"
+                          },
+                          "source": "S1",
+                          "value": 30,
+                          "verified": true
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "require_verified": false,
+                        "required_conditions": [
+                          "recipe",
+                          "material"
+                        ]
+                      },
+                      "request": {
+                        "claim": "vertical_rate",
+                        "conditions": {
+                          "material": "SiN",
+                          "recipe": "R0",
+                          "regime": "dry"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "unknown",
+                    "id": "boundary-missing-calibration",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "calibration": "x",
+                            "mode": "m"
+                          },
+                          "source": "A",
+                          "value": 0
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": false,
+                        "missing_required": true
+                      },
+                      "policy": {
+                        "required_conditions": [
+                          "mode",
+                          "calibration"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "mode": "m"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "unknown",
+                    "id": "boundary-no-matching-evidence",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "U",
+                          "value": 7
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": false,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "require_verified": true,
+                        "required_conditions": [
+                          "mode"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "mode": "m"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "conflict",
+                    "id": "boundary-counts-no-authority",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "A",
+                          "value": 1
+                        },
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "B",
+                          "value": 1
+                        },
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "C",
+                          "value": 2
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": true,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "required_conditions": [
+                          "mode"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "mode": "m"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "unsupported",
+                    "id": "boundary-boolean-false",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {},
+                          "source": "F",
+                          "value": false
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": true,
+                        "disagreement": false,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "required_conditions": []
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {}
+                      }
+                    },
+                    "target": "status"
+                  }
+                ],
+                "inputs": {
+                  "evidence": "array",
+                  "facts": "object",
+                  "policy": "object",
+                  "request": "object"
+                },
+                "resolutions": [],
+                "rules": [
+                  {
+                    "claim": "Shared rule for status; read retained conditions.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "missing-required",
+                    "target": "status",
+                    "then": {
+                      "value": "unknown"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "facts.has_eligible"
+                                }
+                              ],
+                              "op": "not"
+                            },
+                            {
+                              "args": [
+                                {
+                                  "var": "facts.missing_required"
+                                }
+                              ],
+                              "op": "not"
+                            }
+                          ],
+                          "op": "and"
+                        },
+                        {
+                          "var": "facts.missing_required"
+                        }
+                      ],
+                      "op": "or"
+                    }
+                  },
+                  {
+                    "claim": "More than one canonical JSON value among remaining eligible records yields conflict regardless of source counts.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "disagreement",
+                    "target": "status",
+                    "then": {
+                      "value": "conflict"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.disagreement"
+                        },
+                        {
+                          "var": "facts.has_eligible"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "Agreement on Boolean false yields unsupported.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "agreed-false",
+                    "target": "status",
+                    "then": {
+                      "value": "unsupported"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.disagreement"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.agreed_boolean_false"
+                        },
+                        {
+                          "var": "facts.has_eligible"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "Agreement on any canonical JSON value other than Boolean false yields supported.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "agreed-other",
+                    "target": "status",
+                    "then": {
+                      "value": "supported"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.agreed_boolean_false"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.disagreement"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.has_eligible"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  }
+                ],
+                "schema": 1,
+                "title": "Policy-governed evidence evaluation",
+                "unresolved": [
+                  "Malformed inputs, duplicate or non-string source identifiers, and non-JSON values are outside tested conditions.",
+                  "Only direct eligible supersession is defined and tested; transitive and cyclic semantics remain unresolved."
+                ]
+              },
+              "parent": "622a83f77d889971942016692f18b8b98a4c4b5a",
+              "reason": "Factor shared effects and repeated Boolean expressions",
+              "revision": 2
+            }
+          }
+        },
+        {
+          "id": "c5fc2221264cbe3a892bf52e00ce5e48cd625ccd",
+          "text": "Task model active: Policy-governed evidence evaluation",
+          "payload": {
+            "agent": "agent",
+            "model_event": "accepted",
+            "task_model": {
+              "checks": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": false,
+                    "expected": "supported",
+                    "id": "current-supported-rate",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "agreed-other"
+                      ],
+                      "status": "predicted",
+                      "value": "supported"
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": "unknown",
+                    "id": "boundary-missing-calibration",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "missing-required"
+                      ],
+                      "status": "predicted",
+                      "value": "unknown"
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": "unknown",
+                    "id": "boundary-no-matching-evidence",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "missing-required"
+                      ],
+                      "status": "predicted",
+                      "value": "unknown"
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": "conflict",
+                    "id": "boundary-counts-no-authority",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "disagreement"
+                      ],
+                      "status": "predicted",
+                      "value": "conflict"
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": "unsupported",
+                    "id": "boundary-boolean-false",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "agreed-false"
+                      ],
+                      "status": "predicted",
+                      "value": "unsupported"
+                    }
+                  }
+                ],
+                "changed_dependencies": [],
+                "complexity": {
+                  "cases": 5,
+                  "complete_bytes": 4650,
+                  "rules": 4,
+                  "working_bytes": 1850
+                },
+                "id": "e7c90ffdd2430810031cf447522daa886a50b705",
+                "issues": [],
+                "missing_evidence": [],
+                "status": "tested",
+                "uncovered_rules": [],
+                "unresolved": [
+                  "Malformed inputs, duplicate or non-string source identifiers, and non-JSON values are outside tested conditions.",
+                  "Only direct eligible supersession is defined and tested; transitive and cyclic semantics remain unresolved."
+                ]
+              },
+              "complexity": {
+                "cases": 5,
+                "complete_bytes": 4650,
+                "rules": 4,
+                "working_bytes": 1850
+              },
+              "fingerprints": {
+                "OUTPUT_SCHEMA.json": {
+                  "sha256": "5dd247296ca98fea77156dd74c41db05e85261cbdeac76819c8154068709c849",
+                  "state": "file"
+                },
+                "TASK.md": {
+                  "sha256": "db12b49dbf5f818a0831784fba505aa9d74120c96c7189e26a4d984fe05779ad",
+                  "state": "file"
+                },
+                "evidence.json": {
+                  "sha256": "4d6a24e6af7038759331d5882d27391749655a23e7cf0aae00ffa7a521fee936",
+                  "state": "file"
+                },
+                "policy.json": {
+                  "sha256": "98a0221d2e6e10b9d4b3d7c6209371ed1cf6039f8c2b0f0c9c219d8a26fedeea",
+                  "state": "file"
+                },
+                "report.json": {
+                  "sha256": "a3c2c4c2c37d5ab7fd9771ced7e61bc8ff7877ea6653a45f09cf74d31b8dc009",
+                  "state": "file"
+                },
+                "requests.json": {
+                  "sha256": "ed912a7959cfd7af04c0419d8cfa6f33c58c7cdef24a65f04ae6f7f61a2cbab5",
+                  "state": "file"
+                },
+                "work.py": {
+                  "sha256": "702b2de018f3b7787a3cd5e502df130e2859859091c356ed46d82aa01e58cdf6",
+                  "state": "file"
+                }
+              },
+              "model": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "supported",
+                    "id": "current-supported-rate",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "vertical_rate",
+                          "conditions": {
+                            "material": "SiN",
+                            "recipe": "R0",
+                            "regime": "dry"
+                          },
+                          "source": "S1",
+                          "value": 30,
+                          "verified": true
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "require_verified": false,
+                        "required_conditions": [
+                          "recipe",
+                          "material"
+                        ]
+                      },
+                      "request": {
+                        "claim": "vertical_rate",
+                        "conditions": {
+                          "material": "SiN",
+                          "recipe": "R0",
+                          "regime": "dry"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "unknown",
+                    "id": "boundary-missing-calibration",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "calibration": "x",
+                            "mode": "m"
+                          },
+                          "source": "A",
+                          "value": 0
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": false,
+                        "missing_required": true
+                      },
+                      "policy": {
+                        "required_conditions": [
+                          "mode",
+                          "calibration"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "mode": "m"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "unknown",
+                    "id": "boundary-no-matching-evidence",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "U",
+                          "value": 7
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": false,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "require_verified": true,
+                        "required_conditions": [
+                          "mode"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "mode": "m"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "conflict",
+                    "id": "boundary-counts-no-authority",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "A",
+                          "value": 1
+                        },
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "B",
+                          "value": 1
+                        },
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "C",
+                          "value": 2
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": true,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "required_conditions": [
+                          "mode"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "mode": "m"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "unsupported",
+                    "id": "boundary-boolean-false",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {},
+                          "source": "F",
+                          "value": false
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": true,
+                        "disagreement": false,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "required_conditions": []
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {}
+                      }
+                    },
+                    "target": "status"
+                  }
+                ],
+                "inputs": {
+                  "evidence": "array",
+                  "facts": "object",
+                  "policy": "object",
+                  "request": "object"
+                },
+                "resolutions": [],
+                "rules": [
+                  {
+                    "claim": "Shared rule for status; read retained conditions.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "missing-required",
+                    "target": "status",
+                    "then": {
+                      "value": "unknown"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "facts.has_eligible"
+                                }
+                              ],
+                              "op": "not"
+                            },
+                            {
+                              "args": [
+                                {
+                                  "var": "facts.missing_required"
+                                }
+                              ],
+                              "op": "not"
+                            }
+                          ],
+                          "op": "and"
+                        },
+                        {
+                          "var": "facts.missing_required"
+                        }
+                      ],
+                      "op": "or"
+                    }
+                  },
+                  {
+                    "claim": "More than one canonical JSON value among remaining eligible records yields conflict regardless of source counts.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "disagreement",
+                    "target": "status",
+                    "then": {
+                      "value": "conflict"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.disagreement"
+                        },
+                        {
+                          "var": "facts.has_eligible"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "Agreement on Boolean false yields unsupported.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "agreed-false",
+                    "target": "status",
+                    "then": {
+                      "value": "unsupported"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.disagreement"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.agreed_boolean_false"
+                        },
+                        {
+                          "var": "facts.has_eligible"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "Agreement on any canonical JSON value other than Boolean false yields supported.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "id": "agreed-other",
+                    "target": "status",
+                    "then": {
+                      "value": "supported"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.agreed_boolean_false"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.disagreement"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.has_eligible"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  }
+                ],
+                "schema": 1,
+                "title": "Policy-governed evidence evaluation",
+                "unresolved": [
+                  "Malformed inputs, duplicate or non-string source identifiers, and non-JSON values are outside tested conditions.",
+                  "Only direct eligible supersession is defined and tested; transitive and cyclic semantics remain unresolved."
+                ]
+              },
+              "parent": "622a83f77d889971942016692f18b8b98a4c4b5a",
+              "proposal": "e7c90ffdd2430810031cf447522daa886a50b705",
+              "reason": "Factor shared effects and repeated Boolean expressions",
+              "revision": 2
+            }
+          }
+        },
+        {
+          "id": "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be",
+          "text": "Stage 2 implementation in work.py obeys required-condition matching, verified/withdrawn filters, eligible-only supersession, canonical JSON agreement, Boolean-false unsupported status, exact four-field output, and input immutability. Current report.json equals evaluate over requests.json with current evidence.json and policy.json. Boundary checks also cover ineligible superseders, string supersedes, unverified exclusion, and an agreed null value.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "report.json",
+              "TASK.md",
+              "OUTPUT_SCHEMA.json",
+              "requests.json",
+              "policy.json",
+              "evidence.json"
+            ]
+          }
+        },
+        {
+          "id": "c71ad6892fc58853fe047c4859146d86587747e5",
+          "text": "Unresolved limits: malformed inputs, missing/non-string source IDs, duplicate source IDs, and non-JSON values are unspecified and untested. Supersession cycles and transitive intent are not defined; implementation removes every directly named source ID when named by another eligible record. Extra non-required request/record conditions are not used for matching because the contract specifies required conditions.",
+          "payload": {
+            "agent": "agent"
+          }
+        },
+        {
+          "id": "eb163316602904a2ccd3212122475bcbeb0260a5",
+          "text": "Task model proposed: Policy-governed evidence evaluation",
+          "payload": {
+            "agent": "agent",
+            "model_event": "proposed",
+            "task_model": {
+              "complexity": {
+                "cases": 9,
+                "complete_bytes": 6942,
+                "rules": 4,
+                "working_bytes": 1940
+              },
+              "fingerprints": {
+                "OUTPUT_SCHEMA.json": {
+                  "sha256": "5dd247296ca98fea77156dd74c41db05e85261cbdeac76819c8154068709c849",
+                  "state": "file"
+                },
+                "TASK.md": {
+                  "sha256": "7c59bd3f156b6faaedf5c81e4339c357985640092188e278315d075ba9aae6b8",
+                  "state": "file"
+                },
+                "evidence.json": {
+                  "sha256": "4d6a24e6af7038759331d5882d27391749655a23e7cf0aae00ffa7a521fee936",
+                  "state": "file"
+                },
+                "policy.json": {
+                  "sha256": "a5f19b6254f9aa6b1784895072ab211a78a2c1784bee3813da4a509899a8d359",
+                  "state": "file"
+                },
+                "report.json": {
+                  "sha256": "a3c2c4c2c37d5ab7fd9771ced7e61bc8ff7877ea6653a45f09cf74d31b8dc009",
+                  "state": "file"
+                },
+                "requests.json": {
+                  "sha256": "ed912a7959cfd7af04c0419d8cfa6f33c58c7cdef24a65f04ae6f7f61a2cbab5",
+                  "state": "file"
+                },
+                "work.py": {
+                  "sha256": "702b2de018f3b7787a3cd5e502df130e2859859091c356ed46d82aa01e58cdf6",
+                  "state": "file"
+                }
+              },
+              "model": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+                    ],
+                    "expected": "unknown",
+                    "id": "stage2-missing-condition",
+                    "inputs": {
+                      "evidence": [],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": false,
+                        "missing_required": true
+                      },
+                      "policy": {
+                        "require_verified": true,
+                        "required_conditions": [
+                          "b",
+                          "a"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "a": 1
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+                    ],
+                    "expected": "conflict",
+                    "id": "stage2-eligible-conflict",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "a": 1,
+                            "b": null
+                          },
+                          "source": "z",
+                          "value": {
+                            "x": 1,
+                            "y": 2
+                          },
+                          "verified": true
+                        },
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "a": 1,
+                            "b": null
+                          },
+                          "source": "m",
+                          "value": false,
+                          "verified": true
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": true,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "require_verified": true,
+                        "required_conditions": [
+                          "b",
+                          "a"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "a": 1,
+                          "b": null
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+                    ],
+                    "expected": "unsupported",
+                    "id": "stage2-agreed-false",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "a": 1,
+                            "b": null
+                          },
+                          "source": "f",
+                          "value": false,
+                          "verified": true
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": true,
+                        "disagreement": false,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "require_verified": true,
+                        "required_conditions": [
+                          "b",
+                          "a"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "a": 1,
+                          "b": null
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+                    ],
+                    "expected": "supported",
+                    "id": "stage2-ineligible-superseder-and-null",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "x",
+                          "conditions": {
+                            "site": "A"
+                          },
+                          "source": "old",
+                          "value": null,
+                          "verified": true
+                        },
+                        {
+                          "claim": "x",
+                          "conditions": {
+                            "site": "B"
+                          },
+                          "source": "bad-new",
+                          "supersedes": [
+                            "old"
+                          ],
+                          "value": 2,
+                          "verified": true
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "require_verified": true,
+                        "required_conditions": [
+                          "site"
+                        ]
+                      },
+                      "request": {
+                        "claim": "x",
+                        "conditions": {
+                          "extra": 9,
+                          "site": "A"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "supported",
+                    "id": "current-supported-rate",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "vertical_rate",
+                          "conditions": {
+                            "material": "SiN",
+                            "recipe": "R0",
+                            "regime": "dry"
+                          },
+                          "source": "S1",
+                          "value": 30,
+                          "verified": true
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "require_verified": false,
+                        "required_conditions": [
+                          "recipe",
+                          "material"
+                        ]
+                      },
+                      "request": {
+                        "claim": "vertical_rate",
+                        "conditions": {
+                          "material": "SiN",
+                          "recipe": "R0",
+                          "regime": "dry"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "unknown",
+                    "id": "boundary-missing-calibration",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "calibration": "x",
+                            "mode": "m"
+                          },
+                          "source": "A",
+                          "value": 0
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": false,
+                        "missing_required": true
+                      },
+                      "policy": {
+                        "required_conditions": [
+                          "mode",
+                          "calibration"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "mode": "m"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "unknown",
+                    "id": "boundary-no-matching-evidence",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "U",
+                          "value": 7
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": false,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "require_verified": true,
+                        "required_conditions": [
+                          "mode"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "mode": "m"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "conflict",
+                    "id": "boundary-counts-no-authority",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "A",
+                          "value": 1
+                        },
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "B",
+                          "value": 1
+                        },
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "C",
+                          "value": 2
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": true,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "required_conditions": [
+                          "mode"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "mode": "m"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "unsupported",
+                    "id": "boundary-boolean-false",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {},
+                          "source": "F",
+                          "value": false
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": true,
+                        "disagreement": false,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "required_conditions": []
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {}
+                      }
+                    },
+                    "target": "status"
+                  }
+                ],
+                "inputs": {
+                  "evidence": "array",
+                  "facts": "object",
+                  "policy": "object",
+                  "request": "object"
+                },
+                "resolutions": [],
+                "rules": [
+                  {
+                    "claim": "A request missing any policy-required condition is unknown; otherwise, a request with no eligible evidence is also unknown.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+                    ],
+                    "id": "missing-required",
+                    "target": "status",
+                    "then": {
+                      "value": "unknown"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "var": "facts.missing_required"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "facts.missing_required"
+                                }
+                              ],
+                              "op": "not"
+                            },
+                            {
+                              "args": [
+                                {
+                                  "var": "facts.has_eligible"
+                                }
+                              ],
+                              "op": "not"
+                            }
+                          ],
+                          "op": "and"
+                        }
+                      ],
+                      "op": "or"
+                    }
+                  },
+                  {
+                    "claim": "More than one canonical JSON value among remaining eligible records yields conflict regardless of source counts.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+                    ],
+                    "id": "disagreement",
+                    "target": "status",
+                    "then": {
+                      "value": "conflict"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.has_eligible"
+                        },
+                        {
+                          "var": "facts.disagreement"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "Agreement on Boolean false yields unsupported.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+                    ],
+                    "id": "agreed-false",
+                    "target": "status",
+                    "then": {
+                      "value": "unsupported"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.has_eligible"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.disagreement"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.agreed_boolean_false"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "Agreement on any canonical JSON value other than Boolean false yields supported, including null.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+                    ],
+                    "id": "agreed-other",
+                    "target": "status",
+                    "then": {
+                      "value": "supported"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.has_eligible"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.disagreement"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.agreed_boolean_false"
+                            }
+                          ],
+                          "op": "not"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  }
+                ],
+                "schema": 1,
+                "title": "Policy-governed evidence evaluation",
+                "unresolved": [
+                  "Malformed inputs, duplicate or non-string source identifiers, and non-JSON values are outside tested conditions.",
+                  "Only direct eligible supersession is defined and tested; transitive and cyclic semantics remain unresolved.",
+                  "Extra non-required request and evidence conditions are ignored for matching because only policy-required conditions are specified by the contract."
+                ]
+              },
+              "parent": "c5fc2221264cbe3a892bf52e00ce5e48cd625ccd",
+              "reason": "Agent proposed a model revision",
+              "revision": 3
+            }
+          }
+        },
+        {
+          "id": "39718ea3e86b00b5cae2ebaf719fc6203f3db320",
+          "text": "Task model active: Policy-governed evidence evaluation",
+          "payload": {
+            "agent": "agent",
+            "model_event": "accepted",
+            "task_model": {
+              "checks": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": true,
+                    "expected": "unknown",
+                    "id": "stage2-missing-condition",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "missing-required"
+                      ],
+                      "status": "predicted",
+                      "value": "unknown"
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": "conflict",
+                    "id": "stage2-eligible-conflict",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "disagreement"
+                      ],
+                      "status": "predicted",
+                      "value": "conflict"
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": "unsupported",
+                    "id": "stage2-agreed-false",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "agreed-false"
+                      ],
+                      "status": "predicted",
+                      "value": "unsupported"
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": "supported",
+                    "id": "stage2-ineligible-superseder-and-null",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "agreed-other"
+                      ],
+                      "status": "predicted",
+                      "value": "supported"
+                    }
+                  },
+                  {
+                    "challenge": false,
+                    "expected": "supported",
+                    "id": "current-supported-rate",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "agreed-other"
+                      ],
+                      "status": "predicted",
+                      "value": "supported"
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": "unknown",
+                    "id": "boundary-missing-calibration",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "missing-required"
+                      ],
+                      "status": "predicted",
+                      "value": "unknown"
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": "unknown",
+                    "id": "boundary-no-matching-evidence",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "missing-required"
+                      ],
+                      "status": "predicted",
+                      "value": "unknown"
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": "conflict",
+                    "id": "boundary-counts-no-authority",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "disagreement"
+                      ],
+                      "status": "predicted",
+                      "value": "conflict"
+                    }
+                  },
+                  {
+                    "challenge": true,
+                    "expected": "unsupported",
+                    "id": "boundary-boolean-false",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "agreed-false"
+                      ],
+                      "status": "predicted",
+                      "value": "unsupported"
+                    }
+                  }
+                ],
+                "changed_dependencies": [],
+                "complexity": {
+                  "cases": 9,
+                  "complete_bytes": 6942,
+                  "rules": 4,
+                  "working_bytes": 1940
+                },
+                "id": "eb163316602904a2ccd3212122475bcbeb0260a5",
+                "issues": [],
+                "missing_evidence": [],
+                "status": "tested",
+                "uncovered_rules": [],
+                "unresolved": [
+                  "Malformed inputs, duplicate or non-string source identifiers, and non-JSON values are outside tested conditions.",
+                  "Only direct eligible supersession is defined and tested; transitive and cyclic semantics remain unresolved.",
+                  "Extra non-required request and evidence conditions are ignored for matching because only policy-required conditions are specified by the contract."
+                ]
+              },
+              "complexity": {
+                "cases": 9,
+                "complete_bytes": 6942,
+                "rules": 4,
+                "working_bytes": 1940
+              },
+              "fingerprints": {
+                "OUTPUT_SCHEMA.json": {
+                  "sha256": "5dd247296ca98fea77156dd74c41db05e85261cbdeac76819c8154068709c849",
+                  "state": "file"
+                },
+                "TASK.md": {
+                  "sha256": "7c59bd3f156b6faaedf5c81e4339c357985640092188e278315d075ba9aae6b8",
+                  "state": "file"
+                },
+                "evidence.json": {
+                  "sha256": "4d6a24e6af7038759331d5882d27391749655a23e7cf0aae00ffa7a521fee936",
+                  "state": "file"
+                },
+                "policy.json": {
+                  "sha256": "a5f19b6254f9aa6b1784895072ab211a78a2c1784bee3813da4a509899a8d359",
+                  "state": "file"
+                },
+                "report.json": {
+                  "sha256": "a3c2c4c2c37d5ab7fd9771ced7e61bc8ff7877ea6653a45f09cf74d31b8dc009",
+                  "state": "file"
+                },
+                "requests.json": {
+                  "sha256": "ed912a7959cfd7af04c0419d8cfa6f33c58c7cdef24a65f04ae6f7f61a2cbab5",
+                  "state": "file"
+                },
+                "work.py": {
+                  "sha256": "702b2de018f3b7787a3cd5e502df130e2859859091c356ed46d82aa01e58cdf6",
+                  "state": "file"
+                }
+              },
+              "model": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+                    ],
+                    "expected": "unknown",
+                    "id": "stage2-missing-condition",
+                    "inputs": {
+                      "evidence": [],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": false,
+                        "missing_required": true
+                      },
+                      "policy": {
+                        "require_verified": true,
+                        "required_conditions": [
+                          "b",
+                          "a"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "a": 1
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+                    ],
+                    "expected": "conflict",
+                    "id": "stage2-eligible-conflict",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "a": 1,
+                            "b": null
+                          },
+                          "source": "z",
+                          "value": {
+                            "x": 1,
+                            "y": 2
+                          },
+                          "verified": true
+                        },
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "a": 1,
+                            "b": null
+                          },
+                          "source": "m",
+                          "value": false,
+                          "verified": true
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": true,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "require_verified": true,
+                        "required_conditions": [
+                          "b",
+                          "a"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "a": 1,
+                          "b": null
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+                    ],
+                    "expected": "unsupported",
+                    "id": "stage2-agreed-false",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "a": 1,
+                            "b": null
+                          },
+                          "source": "f",
+                          "value": false,
+                          "verified": true
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": true,
+                        "disagreement": false,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "require_verified": true,
+                        "required_conditions": [
+                          "b",
+                          "a"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "a": 1,
+                          "b": null
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+                    ],
+                    "expected": "supported",
+                    "id": "stage2-ineligible-superseder-and-null",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "x",
+                          "conditions": {
+                            "site": "A"
+                          },
+                          "source": "old",
+                          "value": null,
+                          "verified": true
+                        },
+                        {
+                          "claim": "x",
+                          "conditions": {
+                            "site": "B"
+                          },
+                          "source": "bad-new",
+                          "supersedes": [
+                            "old"
+                          ],
+                          "value": 2,
+                          "verified": true
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "require_verified": true,
+                        "required_conditions": [
+                          "site"
+                        ]
+                      },
+                      "request": {
+                        "claim": "x",
+                        "conditions": {
+                          "extra": 9,
+                          "site": "A"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "supported",
+                    "id": "current-supported-rate",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "vertical_rate",
+                          "conditions": {
+                            "material": "SiN",
+                            "recipe": "R0",
+                            "regime": "dry"
+                          },
+                          "source": "S1",
+                          "value": 30,
+                          "verified": true
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "require_verified": false,
+                        "required_conditions": [
+                          "recipe",
+                          "material"
+                        ]
+                      },
+                      "request": {
+                        "claim": "vertical_rate",
+                        "conditions": {
+                          "material": "SiN",
+                          "recipe": "R0",
+                          "regime": "dry"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "unknown",
+                    "id": "boundary-missing-calibration",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "calibration": "x",
+                            "mode": "m"
+                          },
+                          "source": "A",
+                          "value": 0
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": false,
+                        "missing_required": true
+                      },
+                      "policy": {
+                        "required_conditions": [
+                          "mode",
+                          "calibration"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "mode": "m"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "unknown",
+                    "id": "boundary-no-matching-evidence",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "U",
+                          "value": 7
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": false,
+                        "has_eligible": false,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "require_verified": true,
+                        "required_conditions": [
+                          "mode"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "mode": "m"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "conflict",
+                    "id": "boundary-counts-no-authority",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "A",
+                          "value": 1
+                        },
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "B",
+                          "value": 1
+                        },
+                        {
+                          "claim": "c",
+                          "conditions": {
+                            "mode": "m"
+                          },
+                          "source": "C",
+                          "value": 2
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": false,
+                        "disagreement": true,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "required_conditions": [
+                          "mode"
+                        ]
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {
+                          "mode": "m"
+                        }
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "0deb922d84ad8bb38643b1ccf99c7a76f6c99c6d"
+                    ],
+                    "expected": "unsupported",
+                    "id": "boundary-boolean-false",
+                    "inputs": {
+                      "evidence": [
+                        {
+                          "claim": "c",
+                          "conditions": {},
+                          "source": "F",
+                          "value": false
+                        }
+                      ],
+                      "facts": {
+                        "agreed_boolean_false": true,
+                        "disagreement": false,
+                        "has_eligible": true,
+                        "missing_required": false
+                      },
+                      "policy": {
+                        "required_conditions": []
+                      },
+                      "request": {
+                        "claim": "c",
+                        "conditions": {}
+                      }
+                    },
+                    "target": "status"
+                  }
+                ],
+                "inputs": {
+                  "evidence": "array",
+                  "facts": "object",
+                  "policy": "object",
+                  "request": "object"
+                },
+                "resolutions": [],
+                "rules": [
+                  {
+                    "claim": "A request missing any policy-required condition is unknown; otherwise, a request with no eligible evidence is also unknown.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+                    ],
+                    "id": "missing-required",
+                    "target": "status",
+                    "then": {
+                      "value": "unknown"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "var": "facts.missing_required"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "facts.missing_required"
+                                }
+                              ],
+                              "op": "not"
+                            },
+                            {
+                              "args": [
+                                {
+                                  "var": "facts.has_eligible"
+                                }
+                              ],
+                              "op": "not"
+                            }
+                          ],
+                          "op": "and"
+                        }
+                      ],
+                      "op": "or"
+                    }
+                  },
+                  {
+                    "claim": "More than one canonical JSON value among remaining eligible records yields conflict regardless of source counts.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+                    ],
+                    "id": "disagreement",
+                    "target": "status",
+                    "then": {
+                      "value": "conflict"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.has_eligible"
+                        },
+                        {
+                          "var": "facts.disagreement"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "Agreement on Boolean false yields unsupported.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+                    ],
+                    "id": "agreed-false",
+                    "target": "status",
+                    "then": {
+                      "value": "unsupported"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.has_eligible"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.disagreement"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.agreed_boolean_false"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "Agreement on any canonical JSON value other than Boolean false yields supported, including null.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "3595dd527e3bbc4c8da9b9b6ba0907a91412e6be"
+                    ],
+                    "id": "agreed-other",
+                    "target": "status",
+                    "then": {
+                      "value": "supported"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "facts.missing_required"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "var": "facts.has_eligible"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.disagreement"
+                            }
+                          ],
+                          "op": "not"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "facts.agreed_boolean_false"
+                            }
+                          ],
+                          "op": "not"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  }
+                ],
+                "schema": 1,
+                "title": "Policy-governed evidence evaluation",
+                "unresolved": [
+                  "Malformed inputs, duplicate or non-string source identifiers, and non-JSON values are outside tested conditions.",
+                  "Only direct eligible supersession is defined and tested; transitive and cyclic semantics remain unresolved.",
+                  "Extra non-required request and evidence conditions are ignored for matching because only policy-required conditions are specified by the contract."
+                ]
+              },
+              "parent": "c5fc2221264cbe3a892bf52e00ce5e48cd625ccd",
+              "proposal": "eb163316602904a2ccd3212122475bcbeb0260a5",
+              "reason": "Agent proposed a model revision",
+              "revision": 3
+            }
+          }
+        }
+      ]
+    }
+  }
+}

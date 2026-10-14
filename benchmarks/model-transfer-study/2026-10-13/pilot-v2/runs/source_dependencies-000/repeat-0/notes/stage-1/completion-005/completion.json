@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "write",
+    "arguments": {
+      "path": "work.py",
+      "content": "\"\"\"Evaluate whether declared source dependencies changed.\"\"\"\n\nimport json\n\n\n_MISSING = {\"kind\": \"missing\"}\n\n\ndef _canonical_json(value):\n    \"\"\"Return the canonical JSON representation used for state comparison.\"\"\"\n    return json.dumps(value, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False)\n\n\ndef evaluate(request, policy):\n    \"\"\"Compare saved and current states for relevant declared paths.\n\n    Missing mapping entries are treated as ``{\"kind\": \"missing\"}``.\n    Neither input is modified.\n    \"\"\"\n    declared = request.get(\"declared\", [])\n    saved = request.get(\"saved\", {})\n    current = request.get(\"current\", {})\n    ignored = set(policy.get(\"ignored\", []))\n\n    paths = sorted(set(declared) - ignored)\n    changed = []\n    missing_json = _canonical_json(_MISSING)\n\n    for path in paths:\n        saved_json = _canonical_json(saved[path]) if path in saved else missing_json\n        current_json = _canonical_json(current[path]) if path in current else missing_json\n        if saved_json != current_json:\n            changed.append(path)\n\n    return {\"needs_review\": bool(changed), \"changed\": changed}\n"
+    }
+  },
+  "usage": {
+    "input_tokens": 8867,
+    "output_tokens": 549,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 156
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 11.456653750035912,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

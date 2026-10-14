@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a135c8-fe6a-74c2-954d-41e30c374445"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"action\":\"memory\",\"arguments_json\":\"{\\\"action\\\":\\\"model_accept\\\",\\\"id\\\":\\\"77d62507fbf700639a3bafbd806f4123cd509071\\\"}\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":13978,"cached_input_tokens":6528,"cache_write_input_tokens":0,"output_tokens":157,"reasoning_output_tokens":106}}

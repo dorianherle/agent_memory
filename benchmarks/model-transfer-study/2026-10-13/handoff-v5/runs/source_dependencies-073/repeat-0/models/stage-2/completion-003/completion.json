@@ -1,0 +1,54 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy,json\nfrom work import evaluate\ncases=[\n ({'declared':['b','a','b','gone'],'saved':{'a':{'kind':'file','hash':'x','meta':{'n':1}},'b':{'kind':'file','hash':'old'}},'current':{'a':{'meta':{'n':1},'hash':'x','kind':'file'},'b':{'kind':'file','hash':'new'},'noise':{'v':2}}},{'ignored':[]},{'needs_review':True,'changed':['b']}),\n ({'declared':['skip','x'],'saved':{'skip':{'kind':'file','hash':'1'},'x':{'kind':'file','hash':'2'}},'current':{'skip':{'kind':'file','hash':'9'},'x':{'kind':'file','hash':'2'}}},{'ignored':['skip']},{'needs_review':False,'changed':[]}),\n ({'declared':['new','gone'],'saved':{'gone':{'kind':'file','hash':'1'}},'current':{'new':{'kind':'file','hash':'2'}}},{'ignored':[]},{'needs_review':True,'changed':['gone','new']}),\n ({'declared':['absent'],'saved':{},'current':{'absent':{'kind':'missing'}}},{'ignored':[]},{'needs_review':False,'changed':[]}),\n]\nfor i,(r,p,want) in enumerate(cases):\n rb,pb=copy.deepcopy(r),copy.deepcopy(p)\n got=evaluate(r,p)\n assert got==want,(i,got,want)\n assert r==rb and p==pb,(i,'mutated')\nprint(json.dumps({'passed':len(cases)}))"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import json\nfrom work import evaluate\nwith open('requests.json',encoding='utf-8') as f: requests=json.load(f)\nwith open('policy.json',encoding='utf-8') as f: policy=json.load(f)\nactual=[evaluate(r,policy) for r in requests]\nwith open('report.json',encoding='utf-8') as f: report=json.load(f)\nassert actual==report,(actual,report)\nprint(json.dumps(actual,sort_keys=True))"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "status",
+              "--short"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 12759,
+    "output_tokens": 940,
+    "cached_input_tokens": 0,
+    "reasoning_output_tokens": 362
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 21.243816709145904,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

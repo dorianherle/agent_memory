@@ -11,6 +11,7 @@ from agent_memory.runner import (
     list_codex_models,
     run_goal,
     start_codex_login,
+    _call_worker,
 )
 from agent_memory.tests.helpers import MemoryTestCase
 
@@ -21,6 +22,35 @@ def _write(path: Path, text: str) -> None:
 
 
 class RunnerTests(MemoryTestCase):
+    def test_worker_internal_type_error_does_not_repeat_experiment(self) -> None:
+        calls = []
+
+        def worker(prompt, cwd, **kwargs):
+            calls.append((prompt, cwd, kwargs))
+            raise TypeError('experiment input is invalid')
+
+        with self.assertRaisesRegex(TypeError, 'experiment input is invalid'):
+            _call_worker(worker, 'run experiment', self.path, model='requested')
+        self.assertEqual(len(calls), 1)
+
+    def test_worker_signature_keeps_supported_model_option(self) -> None:
+        calls = []
+
+        def worker(prompt, cwd, *, model):
+            calls.append(model)
+
+        _call_worker(worker, 'run experiment', self.path, model='requested', on_line=None)
+        self.assertEqual(calls, ['requested'])
+
+    def test_legacy_worker_without_options_is_called_once(self) -> None:
+        calls = []
+
+        def worker(prompt, cwd):
+            calls.append((prompt, cwd))
+
+        _call_worker(worker, 'run experiment', self.path, model='requested', on_line=None)
+        self.assertEqual(calls, [('run experiment', self.path)])
+
     def test_bootstrap_receives_full_goal_not_truncated_title(self) -> None:
         goal = "Implement ledger. Preserve existing POSIX mode across compaction."
 
@@ -166,6 +196,31 @@ class RunnerTests(MemoryTestCase):
         with patch("agent_memory.runner.subprocess.Popen", return_value=FakeProc()):
             codex_worker("go", self.path, model="gpt-5.6-luna", on_line=lines.append)
         self.assertEqual(lines, ["editing tests/test_goal.py", "done"])
+
+    def test_codex_worker_times_out(self) -> None:
+        import time
+        from agent_memory.runner import TURN_SECONDS
+
+        class FakeProc:
+            def __init__(self):
+                self.stdout = iter(["working\n"])
+                self.killed = False
+            def poll(self):
+                return 1 if self.killed else None
+            def terminate(self):
+                self.killed = True
+            def wait(self):
+                while not self.killed:
+                    time.sleep(0.01)
+                return 1
+
+        with patch("agent_memory.runner.TURN_SECONDS", 0.05), patch(
+            "agent_memory.runner.subprocess.Popen", return_value=FakeProc()
+        ):
+            with self.assertRaises(RuntimeError) as err:
+                codex_worker("go", self.path)
+        self.assertIn("exceeded", str(err.exception))
+        self.assertGreater(TURN_SECONDS, 1)
 
 
 class WorkerDetectTests(MemoryTestCase):

@@ -1,0 +1,49 @@
+You are an agent in a controlled work study. Use only the study tool protocol.
+Do not call any native Codex tool. The completion process has no project files.
+Return one JSON object: action plus arguments_json (a JSON-encoded object).
+Actions:
+read {path}; write {path,content}; list {path}; run {command:[program,arg,...]};
+memory {action:save|find|history|open_questions|delete,text?,query?,ids?,payload?};
+finish {}. Commands run offline in the project container, with Python and Git.
+Use current files and local tests. Complete work.py and report.json. Save durable
+findings and unresolved questions before finish. You may store concise reusable
+rules in ordinary notes. Do not invent observations. Tool errors can be repaired.
+Save source-bound findings with payload {files:[relative_source_paths]} when useful.
+The history below contains every previous study tool call and its full result.
+
+This method requires model transfer. At the start, call model_get. Before finish,
+create or revise an accepted task model from actual local observations. A note
+alone is not a model handoff. Preserve prior cases and meaningful conditions.
+Call model_check before accept. Call model_reduce on the tested active model;
+if it proposes a passing revision, accept it. Also call model_predict for a
+recorded case. Do not require size reduction when new evidence needs more rules.
+Executable model memory also supports actions model_get, model_propose,
+model_check, model_accept, model_reduce, model_predict. Propose arguments:
+{action:model_propose,id:active_model_id_or_null,payload:model}. Accept/check:
+{action:model_accept_or_model_check,id:proposal_id}. Predict:
+{action:model_predict,name:target,payload:inputs}. Get {action:model_get,full:false}.
+Model schema: {schema:1,title,inputs:{name:type},rules:[{id,target,claim,when,then,
+evidence:[saved_note_ids],dependencies:[relative_files]}],cases:[{id,target,inputs,
+expected,evidence:[saved_note_ids],challenge:bool}],alternatives:[],unresolved:[]}.
+Expressions: {value:literal}, {var:input_or_nested_field}, {op:operator,args:[expressions]}.
+Operators eq,ne,lt,le,gt,ge,in,not,and,or,len,add,sub,if; collection all/any:
+{op:all_or_any,items:expression,as:alias,test:expression}. Input types string,
+number,integer,boolean,array,object. Every target needs a challenge observation.
+All saved cases must pass before accept. Changed dependencies block old rules;
+new source evidence needs a new challenge. Reduction creates a proposal and
+never accepts it. The next agent receives the working model first. Build and
+revise models for handoff; retain raw evidence, limits, and important conditions.
+For comparable unseen-case probes, use inputs request:object, policy:object, and
+evidence:array for research when possible. Useful targets are ok, needs_review,
+or status. Other input schemes are permitted and will be reported as unprobed.
+
+Current task:
+Stage 1: source_dependencies; work sample 0.
+Implement evaluate(request, policy). Return {needs_review, changed}. Compare canonical JSON source states for every unique declared path except policy.ignored. An absent state equals {kind:missing}. Compare complete states, not names or timestamps. Return sorted changed paths. Irrelevant changes do not require review. Do not modify inputs.
+Write work.py with this API. Also write report.json as a JSON array of evaluate results for requests.json, using current policy.json and evidence.json when present. Keep prior supported behavior. Use actual local checks. Store findings and unresolved limits for the next agent.
+
+Initial memory (maximum 1200 characters):
+
+Tool calls used: 9/40.
+History:
+[{"type": "tool", "number": 1, "action": "memory", "arguments": {"action": "model_get", "full": false}, "result": {"ok": true, "result": "null"}}, {"type": "tool", "number": 2, "action": "list", "arguments": {"path": "."}, "result": {"ok": true, "result": [".agent_memory", ".git", "TASK.md", "policy.json", "requests.json", "work.py"]}}, {"type": "tool", "number": 3, "action": "read", "arguments": {"path": "TASK.md"}, "result": {"ok": true, "result": {"content": "Stage 1: source_dependencies; work sample 0.\nImplement evaluate(request, policy). Return {needs_review, changed}. Compare canonical JSON source states for every unique declared path except policy.ignored. An absent state equals {kind:missing}. Compare complete states, not names or timestamps. Return sorted changed paths. Irrelevant changes do not require review. Do not modify inputs.\nWrite work.py with this API. Also write report.json as a JSON array of evaluate results for requests.json, using current policy.json and evidence.json when present. Keep prior supported behavior. Use actual local checks. Store findings and unresolved limits for the next agent.\n"}}}, {"type": "tool", "number": 4, "action": "read", "arguments": {"path": "work.py"}, "result": {"ok": true, "result": {"content": "# Complete the required API and report.\n"}}}, {"type": "tool", "number": 5, "action": "read", "arguments": {"path": "policy.json"}, "result": {"ok": true, "result": {"content": "{\n  \"variant\": 0,\n  \"ignored\": []\n}"}}}, {"type": "tool", "number": 6, "action": "read", "arguments": {"path": "requests.json"}, "result": {"ok": true, "result": {"content": "[\n  {\n    \"declared\": [\n      \"worker_0.py\"\n    ],\n    \"saved\": {\n      \"worker_0.py\": {\n        \"kind\": \"file\",\n        \"hash\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\n      }\n    },\n    \"current\": {\n      \"worker_0.py\": {\n        \"kind\": \"file\",\n        \"hash\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\n      }\n    }\n  }\n]"}}}, {"type": "tool", "number": 7, "action": "write", "arguments": {"path": "work.py", "content": "\"\"\"Evaluate whether declared source dependencies have changed.\"\"\"\n\nimport json\n\n_MISSING = {\"kind\": \"missing\"}\n\ndef _canonical(state):\n    return json.dumps(state, sort_keys=True, separators=(\",\", \":\"))\n\ndef evaluate(request, policy):\n    \"\"\"Compare complete saved/current states for relevant declared paths.\"\"\"\n    ignored = set(policy.get(\"ignored\", ()))\n    saved = request.get(\"saved\", {})\n    current = request.get(\"current\", {})\n    changed = sorted({\n        path\n        for path in request.get(\"declared\", ())\n        if path not in ignored\n        and _canonical(saved.get(path, _MISSING)) != _canonical(current.get(path, _MISSING))\n    })\n    return {\"needs_review\": bool(changed), \"changed\": changed}\n"}, "result": {"ok": true, "result": {"written": "work.py", "sha256": "3db779fe02a25665e85d9fdbb6386168691eb3c61251b35307ece90a30beed20"}}}, {"type": "tool", "number": 8, "action": "list", "arguments": {"path": "."}, "result": {"ok": true, "result": [".agent_memory", ".git", "TASK.md", "policy.json", "requests.json", "work.py"]}}, {"type": "tool", "number": 9, "action": "run", "arguments": {"command": ["python", "-c", "import json,copy; from work import evaluate; p=json.load(open('policy.json')); rs=json.load(open('requests.json')); print(json.dumps([evaluate(r,p) for r in rs])); tests=[({'declared':['b','a','a'],'saved':{'a':{'kind':'file','hash':'x'},'b':{'kind':'file','hash':'z'}},'current':{'a':{'kind':'file','hash':'y'},'b':{'kind':'file','hash':'z'}}},{'ignored':[]}),({'declared':['x'],'saved':{},'current':{'x':{'kind':'missing'}}},{'ignored':[]}),({'declared':['x'],'saved':{'x':{'kind':'file','hash':'a'}},'current':{'x':{'kind':'file','hash':'b'}}},{'ignored':['x']}),({'declared':['x'],'saved':{'x':{'name':'n','timestamp':1}},'current':{'x':{'name':'n','timestamp':2}}},{'ignored':[]}),({'declared':['x'],'saved':{},'current':{'y':{'kind':'file'}}},{'ignored':[]})]; print([evaluate(r,p) for r,p in tests]); r,p=tests[0]; rb=copy.deepcopy(r); pb=copy.deepcopy(p); evaluate(r,p); assert r==rb and p==pb"]}, "result": {"ok": true, "result": {"exit_code": 0, "stdout": "[{\"needs_review\": false, \"changed\": []}]\n[{'needs_review': True, 'changed': ['a']}, {'needs_review': False, 'changed': []}, {'needs_review': False, 'changed': []}, {'needs_review': True, 'changed': ['x']}, {'needs_review': False, 'changed': []}]\n", "stderr": ""}}}]

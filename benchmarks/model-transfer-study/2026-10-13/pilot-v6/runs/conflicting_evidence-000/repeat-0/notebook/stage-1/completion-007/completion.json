@@ -1,0 +1,57 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-m",
+              "py_compile",
+              "work.py"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import json; from work import evaluate; e=json.load(open('evidence.json')); p=json.load(open('policy.json')); r=json.load(open('requests.json')); actual=[evaluate(x,e,p) for x in r]; expected=json.load(open('report.json')); assert actual==expected,(actual,expected); print('report verified')"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "diff",
+              "--",
+              "work.py",
+              "report.json"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 25471,
+    "output_tokens": 550,
+    "cached_input_tokens": 18944,
+    "reasoning_output_tokens": 360
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 20.674937166972086,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

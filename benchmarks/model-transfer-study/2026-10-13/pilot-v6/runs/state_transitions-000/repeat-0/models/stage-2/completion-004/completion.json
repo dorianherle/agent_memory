@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "git",
+        "show",
+        "--stat",
+        "--patch",
+        "587d1d8"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 25444,
+    "output_tokens": 527,
+    "cached_input_tokens": 18816,
+    "reasoning_output_tokens": 458
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 15.882907415973023,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

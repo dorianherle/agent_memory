@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-m",
+              "py_compile",
+              "work.py"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import json\nfrom work import evaluate\npolicy=json.load(open('policy.json'))\nrequests=json.load(open('requests.json'))\nactual=[evaluate(r,policy) for r in requests]\nreport=json.load(open('report.json'))\nassert actual == report, (actual, report)\nprint(json.dumps(actual, sort_keys=True))"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "from work import evaluate\np={'defaults':{'b':True,'i':7,'s':'d'},'types':{'b':'boolean','i':'integer','s':'string'},'null_resets':True,'environment':True}\ncases=[\n ({'layers':[{'b':None,'i':None,'s':None}]},{'ok':True,'config':{'b':True,'i':7,'s':'d'},'error':None}),\n ({'layers':[{'i':'9'}],'environment':{'i':'+0'}},{'ok':True,'config':{'b':True,'i':0,'s':'d'},'error':None}),\n ({'layers':[{'b':0}]},{'ok':False,'config':{},'error':'type'}),\n ({'layers':[{'i':False}]},{'ok':False,'config':{},'error':'type'}),\n ({'environment':{'i':'--1'}},{'ok':False,'config':{},'error':'environment'}),\n ({'environment':{'i':'1.0'}},{'ok':False,'config':{},'error':'environment'}),\n ({'environment':{'b':'TRUE'}},{'ok':False,'config':{},'error':'environment'}),\n ({'layers':[{'s':''}]},{'ok':True,'config':{'b':True,'i':7,'s':''},'error':None}),\n]\nfor n,(request,expected) in enumerate(cases):\n actual=evaluate(request,p)\n assert actual==expected,(n,actual,expected)\nprint('8 boundary cases passed')"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 25756,
+    "output_tokens": 1298,
+    "cached_input_tokens": 18816,
+    "reasoning_output_tokens": 246
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 22.33284779218957,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

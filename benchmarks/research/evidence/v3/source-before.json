@@ -1,0 +1,48 @@
+{
+  "source": "/Users/dorianherle/Documents/Personal/agent_memory",
+  "catalog_loaded": "/Users/dorianherle/Documents/Personal/agent_memory/agent_memory/catalog.py",
+  "core_loaded": "/Users/dorianherle/Documents/Personal/agent_memory/agent_memory/core.py",
+  "tests_run": 6,
+  "failure_entries": 8,
+  "error_entries": 0,
+  "passed": false,
+  "elapsed_seconds": 2.9829088340047747,
+  "failures": [
+    {
+      "test": "test_embedding_must_be_one_dimensional (audit_cases.EmbeddingValidationTests.test_embedding_must_be_one_dimensional)",
+      "traceback": "Traceback (most recent call last):\n  File \"/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v3/agent_memory/tests/test_reliability_audit.py\", line 16, in test_embedding_must_be_one_dimensional\n    with self.assertRaises(ValueError):\n         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\nAssertionError: ValueError not raised\n"
+    },
+    {
+      "test": "test_large_valid_embedding_keeps_unit_norm (audit_cases.EmbeddingValidationTests.test_large_valid_embedding_keeps_unit_norm)",
+      "traceback": "Traceback (most recent call last):\n  File \"/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v3/agent_memory/tests/test_reliability_audit.py\", line 24, in test_large_valid_embedding_keeps_unit_norm\n    self.assertAlmostEqual(float(np.linalg.norm(vector)), 1, places=6)\n    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 0.0 != 1 within 6 places (1.0 difference)\n"
+    },
+    {
+      "test": "test_nonfinite_embeddings_are_rejected (audit_cases.EmbeddingValidationTests.test_nonfinite_embeddings_are_rejected) (vector=[nan, 1])",
+      "traceback": "Traceback (most recent call last):\n  File \"/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v3/agent_memory/tests/test_reliability_audit.py\", line 12, in test_nonfinite_embeddings_are_rejected\n    with self.subTest(vector=vector), self.assertRaises(ValueError):\n                                      ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\nAssertionError: ValueError not raised\n"
+    },
+    {
+      "test": "test_nonfinite_embeddings_are_rejected (audit_cases.EmbeddingValidationTests.test_nonfinite_embeddings_are_rejected) (vector=[inf, 1])",
+      "traceback": "Traceback (most recent call last):\n  File \"/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v3/agent_memory/tests/test_reliability_audit.py\", line 12, in test_nonfinite_embeddings_are_rejected\n    with self.subTest(vector=vector), self.assertRaises(ValueError):\n                                      ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\nAssertionError: ValueError not raised\n"
+    },
+    {
+      "test": "test_nonfinite_embeddings_are_rejected (audit_cases.EmbeddingValidationTests.test_nonfinite_embeddings_are_rejected) (vector=[1, -inf])",
+      "traceback": "Traceback (most recent call last):\n  File \"/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v3/agent_memory/tests/test_reliability_audit.py\", line 12, in test_nonfinite_embeddings_are_rejected\n    with self.subTest(vector=vector), self.assertRaises(ValueError):\n                                      ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\nAssertionError: ValueError not raised\n"
+    },
+    {
+      "test": "test_fts_filter_does_not_lose_low_ranked_explicit_id (audit_cases.EvidenceRecoveryAuditTests.test_fts_filter_does_not_lose_low_ranked_explicit_id)",
+      "traceback": "Traceback (most recent call last):\n  File \"/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v3/agent_memory/tests/test_reliability_audit.py\", line 32, in test_fts_filter_does_not_lose_low_ranked_explicit_id\n    self.assertEqual([item.id for item in self.memory.find('needle', ids=target, k=1)], [target])\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Lists differ: [] != ['ff5834c94f9dbba74f15f41ee8020efb017dea2f']\n\nSecond list contains 1 additional elements.\nFirst extra element 0:\n'ff5834c94f9dbba74f15f41ee8020efb017dea2f'\n\n- []\n+ ['ff5834c94f9dbba74f15f41ee8020efb017dea2f']\n"
+    },
+    {
+      "test": "test_other_branch_hits_do_not_hide_current_branch_evidence (audit_cases.EvidenceRecoveryAuditTests.test_other_branch_hits_do_not_hide_current_branch_evidence)",
+      "traceback": "Traceback (most recent call last):\n  File \"/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v3/agent_memory/tests/test_reliability_audit.py\", line 39, in test_other_branch_hits_do_not_hide_current_branch_evidence\n    self.assertEqual([item.id for item in self.memory.find('needle', k=1)], [target])\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Lists differ: [] != ['dfcc5c738ea632328e6f9ea42517734cfa78fee9']\n\nSecond list contains 1 additional elements.\nFirst extra element 0:\n'dfcc5c738ea632328e6f9ea42517734cfa78fee9'\n\n- []\n+ ['dfcc5c738ea632328e6f9ea42517734cfa78fee9']\n"
+    },
+    {
+      "test": "test_previously_missing_dependency_becomes_stale_when_created (audit_cases.EvidenceRecoveryAuditTests.test_previously_missing_dependency_becomes_stale_when_created)",
+      "traceback": "Traceback (most recent call last):\n  File \"/Users/dorianherle/Documents/Personal/Application_California/agent-memory-v3/agent_memory/tests/test_reliability_audit.py\", line 45, in test_previously_missing_dependency_becomes_stale_when_created\n    self.assertIn(f'[{target[:8]}] [stale]', self.memory.render_packet('calibration'))\n    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: '[2ef1a663] [stale]' not found in '## Handoff\\n[2ef1a663] Calibration file is missing.\\nNext: obtain calibration.'\n"
+    }
+  ],
+  "source_sha256": {
+    "agent_memory/core.py": "6184d1d433d45bdd08d1be8fe8cddad88c2452b2120c9b8216bf75e620323ffc",
+    "agent_memory/catalog.py": "149d061394a104e1ee6758471447d1ab62d75d71ef3fd0ddc78ee15c978d8c16"
+  }
+}

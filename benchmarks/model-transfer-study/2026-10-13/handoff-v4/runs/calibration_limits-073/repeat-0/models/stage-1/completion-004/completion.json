@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "write",
+    "arguments": {
+      "path": "work.py",
+      "content": "\"\"\"Evidence evaluation for the calibration-limits study.\"\"\"\n\nimport json\n\n\ndef _canonical(value):\n    \"\"\"Return a stable JSON representation used only for value comparison.\"\"\"\n    return json.dumps(value, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False)\n\n\ndef evaluate(request, evidence, policy):\n    \"\"\"Evaluate one request without mutating any input object.\"\"\"\n    required = policy.get(\"required_conditions\", [])\n    request_conditions = request.get(\"conditions\", {})\n    missing = sorted(name for name in required if name not in request_conditions)\n    if missing:\n        return {\"status\": \"unknown\", \"value\": None, \"sources\": [], \"unknowns\": missing}\n\n    eligible = []\n    for record in evidence:\n        if record.get(\"claim\") != request.get(\"claim\"):\n            continue\n        if record.get(\"withdrawn\", False):\n            continue\n        if policy.get(\"require_verified\", False) and record.get(\"verified\") is not True:\n            continue\n        record_conditions = record.get(\"conditions\", {})\n        if any(\n            name not in record_conditions\n            or record_conditions[name] != request_conditions[name]\n            for name in required\n        ):\n            continue\n        eligible.append(record)\n\n    superseded = set()\n    for record in eligible:\n        replaced = record.get(\"supersedes\", [])\n        if isinstance(replaced, str):\n            superseded.add(replaced)\n        elif isinstance(replaced, (list, tuple, set)):\n            superseded.update(replaced)\n    eligible = [record for record in eligible if record.get(\"source\") not in superseded]\n\n    if not eligible:\n        return {\n            \"status\": \"unknown\",\n            \"value\": None,\n            \"sources\": [],\n            \"unknowns\": [\"no matching evidence\"],\n        }\n\n    sources = sorted(record.get(\"source\") for record in eligible)\n    first_value = eligible[0].get(\"value\")\n    if any(_canonical(record.get(\"value\")) != _canonical(first_value) for record in eligible[1:]):\n        return {\n            \"status\": \"conflict\",\n            \"value\": None,\n            \"sources\": sources,\n            \"unknowns\": [\"source disagreement\"],\n        }\n\n    status = \"unsupported\" if isinstance(first_value, bool) and first_value is False else \"supported\"\n    return {\"status\": status, \"value\": first_value, \"sources\": sources, \"unknowns\": []}\n\n\ndef _build_report():\n    with open(\"requests.json\", encoding=\"utf-8\") as handle:\n        requests = json.load(handle)\n    with open(\"evidence.json\", encoding=\"utf-8\") as handle:\n        evidence = json.load(handle)\n    with open(\"policy.json\", encoding=\"utf-8\") as handle:\n        policy = json.load(handle)\n    return [evaluate(request, evidence, policy) for request in requests]\n\n\nif __name__ == \"__main__\":\n    with open(\"report.json\", \"w\", encoding=\"utf-8\") as handle:\n        json.dump(_build_report(), handle, indent=2, ensure_ascii=False)\n        handle.write(\"\\n\")\n"
+    }
+  },
+  "usage": {
+    "input_tokens": 10386,
+    "output_tokens": 1392,
+    "cached_input_tokens": 0,
+    "reasoning_output_tokens": 430
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 39.74173483392224,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

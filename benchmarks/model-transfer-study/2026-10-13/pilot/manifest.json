@@ -1,0 +1,360 @@
+{
+  "schema": 1,
+  "phase": "pilot",
+  "settings": {
+    "model": "gpt-5.6-sol",
+    "reasoning": "high",
+    "seconds": 600,
+    "tool_calls": 40,
+    "image": "agent-memory-study:2026-10-13"
+  },
+  "repeats": 2,
+  "task_ids": [
+    "state_transitions-000",
+    "source_dependencies-000",
+    "configuration_changes-000",
+    "data_validation-000",
+    "source_comparison-000",
+    "calibration_limits-000",
+    "conflicting_evidence-000",
+    "revised_conclusions-000"
+  ],
+  "task_digest": "fa903ff5f249cbd490a760b853f3d9e68d606be56c2f57f0ac7f249337372818",
+  "control_digest": "5cb3f98d961fd6a6d504131f4f3efbb01b7843e0577c8e407571fa0a0b1bef04",
+  "schedule": [
+    {
+      "task": "state_transitions-000",
+      "repeat": 0,
+      "arm": "notebook"
+    },
+    {
+      "task": "state_transitions-000",
+      "repeat": 0,
+      "arm": "notes"
+    },
+    {
+      "task": "state_transitions-000",
+      "repeat": 0,
+      "arm": "models"
+    },
+    {
+      "task": "source_dependencies-000",
+      "repeat": 0,
+      "arm": "notebook"
+    },
+    {
+      "task": "source_dependencies-000",
+      "repeat": 0,
+      "arm": "models"
+    },
+    {
+      "task": "source_dependencies-000",
+      "repeat": 0,
+      "arm": "notes"
+    },
+    {
+      "task": "configuration_changes-000",
+      "repeat": 0,
+      "arm": "notes"
+    },
+    {
+      "task": "configuration_changes-000",
+      "repeat": 0,
+      "arm": "notebook"
+    },
+    {
+      "task": "configuration_changes-000",
+      "repeat": 0,
+      "arm": "models"
+    },
+    {
+      "task": "data_validation-000",
+      "repeat": 0,
+      "arm": "notes"
+    },
+    {
+      "task": "data_validation-000",
+      "repeat": 0,
+      "arm": "models"
+    },
+    {
+      "task": "data_validation-000",
+      "repeat": 0,
+      "arm": "notebook"
+    },
+    {
+      "task": "source_comparison-000",
+      "repeat": 0,
+      "arm": "models"
+    },
+    {
+      "task": "source_comparison-000",
+      "repeat": 0,
+      "arm": "notebook"
+    },
+    {
+      "task": "source_comparison-000",
+      "repeat": 0,
+      "arm": "notes"
+    },
+    {
+      "task": "calibration_limits-000",
+      "repeat": 0,
+      "arm": "models"
+    },
+    {
+      "task": "calibration_limits-000",
+      "repeat": 0,
+      "arm": "notes"
+    },
+    {
+      "task": "calibration_limits-000",
+      "repeat": 0,
+      "arm": "notebook"
+    },
+    {
+      "task": "conflicting_evidence-000",
+      "repeat": 0,
+      "arm": "notebook"
+    },
+    {
+      "task": "conflicting_evidence-000",
+      "repeat": 0,
+      "arm": "notes"
+    },
+    {
+      "task": "conflicting_evidence-000",
+      "repeat": 0,
+      "arm": "models"
+    },
+    {
+      "task": "revised_conclusions-000",
+      "repeat": 0,
+      "arm": "notebook"
+    },
+    {
+      "task": "revised_conclusions-000",
+      "repeat": 0,
+      "arm": "models"
+    },
+    {
+      "task": "revised_conclusions-000",
+      "repeat": 0,
+      "arm": "notes"
+    },
+    {
+      "task": "state_transitions-000",
+      "repeat": 1,
+      "arm": "notes"
+    },
+    {
+      "task": "state_transitions-000",
+      "repeat": 1,
+      "arm": "notebook"
+    },
+    {
+      "task": "state_transitions-000",
+      "repeat": 1,
+      "arm": "models"
+    },
+    {
+      "task": "source_dependencies-000",
+      "repeat": 1,
+      "arm": "notes"
+    },
+    {
+      "task": "source_dependencies-000",
+      "repeat": 1,
+      "arm": "models"
+    },
+    {
+      "task": "source_dependencies-000",
+      "repeat": 1,
+      "arm": "notebook"
+    },
+    {
+      "task": "configuration_changes-000",
+      "repeat": 1,
+      "arm": "models"
+    },
+    {
+      "task": "configuration_changes-000",
+      "repeat": 1,
+      "arm": "notebook"
+    },
+    {
+      "task": "configuration_changes-000",
+      "repeat": 1,
+      "arm": "notes"
+    },
+    {
+      "task": "data_validation-000",
+      "repeat": 1,
+      "arm": "models"
+    },
+    {
+      "task": "data_validation-000",
+      "repeat": 1,
+      "arm": "notes"
+    },
+    {
+      "task": "data_validation-000",
+      "repeat": 1,
+      "arm": "notebook"
+    },
+    {
+      "task": "source_comparison-000",
+      "repeat": 1,
+      "arm": "notebook"
+    },
+    {
+      "task": "source_comparison-000",
+      "repeat": 1,
+      "arm": "notes"
+    },
+    {
+      "task": "source_comparison-000",
+      "repeat": 1,
+      "arm": "models"
+    },
+    {
+      "task": "calibration_limits-000",
+      "repeat": 1,
+      "arm": "notebook"
+    },
+    {
+      "task": "calibration_limits-000",
+      "repeat": 1,
+      "arm": "models"
+    },
+    {
+      "task": "calibration_limits-000",
+      "repeat": 1,
+      "arm": "notes"
+    },
+    {
+      "task": "conflicting_evidence-000",
+      "repeat": 1,
+      "arm": "notes"
+    },
+    {
+      "task": "conflicting_evidence-000",
+      "repeat": 1,
+      "arm": "notebook"
+    },
+    {
+      "task": "conflicting_evidence-000",
+      "repeat": 1,
+      "arm": "models"
+    },
+    {
+      "task": "revised_conclusions-000",
+      "repeat": 1,
+      "arm": "notes"
+    },
+    {
+      "task": "revised_conclusions-000",
+      "repeat": 1,
+      "arm": "models"
+    },
+    {
+      "task": "revised_conclusions-000",
+      "repeat": 1,
+      "arm": "notebook"
+    }
+  ],
+  "ablation_tasks": [
+    "state_transitions-000",
+    "source_dependencies-000",
+    "configuration_changes-000",
+    "data_validation-000",
+    "source_comparison-000",
+    "calibration_limits-000",
+    "conflicting_evidence-000",
+    "revised_conclusions-000"
+  ],
+  "source_hashes": {
+    "agent_memory/__init__.py": "7945e93831231852669dbf7093588b36bca6d77b0b999278073e59495b43759a",
+    "agent_memory/ann.py": "f193dfcf1fcdeac5ddddcd1e98e5ef24c473e9c1251992fbd624b23c825863f0",
+    "agent_memory/canvas.py": "5bdd7e5ef204ac8e7a635fb2ed92f0e9e2c0eb96bdc162f5d160f7bb2c16a8cf",
+    "agent_memory/catalog.py": "7bf9afe157737372cf5491b94005e58bd4824f0850d8a951dec26a91d7f95dd1",
+    "agent_memory/cli.py": "dc4e6c8abcd1abf35d399f92426b0b23ed11681b7e2f5f9b92cf380c553b34b4",
+    "agent_memory/core.py": "74f8e429dda67c6a65067ffd6eb3142df13fdc6a70189fb28152eefa2ebff3a9",
+    "agent_memory/cursor/__init__.py": "fedb43e8f8190f5fb40167cf05c9e435e7ce5c3373a1d63b06e152ddcc35a341",
+    "agent_memory/cursor/__main__.py": "907938b814a1868816d685ae82d748daed4c700fd0c3188bb1d56dadfedcfdf1",
+    "agent_memory/cursor/common.py": "de3f517071fc72bfe8f472df919b736e7d4177600f5700583519f0b3bde5666a",
+    "agent_memory/cursor/hook.py": "10693f414d817d45496d3d7c093efcb397f068286492d4fe523e004130a02310",
+    "agent_memory/cursor/install.py": "eb669dda9cfa384aae7259de0d468fa677f6f2f2c0c54ab2b75c8f61e28ae291",
+    "agent_memory/cursor/mcp.py": "bbab8a0d1413a7d5a39357d9d971e817fb483a02fbad8624a6f3bd9db948bb89",
+    "agent_memory/goals.py": "52c57a8054ea6a68f77fc4e9e8348dcd971226b5e0ccfb10e2e447fe01a09bc7",
+    "agent_memory/identity.py": "9a4ae9884225cdd7ccb65b14b6be1e9911259db0963bdd933857f7acc8905ab6",
+    "agent_memory/live_html.py": "216407ed1adb46d7ae65c253cf69ba9d3a57afd2591e7f9c4ee85ef0d6c44155",
+    "agent_memory/live_reveal.py": "e19726b0149a9d8d5b70ba3308e21156b1b18c6cb400d07a400198e74b67440b",
+    "agent_memory/models.py": "98c4d416308fd5fe53f029bb03bc671b9ed714077da53fe8fabdea916d8e4f3d",
+    "agent_memory/prompt.py": "7aa9999b41049bf90f59d20d15eee398d0f2c0280f87189e88c7a01cd7d7e915",
+    "agent_memory/providers/__init__.py": "958cb8dc9b74bc45c399b5b42d01b42630412409b07c0fc3f105d1ec66f1f08a",
+    "agent_memory/providers/base.py": "6217ff44203e4631a03412b2b3bb85fec07e3f6c9f9029759f337858fc4a2bfe",
+    "agent_memory/providers/gemini.py": "7b5d5b4eac4304298fc093c9e74a129ae94122873f04b15557a67da6385d805d",
+    "agent_memory/providers/openai_compatible.py": "935fcbff0b64db0f2040cbe7a3bdd0a682dab7b67b6b880acd6a35677872a4cb",
+    "agent_memory/runner.py": "88e1a2ab8541cf899ceea480f8aa0901d4ba1cdbd89ad4b83fc900b3f478d159",
+    "agent_memory/search.py": "4643638d50f35c618e48998df89709d57c08bdf98f06b78281865b14d2e24d96",
+    "agent_memory/studio.py": "f653f0a7ccb79ec8ea9256ade4f0b66a7f04ea439b55803130a0ebaf3c7ca742",
+    "agent_memory/studio_runtime.py": "2140e7767aa40c2f643caba3bd15557f79c55cc905ced4196b1fd25a63e624a7",
+    "agent_memory/tests/__init__.py": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "agent_memory/tests/helpers.py": "2e9f9ea25eabf141bf0a3a856c579345d3f0c23ee4ebc88ce0277a92502a2fe4",
+    "agent_memory/tests/test_branch.py": "66bd07e5b88e4dde4920ba760037cf50f99366d0181277d5d207e2db5834b9bb",
+    "agent_memory/tests/test_clear.py": "c9f47634095389cb341e2724ddd552098f4f946d66bf2d1fec37913b2390f434",
+    "agent_memory/tests/test_cursor.py": "5d4e14e78cb00973c60694dbae31f22273e0437ec559719fe2fb6c02b4fb27d1",
+    "agent_memory/tests/test_extended.py": "331770be5d031f03e49f05f47e9cc524b6aa6284ab4d119186a8bd743f20d1ff",
+    "agent_memory/tests/test_find.py": "5fc26401cbf3daa880715f934b87274108b01a64fa862715841c59114a5c4ced",
+    "agent_memory/tests/test_goals.py": "713fdf665f2307db7e998abe76525a5369e410bf95be284b9d362ee2a0908acc",
+    "agent_memory/tests/test_handoff.py": "68ed7bbe008b6f210d4269f17b91f53c86cb11413bde9963396af1d25ba955fd",
+    "agent_memory/tests/test_live_reveal.py": "5104a7d65763a089ce9d67d2653401d16030d7aa1bb567bf2aab586f597ae57f",
+    "agent_memory/tests/test_models.py": "ceb8d4396f0be41f43c65a35e9d10f70ab74ef7a572941f07e5519a1bb3508b6",
+    "agent_memory/tests/test_open_question.py": "5054f2c53d759444ac992ad15e2de7f1faa12a54184562f1d559a45219739a2f",
+    "agent_memory/tests/test_reliability_audit.py": "6b6821ed09fcb99974f1c535c8310e9550a728e55c1c2931b502f104728e830c",
+    "agent_memory/tests/test_revisit.py": "9b0d700c56aafd038ba00f879a41a2b15555e74158dd3f1c02a5247aedbaa666",
+    "agent_memory/tests/test_runner.py": "d6e701b00ccd32fe22826cc4947f7925b48af7163fad123ed368072d32cee38a",
+    "agent_memory/tests/test_save.py": "34c4632e990f2c116aceaf510bd08f3a43202a83e202fa2164a5f280c64badbb",
+    "agent_memory/tests/test_semantic.py": "32100aae216e28b530c76bb110dd992727d92a2d281444513a5352ca049c2a21",
+    "agent_memory/tests/test_state.py": "c36d6482811fc9a4818ba0504f7f7c5e7d291104df0da508333fd107c2ef5527",
+    "agent_memory/tests/test_studio.py": "941b0d5db65cea4ad1bd69cc6d825083076295178d87bd5f5c0bf07b3e1bd4fd",
+    "agent_memory/tests/test_studio_runtime.py": "6e767e481b39169f300d994e4bd79c3bc6e7cdba1e8c16bb5744d881f707b577",
+    "agent_memory/tests/test_wrapper.py": "a2aa90b126b27668a8a8b03d653189a5a52afc869d2a771db43122dca0f632d4",
+    "agent_memory/tools.py": "52039480ee93881e80f399d9cb847e5df40d8c1d078bd98d81b195ea99ba1546",
+    "agent_memory/turn_prompts.py": "8d5f157db7d28afe5e7196b33861cb9e9772c3bf7af2d5a648631a7801d93da5",
+    "agent_memory/viz.py": "8e08b454f950fee89a6ea8d6a5f22a024a0e079290b10cf192fa85594760130a",
+    "agent_memory/wrappers.py": "4202bccb565eb4af0a46464f8af87fa31d73a23a2d60e7a6b4d4be3e39d09655",
+    "evaluation/model_transfer/__init__.py": "f5311df4cb3172dc1bfe362132efca684cfe83efbac9931f17865182d808ecf5",
+    "evaluation/model_transfer/__main__.py": "8280be7ef65ad75bd2377a399671041a229d563c883d942ec53dc0cd1f0523d1",
+    "evaluation/model_transfer/analysis.py": "aeffbcfc503541d46fd46af8a9124d99ce39868c636713166816ebfd25b8b8af",
+    "evaluation/model_transfer/runner.py": "c9f7b5800f9cbd0d66cd480694893cf9a227f03d712535a2ee51f2b52f69b143",
+    "evaluation/model_transfer/study.py": "d665636b27bca1cb582584fda0940b922301e950f2304a2f4af355e6fecab838",
+    "evaluation/model_transfer/tasks.py": "75641d177c486105122a406d4b3d5cb660744257f65271c00f3e7a5a5a034ee0",
+    "evaluation/model_transfer/worker.py": "0df8953478f09befb1f3faff7e1ff7e5bd3aa6eadf4ac67b0d8ef3f3aecd47ab",
+    "evaluation/model_transfer/Dockerfile": "0704a3315acd0aa76addab2ce2cdf2e88c85ed8ddf9af7c334e9e164f9ffcb85",
+    "pyproject.toml": "d8e74b8d28974ec662d33b53e6e2ec2dcaf333996ddac023c21e693a4691ab38"
+  },
+  "analysis": {
+    "bootstrap": 10000,
+    "seed": 1327,
+    "task_unit": "distinct constructed work sample; repeats remain within task",
+    "confidence": "paired domain-stratified bootstrap; 97.5% one-sided upper cost bound per baseline; exact 97.5% added-failure bound",
+    "useful_ratio": 0.75,
+    "exceptional_ratio": 0.5,
+    "max_added_failure": 0.05,
+    "pilot_ratio": 0.85,
+    "pilot_added_failures": 0
+  },
+  "execution": {
+    "parallel_task_blocks": 3,
+    "order": "counterbalanced method order within each task/repeat block"
+  },
+  "limits": [
+    "Constructed task population, eight families, shared author for task contracts and oracle",
+    "Confirmation variants are new instances of these families, not 96 new domains",
+    "Structured decision loop; not native IDE-agent performance",
+    "No monetary cost estimate without verified billing",
+    "Research records are constructed test evidence, not measured fabrication data"
+  ]
+}

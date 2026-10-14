@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import json\np='stored-model.json'\nd=json.load(open(p))\nprint(type(d).__name__, sorted(d) if isinstance(d,dict) else '')\nprint('model' in d if isinstance(d,dict) else False)"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 14554,
+    "output_tokens": 601,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 516
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 18.1625661670696,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

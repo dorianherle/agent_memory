@@ -1,0 +1,83 @@
+You are an agent in a controlled work study. Use only the study tool protocol.
+Do not call any native Codex tool. The completion process has no project files.
+Return one JSON object: action plus arguments_json (a JSON-encoded object).
+Actions:
+read {path}; write {path,content}; list {path}; run {command:[program,arg,...]};
+memory {action:save|find|history|open_questions|delete,text?,query?,ids?,payload?};
+finish {}. Commands run offline in the project container, with Python and Git.
+batch {calls:[{action,arguments},...]}, one to eight sequential calls. All methods
+can batch independent reads, writes, tests, and saves. Each operation counts
+toward the 40-call limit. A batch stops on its first tool error. No nested batch.
+Use current files and local tests. Complete work.py and report.json. Save durable
+findings and unresolved questions before finish. You may store concise reusable
+rules in ordinary notes. Do not invent observations. Tool errors can be repaired.
+Save source-bound findings with payload {files:[relative_source_paths]} when useful.
+The history below contains every previous study tool call and its full result.
+Memory calls can include result_file:path to write the complete tool result as
+JSON for local scripts. This is available to all methods and retains the full
+result in the history. Use files and scripts instead of repeating large data.
+
+This method requires model transfer. At the start, call model_get. Before finish,
+call model_handoff with payload=model and id=active_model_id_or_null to propose,
+check, accept, reduce, and predict a stored challenge in one workflow. It records
+every operation and charges each against the tool limit (reserve seven slots).
+With payload=null, reuse the active model if its conditions still apply. Repair
+only when new evidence or requirements show a missing condition. A note alone is
+not a model handoff. Preserve prior cases and conditions. Do not require size
+reduction when new evidence needs more rules.
+If the active rules explain new observations, use payload={observations:[cases]}
+and id=active_model_id. The backend retains old rules and immutable cases, tests
+new cases, and revises only if they pass. A mismatch requires rule repair. This
+avoids copying the stored model. Each case has id,target,inputs,expected,evidence,
+challenge. Use actual local results; changed sources need a new challenge.
+For large model definitions, write a JSON file with a script and use
+{action:model_handoff,payload_file:"model.json",id:active_model_id_or_null}.
+Use model_get with result_file:"stored-model.json" to revise the working rules
+in code. Ask full:true only to inspect old fixtures. Omitted old cases are
+retained automatically. Existing cases cannot be rewritten. Add real new cases.
+Handoff returns working check summaries by default. Full audits are retained in
+the run record and result_file; full:true returns them to the agent as well.
+Test predictions on independently constructed boundary cases from the current
+task contract. Compare them with actual local observations before handoff.
+Retain mismatches and repair or restrict the affected rule. A saved-case pass
+alone does not establish generality. State unknowns outside tested conditions.
+Do not replace a required condition with a broader approximation to pass checks.
+Executable model memory also supports actions model_get, model_propose,
+model_check, model_accept, model_reduce, model_predict. Propose arguments:
+{action:model_propose,id:active_model_id_or_null,payload:model}. Accept/check:
+{action:model_accept_or_model_check,id:proposal_id}. Predict:
+{action:model_predict,name:target,payload:inputs}. Get {action:model_get,full:false}.
+Model schema: {schema:1,title,inputs:{name:type},rules:[{id,target,claim,when,then,
+evidence:[saved_note_ids],dependencies:[relative_files]}],cases:[{id,target,inputs,
+expected,evidence:[saved_note_ids],challenge:bool}],alternatives:[],unresolved:[]}.
+Expressions: {value:literal}, {var:input_or_nested_field}, {op:operator,args:[expressions]}.
+Operators eq,ne,lt,le,gt,ge,in,not,and,or,len,add,sub,if,get. get takes an object,
+a string key expression, and a default expression (evaluated only if absent).
+Keep alternatives empty unless each alternative has id, claim, and a full
+list of rule objects with the same rule schema above. Collection all/any:
+{op:all_or_any,items:expression,as:alias,test:expression}. Input types string,
+number,integer,boolean,array,object. Every target needs a challenge observation.
+All saved cases must pass before accept. Changed dependencies block old rules;
+new source evidence needs a new challenge. Reduction creates a proposal and
+never accepts it. The next agent receives the working model first. Build and
+revise models for handoff; retain raw evidence, limits, and important conditions.
+For comparable unseen-case probes, use inputs request:object, policy:object, and
+evidence:array for research when possible. Useful targets are ok, needs_review,
+or status. Other input schemes are permitted and will be reported as unprobed.
+
+Current task:
+Stage 2: data_validation; work sample 0.
+Implement evaluate(request, policy). Validate every row in input order, with at most one error per row. id must be a nonempty string. amount must be a finite nonnegative number, not bool. Unit defaults to base_unit and must be in policy.units. If policy.unique, reject IDs already accepted from an earlier row. Add an ID to the seen set only after that row passes every check. Error priority is id, amount, unit, duplicate. Return {ok, records, errors}; each error has exactly {row:index,cause}. Each accepted record has exactly {id:the_original_id,amount:the_input_amount_times_policy.units[unit]}. Do not include unit or other metadata in records. Any error makes the complete batch fail with records=[]; still collect errors for all rows. Otherwise ok=true and errors=[]. Do not modify inputs.
+Every result must follow OUTPUT_SCHEMA.json. Output objects have exactly the listed fields. Unknown research results have value=null and sources=[]. Use the API arguments supplied by the caller, including earlier policies and evidence; do not substitute current file globals. Write work.py with this API. Also write report.json as a JSON array of evaluate results for requests.json, using current policy.json and evidence.json when present. Keep prior supported behavior. Use actual local checks. Store findings and unresolved limits for the next agent.
+
+Initial memory (maximum 1200 characters):
+## Handoff
+[040d988e] Boundary checks passed for duplicate handling, invalid bool/NaN/inf/negative amounts, unhashable unk…
+
+## Task model
+[d5323717] r1 blocked; 2 rules. Read model_get for conditions.
+Needs review: Evidence or dependency versions changed
+0 alternatives; 2 unresolved results.
+Tool calls used: 7/40.
+History:
+[{"type": "tool", "number": 1, "first_number": 1, "operation_count": 1, "action": "memory", "arguments": {"action": "model_get", "full": false, "result_file": "stored-model.json"}, "result": {"ok": true, "result": "{\"id\": \"d5323717dd9fab85b22d0031d4333ff677d001bb\", \"event\": \"accepted\", \"parent\": null, \"revision\": 1, \"model\": {\"alternatives\": [], \"inputs\": {\"evidence\": \"array\", \"policy\": \"object\", \"request\": \"object\"}, \"resolutions\": [], \"rules\": [{\"claim\": \"If validation produces any prioritized row error, the complete batch fails and records are empty; row validation priority is id, amount, unit, duplicate, and duplicate tracking includes only earlier fully accepted rows.\", \"dependencies\": [\"work.py\", \"OUTPUT_SCHEMA.json\"], \"evidence\": [\"fe5dcaf0e9ff838cf1596e62f8de4905099afdd6\", \"040d988edfa52ebb4d8d4caac152fda736332a33\"], \"id\": \"row_error_fails_batch\", \"target\": \"ok\", \"then\": {\"value\": false}, \"when\": {\"as\": \"item\", \"items\": {\"var\": \"evidence\"}, \"op\": \"any\", \"test\": {\"args\": [{\"var\": \"item\"}, {\"value\": \"row_errors_present\"}], \"op\": \"eq\"}}}, {\"claim\": \"When every row is valid, the batch succeeds with normalized records in input order and no errors; units default to base_unit and inputs remain unmodified.\", \"dependencies\": [\"work.py\", \"OUTPUT_SCHEMA.json\"], \"evidence\": [\"fe5dcaf0e9ff838cf1596e62f8de4905099afdd6\", \"040d988edfa52ebb4d8d4caac152fda736332a33\"], \"id\": \"all_valid_succeeds\", \"target\": \"ok\", \"then\": {\"value\": true}, \"when\": {\"as\": \"item\", \"items\": {\"var\": \"evidence\"}, \"op\": \"any\", \"test\": {\"args\": [{\"var\": \"item\"}, {\"value\": \"all_rows_valid\"}], \"op\": \"eq\"}}}], \"schema\": 1, \"title\": \"Stage 1 row-validation batch outcome\", \"unresolved\": [\"The executable model predicts batch ok only when supplied evidence classifies whether row errors are present; it does not itself derive that classification from arbitrary nested rows because the expression language lacks type tests, indexing, and prior-row distinctness.\", \"Malformed top-level request or policy objects are outside the tested task contract.\"]}, \"case_count\": 3, \"complexity\": {\"cases\": 3, \"complete_bytes\": 2650, \"rules\": 2, \"working_bytes\": 1179}, \"checks\": {\"id\": \"d5323717dd9fab85b22d0031d4333ff677d001bb\", \"status\": \"blocked\", \"issues\": [\"Evidence or dependency versions changed\"], \"uncovered_rules\": [], \"missing_evidence\": [], \"changed_dependencies\": [\"policy.json\"], \"alternatives\": [], \"complexity\": {\"cases\": 3, \"complete_bytes\": 2650, \"rules\": 2, \"working_bytes\": 1179}, \"unresolved\": [\"The executable model predicts batch ok only when supplied evidence classifies whether row errors are present; it does not itself derive that classification from arbitrary nested rows because the expression language lacks type tests, indexing, and prior-row distinctness.\", \"Malformed top-level request or policy objects are outside the tested task contract.\"], \"passed\": 3, \"total\": 3, \"failed_cases\": [], \"omitted_failed_cases\": 0}}"}}, {"type": "tool", "number": 7, "first_number": 2, "operation_count": 6, "action": "batch", "arguments": {"calls": [{"action": "list", "arguments": {"path": "."}}, {"action": "read", "arguments": {"path": "work.py"}}, {"action": "read", "arguments": {"path": "OUTPUT_SCHEMA.json"}}, {"action": "read", "arguments": {"path": "requests.json"}}, {"action": "read", "arguments": {"path": "policy.json"}}, {"action": "read", "arguments": {"path": "evidence.json"}}, {"action": "read", "arguments": {"path": "report.json"}}, {"action": "read", "arguments": {"path": "stored-model.json"}}]}, "result": {"ok": true, "result": {"calls": [{"action": "list", "arguments": {"path": "."}, "response": {"ok": true, "result": [".agent_memory", ".git", "OUTPUT_SCHEMA.json", "TASK.md", "policy.json", "report.json", "requests.json", "stored-model.json", "work.py"]}}, {"action": "read", "arguments": {"path": "work.py"}, "response": {"ok": true, "result": {"content": "\"\"\"Validation API for the current work sample.\"\"\"\n\nimport math\n\n\ndef evaluate(request, policy):\n    \"\"\"Validate and normalize all request rows without modifying the inputs.\"\"\"\n    errors = []\n    accepted = []\n    seen = set()\n\n    for index, row in enumerate(request[\"rows\"]):\n        row_id = row.get(\"id\")\n        if not isinstance(row_id, str) or not row_id:\n            errors.append({\"row\": index, \"cause\": \"id\"})\n            continue\n\n        amount = row.get(\"amount\")\n        if (\n            isinstance(amount, bool)\n            or not isinstance(amount, (int, float))\n            or not math.isfinite(amount)\n            or amount < 0\n        ):\n            errors.append({\"row\": index, \"cause\": \"amount\"})\n            continue\n\n        unit = row.get(\"unit\", policy[\"base_unit\"])\n        try:\n            unit_is_known = unit in policy[\"units\"]\n        except TypeError:\n            unit_is_known = False\n        if not unit_is_known:\n            errors.append({\"row\": index, \"cause\": \"unit\"})\n            continue\n\n        if policy[\"unique\"] and row_id in seen:\n            errors.append({\"row\": index, \"cause\": \"duplicate\"})\n            continue\n\n        accepted.append({\"id\": row_id, \"amount\": amount * policy[\"units\"][unit]})\n        seen.add(row_id)\n\n    if errors:\n        return {\"ok\": False, \"records\": [], \"errors\": errors}\n    return {\"ok\": True, \"records\": accepted, \"errors\": []}\n"}}}, {"action": "read", "arguments": {"path": "OUTPUT_SCHEMA.json"}, "response": {"ok": true, "result": {"content": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"ok\": {\n      \"type\": \"boolean\"\n    },\n    \"records\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"id\": {\n            \"type\": \"string\"\n          },\n          \"amount\": {\n            \"type\": \"number\"\n          }\n        },\n        \"required\": [\n          \"id\",\n          \"amount\"\n        ],\n        \"additionalProperties\": false\n      }\n    },\n    \"errors\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"row\": {\n            \"type\": \"integer\",\n            \"minimum\": 0\n          },\n          \"cause\": {\n            \"enum\": [\n              \"id\",\n              \"amount\",\n              \"unit\",\n              \"duplicate\"\n            ]\n          }\n        },\n        \"required\": [\n          \"row\",\n          \"cause\"\n        ],\n        \"additionalProperties\": false\n      }\n    }\n  },\n  \"required\": [\n    \"ok\",\n    \"records\",\n    \"errors\"\n  ],\n  \"additionalProperties\": false\n}"}}}, {"action": "read", "arguments": {"path": "requests.json"}, "response": {"ok": true, "result": {"content": "[\n  {\n    \"rows\": [\n      {\n        \"id\": \"sample_0\",\n        \"amount\": 4,\n        \"unit\": \"nm\"\n      }\n    ]\n  }\n]"}}}, {"action": "read", "arguments": {"path": "policy.json"}, "response": {"ok": true, "result": {"content": "{\n  \"variant\": 0,\n  \"base_unit\": \"nm\",\n  \"units\": {\n    \"nm\": 1,\n    \"um\": 1000\n  },\n  \"unique\": false\n}"}}}, {"action": "read", "arguments": {"path": "evidence.json"}, "response": {"ok": false, "error": "FileNotFoundError: [Errno 2] No such file or directory: '/workspace/evidence.json'"}}]}}}]

@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "write",
+    "arguments": {
+      "path": "report.json",
+      "content": "[\n  {\n    \"status\": \"supported\",\n    \"value\": 30,\n    \"sources\": [\"S1\"],\n    \"unknowns\": []\n  },\n  {\n    \"status\": \"unsupported\",\n    \"value\": false,\n    \"sources\": [\"D1\"],\n    \"unknowns\": []\n  }\n]\n"
+    }
+  },
+  "usage": {
+    "input_tokens": 22495,
+    "output_tokens": 711,
+    "cached_input_tokens": 18560,
+    "reasoning_output_tokens": 405
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 14.586481834063306,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

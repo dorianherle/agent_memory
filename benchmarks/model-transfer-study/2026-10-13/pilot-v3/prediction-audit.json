@@ -1,0 +1,15 @@
+{
+  "scored_study_complete": false,
+  "claim": "Diagnostic results only; no independent task-level gain estimate",
+  "predictions": [
+    {
+      "task": "source_dependencies-000",
+      "stage": 1,
+      "cases": 27,
+      "correct": 16,
+      "unknown": 0,
+      "wrong": 11,
+      "task_checks_pass": true
+    }
+  ]
+}

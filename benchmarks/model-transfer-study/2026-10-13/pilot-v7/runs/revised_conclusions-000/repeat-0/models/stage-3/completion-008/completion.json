@@ -1,0 +1,132 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "model_handoff",
+      "id": "652d4eea59b50465e8dd33152dafe5edf55660ba",
+      "payload": {
+        "observations": [
+          {
+            "id": "stage3-supersession-after-withdrawal",
+            "target": "status",
+            "inputs": {
+              "missing_required": [],
+              "surviving_sources": [
+                "B",
+                "C"
+              ],
+              "has_source_disagreement": false,
+              "agreed_value_is_boolean_false": false,
+              "request": {
+                "claim": "c",
+                "conditions": {
+                  "x": 1
+                }
+              },
+              "evidence": [
+                {
+                  "source": "A",
+                  "claim": "c",
+                  "value": 1,
+                  "conditions": {
+                    "x": 1
+                  },
+                  "verified": true
+                },
+                {
+                  "source": "B",
+                  "claim": "c",
+                  "value": 2,
+                  "conditions": {
+                    "x": 1
+                  },
+                  "verified": true
+                },
+                {
+                  "source": "C",
+                  "claim": "c",
+                  "value": 2,
+                  "conditions": {
+                    "x": 1
+                  },
+                  "verified": true,
+                  "supersedes": [
+                    "A"
+                  ]
+                }
+              ],
+              "policy": {
+                "required_conditions": [
+                  "x"
+                ],
+                "require_verified": true
+              }
+            },
+            "expected": "supported",
+            "evidence": [
+              "a16e78e2"
+            ],
+            "challenge": true
+          },
+          {
+            "id": "stage3-absent-calibration",
+            "target": "status",
+            "inputs": {
+              "missing_required": [
+                "calibration"
+              ],
+              "surviving_sources": [],
+              "has_source_disagreement": false,
+              "agreed_value_is_boolean_false": false,
+              "request": {
+                "claim": "c",
+                "conditions": {
+                  "x": 1
+                }
+              },
+              "evidence": [
+                {
+                  "source": "Z",
+                  "claim": "c",
+                  "value": 0,
+                  "conditions": {
+                    "x": 1,
+                    "calibration": 0
+                  },
+                  "verified": true
+                }
+              ],
+              "policy": {
+                "required_conditions": [
+                  "x",
+                  "calibration"
+                ],
+                "require_verified": true
+              }
+            },
+            "expected": "unknown",
+            "evidence": [
+              "a16e78e2"
+            ],
+            "challenge": true
+          }
+        ]
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 37219,
+    "output_tokens": 1312,
+    "cached_input_tokens": 24448,
+    "reasoning_output_tokens": 897
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 41.47160891699605,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

@@ -1,0 +1,12 @@
+{
+  "stop": "finished",
+  "tool_calls": 27,
+  "elapsed_seconds": 170.9375792921055,
+  "usage_complete": true,
+  "tokens": 190164,
+  "known_tokens": 190164,
+  "input_tokens": 184409,
+  "output_tokens": 5755,
+  "cached_input_tokens": 121472,
+  "reasoning_output_tokens": 2424
+}

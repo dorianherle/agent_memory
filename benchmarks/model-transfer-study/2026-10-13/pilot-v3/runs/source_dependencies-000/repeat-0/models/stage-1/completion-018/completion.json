@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "find",
+      "query": "accepted model rule schema valid rule fields claim when then alternatives"
+    }
+  },
+  "usage": {
+    "input_tokens": 31686,
+    "output_tokens": 225,
+    "cached_input_tokens": 24192,
+    "reasoning_output_tokens": 154
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 11.180254291044548,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "write",
+    "arguments": {
+      "path": "work.py",
+      "content": "\"\"\"Evidence-based request evaluation.\"\"\"\n\nimport json\n\n\ndef _canonical(value):\n    \"\"\"Return the canonical JSON representation used for exact comparisons.\"\"\"\n    return json.dumps(\n        value, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False\n    )\n\n\ndef _superseded_sources(record):\n    supersedes = record.get(\"supersedes\", [])\n    if isinstance(supersedes, list):\n        return supersedes\n    if supersedes is None:\n        return []\n    return [supersedes]\n\n\ndef evaluate(request, evidence, policy):\n    \"\"\"Evaluate one request against evidence under the supplied policy.\"\"\"\n    required = policy.get(\"required_conditions\", [])\n    request_conditions = request.get(\"conditions\", {})\n    missing = sorted(name for name in required if name not in request_conditions)\n    if missing:\n        return {\n            \"status\": \"unknown\",\n            \"value\": None,\n            \"sources\": [],\n            \"unknowns\": missing,\n        }\n\n    eligible = []\n    for record in evidence:\n        if record.get(\"claim\") != request.get(\"claim\"):\n            continue\n        if record.get(\"withdrawn\", False):\n            continue\n        if policy.get(\"require_verified\", False) and record.get(\"verified\") is not True:\n            continue\n        conditions = record.get(\"conditions\", {})\n        if any(\n            name not in conditions\n            or _canonical(conditions[name]) != _canonical(request_conditions[name])\n            for name in required\n        ):\n            continue\n        eligible.append(record)\n\n    superseded = {\n        source\n        for record in eligible\n        for source in _superseded_sources(record)\n    }\n    eligible = [record for record in eligible if record.get(\"source\") not in superseded]\n\n    if not eligible:\n        return {\n            \"status\": \"unknown\",\n            \"value\": None,\n            \"sources\": [],\n            \"unknowns\": [\"no matching evidence\"],\n        }\n\n    sources = sorted(record.get(\"source\") for record in eligible)\n    canonical_values = {_canonical(record.get(\"value\")) for record in eligible}\n    if len(canonical_values) != 1:\n        return {\n            \"status\": \"conflict\",\n            \"value\": None,\n            \"sources\": sources,\n            \"unknowns\": [\"source disagreement\"],\n        }\n\n    value = eligible[0].get(\"value\")\n    return {\n        \"status\": \"unsupported\" if value is False else \"supported\",\n        \"value\": value,\n        \"sources\": sources,\n        \"unknowns\": [],\n    }\n"
+    }
+  },
+  "usage": {
+    "input_tokens": 9903,
+    "output_tokens": 1158,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 342
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 20.424849833128974,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

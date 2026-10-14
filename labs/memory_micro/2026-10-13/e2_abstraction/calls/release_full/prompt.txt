@@ -1,0 +1,33 @@
+You are a fresh receiver. Use only the supplied memory and each question. Answer usable, unusable, or unknown. Use unknown when the memory does not support a conclusion. New objects in the questions use the same workflow. Do not use tools. Return a JSON object whose keys are question IDs and whose values are those exact labels. Do not include explanations.
+MEMORY:
+The following chat records describe a release workflow. The tool checks are reliable. A content token identifies exact file bytes. Equal tokens mean equal bytes. Each build records which inputs it used. The word 'usable' is the tool's result, not an assistant opinion.
+User: Build the atlas package. Use map (m1) and style (s1). Notes are not an input.
+Tool: Atlas output exists. The build recorded map=m1, style=s1. Usability check: usable.
+User: Change style to s2. Do not rebuild.
+Tool: Atlas output still exists. Map=m1, style=s2. Usability check: unusable.
+Assistant: Perhaps any earlier edit permanently invalidates a package.
+User: Restore style to its original bytes s1. Do not rebuild.
+Tool: Atlas output still exists. Map=m1, style=s1. Usability check: usable.
+User: Change notes from n1 to n2. Do not rebuild.
+Tool: Atlas output still exists. Map=m1, style=s1, notes=n2. Usability check: usable.
+User: Delete map. Do not rebuild.
+Tool: Atlas output still exists. Map is absent, style=s1. Usability check: unusable.
+User: Restore map=m1. Then remove the atlas output itself.
+Tool: Map=m1, style=s1. Atlas output is absent. Usability check: unusable.
+User: Build beacon. Use scene=c7 and lighting=l2. The README is not an input.
+Tool: Beacon output exists. The build recorded scene=c7, lighting=l2. Usability check: usable.
+User: Change scene to c8. Do not rebuild.
+Tool: Beacon output exists. Scene=c8, lighting=l2. Usability check: unusable.
+User: Rebuild beacon with scene=c8 and lighting=l2.
+Tool: Beacon output exists. The build recorded scene=c8, lighting=l2. Usability check: usable.
+User: Change lighting to l3. Do not rebuild.
+Tool: Beacon output exists. Scene=c8, lighting=l3. Usability check: unusable.
+User: Restore lighting=l2. Change the README. Do not rebuild.
+Tool: Beacon output exists. Scene=c8, lighting=l2. Usability check: usable.
+User: Build comet from one input, mesh=q4.
+Tool: Comet output exists. The build recorded mesh=q4. Usability check: usable.
+User: Change mesh=q5, then restore q4. Do not rebuild.
+Tool: Comet output exists. Mesh=q4. Usability check: usable.
+
+QUESTIONS:
+[{"id": "T1", "split": "observed", "question": "Atlas was built from map=m1 and style=s1. Output exists. Current map=m1 and style=s2. Is it usable?"}, {"id": "T2", "split": "observed", "question": "Atlas was built from map=m1 and style=s1. Output exists. Style changed to s2 and then returned to s1. Current map=m1 and style=s1. Is it usable?"}, {"id": "T3", "split": "observed", "question": "Beacon was rebuilt from scene=c8 and lighting=l2. Output exists. Only the README changed. Scene=c8 and lighting=l2 remain. Is it usable?"}, {"id": "U1", "split": "unseen", "question": "In the same release workflow, delta was built from graph=g3 and theme=t8. Output exists. Both inputs retain those tokens. An unrelated log changed. Is delta usable?"}, {"id": "U2", "split": "unseen", "question": "Delta was built from graph=g3 and theme=t8. Output exists. Current graph=g4 and theme=t8. Is delta usable?"}, {"id": "U3", "split": "unseen", "question": "Echo was built from audio=a1, captions=b2, and timing=d4. Output exists. Current audio=a1 and timing=d4, but captions are absent. Is echo usable?"}, {"id": "U4", "split": "unseen", "question": "Echo was built from audio=a1, captions=b2, and timing=d4. Output exists. All three inputs changed and then each returned to its recorded token. No rebuild occurred. Is echo usable?"}, {"id": "U5", "split": "unseen", "question": "Foxtrot was built from source=h6. Source still has h6. The output file is absent. Is foxtrot usable?"}, {"id": "U6", "split": "unseen", "question": "Gamma was built from data=d1 and config=k1. Both changed. Gamma was then rebuilt from data=d2 and config=k2. Output exists. Current data=d2 and config=k2. Is gamma usable?"}, {"id": "U7", "split": "unseen", "question": "Gamma was rebuilt from data=d2 and config=k2. Output exists. Current data=d1 and config=k1. Those are the tokens from its earlier build. Is gamma usable?"}, {"id": "U8", "split": "unseen", "question": "Hotel was built from three inputs: alpha=x1, beta=x2, gamma=x3. Output exists. Alpha changed to x4 and then returned to x1. Beta changed to x5 and still has x5. Gamma remains x3. Is hotel usable?"}]

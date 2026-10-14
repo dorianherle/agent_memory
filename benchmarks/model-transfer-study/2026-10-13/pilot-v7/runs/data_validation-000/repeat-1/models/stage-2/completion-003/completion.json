@@ -1,0 +1,54 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy, json\nfrom work import evaluate\n\ndef verify(req, pol, expected):\n    req_before = copy.deepcopy(req)\n    pol_before = copy.deepcopy(pol)\n    actual = evaluate(req, pol)\n    assert actual == expected, (actual, expected)\n    assert req == req_before and pol == pol_before\n    assert set(actual) == {'ok','records','errors'}\n    for record in actual['records']:\n        assert set(record) == {'id','amount'}\n    for error in actual['errors']:\n        assert set(error) == {'row','cause'}\n\np = {'base_unit':'m','units':{'m':1,'cm':0.01},'unique':True}\nverify({'rows':[{'id':'a','amount':2,'unit':'cm'},{'id':'b','amount':3}]}, p, {'ok':True,'records':[{'id':'a','amount':0.02},{'id':'b','amount':3}],'errors':[]})\nverify({'rows':[{'id':'x','amount':-1,'unit':'bad'},{'id':'x','amount':1,'unit':'bad'},{'id':'x','amount':2},{'id':'x','amount':3},{'id':False,'amount':0}]}, p, {'ok':False,'records':[],'errors':[{'row':0,'cause':'amount'},{'row':1,'cause':'unit'},{'row':3,'cause':'duplicate'},{'row':4,'cause':'id'}]})\nverify({'rows':[{'id':'q','amount':1,'unit':'bad'},{'id':'q','amount':2}]}, p, {'ok':False,'records':[],'errors':[{'row':0,'cause':'unit'}]})\nfor bad in (True, False, float('nan'), float('inf'), float('-inf'), -0.01, '1', None):\n    verify({'rows':[{'id':'n','amount':bad}]}, p, {'ok':False,'records':[],'errors':[{'row':0,'cause':'amount'}]})\nverify({'rows':[{'id':'same','amount':1},{'id':'same','amount':2}]}, {'base_unit':'m','units':{'m':1},'unique':False}, {'ok':True,'records':[{'id':'same','amount':1},{'id':'same','amount':2}],'errors':[]})\nprint(json.dumps({'independent_boundary_checks':'passed'}))"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import json\nfrom work import evaluate\nwith open('requests.json') as f: requests=json.load(f)\nwith open('policy.json') as f: policy=json.load(f)\nexpected=[evaluate(request, policy) for request in requests]\nwith open('report.json') as f: report=json.load(f)\nassert report == expected, (report, expected)\nprint(json.dumps({'report_matches_current_inputs': True, 'results': len(report)}))"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "status",
+              "--short"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 12740,
+    "output_tokens": 1003,
+    "cached_input_tokens": 12544,
+    "reasoning_output_tokens": 258
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 57.54687120812014,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

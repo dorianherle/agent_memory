@@ -1,0 +1,2039 @@
+{
+  "stop": "finished",
+  "tool_calls": 30,
+  "elapsed_seconds": 249.96359962504357,
+  "usage_complete": true,
+  "tokens": 273421,
+  "known_tokens": 273421,
+  "input_tokens": 264669,
+  "output_tokens": 8752,
+  "cached_input_tokens": 178176,
+  "reasoning_output_tokens": 3287,
+  "model_probes": {
+    "status": "unprobed",
+    "reason": "Model uses other inputs or targets; no feature extractor was validated"
+  },
+  "stage": 1,
+  "grade": {
+    "full_pass": false,
+    "passed": 47,
+    "total": 49,
+    "checks": [
+      {
+        "check": "case_0",
+        "passed": true
+      },
+      {
+        "check": "case_1",
+        "passed": true
+      },
+      {
+        "check": "case_2",
+        "passed": true
+      },
+      {
+        "check": "case_3",
+        "passed": false
+      },
+      {
+        "check": "case_4",
+        "passed": false
+      },
+      {
+        "check": "case_5",
+        "passed": true
+      },
+      {
+        "check": "case_6",
+        "passed": true
+      },
+      {
+        "check": "case_7",
+        "passed": true
+      },
+      {
+        "check": "case_8",
+        "passed": true
+      },
+      {
+        "check": "case_9",
+        "passed": true
+      },
+      {
+        "check": "case_10",
+        "passed": true
+      },
+      {
+        "check": "case_11",
+        "passed": true
+      },
+      {
+        "check": "case_12",
+        "passed": true
+      },
+      {
+        "check": "case_13",
+        "passed": true
+      },
+      {
+        "check": "case_14",
+        "passed": true
+      },
+      {
+        "check": "case_15",
+        "passed": true
+      },
+      {
+        "check": "case_16",
+        "passed": true
+      },
+      {
+        "check": "case_17",
+        "passed": true
+      },
+      {
+        "check": "case_18",
+        "passed": true
+      },
+      {
+        "check": "case_19",
+        "passed": true
+      },
+      {
+        "check": "case_20",
+        "passed": true
+      },
+      {
+        "check": "case_21",
+        "passed": true
+      },
+      {
+        "check": "case_22",
+        "passed": true
+      },
+      {
+        "check": "case_23",
+        "passed": true
+      },
+      {
+        "check": "case_24",
+        "passed": true
+      },
+      {
+        "check": "case_25",
+        "passed": true
+      },
+      {
+        "check": "case_26",
+        "passed": true
+      },
+      {
+        "check": "case_27",
+        "passed": true
+      },
+      {
+        "check": "case_28",
+        "passed": true
+      },
+      {
+        "check": "case_29",
+        "passed": true
+      },
+      {
+        "check": "case_30",
+        "passed": true
+      },
+      {
+        "check": "case_31",
+        "passed": true
+      },
+      {
+        "check": "case_32",
+        "passed": true
+      },
+      {
+        "check": "case_33",
+        "passed": true
+      },
+      {
+        "check": "case_34",
+        "passed": true
+      },
+      {
+        "check": "case_35",
+        "passed": true
+      },
+      {
+        "check": "case_36",
+        "passed": true
+      },
+      {
+        "check": "case_37",
+        "passed": true
+      },
+      {
+        "check": "case_38",
+        "passed": true
+      },
+      {
+        "check": "case_39",
+        "passed": true
+      },
+      {
+        "check": "case_40",
+        "passed": true
+      },
+      {
+        "check": "case_41",
+        "passed": true
+      },
+      {
+        "check": "case_42",
+        "passed": true
+      },
+      {
+        "check": "case_43",
+        "passed": true
+      },
+      {
+        "check": "case_44",
+        "passed": true
+      },
+      {
+        "check": "case_45",
+        "passed": true
+      },
+      {
+        "check": "case_46",
+        "passed": true
+      },
+      {
+        "check": "all_cases_returned",
+        "passed": true
+      },
+      {
+        "check": "current_source_report",
+        "passed": true
+      }
+    ],
+    "unsupported_conclusions": 0,
+    "missed_source_changes": 0
+  },
+  "memory": {
+    "ok": true,
+    "result": {
+      "notes": 7,
+      "model": {
+        "id": "5f5b014d0a80b09f30e36eae7f067015ede7e7c4",
+        "event": "accepted",
+        "checks": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": true,
+              "expected": "permission",
+              "id": "challenge-permission-precedence-v2",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "role-denied"
+                ],
+                "status": "predicted",
+                "value": "permission"
+              }
+            },
+            {
+              "challenge": false,
+              "expected": "blocked",
+              "id": "missing-edge-v2",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "missing-edge"
+                ],
+                "status": "predicted",
+                "value": "blocked"
+              }
+            },
+            {
+              "challenge": false,
+              "expected": "retry_limit",
+              "id": "invalid-bool-retry-v2",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "invalid-retry"
+                ],
+                "status": "predicted",
+                "value": "retry_limit"
+              }
+            },
+            {
+              "challenge": false,
+              "expected": "ok",
+              "id": "valid-upper-bound-v2",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "allowed"
+                ],
+                "status": "predicted",
+                "value": "ok"
+              }
+            }
+          ],
+          "changed_dependencies": [],
+          "complexity": {
+            "cases": 4,
+            "complete_bytes": 3622,
+            "rules": 4,
+            "working_bytes": 1787
+          },
+          "id": "27b26cb0f423b846d78bc71b07d56c8fede87909",
+          "issues": [],
+          "missing_evidence": [],
+          "status": "tested",
+          "uncovered_rules": [],
+          "unresolved": [
+            "Malformed non-mapping request, policy, edges, or edge values are outside tested conditions.",
+            "The edge_exists, role_allowed, retry_present, and retry_valid inputs are faithful normalizations of the API checks; retry_valid requires exact integer semantics excluding booleans.",
+            "retry_limit validity when attempts is absent is not required or tested."
+          ]
+        },
+        "complexity": {
+          "cases": 4,
+          "complete_bytes": 3622,
+          "rules": 4,
+          "working_bytes": 1787
+        },
+        "fingerprints": {
+          "OUTPUT_SCHEMA.json": {
+            "sha256": "cbdc36d2b4017786c42db68f60db0c6bab5051b497944c453f6db026aa00f89d",
+            "state": "file"
+          },
+          "TASK.md": {
+            "sha256": "a62d9100d07c46684d30641b430a96224a75adb528604f86a48968475941d60c",
+            "state": "file"
+          },
+          "policy.json": {
+            "sha256": "afb4bb721f21a3e6eb9ce1fedd28cb685016662b49d7918d95e38dd8d82cb922",
+            "state": "file"
+          },
+          "report.json": {
+            "sha256": "408a25e7fe43ed6375ab655147ef46dab8fa338cfe48648bef58f6c00d98c03a",
+            "state": "file"
+          },
+          "requests.json": {
+            "sha256": "d5b882035d3077c52a11db089dae1e277bbb0d88d63f8be3ed532731436a4f8d",
+            "state": "file"
+          },
+          "work.py": {
+            "sha256": "6ce6798e91169277e0800934b3b3d4348bbbc8f690e14dc72305e8e63f9aaa50",
+            "state": "file"
+          }
+        },
+        "model": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": true,
+              "evidence": [
+                "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+              ],
+              "expected": "permission",
+              "id": "challenge-permission-precedence-v2",
+              "inputs": {
+                "edge_exists": true,
+                "evidence": [],
+                "policy": {
+                  "edges": {
+                    "a>b": {
+                      "role": "right"
+                    }
+                  },
+                  "retry_limit": 2
+                },
+                "request": {
+                  "attempts": 99,
+                  "from": "a",
+                  "role": "wrong",
+                  "to": "b"
+                },
+                "retry_present": true,
+                "retry_valid": false,
+                "role_allowed": false
+              },
+              "target": "status"
+            },
+            {
+              "challenge": false,
+              "evidence": [
+                "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+              ],
+              "expected": "blocked",
+              "id": "missing-edge-v2",
+              "inputs": {
+                "edge_exists": false,
+                "evidence": [],
+                "policy": {
+                  "edges": {
+                    "a>b": {}
+                  },
+                  "retry_limit": 2
+                },
+                "request": {
+                  "from": "x",
+                  "to": "y"
+                },
+                "retry_present": false,
+                "retry_valid": true,
+                "role_allowed": true
+              },
+              "target": "status"
+            },
+            {
+              "challenge": false,
+              "evidence": [
+                "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+              ],
+              "expected": "retry_limit",
+              "id": "invalid-bool-retry-v2",
+              "inputs": {
+                "edge_exists": true,
+                "evidence": [],
+                "policy": {
+                  "edges": {
+                    "a>b": {}
+                  },
+                  "retry_limit": 2
+                },
+                "request": {
+                  "attempts": true,
+                  "from": "a",
+                  "to": "b"
+                },
+                "retry_present": true,
+                "retry_valid": false,
+                "role_allowed": true
+              },
+              "target": "status"
+            },
+            {
+              "challenge": false,
+              "evidence": [
+                "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+              ],
+              "expected": "ok",
+              "id": "valid-upper-bound-v2",
+              "inputs": {
+                "edge_exists": true,
+                "evidence": [],
+                "policy": {
+                  "edges": {
+                    "a>b": {}
+                  },
+                  "retry_limit": 2
+                },
+                "request": {
+                  "attempts": 1,
+                  "from": "a",
+                  "to": "b"
+                },
+                "retry_present": true,
+                "retry_valid": true,
+                "role_allowed": true
+              },
+              "target": "status"
+            }
+          ],
+          "inputs": {
+            "edge_exists": "boolean",
+            "evidence": "array",
+            "policy": "object",
+            "request": "object",
+            "retry_present": "boolean",
+            "retry_valid": "boolean",
+            "role_allowed": "boolean"
+          },
+          "resolutions": [],
+          "rules": [
+            {
+              "claim": "A missing exact transition edge is blocked.",
+              "dependencies": [
+                "work.py",
+                "TASK.md"
+              ],
+              "evidence": [
+                "2a65bad02c06f18b519a06e56dd89706c483e737",
+                "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+              ],
+              "id": "missing-edge",
+              "target": "status",
+              "then": {
+                "value": "blocked"
+              },
+              "when": {
+                "args": [
+                  {
+                    "var": "edge_exists"
+                  }
+                ],
+                "op": "not"
+              }
+            },
+            {
+              "claim": "For an existing edge, a failed role check yields permission before retry validation.",
+              "dependencies": [
+                "work.py",
+                "TASK.md"
+              ],
+              "evidence": [
+                "2a65bad02c06f18b519a06e56dd89706c483e737",
+                "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+              ],
+              "id": "role-denied",
+              "target": "status",
+              "then": {
+                "value": "permission"
+              },
+              "when": {
+                "args": [
+                  {
+                    "var": "edge_exists"
+                  },
+                  {
+                    "args": [
+                      {
+                        "var": "role_allowed"
+                      }
+                    ],
+                    "op": "not"
+                  }
+                ],
+                "op": "and"
+              }
+            },
+            {
+              "claim": "After edge and role checks pass, a present invalid retry yields retry_limit.",
+              "dependencies": [
+                "work.py",
+                "TASK.md"
+              ],
+              "evidence": [
+                "2a65bad02c06f18b519a06e56dd89706c483e737",
+                "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+              ],
+              "id": "invalid-retry",
+              "target": "status",
+              "then": {
+                "value": "retry_limit"
+              },
+              "when": {
+                "args": [
+                  {
+                    "var": "edge_exists"
+                  },
+                  {
+                    "var": "role_allowed"
+                  },
+                  {
+                    "var": "retry_present"
+                  },
+                  {
+                    "args": [
+                      {
+                        "var": "retry_valid"
+                      }
+                    ],
+                    "op": "not"
+                  }
+                ],
+                "op": "and"
+              }
+            },
+            {
+              "claim": "An existing edge with an allowed role and either no retry or a valid retry succeeds.",
+              "dependencies": [
+                "work.py",
+                "TASK.md"
+              ],
+              "evidence": [
+                "2a65bad02c06f18b519a06e56dd89706c483e737",
+                "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+              ],
+              "id": "allowed",
+              "target": "status",
+              "then": {
+                "value": "ok"
+              },
+              "when": {
+                "args": [
+                  {
+                    "var": "edge_exists"
+                  },
+                  {
+                    "var": "role_allowed"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "var": "retry_present"
+                          }
+                        ],
+                        "op": "not"
+                      },
+                      {
+                        "var": "retry_valid"
+                      }
+                    ],
+                    "op": "or"
+                  }
+                ],
+                "op": "and"
+              }
+            }
+          ],
+          "schema": 1,
+          "title": "State-transition decision reason",
+          "unresolved": [
+            "Malformed non-mapping request, policy, edges, or edge values are outside tested conditions.",
+            "The edge_exists, role_allowed, retry_present, and retry_valid inputs are faithful normalizations of the API checks; retry_valid requires exact integer semantics excluding booleans.",
+            "retry_limit validity when attempts is absent is not required or tested."
+          ]
+        },
+        "parent": null,
+        "proposal": "27b26cb0f423b846d78bc71b07d56c8fede87909",
+        "reason": "Agent proposed a model revision",
+        "revision": 1
+      },
+      "checks": {
+        "id": "5f5b014d0a80b09f30e36eae7f067015ede7e7c4",
+        "status": "tested",
+        "issues": [],
+        "cases": [
+          {
+            "id": "challenge-permission-precedence-v2",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "permission",
+              "rules": [
+                "role-denied"
+              ]
+            },
+            "expected": "permission",
+            "challenge": true
+          },
+          {
+            "id": "missing-edge-v2",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "blocked",
+              "rules": [
+                "missing-edge"
+              ]
+            },
+            "expected": "blocked",
+            "challenge": false
+          },
+          {
+            "id": "invalid-bool-retry-v2",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "retry_limit",
+              "rules": [
+                "invalid-retry"
+              ]
+            },
+            "expected": "retry_limit",
+            "challenge": false
+          },
+          {
+            "id": "valid-upper-bound-v2",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": "ok",
+              "rules": [
+                "allowed"
+              ]
+            },
+            "expected": "ok",
+            "challenge": false
+          }
+        ],
+        "uncovered_rules": [],
+        "missing_evidence": [],
+        "changed_dependencies": [],
+        "alternatives": [],
+        "complexity": {
+          "cases": 4,
+          "complete_bytes": 3622,
+          "rules": 4,
+          "working_bytes": 1787
+        },
+        "unresolved": [
+          "Malformed non-mapping request, policy, edges, or edge values are outside tested conditions.",
+          "The edge_exists, role_allowed, retry_present, and retry_valid inputs are faithful normalizations of the API checks; retry_valid requires exact integer semantics excluding booleans.",
+          "retry_limit validity when attempts is absent is not required or tested."
+        ]
+      },
+      "evidence": [
+        {
+          "id": "2a65bad02c06f18b519a06e56dd89706c483e737",
+          "text": "Implemented state-transition evaluation: resolve the exact from>to key from the supplied policy; absent edge returns blocked; a present role requirement is checked before retry validation; supplied attempts must have exact int type (excluding bool), be nonnegative, and be below an integer retry_limit; successes return the requested to value. Inputs remain unchanged and outputs contain exactly ok/value/reason.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "OUTPUT_SCHEMA.json",
+              "TASK.md"
+            ]
+          }
+        },
+        {
+          "id": "cfa3dc17015fb023edfbec4a11e8661f684d62dd",
+          "text": "Verified current report.json equals evaluating every requests.json item against policy.json; both current results succeed. Boundary checks covered missing edges, permission precedence over invalid retries, attempts at -1/0/limit-1/limit, bool/float/string/null attempts, retry_limit zero, exact output fields, schema types, and input immutability.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "report.json",
+              "requests.json",
+              "policy.json",
+              "OUTPUT_SCHEMA.json"
+            ]
+          }
+        },
+        {
+          "id": "24f0e8003310d44bd530c316a5086089e00a93b9",
+          "text": "Unresolved contract limits: behavior for malformed non-mapping request/policy/edges/edge values is unspecified; retry_limit validity when no attempts is supplied is not required by observed contract. Implementation intentionally validates retries only when attempts is present.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "TASK.md",
+              "work.py"
+            ]
+          }
+        },
+        {
+          "id": "8712f49f36836d91d05f4142e8c6fd620544321c",
+          "text": "Task model proposed: State-transition request evaluation",
+          "payload": {
+            "agent": "agent",
+            "model_event": "proposed",
+            "task_model": {
+              "complexity": {
+                "cases": 4,
+                "complete_bytes": 5071,
+                "rules": 4,
+                "working_bytes": 3280
+              },
+              "fingerprints": {
+                "OUTPUT_SCHEMA.json": {
+                  "sha256": "cbdc36d2b4017786c42db68f60db0c6bab5051b497944c453f6db026aa00f89d",
+                  "state": "file"
+                },
+                "TASK.md": {
+                  "sha256": "a62d9100d07c46684d30641b430a96224a75adb528604f86a48968475941d60c",
+                  "state": "file"
+                },
+                "policy.json": {
+                  "sha256": "afb4bb721f21a3e6eb9ce1fedd28cb685016662b49d7918d95e38dd8d82cb922",
+                  "state": "file"
+                },
+                "report.json": {
+                  "sha256": "408a25e7fe43ed6375ab655147ef46dab8fa338cfe48648bef58f6c00d98c03a",
+                  "state": "file"
+                },
+                "requests.json": {
+                  "sha256": "d5b882035d3077c52a11db089dae1e277bbb0d88d63f8be3ed532731436a4f8d",
+                  "state": "file"
+                },
+                "work.py": {
+                  "sha256": "6ce6798e91169277e0800934b3b3d4348bbbc8f690e14dc72305e8e63f9aaa50",
+                  "state": "file"
+                }
+              },
+              "model": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "expected": {
+                      "ok": false,
+                      "reason": "permission",
+                      "value": null
+                    },
+                    "id": "challenge-permission-precedence",
+                    "inputs": {
+                      "attempts_is_integer": true,
+                      "evidence": [],
+                      "policy": {
+                        "edges": {
+                          "a>b": {
+                            "role": "right"
+                          }
+                        },
+                        "retry_limit": 2
+                      },
+                      "request": {
+                        "attempts": 99,
+                        "from": "a",
+                        "role": "wrong",
+                        "to": "b"
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "expected": {
+                      "ok": true,
+                      "reason": "ok",
+                      "value": "b"
+                    },
+                    "id": "valid-upper-bound",
+                    "inputs": {
+                      "attempts_is_integer": true,
+                      "evidence": [],
+                      "policy": {
+                        "edges": {
+                          "a>b": {}
+                        },
+                        "retry_limit": 2
+                      },
+                      "request": {
+                        "attempts": 1,
+                        "from": "a",
+                        "to": "b"
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "expected": {
+                      "ok": false,
+                      "reason": "retry_limit",
+                      "value": null
+                    },
+                    "id": "bool-is-not-integer",
+                    "inputs": {
+                      "attempts_is_integer": false,
+                      "evidence": [],
+                      "policy": {
+                        "edges": {
+                          "a>b": {}
+                        },
+                        "retry_limit": 2
+                      },
+                      "request": {
+                        "attempts": true,
+                        "from": "a",
+                        "to": "b"
+                      }
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "expected": {
+                      "ok": false,
+                      "reason": "blocked",
+                      "value": null
+                    },
+                    "id": "missing-edge-blocked",
+                    "inputs": {
+                      "attempts_is_integer": false,
+                      "evidence": [],
+                      "policy": {
+                        "edges": {
+                          "a>b": {}
+                        },
+                        "retry_limit": 2
+                      },
+                      "request": {
+                        "from": "x",
+                        "to": "y"
+                      }
+                    },
+                    "target": "status"
+                  }
+                ],
+                "inputs": {
+                  "attempts_is_integer": "boolean",
+                  "evidence": "array",
+                  "policy": "object",
+                  "request": "object"
+                },
+                "resolutions": [],
+                "rules": [
+                  {
+                    "claim": "An exact from>to key absent from the supplied policy edges is blocked.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "2a65bad02c06f18b519a06e56dd89706c483e737",
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "id": "missing-edge",
+                    "target": "status",
+                    "then": {
+                      "value": {
+                        "ok": false,
+                        "reason": "blocked",
+                        "value": null
+                      }
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "args": [
+                                    {
+                                      "args": [
+                                        {
+                                          "var": "request"
+                                        },
+                                        {
+                                          "value": "from"
+                                        },
+                                        {
+                                          "value": null
+                                        }
+                                      ],
+                                      "op": "get"
+                                    },
+                                    {
+                                      "value": ">"
+                                    }
+                                  ],
+                                  "op": "add"
+                                },
+                                {
+                                  "args": [
+                                    {
+                                      "var": "request"
+                                    },
+                                    {
+                                      "value": "to"
+                                    },
+                                    {
+                                      "value": null
+                                    }
+                                  ],
+                                  "op": "get"
+                                }
+                              ],
+                              "op": "add"
+                            },
+                            {
+                              "args": [
+                                {
+                                  "var": "policy"
+                                },
+                                {
+                                  "value": "edges"
+                                },
+                                {
+                                  "value": {}
+                                }
+                              ],
+                              "op": "get"
+                            }
+                          ],
+                          "op": "in"
+                        }
+                      ],
+                      "op": "not"
+                    }
+                  },
+                  {
+                    "claim": "For an existing edge with a role requirement, a nonmatching or missing request role yields permission before retry validation.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "2a65bad02c06f18b519a06e56dd89706c483e737",
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "id": "role-denied",
+                    "target": "status",
+                    "then": {
+                      "value": {
+                        "ok": false,
+                        "reason": "permission",
+                        "value": null
+                      }
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "args": [
+                                    {
+                                      "args": [
+                                        {
+                                          "var": "request"
+                                        },
+                                        {
+                                          "value": "from"
+                                        },
+                                        {
+                                          "value": null
+                                        }
+                                      ],
+                                      "op": "get"
+                                    },
+                                    {
+                                      "value": ">"
+                                    }
+                                  ],
+                                  "op": "add"
+                                },
+                                {
+                                  "args": [
+                                    {
+                                      "var": "request"
+                                    },
+                                    {
+                                      "value": "to"
+                                    },
+                                    {
+                                      "value": null
+                                    }
+                                  ],
+                                  "op": "get"
+                                }
+                              ],
+                              "op": "add"
+                            },
+                            {
+                              "args": [
+                                {
+                                  "var": "policy"
+                                },
+                                {
+                                  "value": "edges"
+                                },
+                                {
+                                  "value": {}
+                                }
+                              ],
+                              "op": "get"
+                            }
+                          ],
+                          "op": "in"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "role"
+                                },
+                                {
+                                  "value": null
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "args": [
+                                {
+                                  "args": [
+                                    {
+                                      "args": [
+                                        {
+                                          "var": "policy"
+                                        },
+                                        {
+                                          "value": "edges"
+                                        },
+                                        {
+                                          "value": {}
+                                        }
+                                      ],
+                                      "op": "get"
+                                    },
+                                    {
+                                      "args": [
+                                        {
+                                          "args": [
+                                            {
+                                              "args": [
+                                                {
+                                                  "var": "request"
+                                                },
+                                                {
+                                                  "value": "from"
+                                                },
+                                                {
+                                                  "value": null
+                                                }
+                                              ],
+                                              "op": "get"
+                                            },
+                                            {
+                                              "value": ">"
+                                            }
+                                          ],
+                                          "op": "add"
+                                        },
+                                        {
+                                          "args": [
+                                            {
+                                              "var": "request"
+                                            },
+                                            {
+                                              "value": "to"
+                                            },
+                                            {
+                                              "value": null
+                                            }
+                                          ],
+                                          "op": "get"
+                                        }
+                                      ],
+                                      "op": "add"
+                                    },
+                                    {
+                                      "value": {}
+                                    }
+                                  ],
+                                  "op": "get"
+                                },
+                                {
+                                  "value": "role"
+                                },
+                                {
+                                  "args": [
+                                    {
+                                      "var": "request"
+                                    },
+                                    {
+                                      "value": "role"
+                                    },
+                                    {
+                                      "value": null
+                                    }
+                                  ],
+                                  "op": "get"
+                                }
+                              ],
+                              "op": "get"
+                            }
+                          ],
+                          "op": "ne"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "After edge and role checks pass, a supplied attempts value yields retry_limit unless it is an actual integer excluding bool, is nonnegative, and is below an actual integer retry_limit.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "2a65bad02c06f18b519a06e56dd89706c483e737",
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "id": "invalid-retry",
+                    "target": "status",
+                    "then": {
+                      "value": {
+                        "ok": false,
+                        "reason": "retry_limit",
+                        "value": null
+                      }
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "value": "attempts"
+                            },
+                            {
+                              "var": "request"
+                            }
+                          ],
+                          "op": "in"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "attempts_is_integer"
+                                }
+                              ],
+                              "op": "not"
+                            },
+                            {
+                              "args": [
+                                {
+                                  "args": [
+                                    {
+                                      "var": "request"
+                                    },
+                                    {
+                                      "value": "attempts"
+                                    },
+                                    {
+                                      "value": null
+                                    }
+                                  ],
+                                  "op": "get"
+                                },
+                                {
+                                  "value": 0
+                                }
+                              ],
+                              "op": "lt"
+                            },
+                            {
+                              "args": [
+                                {
+                                  "args": [
+                                    {
+                                      "args": [
+                                        {
+                                          "var": "request"
+                                        },
+                                        {
+                                          "value": "attempts"
+                                        },
+                                        {
+                                          "value": null
+                                        }
+                                      ],
+                                      "op": "get"
+                                    },
+                                    {
+                                      "args": [
+                                        {
+                                          "var": "policy"
+                                        },
+                                        {
+                                          "value": "retry_limit"
+                                        },
+                                        {
+                                          "value": null
+                                        }
+                                      ],
+                                      "op": "get"
+                                    }
+                                  ],
+                                  "op": "lt"
+                                }
+                              ],
+                              "op": "not"
+                            }
+                          ],
+                          "op": "or"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "An existing edge whose role requirement passes, with no retry or a valid retry, succeeds with the requested destination.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "2a65bad02c06f18b519a06e56dd89706c483e737",
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "id": "allowed",
+                    "target": "status",
+                    "then": {
+                      "value": {
+                        "ok": true,
+                        "reason": "ok",
+                        "value": "derived from request.to"
+                      }
+                    },
+                    "when": {
+                      "value": true
+                    }
+                  }
+                ],
+                "schema": 1,
+                "title": "State-transition request evaluation",
+                "unresolved": [
+                  "Malformed non-mapping request, policy, edges, or edge values are outside tested conditions.",
+                  "The attempts_is_integer input is a faithful normalization required because the expression language has no runtime type-test operator; callers must derive it using exact integer semantics that exclude booleans.",
+                  "retry_limit validity when attempts is absent is not required or tested."
+                ]
+              },
+              "parent": null,
+              "reason": "Agent proposed a model revision",
+              "revision": 1
+            }
+          }
+        },
+        {
+          "id": "27b26cb0f423b846d78bc71b07d56c8fede87909",
+          "text": "Task model proposed: State-transition decision reason",
+          "payload": {
+            "agent": "agent",
+            "model_event": "proposed",
+            "task_model": {
+              "complexity": {
+                "cases": 4,
+                "complete_bytes": 3622,
+                "rules": 4,
+                "working_bytes": 1787
+              },
+              "fingerprints": {
+                "OUTPUT_SCHEMA.json": {
+                  "sha256": "cbdc36d2b4017786c42db68f60db0c6bab5051b497944c453f6db026aa00f89d",
+                  "state": "file"
+                },
+                "TASK.md": {
+                  "sha256": "a62d9100d07c46684d30641b430a96224a75adb528604f86a48968475941d60c",
+                  "state": "file"
+                },
+                "policy.json": {
+                  "sha256": "afb4bb721f21a3e6eb9ce1fedd28cb685016662b49d7918d95e38dd8d82cb922",
+                  "state": "file"
+                },
+                "report.json": {
+                  "sha256": "408a25e7fe43ed6375ab655147ef46dab8fa338cfe48648bef58f6c00d98c03a",
+                  "state": "file"
+                },
+                "requests.json": {
+                  "sha256": "d5b882035d3077c52a11db089dae1e277bbb0d88d63f8be3ed532731436a4f8d",
+                  "state": "file"
+                },
+                "work.py": {
+                  "sha256": "6ce6798e91169277e0800934b3b3d4348bbbc8f690e14dc72305e8e63f9aaa50",
+                  "state": "file"
+                }
+              },
+              "model": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "expected": "permission",
+                    "id": "challenge-permission-precedence-v2",
+                    "inputs": {
+                      "edge_exists": true,
+                      "evidence": [],
+                      "policy": {
+                        "edges": {
+                          "a>b": {
+                            "role": "right"
+                          }
+                        },
+                        "retry_limit": 2
+                      },
+                      "request": {
+                        "attempts": 99,
+                        "from": "a",
+                        "role": "wrong",
+                        "to": "b"
+                      },
+                      "retry_present": true,
+                      "retry_valid": false,
+                      "role_allowed": false
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "expected": "blocked",
+                    "id": "missing-edge-v2",
+                    "inputs": {
+                      "edge_exists": false,
+                      "evidence": [],
+                      "policy": {
+                        "edges": {
+                          "a>b": {}
+                        },
+                        "retry_limit": 2
+                      },
+                      "request": {
+                        "from": "x",
+                        "to": "y"
+                      },
+                      "retry_present": false,
+                      "retry_valid": true,
+                      "role_allowed": true
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "expected": "retry_limit",
+                    "id": "invalid-bool-retry-v2",
+                    "inputs": {
+                      "edge_exists": true,
+                      "evidence": [],
+                      "policy": {
+                        "edges": {
+                          "a>b": {}
+                        },
+                        "retry_limit": 2
+                      },
+                      "request": {
+                        "attempts": true,
+                        "from": "a",
+                        "to": "b"
+                      },
+                      "retry_present": true,
+                      "retry_valid": false,
+                      "role_allowed": true
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "expected": "ok",
+                    "id": "valid-upper-bound-v2",
+                    "inputs": {
+                      "edge_exists": true,
+                      "evidence": [],
+                      "policy": {
+                        "edges": {
+                          "a>b": {}
+                        },
+                        "retry_limit": 2
+                      },
+                      "request": {
+                        "attempts": 1,
+                        "from": "a",
+                        "to": "b"
+                      },
+                      "retry_present": true,
+                      "retry_valid": true,
+                      "role_allowed": true
+                    },
+                    "target": "status"
+                  }
+                ],
+                "inputs": {
+                  "edge_exists": "boolean",
+                  "evidence": "array",
+                  "policy": "object",
+                  "request": "object",
+                  "retry_present": "boolean",
+                  "retry_valid": "boolean",
+                  "role_allowed": "boolean"
+                },
+                "resolutions": [],
+                "rules": [
+                  {
+                    "claim": "A missing exact transition edge is blocked.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "2a65bad02c06f18b519a06e56dd89706c483e737",
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "id": "missing-edge",
+                    "target": "status",
+                    "then": {
+                      "value": "blocked"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "var": "edge_exists"
+                        }
+                      ],
+                      "op": "not"
+                    }
+                  },
+                  {
+                    "claim": "For an existing edge, a failed role check yields permission before retry validation.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "2a65bad02c06f18b519a06e56dd89706c483e737",
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "id": "role-denied",
+                    "target": "status",
+                    "then": {
+                      "value": "permission"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "var": "edge_exists"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "role_allowed"
+                            }
+                          ],
+                          "op": "not"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "After edge and role checks pass, a present invalid retry yields retry_limit.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "2a65bad02c06f18b519a06e56dd89706c483e737",
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "id": "invalid-retry",
+                    "target": "status",
+                    "then": {
+                      "value": "retry_limit"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "var": "edge_exists"
+                        },
+                        {
+                          "var": "role_allowed"
+                        },
+                        {
+                          "var": "retry_present"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "retry_valid"
+                            }
+                          ],
+                          "op": "not"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "An existing edge with an allowed role and either no retry or a valid retry succeeds.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "2a65bad02c06f18b519a06e56dd89706c483e737",
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "id": "allowed",
+                    "target": "status",
+                    "then": {
+                      "value": "ok"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "var": "edge_exists"
+                        },
+                        {
+                          "var": "role_allowed"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "retry_present"
+                                }
+                              ],
+                              "op": "not"
+                            },
+                            {
+                              "var": "retry_valid"
+                            }
+                          ],
+                          "op": "or"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  }
+                ],
+                "schema": 1,
+                "title": "State-transition decision reason",
+                "unresolved": [
+                  "Malformed non-mapping request, policy, edges, or edge values are outside tested conditions.",
+                  "The edge_exists, role_allowed, retry_present, and retry_valid inputs are faithful normalizations of the API checks; retry_valid requires exact integer semantics excluding booleans.",
+                  "retry_limit validity when attempts is absent is not required or tested."
+                ]
+              },
+              "parent": null,
+              "reason": "Agent proposed a model revision",
+              "revision": 1
+            }
+          }
+        },
+        {
+          "id": "5f5b014d0a80b09f30e36eae7f067015ede7e7c4",
+          "text": "Task model active: State-transition decision reason",
+          "payload": {
+            "agent": "agent",
+            "model_event": "accepted",
+            "task_model": {
+              "checks": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": true,
+                    "expected": "permission",
+                    "id": "challenge-permission-precedence-v2",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "role-denied"
+                      ],
+                      "status": "predicted",
+                      "value": "permission"
+                    }
+                  },
+                  {
+                    "challenge": false,
+                    "expected": "blocked",
+                    "id": "missing-edge-v2",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "missing-edge"
+                      ],
+                      "status": "predicted",
+                      "value": "blocked"
+                    }
+                  },
+                  {
+                    "challenge": false,
+                    "expected": "retry_limit",
+                    "id": "invalid-bool-retry-v2",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "invalid-retry"
+                      ],
+                      "status": "predicted",
+                      "value": "retry_limit"
+                    }
+                  },
+                  {
+                    "challenge": false,
+                    "expected": "ok",
+                    "id": "valid-upper-bound-v2",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "allowed"
+                      ],
+                      "status": "predicted",
+                      "value": "ok"
+                    }
+                  }
+                ],
+                "changed_dependencies": [],
+                "complexity": {
+                  "cases": 4,
+                  "complete_bytes": 3622,
+                  "rules": 4,
+                  "working_bytes": 1787
+                },
+                "id": "27b26cb0f423b846d78bc71b07d56c8fede87909",
+                "issues": [],
+                "missing_evidence": [],
+                "status": "tested",
+                "uncovered_rules": [],
+                "unresolved": [
+                  "Malformed non-mapping request, policy, edges, or edge values are outside tested conditions.",
+                  "The edge_exists, role_allowed, retry_present, and retry_valid inputs are faithful normalizations of the API checks; retry_valid requires exact integer semantics excluding booleans.",
+                  "retry_limit validity when attempts is absent is not required or tested."
+                ]
+              },
+              "complexity": {
+                "cases": 4,
+                "complete_bytes": 3622,
+                "rules": 4,
+                "working_bytes": 1787
+              },
+              "fingerprints": {
+                "OUTPUT_SCHEMA.json": {
+                  "sha256": "cbdc36d2b4017786c42db68f60db0c6bab5051b497944c453f6db026aa00f89d",
+                  "state": "file"
+                },
+                "TASK.md": {
+                  "sha256": "a62d9100d07c46684d30641b430a96224a75adb528604f86a48968475941d60c",
+                  "state": "file"
+                },
+                "policy.json": {
+                  "sha256": "afb4bb721f21a3e6eb9ce1fedd28cb685016662b49d7918d95e38dd8d82cb922",
+                  "state": "file"
+                },
+                "report.json": {
+                  "sha256": "408a25e7fe43ed6375ab655147ef46dab8fa338cfe48648bef58f6c00d98c03a",
+                  "state": "file"
+                },
+                "requests.json": {
+                  "sha256": "d5b882035d3077c52a11db089dae1e277bbb0d88d63f8be3ed532731436a4f8d",
+                  "state": "file"
+                },
+                "work.py": {
+                  "sha256": "6ce6798e91169277e0800934b3b3d4348bbbc8f690e14dc72305e8e63f9aaa50",
+                  "state": "file"
+                }
+              },
+              "model": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "expected": "permission",
+                    "id": "challenge-permission-precedence-v2",
+                    "inputs": {
+                      "edge_exists": true,
+                      "evidence": [],
+                      "policy": {
+                        "edges": {
+                          "a>b": {
+                            "role": "right"
+                          }
+                        },
+                        "retry_limit": 2
+                      },
+                      "request": {
+                        "attempts": 99,
+                        "from": "a",
+                        "role": "wrong",
+                        "to": "b"
+                      },
+                      "retry_present": true,
+                      "retry_valid": false,
+                      "role_allowed": false
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "expected": "blocked",
+                    "id": "missing-edge-v2",
+                    "inputs": {
+                      "edge_exists": false,
+                      "evidence": [],
+                      "policy": {
+                        "edges": {
+                          "a>b": {}
+                        },
+                        "retry_limit": 2
+                      },
+                      "request": {
+                        "from": "x",
+                        "to": "y"
+                      },
+                      "retry_present": false,
+                      "retry_valid": true,
+                      "role_allowed": true
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "expected": "retry_limit",
+                    "id": "invalid-bool-retry-v2",
+                    "inputs": {
+                      "edge_exists": true,
+                      "evidence": [],
+                      "policy": {
+                        "edges": {
+                          "a>b": {}
+                        },
+                        "retry_limit": 2
+                      },
+                      "request": {
+                        "attempts": true,
+                        "from": "a",
+                        "to": "b"
+                      },
+                      "retry_present": true,
+                      "retry_valid": false,
+                      "role_allowed": true
+                    },
+                    "target": "status"
+                  },
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "expected": "ok",
+                    "id": "valid-upper-bound-v2",
+                    "inputs": {
+                      "edge_exists": true,
+                      "evidence": [],
+                      "policy": {
+                        "edges": {
+                          "a>b": {}
+                        },
+                        "retry_limit": 2
+                      },
+                      "request": {
+                        "attempts": 1,
+                        "from": "a",
+                        "to": "b"
+                      },
+                      "retry_present": true,
+                      "retry_valid": true,
+                      "role_allowed": true
+                    },
+                    "target": "status"
+                  }
+                ],
+                "inputs": {
+                  "edge_exists": "boolean",
+                  "evidence": "array",
+                  "policy": "object",
+                  "request": "object",
+                  "retry_present": "boolean",
+                  "retry_valid": "boolean",
+                  "role_allowed": "boolean"
+                },
+                "resolutions": [],
+                "rules": [
+                  {
+                    "claim": "A missing exact transition edge is blocked.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "2a65bad02c06f18b519a06e56dd89706c483e737",
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "id": "missing-edge",
+                    "target": "status",
+                    "then": {
+                      "value": "blocked"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "var": "edge_exists"
+                        }
+                      ],
+                      "op": "not"
+                    }
+                  },
+                  {
+                    "claim": "For an existing edge, a failed role check yields permission before retry validation.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "2a65bad02c06f18b519a06e56dd89706c483e737",
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "id": "role-denied",
+                    "target": "status",
+                    "then": {
+                      "value": "permission"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "var": "edge_exists"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "role_allowed"
+                            }
+                          ],
+                          "op": "not"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "After edge and role checks pass, a present invalid retry yields retry_limit.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "2a65bad02c06f18b519a06e56dd89706c483e737",
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "id": "invalid-retry",
+                    "target": "status",
+                    "then": {
+                      "value": "retry_limit"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "var": "edge_exists"
+                        },
+                        {
+                          "var": "role_allowed"
+                        },
+                        {
+                          "var": "retry_present"
+                        },
+                        {
+                          "args": [
+                            {
+                              "var": "retry_valid"
+                            }
+                          ],
+                          "op": "not"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  },
+                  {
+                    "claim": "An existing edge with an allowed role and either no retry or a valid retry succeeds.",
+                    "dependencies": [
+                      "work.py",
+                      "TASK.md"
+                    ],
+                    "evidence": [
+                      "2a65bad02c06f18b519a06e56dd89706c483e737",
+                      "cfa3dc17015fb023edfbec4a11e8661f684d62dd"
+                    ],
+                    "id": "allowed",
+                    "target": "status",
+                    "then": {
+                      "value": "ok"
+                    },
+                    "when": {
+                      "args": [
+                        {
+                          "var": "edge_exists"
+                        },
+                        {
+                          "var": "role_allowed"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "retry_present"
+                                }
+                              ],
+                              "op": "not"
+                            },
+                            {
+                              "var": "retry_valid"
+                            }
+                          ],
+                          "op": "or"
+                        }
+                      ],
+                      "op": "and"
+                    }
+                  }
+                ],
+                "schema": 1,
+                "title": "State-transition decision reason",
+                "unresolved": [
+                  "Malformed non-mapping request, policy, edges, or edge values are outside tested conditions.",
+                  "The edge_exists, role_allowed, retry_present, and retry_valid inputs are faithful normalizations of the API checks; retry_valid requires exact integer semantics excluding booleans.",
+                  "retry_limit validity when attempts is absent is not required or tested."
+                ]
+              },
+              "parent": null,
+              "proposal": "27b26cb0f423b846d78bc71b07d56c8fede87909",
+              "reason": "Agent proposed a model revision",
+              "revision": 1
+            }
+          }
+        },
+        {
+          "id": "411ba00a3ab39216e1faa41a4916d126652a0a90",
+          "text": "Completed and verified Stage 1 state_transitions work sample 0: work.py implements evaluate(request, policy) with blocked/permission/retry_limit precedence, exact integer retry validation excluding bool, successful destination values, input immutability, and exact output fields. report.json matches all current requests under current policy. Remaining limits concern malformed container inputs and retry_limit validity when no attempts is supplied.",
+          "payload": {
+            "agent": "agent",
+            "covers": [
+              "2a65bad02c06f18b519a06e56dd89706c483e737",
+              "cfa3dc17015fb023edfbec4a11e8661f684d62dd",
+              "24f0e8003310d44bd530c316a5086089e00a93b9"
+            ],
+            "files": [
+              "work.py",
+              "report.json",
+              "requests.json",
+              "policy.json",
+              "OUTPUT_SCHEMA.json",
+              "TASK.md"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

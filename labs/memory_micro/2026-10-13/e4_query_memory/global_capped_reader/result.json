@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "text": "{\"answers\":[{\"id\":\"sparrow_common\",\"answer\":\"42 µm\",\"source\":\"S01-S24\"},{\"id\":\"sparrow_correction\",\"answer\":\"17 mW\",\"source\":\"S08\"},{\"id\":\"sparrow_rare_ice\",\"answer\":\"3 mW\",\"source\":\"S01-S24\"},{\"id\":\"sparrow_rare_binder\",\"answer\":\"No\",\"source\":\"S01-S24\"},{\"id\":\"sparrow_tail\",\"answer\":\"37 times\",\"source\":\"S01-S24\"},{\"id\":\"sparrow_absent\",\"answer\":\"UNKNOWN\",\"source\":\"NONE\"},{\"id\":\"quarry_common\",\"answer\":\"7 mTorr\",\"source\":\"Q01-Q24\"},{\"id\":\"quarry_correction\",\"answer\":\"135 °C\",\"source\":\"Q08\"},{\"id\":\"quarry_rare_lateral\",\"answer\":\"No; unknown\",\"source\":\"Q01-Q24\"},{\"id\":\"quarry_rare_acetone\",\"answer\":\"No\",\"source\":\"Q01-Q24\"},{\"id\":\"quarry_tail\",\"answer\":\"93 s\",\"source\":\"Q01-Q24\"},{\"id\":\"quarry_absent\",\"answer\":\"UNKNOWN\",\"source\":\"NONE\"}]}",
+  "errors": [],
+  "model": "gpt-5.6-sol",
+  "reasoning": "low",
+  "elapsed_seconds": 11.042195499874651,
+  "usage_complete": true,
+  "usage": {
+    "input_tokens": 12602,
+    "output_tokens": 343
+  },
+  "native_tools": [],
+  "prompt_sha256": "7955183ac8ff831164f27a984c991b0969b097bdaf02bc06b0c2515f854bd995"
+}

@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "write",
+    "arguments": {
+      "path": "work.py",
+      "content": "\"\"\"Evaluate changes to declared source dependencies.\"\"\"\n\nfrom __future__ import annotations\n\nimport json\nfrom typing import Any, Mapping\n\n_MISSING = {\"kind\": \"missing\"}\n\n\ndef _canonical_json(value: Any) -> str:\n    \"\"\"Return a stable, type-sensitive representation of a JSON value.\"\"\"\n    return json.dumps(\n        value,\n        sort_keys=True,\n        separators=(\",\", \":\"),\n        ensure_ascii=False,\n        allow_nan=False,\n    )\n\n\ndef evaluate(request: Mapping[str, Any], policy: Mapping[str, Any]) -> dict[str, Any]:\n    \"\"\"Evaluate complete states for relevant declared source paths.\"\"\"\n    declared = request.get(\"declared\", ())\n    ignored = set(policy.get(\"ignored\", ()))\n    saved = request.get(\"saved\", {})\n    current = request.get(\"current\", {})\n\n    changed = []\n    for path in set(declared):\n        if path in ignored:\n            continue\n        before = saved.get(path, _MISSING)\n        after = current.get(path, _MISSING)\n        if _canonical_json(before) != _canonical_json(after):\n            changed.append(path)\n\n    changed.sort()\n    return {\"needs_review\": bool(changed), \"changed\": changed}\n"
+    }
+  },
+  "usage": {
+    "input_tokens": 19001,
+    "output_tokens": 1251,
+    "cached_input_tokens": 17024,
+    "reasoning_output_tokens": 355
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 39.33468091697432,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

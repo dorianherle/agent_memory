@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "save",
+      "text": "Unresolved limit: malformed non-mapping request or policy inputs are outside the stated evaluate(request, policy) contract and remain untested. evidence.json is absent, so the current report is based on requests.json and policy.json only.",
+      "payload": {
+        "files": [
+          "TASK.md",
+          "work.py",
+          "requests.json",
+          "policy.json",
+          "report.json"
+        ]
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 19114,
+    "output_tokens": 547,
+    "cached_input_tokens": 9216,
+    "reasoning_output_tokens": 449
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 14.496975332964212,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

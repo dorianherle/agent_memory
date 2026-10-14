@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import json\ne=json.load(open('stored-model.json',encoding='utf-8')); m=e['model']\nfor r in m['rules']:\n for note in ['a47a675e','7b50a1eb']:\n  if note not in r['evidence']: r['evidence'].append(note)\ncid='boundary_unicode_key_order_and_explicit_missing'\nif not any(c['id']==cid for c in m['cases']):\n m['cases'].append({'id':cid,'target':'needs_review','inputs':{'request':{'declared':['\u00e9.json','a.json','\u00e9.json'],'saved':{'\u00e9.json':{'kind':'file','metadata':{'z':1,'a':[True,1]}},'a.json':{'kind':'missing'}},'current':{'\u00e9.json':{'metadata':{'a':[True,1],'z':1},'kind':'file'}}},'policy':{'ignored':[]},'evidence':[]},'expected':False,'evidence':['7b50a1eb'],'challenge':True})\nm['unresolved']=['Behavior for malformed non-JSON inputs or non-string declared paths is outside tested conditions; the task contract supplies canonical JSON-compatible data.','evidence.json is absent in this sample, so no evidence-derived behavior was exercised.']\njson.dump(m,open('model3.json','w',encoding='utf-8'),ensure_ascii=False,sort_keys=True,indent=2)\n"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 34802,
+    "output_tokens": 1504,
+    "cached_input_tokens": 23040,
+    "reasoning_output_tokens": 554
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 27.66055433312431,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

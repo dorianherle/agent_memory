@@ -1,0 +1,25 @@
+{
+  "ok": false,
+  "errors": [
+    "Native tools are forbidden in the model-only completion process"
+  ],
+  "decision": {
+    "action": "read",
+    "arguments": {
+      "path": "TASK.md"
+    }
+  },
+  "usage": {
+    "input_tokens": 28316,
+    "output_tokens": 373,
+    "cached_input_tokens": 24448,
+    "reasoning_output_tokens": 274
+  },
+  "usage_complete": true,
+  "native_tool_calls": 1,
+  "events": 6,
+  "elapsed_seconds": 14.218345374800265,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

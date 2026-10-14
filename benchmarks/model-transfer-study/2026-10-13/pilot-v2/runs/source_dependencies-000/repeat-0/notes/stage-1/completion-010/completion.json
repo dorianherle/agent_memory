@@ -1,0 +1,31 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "save",
+      "text": "Unresolved limits: evidence.json is not present in the current project, so report.json was generated solely from requests.json and policy.json as directed. No functional issues remain after local checks.",
+      "payload": {
+        "files": [
+          "report.json",
+          "requests.json",
+          "policy.json"
+        ]
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 10255,
+    "output_tokens": 202,
+    "cached_input_tokens": 8192,
+    "reasoning_output_tokens": 119
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 9.885811666958034,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

@@ -1,0 +1,877 @@
+{
+  "experiment": "E1",
+  "conclusion": "inconclusive",
+  "elapsed_seconds": 81.35528675001115,
+  "calls_submitted": 13,
+  "calls_with_results": 13,
+  "errors": [],
+  "packet_budget_valid": false,
+  "complete": true,
+  "tools_and_usage_valid": true,
+  "full_history_control_valid": true,
+  "packets": {
+    "prose": [
+      {
+        "handoff": 1,
+        "text": "The goal is to qualify controller version 2.6. Use speed 0.80 m/s, PWM period 2.50 ms, maximum load 4.00 kg, and ambient temperature from 18.0 to 28.0 degrees C. For motor serial M17, reduce the maximum load to 2.75 kg only when the ambient temperature is more than 26.0 degrees C. At exactly 26.0 degrees C, the 4.00 kg limit applies. The timing acceptance limit is a 99th percentile of 3.00 ms. An early note says that version 2.5 passed the timing test. This result does not qualify version 2.6. The qualification status of version 2.6 is unknown.",
+        "tokens": 157,
+        "prompt_sha256": "8d0e5897d60474b40a0631e1ad4b6abaf5dd4fe0815cdb322ca124c0fe68dc91"
+      },
+      {
+        "handoff": 2,
+        "text": "The goal is to qualify controller version 2.6 at 0.80 m/s, a 2.50 ms PWM period, a maximum load of 4.00 kg, and 18.0 to 28.0 degrees C. For motor M17 only, reduce the maximum load to 2.75 kg when ambient temperature is more than 26.0 degrees C. At exactly 26.0 degrees C, the 4.00 kg limit applies. The timing limit is a 99th percentile of 3.00 ms. H2 withdraws the version 2.5 pass claim. Its corrected result is 3.20 ms, which fails the limit. Version 2.6 timing is not tested. Release is on hold until timing passes and the watchdog fault is resolved.",
+        "tokens": 166,
+        "prompt_sha256": "8654d3d57a41e64b78c219a074e79ab7ba6876b9cd81d54a03aba86f826e1c8d"
+      },
+      {
+        "handoff": 3,
+        "text": "The goal is to qualify controller version 2.6 at 0.80 m/s, with a 2.50 ms PWM period, a maximum load of 4.00 kg, and an ambient temperature of 18.0 to 28.0 degrees C. For motor M17 only, reduce the maximum load to 2.75 kg when the ambient temperature is more than 26.0 degrees C. At exactly 26.0 degrees C, the 4.00 kg limit applies. The timing limit is a 99th percentile of 3.00 ms. H2 withdraws the version 2.5 pass claim. The corrected version 2.5 result is 3.20 ms and fails the limit. Version 2.6 timing is not tested. H3 reports a watchdog fault in 3 of 5 simulator runs at a load of 3.60 kg. The cause is unknown and must not be reported as established. Do not use zero for an unknown quantity to make a check pass. Release is on hold until version 2.6 timing passes and the watchdog fault is resolved. A proposed extra test is optional. The operating settings and motor exception did not change.",
+        "tokens": 248,
+        "prompt_sha256": "b80657ea18201b2e8750acebc6fc1b0ed2ebc7081e849f419f1c9e1db77c300c"
+      },
+      {
+        "handoff": 4,
+        "text": "The goal is to qualify controller version 2.6 at 0.80 m/s, with a 2.50 ms PWM period, a maximum load of 4.00 kg, and an ambient temperature of 18.0 to 28.0 degrees C. For motor M17 only, reduce the maximum load to 2.75 kg when the temperature is more than 26.0 degrees C. At exactly 26.0 degrees C, the 4.00 kg limit applies. Timing qualification must use test B, a load of 2.00 kg, and a 120 s warmup before measurement. The proposed shorter warmup was rejected. The timing limit is a 99th percentile of 3.00 ms. H2 withdraws the version 2.5 pass claim. Its corrected result is 3.20 ms and fails. Version 2.6 timing is not tested. H3 reports a watchdog fault in 3 of 5 simulator runs at 3.60 kg. A watchdog reset is an untested explanation. No cause is established. Do not use zero for an unknown quantity to make a check pass. Release is on hold until version 2.6 timing passes and the watchdog fault is resolved. The proposed extra test is optional.",
+        "tokens": 263,
+        "prompt_sha256": "904a69e66d2cc0abc7070a8bb62760c962ad4154a107b525d6fa7aa0e0255f4a"
+      },
+      {
+        "handoff": 5,
+        "text": "The goal is to qualify controller version 2.6 at 0.80 m/s, with a 2.50 ms PWM period, a maximum load of 4.00 kg, and an ambient temperature of 18.0 to 28.0 degrees C. For motor M17 only, the maximum load is 2.75 kg above 26.0 degrees C. At exactly 26.0 degrees C, the 4.00 kg limit applies. Timing qualification must use test B, a 2.00 kg load, and a 120 s warmup. The shorter warmup was rejected. The timing limit is a 99th percentile of 3.00 ms. H2 withdraws the version 2.5 pass claim. The corrected result is 3.20 ms, which fails. Version 2.6 timing remains untested. H3 reports a watchdog fault in 3 of 5 simulator runs at 3.60 kg. A watchdog reset is an untested explanation. The cause is unknown. Do not use zero for an unknown quantity to make a check pass. H5 confirms that no operating limit or qualification condition changed. Release remains on hold until version 2.6 timing passes and the watchdog fault is resolved. The extra test is optional. Remaining routine document work does not affect qualification.",
+        "tokens": 274,
+        "prompt_sha256": "05803b578f0506a9b264369d64ab51fbb3f107fdb33965ca29c22a0d665b5517"
+      }
+    ],
+    "ledger": [
+      {
+        "handoff": 1,
+        "text": "goal: Qualify controller version 2.6.\ncurrent_facts: Settings: speed 0.80 m/s; PWM period 2.50 ms; maximum load 4.00 kg; ambient temperature 18.0–28.0 °C. Timing acceptance limit: 99th percentile ≤3.00 ms.\nsuperseded_facts: Version 2.5 passed the timing test. This does not qualify version 2.6.\nfailures: None recorded.\nconditions: For motor serial M17, maximum load is 2.75 kg when ambient temperature is strictly >26.0 °C. At exactly 26.0 °C, the 4.00 kg limit applies.\nunknowns: Version 2.6 timing result and final qualification status.",
+        "tokens": 161,
+        "prompt_sha256": "f91a85ebb4f7a80d10fc6c40cc60283de03b631364f4fcaa352d5916c7307b51"
+      },
+      {
+        "handoff": 2,
+        "text": "goal: Qualify controller version 2.6.\ncurrent_facts: Settings: speed 0.80 m/s; PWM period 2.50 ms; maximum load 4.00 kg; ambient temperature 18.0–28.0 °C. Timing acceptance limit: 99th percentile ≤3.00 ms. Version 2.6 timing is not tested. Release is on hold.\nsuperseded_facts: The claim that version 2.5 passed timing is withdrawn.\nfailures: Version 2.5 timing was 3.20 ms at the 99th percentile and failed the 3.00 ms limit. A watchdog fault is unresolved.\nconditions: For motor serial M17, maximum load is 2.75 kg when ambient temperature is strictly >26.0 °C. At exactly 26.0 °C, the 4.00 kg limit applies. Release requires version 2.6 to pass timing and the watchdog fault to be resolved.\nunknowns: Version 2.6 timing result. Watchdog fault resolution. Final qualification and release status.",
+        "tokens": 225,
+        "prompt_sha256": "a1608b331331957cec2483473f0348ce93428791e07225427b8dcda2637dbd26"
+      },
+      {
+        "handoff": 3,
+        "text": "goal: Qualify controller version 2.6.\ncurrent_facts: Settings: speed 0.80 m/s; PWM period 2.50 ms; maximum load 4.00 kg; ambient temperature 18.0–28.0 °C. Timing limit: 99th percentile ≤3.00 ms. Version 2.6 timing is not tested. Release is on hold. [H3]\nsuperseded_facts: The claim that version 2.5 passed timing is withdrawn.\nfailures: Version 2.5 timing was 3.20 ms at the 99th percentile. It failed the 3.00 ms limit. The watchdog fault occurred in 3 of 5 simulator runs at 3.60 kg. [H3]\nconditions: For motor M17, maximum load is 2.75 kg when ambient temperature is strictly >26.0 °C. At 26.0 °C, the 4.00 kg limit applies. Release requires version 2.6 to pass timing and resolution of the watchdog fault. The proposed extra test is optional. [H3]\nunknowns: Version 2.6 timing result. Watchdog fault cause and resolution. Final qualification and release status.",
+        "tokens": 256,
+        "prompt_sha256": "0d900c81fc0c63b7e5474716091769dd6d6a5030923f1d043b89565597d9d462"
+      },
+      {
+        "handoff": 4,
+        "text": "goal: Qualify controller version 2.6.\ncurrent_facts: Settings: speed 0.80 m/s; PWM period 2.50 ms; maximum load 4.00 kg; ambient temperature 18.0–28.0 °C. Timing limit: 99th percentile ≤3.00 ms. Version 2.6 timing is not tested. Release is on hold. [H3, H4]\nsuperseded_facts: The claim that version 2.5 passed timing is withdrawn. A shorter timing warmup was rejected. [H3, H4]\nfailures: Version 2.5 timing was 3.20 ms at the 99th percentile. It failed the 3.00 ms limit. The watchdog fault occurred in 3 of 5 simulator runs at 3.60 kg. [H3]\nconditions: Timing qualification must use test B, a 2.00 kg load, and 120 s warmup. [H4] For motor M17, maximum load is 2.75 kg when ambient temperature is strictly >26.0 °C. At 26.0 °C, the 4.00 kg limit applies. Release requires version 2.6 to pass timing and resolution of the watchdog fault. The proposed extra test is optional. [H3]\nunknowns: Version 2.6 timing result. Watchdog fault cause and resolution. A watchdog reset is an untested hypothesis; no cause is established. Final qualification and release status. [H4]",
+        "tokens": 318,
+        "prompt_sha256": "57c8b9546cbbd1ee7f53dad1a56027cdceb244de0f749761adacba4c3b593aba"
+      },
+      {
+        "handoff": 5,
+        "text": "goal: Qualify controller version 2.6.\ncurrent_facts: Settings: speed 0.80 m/s; PWM period 2.50 ms; maximum load 4.00 kg; ambient temperature 18.0–28.0 °C. Timing limit: 99th percentile ≤3.00 ms. Version 2.6 timing is not tested. Release is on hold. Presentation work is complete but does not show qualification. [H3–H5]\nsuperseded_facts: The claim that version 2.5 passed timing is withdrawn. A shorter timing warmup was rejected. [H3, H4]\nfailures: Version 2.5 timing was 3.20 ms at the 99th percentile. It failed the 3.00 ms limit. The watchdog fault occurred in 3 of 5 simulator runs at 3.60 kg. [H3]\nconditions: Use test B, a 2.00 kg load, and 120 s warmup for timing qualification. For motor M17, maximum load is 2.75 kg when ambient temperature is strictly >26.0 °C. At 26.0 °C, the 4.00 kg limit applies. Release requires version 2.6 to pass timing and resolution of the watchdog fault. The proposed extra test is optional. No condition or operating limit changed. [H3–H5]\nunknowns: Version 2.6 timing result. Watchdog fault cause and resolution. A watchdog reset is an untested hypothesis. Final qualification and release status. [H4, H5]",
+        "tokens": 332,
+        "prompt_sha256": "5ac5b6cef2f6d63b512c294ed60176c29ac02befc59cb4577c2926ca57a42afc"
+      }
+    ]
+  },
+  "receivers": {
+    "prose": {
+      "result": {
+        "ok": true,
+        "text": "{\"goal_version\":\"2.6\",\"release_state\":\"hold\",\"release_requires_timing_pass\":true,\"release_requires_watchdog_resolution\":true,\"speed_m_per_s\":0.80,\"pwm_period_ms\":2.50,\"normal_max_load_kg\":4.00,\"ambient_min_c\":18.0,\"ambient_max_c\":28.0,\"exception_serial\":\"M17\",\"exception_max_load_kg\":2.75,\"exception_temperature_c\":26.0,\"exception_temperature_comparison\":\"strictly_greater\",\"exception_applies_at_boundary\":false,\"v25_original_pass_claim\":\"withdrawn\",\"v25_corrected_p99_ms\":3.20,\"timing_limit_p99_ms\":3.00,\"v26_timing_state\":\"untested\",\"watchdog_failure_count\":3,\"watchdog_total_runs\":5,\"watchdog_test_load_kg\":3.60,\"watchdog_cause\":\"unknown\",\"timing_test_id\":\"B\",\"timing_test_load_kg\":2.00,\"timing_warmup_s\":120,\"zero_substitution_allowed\":false}",
+        "errors": [],
+        "model": "gpt-5.6-sol",
+        "reasoning": "low",
+        "elapsed_seconds": 11.846743791829795,
+        "usage_complete": true,
+        "usage": {
+          "input_tokens": 14059,
+          "output_tokens": 282
+        },
+        "native_tools": [],
+        "prompt_sha256": "77624fad04722dd081f2a3f0a8c00735efb45b8487dda3ac6cdcd938273b0ca2"
+      },
+      "grade": {
+        "valid_json": true,
+        "answers": {
+          "goal_version": "2.6",
+          "release_state": "hold",
+          "release_requires_timing_pass": true,
+          "release_requires_watchdog_resolution": true,
+          "speed_m_per_s": 0.8,
+          "pwm_period_ms": 2.5,
+          "normal_max_load_kg": 4.0,
+          "ambient_min_c": 18.0,
+          "ambient_max_c": 28.0,
+          "exception_serial": "M17",
+          "exception_max_load_kg": 2.75,
+          "exception_temperature_c": 26.0,
+          "exception_temperature_comparison": "strictly_greater",
+          "exception_applies_at_boundary": false,
+          "v25_original_pass_claim": "withdrawn",
+          "v25_corrected_p99_ms": 3.2,
+          "timing_limit_p99_ms": 3.0,
+          "v26_timing_state": "untested",
+          "watchdog_failure_count": 3,
+          "watchdog_total_runs": 5,
+          "watchdog_test_load_kg": 3.6,
+          "watchdog_cause": "unknown",
+          "timing_test_id": "B",
+          "timing_test_load_kg": 2.0,
+          "timing_warmup_s": 120,
+          "zero_substitution_allowed": false
+        },
+        "field_details": {
+          "goal_version": {
+            "pass": true,
+            "actual": "2.6",
+            "expected": "2.6"
+          },
+          "release_state": {
+            "pass": true,
+            "actual": "hold",
+            "expected": "hold"
+          },
+          "release_requires_timing_pass": {
+            "pass": true,
+            "actual": true,
+            "expected": true
+          },
+          "release_requires_watchdog_resolution": {
+            "pass": true,
+            "actual": true,
+            "expected": true
+          },
+          "speed_m_per_s": {
+            "pass": true,
+            "actual": 0.8,
+            "expected": 0.8
+          },
+          "pwm_period_ms": {
+            "pass": true,
+            "actual": 2.5,
+            "expected": 2.5
+          },
+          "normal_max_load_kg": {
+            "pass": true,
+            "actual": 4.0,
+            "expected": 4.0
+          },
+          "ambient_min_c": {
+            "pass": true,
+            "actual": 18.0,
+            "expected": 18.0
+          },
+          "ambient_max_c": {
+            "pass": true,
+            "actual": 28.0,
+            "expected": 28.0
+          },
+          "exception_serial": {
+            "pass": true,
+            "actual": "M17",
+            "expected": "M17"
+          },
+          "exception_max_load_kg": {
+            "pass": true,
+            "actual": 2.75,
+            "expected": 2.75
+          },
+          "exception_temperature_c": {
+            "pass": true,
+            "actual": 26.0,
+            "expected": 26.0
+          },
+          "exception_temperature_comparison": {
+            "pass": true,
+            "actual": "strictly_greater",
+            "expected": "strictly_greater"
+          },
+          "exception_applies_at_boundary": {
+            "pass": true,
+            "actual": false,
+            "expected": false
+          },
+          "v25_original_pass_claim": {
+            "pass": true,
+            "actual": "withdrawn",
+            "expected": "withdrawn"
+          },
+          "v25_corrected_p99_ms": {
+            "pass": true,
+            "actual": 3.2,
+            "expected": 3.2
+          },
+          "timing_limit_p99_ms": {
+            "pass": true,
+            "actual": 3.0,
+            "expected": 3.0
+          },
+          "v26_timing_state": {
+            "pass": true,
+            "actual": "untested",
+            "expected": "untested"
+          },
+          "watchdog_failure_count": {
+            "pass": true,
+            "actual": 3,
+            "expected": 3
+          },
+          "watchdog_total_runs": {
+            "pass": true,
+            "actual": 5,
+            "expected": 5
+          },
+          "watchdog_test_load_kg": {
+            "pass": true,
+            "actual": 3.6,
+            "expected": 3.6
+          },
+          "watchdog_cause": {
+            "pass": true,
+            "actual": "unknown",
+            "expected": "unknown"
+          },
+          "timing_test_id": {
+            "pass": true,
+            "actual": "B",
+            "expected": "B"
+          },
+          "timing_test_load_kg": {
+            "pass": true,
+            "actual": 2.0,
+            "expected": 2.0
+          },
+          "timing_warmup_s": {
+            "pass": true,
+            "actual": 120,
+            "expected": 120
+          },
+          "zero_substitution_allowed": {
+            "pass": true,
+            "actual": false,
+            "expected": false
+          }
+        },
+        "groups": {
+          "Q1": true,
+          "Q2": true,
+          "Q3": true,
+          "Q4": true,
+          "Q5": true,
+          "Q6": true,
+          "Q7": true,
+          "Q8": true,
+          "Q9": true
+        },
+        "groups_passed": 9,
+        "groups_total": 9,
+        "all_pass": true
+      }
+    },
+    "ledger": {
+      "result": {
+        "ok": true,
+        "text": "{\"goal_version\":\"2.6\",\"release_state\":\"hold\",\"release_requires_timing_pass\":true,\"release_requires_watchdog_resolution\":true,\"speed_m_per_s\":0.80,\"pwm_period_ms\":2.50,\"normal_max_load_kg\":4.00,\"ambient_min_c\":18.0,\"ambient_max_c\":28.0,\"exception_serial\":\"M17\",\"exception_max_load_kg\":2.75,\"exception_temperature_c\":26.0,\"exception_temperature_comparison\":\"strictly_greater\",\"exception_applies_at_boundary\":false,\"v25_original_pass_claim\":\"withdrawn\",\"v25_corrected_p99_ms\":3.20,\"timing_limit_p99_ms\":3.00,\"v26_timing_state\":\"untested\",\"watchdog_failure_count\":3,\"watchdog_total_runs\":5,\"watchdog_test_load_kg\":3.60,\"watchdog_cause\":\"unknown\",\"timing_test_id\":\"B\",\"timing_test_load_kg\":2.00,\"timing_warmup_s\":120,\"zero_substitution_allowed\":\"UNKNOWN\"}",
+        "errors": [],
+        "model": "gpt-5.6-sol",
+        "reasoning": "low",
+        "elapsed_seconds": 9.584576416062191,
+        "usage_complete": true,
+        "usage": {
+          "input_tokens": 11197,
+          "output_tokens": 328
+        },
+        "native_tools": [],
+        "prompt_sha256": "9825ef1839454115cc49f405e9e54cafd1bc9042337d84abcdcee76b78572198"
+      },
+      "grade": {
+        "valid_json": true,
+        "answers": {
+          "goal_version": "2.6",
+          "release_state": "hold",
+          "release_requires_timing_pass": true,
+          "release_requires_watchdog_resolution": true,
+          "speed_m_per_s": 0.8,
+          "pwm_period_ms": 2.5,
+          "normal_max_load_kg": 4.0,
+          "ambient_min_c": 18.0,
+          "ambient_max_c": 28.0,
+          "exception_serial": "M17",
+          "exception_max_load_kg": 2.75,
+          "exception_temperature_c": 26.0,
+          "exception_temperature_comparison": "strictly_greater",
+          "exception_applies_at_boundary": false,
+          "v25_original_pass_claim": "withdrawn",
+          "v25_corrected_p99_ms": 3.2,
+          "timing_limit_p99_ms": 3.0,
+          "v26_timing_state": "untested",
+          "watchdog_failure_count": 3,
+          "watchdog_total_runs": 5,
+          "watchdog_test_load_kg": 3.6,
+          "watchdog_cause": "unknown",
+          "timing_test_id": "B",
+          "timing_test_load_kg": 2.0,
+          "timing_warmup_s": 120,
+          "zero_substitution_allowed": "UNKNOWN"
+        },
+        "field_details": {
+          "goal_version": {
+            "pass": true,
+            "actual": "2.6",
+            "expected": "2.6"
+          },
+          "release_state": {
+            "pass": true,
+            "actual": "hold",
+            "expected": "hold"
+          },
+          "release_requires_timing_pass": {
+            "pass": true,
+            "actual": true,
+            "expected": true
+          },
+          "release_requires_watchdog_resolution": {
+            "pass": true,
+            "actual": true,
+            "expected": true
+          },
+          "speed_m_per_s": {
+            "pass": true,
+            "actual": 0.8,
+            "expected": 0.8
+          },
+          "pwm_period_ms": {
+            "pass": true,
+            "actual": 2.5,
+            "expected": 2.5
+          },
+          "normal_max_load_kg": {
+            "pass": true,
+            "actual": 4.0,
+            "expected": 4.0
+          },
+          "ambient_min_c": {
+            "pass": true,
+            "actual": 18.0,
+            "expected": 18.0
+          },
+          "ambient_max_c": {
+            "pass": true,
+            "actual": 28.0,
+            "expected": 28.0
+          },
+          "exception_serial": {
+            "pass": true,
+            "actual": "M17",
+            "expected": "M17"
+          },
+          "exception_max_load_kg": {
+            "pass": true,
+            "actual": 2.75,
+            "expected": 2.75
+          },
+          "exception_temperature_c": {
+            "pass": true,
+            "actual": 26.0,
+            "expected": 26.0
+          },
+          "exception_temperature_comparison": {
+            "pass": true,
+            "actual": "strictly_greater",
+            "expected": "strictly_greater"
+          },
+          "exception_applies_at_boundary": {
+            "pass": true,
+            "actual": false,
+            "expected": false
+          },
+          "v25_original_pass_claim": {
+            "pass": true,
+            "actual": "withdrawn",
+            "expected": "withdrawn"
+          },
+          "v25_corrected_p99_ms": {
+            "pass": true,
+            "actual": 3.2,
+            "expected": 3.2
+          },
+          "timing_limit_p99_ms": {
+            "pass": true,
+            "actual": 3.0,
+            "expected": 3.0
+          },
+          "v26_timing_state": {
+            "pass": true,
+            "actual": "untested",
+            "expected": "untested"
+          },
+          "watchdog_failure_count": {
+            "pass": true,
+            "actual": 3,
+            "expected": 3
+          },
+          "watchdog_total_runs": {
+            "pass": true,
+            "actual": 5,
+            "expected": 5
+          },
+          "watchdog_test_load_kg": {
+            "pass": true,
+            "actual": 3.6,
+            "expected": 3.6
+          },
+          "watchdog_cause": {
+            "pass": true,
+            "actual": "unknown",
+            "expected": "unknown"
+          },
+          "timing_test_id": {
+            "pass": true,
+            "actual": "B",
+            "expected": "B"
+          },
+          "timing_test_load_kg": {
+            "pass": true,
+            "actual": 2.0,
+            "expected": 2.0
+          },
+          "timing_warmup_s": {
+            "pass": true,
+            "actual": 120,
+            "expected": 120
+          },
+          "zero_substitution_allowed": {
+            "pass": false,
+            "actual": "UNKNOWN",
+            "expected": false
+          }
+        },
+        "groups": {
+          "Q1": true,
+          "Q2": true,
+          "Q3": true,
+          "Q4": true,
+          "Q5": true,
+          "Q6": true,
+          "Q7": true,
+          "Q8": true,
+          "Q9": false
+        },
+        "groups_passed": 8,
+        "groups_total": 9,
+        "all_pass": false
+      }
+    },
+    "full_history_control": {
+      "result": {
+        "ok": true,
+        "text": "{\"goal_version\":\"2.6\",\"release_state\":\"hold\",\"release_requires_timing_pass\":true,\"release_requires_watchdog_resolution\":true,\"speed_m_per_s\":0.80,\"pwm_period_ms\":2.50,\"normal_max_load_kg\":4.00,\"ambient_min_c\":18.0,\"ambient_max_c\":28.0,\"exception_serial\":\"M17\",\"exception_max_load_kg\":2.75,\"exception_temperature_c\":26.0,\"exception_temperature_comparison\":\"strictly_greater\",\"exception_applies_at_boundary\":false,\"v25_original_pass_claim\":\"withdrawn\",\"v25_corrected_p99_ms\":3.20,\"timing_limit_p99_ms\":3.00,\"v26_timing_state\":\"untested\",\"watchdog_failure_count\":3,\"watchdog_total_runs\":5,\"watchdog_test_load_kg\":3.60,\"watchdog_cause\":\"unknown\",\"timing_test_id\":\"B\",\"timing_test_load_kg\":2.00,\"timing_warmup_s\":120,\"zero_substitution_allowed\":false}",
+        "errors": [],
+        "model": "gpt-5.6-sol",
+        "reasoning": "low",
+        "elapsed_seconds": 7.081032583024353,
+        "usage_complete": true,
+        "usage": {
+          "input_tokens": 11535,
+          "output_tokens": 256
+        },
+        "native_tools": [],
+        "prompt_sha256": "b25f1b68b9f42eba52de99e5e8c9e947deaa81cc782f603718a27a49e2c0303b"
+      },
+      "grade": {
+        "valid_json": true,
+        "answers": {
+          "goal_version": "2.6",
+          "release_state": "hold",
+          "release_requires_timing_pass": true,
+          "release_requires_watchdog_resolution": true,
+          "speed_m_per_s": 0.8,
+          "pwm_period_ms": 2.5,
+          "normal_max_load_kg": 4.0,
+          "ambient_min_c": 18.0,
+          "ambient_max_c": 28.0,
+          "exception_serial": "M17",
+          "exception_max_load_kg": 2.75,
+          "exception_temperature_c": 26.0,
+          "exception_temperature_comparison": "strictly_greater",
+          "exception_applies_at_boundary": false,
+          "v25_original_pass_claim": "withdrawn",
+          "v25_corrected_p99_ms": 3.2,
+          "timing_limit_p99_ms": 3.0,
+          "v26_timing_state": "untested",
+          "watchdog_failure_count": 3,
+          "watchdog_total_runs": 5,
+          "watchdog_test_load_kg": 3.6,
+          "watchdog_cause": "unknown",
+          "timing_test_id": "B",
+          "timing_test_load_kg": 2.0,
+          "timing_warmup_s": 120,
+          "zero_substitution_allowed": false
+        },
+        "field_details": {
+          "goal_version": {
+            "pass": true,
+            "actual": "2.6",
+            "expected": "2.6"
+          },
+          "release_state": {
+            "pass": true,
+            "actual": "hold",
+            "expected": "hold"
+          },
+          "release_requires_timing_pass": {
+            "pass": true,
+            "actual": true,
+            "expected": true
+          },
+          "release_requires_watchdog_resolution": {
+            "pass": true,
+            "actual": true,
+            "expected": true
+          },
+          "speed_m_per_s": {
+            "pass": true,
+            "actual": 0.8,
+            "expected": 0.8
+          },
+          "pwm_period_ms": {
+            "pass": true,
+            "actual": 2.5,
+            "expected": 2.5
+          },
+          "normal_max_load_kg": {
+            "pass": true,
+            "actual": 4.0,
+            "expected": 4.0
+          },
+          "ambient_min_c": {
+            "pass": true,
+            "actual": 18.0,
+            "expected": 18.0
+          },
+          "ambient_max_c": {
+            "pass": true,
+            "actual": 28.0,
+            "expected": 28.0
+          },
+          "exception_serial": {
+            "pass": true,
+            "actual": "M17",
+            "expected": "M17"
+          },
+          "exception_max_load_kg": {
+            "pass": true,
+            "actual": 2.75,
+            "expected": 2.75
+          },
+          "exception_temperature_c": {
+            "pass": true,
+            "actual": 26.0,
+            "expected": 26.0
+          },
+          "exception_temperature_comparison": {
+            "pass": true,
+            "actual": "strictly_greater",
+            "expected": "strictly_greater"
+          },
+          "exception_applies_at_boundary": {
+            "pass": true,
+            "actual": false,
+            "expected": false
+          },
+          "v25_original_pass_claim": {
+            "pass": true,
+            "actual": "withdrawn",
+            "expected": "withdrawn"
+          },
+          "v25_corrected_p99_ms": {
+            "pass": true,
+            "actual": 3.2,
+            "expected": 3.2
+          },
+          "timing_limit_p99_ms": {
+            "pass": true,
+            "actual": 3.0,
+            "expected": 3.0
+          },
+          "v26_timing_state": {
+            "pass": true,
+            "actual": "untested",
+            "expected": "untested"
+          },
+          "watchdog_failure_count": {
+            "pass": true,
+            "actual": 3,
+            "expected": 3
+          },
+          "watchdog_total_runs": {
+            "pass": true,
+            "actual": 5,
+            "expected": 5
+          },
+          "watchdog_test_load_kg": {
+            "pass": true,
+            "actual": 3.6,
+            "expected": 3.6
+          },
+          "watchdog_cause": {
+            "pass": true,
+            "actual": "unknown",
+            "expected": "unknown"
+          },
+          "timing_test_id": {
+            "pass": true,
+            "actual": "B",
+            "expected": "B"
+          },
+          "timing_test_load_kg": {
+            "pass": true,
+            "actual": 2.0,
+            "expected": 2.0
+          },
+          "timing_warmup_s": {
+            "pass": true,
+            "actual": 120,
+            "expected": 120
+          },
+          "zero_substitution_allowed": {
+            "pass": true,
+            "actual": false,
+            "expected": false
+          }
+        },
+        "groups": {
+          "Q1": true,
+          "Q2": true,
+          "Q3": true,
+          "Q4": true,
+          "Q5": true,
+          "Q6": true,
+          "Q7": true,
+          "Q8": true,
+          "Q9": true
+        },
+        "groups_passed": 9,
+        "groups_total": 9,
+        "all_pass": true
+      }
+    }
+  },
+  "native_usage": {
+    "input_tokens": 143067,
+    "output_tokens": 3931
+  },
+  "calls": [
+    {
+      "label": "ledger_handoff_1",
+      "ok": true,
+      "text": "goal: Qualify controller version 2.6.\ncurrent_facts: Settings: speed 0.80 m/s; PWM period 2.50 ms; maximum load 4.00 kg; ambient temperature 18.0–28.0 °C. Timing acceptance limit: 99th percentile ≤3.00 ms.\nsuperseded_facts: Version 2.5 passed the timing test. This does not qualify version 2.6.\nfailures: None recorded.\nconditions: For motor serial M17, maximum load is 2.75 kg when ambient temperature is strictly >26.0 °C. At exactly 26.0 °C, the 4.00 kg limit applies.\nunknowns: Version 2.6 timing result and final qualification status.",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 15.492242624983191,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 10517,
+        "output_tokens": 278
+      },
+      "native_tools": [],
+      "prompt_sha256": "f91a85ebb4f7a80d10fc6c40cc60283de03b631364f4fcaa352d5916c7307b51"
+    },
+    {
+      "label": "ledger_handoff_2",
+      "ok": true,
+      "text": "goal: Qualify controller version 2.6.\ncurrent_facts: Settings: speed 0.80 m/s; PWM period 2.50 ms; maximum load 4.00 kg; ambient temperature 18.0–28.0 °C. Timing acceptance limit: 99th percentile ≤3.00 ms. Version 2.6 timing is not tested. Release is on hold.\nsuperseded_facts: The claim that version 2.5 passed timing is withdrawn.\nfailures: Version 2.5 timing was 3.20 ms at the 99th percentile and failed the 3.00 ms limit. A watchdog fault is unresolved.\nconditions: For motor serial M17, maximum load is 2.75 kg when ambient temperature is strictly >26.0 °C. At exactly 26.0 °C, the 4.00 kg limit applies. Release requires version 2.6 to pass timing and the watchdog fault to be resolved.\nunknowns: Version 2.6 timing result. Watchdog fault resolution. Final qualification and release status.",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 12.812004749896005,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 10629,
+        "output_tokens": 324
+      },
+      "native_tools": [],
+      "prompt_sha256": "a1608b331331957cec2483473f0348ce93428791e07225427b8dcda2637dbd26"
+    },
+    {
+      "label": "ledger_handoff_3",
+      "ok": true,
+      "text": "goal: Qualify controller version 2.6.\ncurrent_facts: Settings: speed 0.80 m/s; PWM period 2.50 ms; maximum load 4.00 kg; ambient temperature 18.0–28.0 °C. Timing limit: 99th percentile ≤3.00 ms. Version 2.6 timing is not tested. Release is on hold. [H3]\nsuperseded_facts: The claim that version 2.5 passed timing is withdrawn.\nfailures: Version 2.5 timing was 3.20 ms at the 99th percentile. It failed the 3.00 ms limit. The watchdog fault occurred in 3 of 5 simulator runs at 3.60 kg. [H3]\nconditions: For motor M17, maximum load is 2.75 kg when ambient temperature is strictly >26.0 °C. At 26.0 °C, the 4.00 kg limit applies. Release requires version 2.6 to pass timing and resolution of the watchdog fault. The proposed extra test is optional. [H3]\nunknowns: Version 2.6 timing result. Watchdog fault cause and resolution. Final qualification and release status.",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 13.168234457960352,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 10673,
+        "output_tokens": 342
+      },
+      "native_tools": [],
+      "prompt_sha256": "0d900c81fc0c63b7e5474716091769dd6d6a5030923f1d043b89565597d9d462"
+    },
+    {
+      "label": "ledger_handoff_4",
+      "ok": true,
+      "text": "goal: Qualify controller version 2.6.\ncurrent_facts: Settings: speed 0.80 m/s; PWM period 2.50 ms; maximum load 4.00 kg; ambient temperature 18.0–28.0 °C. Timing limit: 99th percentile ≤3.00 ms. Version 2.6 timing is not tested. Release is on hold. [H3, H4]\nsuperseded_facts: The claim that version 2.5 passed timing is withdrawn. A shorter timing warmup was rejected. [H3, H4]\nfailures: Version 2.5 timing was 3.20 ms at the 99th percentile. It failed the 3.00 ms limit. The watchdog fault occurred in 3 of 5 simulator runs at 3.60 kg. [H3]\nconditions: Timing qualification must use test B, a 2.00 kg load, and 120 s warmup. [H4] For motor M17, maximum load is 2.75 kg when ambient temperature is strictly >26.0 °C. At 26.0 °C, the 4.00 kg limit applies. Release requires version 2.6 to pass timing and resolution of the watchdog fault. The proposed extra test is optional. [H3]\nunknowns: Version 2.6 timing result. Watchdog fault cause and resolution. A watchdog reset is an untested hypothesis; no cause is established. Final qualification and release status. [H4]",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 9.854355415794998,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 10705,
+        "output_tokens": 369
+      },
+      "native_tools": [],
+      "prompt_sha256": "57c8b9546cbbd1ee7f53dad1a56027cdceb244de0f749761adacba4c3b593aba"
+    },
+    {
+      "label": "ledger_handoff_5",
+      "ok": true,
+      "text": "goal: Qualify controller version 2.6.\ncurrent_facts: Settings: speed 0.80 m/s; PWM period 2.50 ms; maximum load 4.00 kg; ambient temperature 18.0–28.0 °C. Timing limit: 99th percentile ≤3.00 ms. Version 2.6 timing is not tested. Release is on hold. Presentation work is complete but does not show qualification. [H3–H5]\nsuperseded_facts: The claim that version 2.5 passed timing is withdrawn. A shorter timing warmup was rejected. [H3, H4]\nfailures: Version 2.5 timing was 3.20 ms at the 99th percentile. It failed the 3.00 ms limit. The watchdog fault occurred in 3 of 5 simulator runs at 3.60 kg. [H3]\nconditions: Use test B, a 2.00 kg load, and 120 s warmup for timing qualification. For motor M17, maximum load is 2.75 kg when ambient temperature is strictly >26.0 °C. At 26.0 °C, the 4.00 kg limit applies. Release requires version 2.6 to pass timing and resolution of the watchdog fault. The proposed extra test is optional. No condition or operating limit changed. [H3–H5]\nunknowns: Version 2.6 timing result. Watchdog fault cause and resolution. A watchdog reset is an untested hypothesis. Final qualification and release status. [H4, H5]",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 13.127889374969527,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 10767,
+        "output_tokens": 384
+      },
+      "native_tools": [],
+      "prompt_sha256": "5ac5b6cef2f6d63b512c294ed60176c29ac02befc59cb4577c2926ca57a42afc"
+    },
+    {
+      "label": "prose_handoff_1",
+      "ok": true,
+      "text": "The goal is to qualify controller version 2.6. Use speed 0.80 m/s, PWM period 2.50 ms, maximum load 4.00 kg, and ambient temperature from 18.0 to 28.0 degrees C. For motor serial M17, reduce the maximum load to 2.75 kg only when the ambient temperature is more than 26.0 degrees C. At exactly 26.0 degrees C, the 4.00 kg limit applies. The timing acceptance limit is a 99th percentile of 3.00 ms. An early note says that version 2.5 passed the timing test. This result does not qualify version 2.6. The qualification status of version 2.6 is unknown.",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 15.473429707810283,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 10487,
+        "output_tokens": 240
+      },
+      "native_tools": [],
+      "prompt_sha256": "8d0e5897d60474b40a0631e1ad4b6abaf5dd4fe0815cdb322ca124c0fe68dc91"
+    },
+    {
+      "label": "prose_handoff_2",
+      "ok": true,
+      "text": "The goal is to qualify controller version 2.6 at 0.80 m/s, a 2.50 ms PWM period, a maximum load of 4.00 kg, and 18.0 to 28.0 degrees C. For motor M17 only, reduce the maximum load to 2.75 kg when ambient temperature is more than 26.0 degrees C. At exactly 26.0 degrees C, the 4.00 kg limit applies. The timing limit is a 99th percentile of 3.00 ms. H2 withdraws the version 2.5 pass claim. Its corrected result is 3.20 ms, which fails the limit. Version 2.6 timing is not tested. Release is on hold until timing passes and the watchdog fault is resolved.",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 10.180511499987915,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 10587,
+        "output_tokens": 180
+      },
+      "native_tools": [],
+      "prompt_sha256": "8654d3d57a41e64b78c219a074e79ab7ba6876b9cd81d54a03aba86f826e1c8d"
+    },
+    {
+      "label": "prose_handoff_3",
+      "ok": true,
+      "text": "The goal is to qualify controller version 2.6 at 0.80 m/s, with a 2.50 ms PWM period, a maximum load of 4.00 kg, and an ambient temperature of 18.0 to 28.0 degrees C. For motor M17 only, reduce the maximum load to 2.75 kg when the ambient temperature is more than 26.0 degrees C. At exactly 26.0 degrees C, the 4.00 kg limit applies. The timing limit is a 99th percentile of 3.00 ms. H2 withdraws the version 2.5 pass claim. The corrected version 2.5 result is 3.20 ms and fails the limit. Version 2.6 timing is not tested. H3 reports a watchdog fault in 3 of 5 simulator runs at a load of 3.60 kg. The cause is unknown and must not be reported as established. Do not use zero for an unknown quantity to make a check pass. Release is on hold until version 2.6 timing passes and the watchdog fault is resolved. A proposed extra test is optional. The operating settings and motor exception did not change.",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 11.636238083941862,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 10574,
+        "output_tokens": 300
+      },
+      "native_tools": [],
+      "prompt_sha256": "b80657ea18201b2e8750acebc6fc1b0ed2ebc7081e849f419f1c9e1db77c300c"
+    },
+    {
+      "label": "prose_handoff_4",
+      "ok": true,
+      "text": "The goal is to qualify controller version 2.6 at 0.80 m/s, with a 2.50 ms PWM period, a maximum load of 4.00 kg, and an ambient temperature of 18.0 to 28.0 degrees C. For motor M17 only, reduce the maximum load to 2.75 kg when the temperature is more than 26.0 degrees C. At exactly 26.0 degrees C, the 4.00 kg limit applies. Timing qualification must use test B, a load of 2.00 kg, and a 120 s warmup before measurement. The proposed shorter warmup was rejected. The timing limit is a 99th percentile of 3.00 ms. H2 withdraws the version 2.5 pass claim. Its corrected result is 3.20 ms and fails. Version 2.6 timing is not tested. H3 reports a watchdog fault in 3 of 5 simulator runs at 3.60 kg. A watchdog reset is an untested explanation. No cause is established. Do not use zero for an unknown quantity to make a check pass. Release is on hold until version 2.6 timing passes and the watchdog fault is resolved. The proposed extra test is optional.",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 7.966713916044682,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 10663,
+        "output_tokens": 313
+      },
+      "native_tools": [],
+      "prompt_sha256": "904a69e66d2cc0abc7070a8bb62760c962ad4154a107b525d6fa7aa0e0255f4a"
+    },
+    {
+      "label": "prose_handoff_5",
+      "ok": true,
+      "text": "The goal is to qualify controller version 2.6 at 0.80 m/s, with a 2.50 ms PWM period, a maximum load of 4.00 kg, and an ambient temperature of 18.0 to 28.0 degrees C. For motor M17 only, the maximum load is 2.75 kg above 26.0 degrees C. At exactly 26.0 degrees C, the 4.00 kg limit applies. Timing qualification must use test B, a 2.00 kg load, and a 120 s warmup. The shorter warmup was rejected. The timing limit is a 99th percentile of 3.00 ms. H2 withdraws the version 2.5 pass claim. The corrected result is 3.20 ms, which fails. Version 2.6 timing remains untested. H3 reports a watchdog fault in 3 of 5 simulator runs at 3.60 kg. A watchdog reset is an untested explanation. The cause is unknown. Do not use zero for an unknown quantity to make a check pass. H5 confirms that no operating limit or qualification condition changed. Release remains on hold until version 2.6 timing passes and the watchdog fault is resolved. The extra test is optional. Remaining routine document work does not affect qualification.",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 13.147434749873355,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 10674,
+        "output_tokens": 335
+      },
+      "native_tools": [],
+      "prompt_sha256": "05803b578f0506a9b264369d64ab51fbb3f107fdb33965ca29c22a0d665b5517"
+    },
+    {
+      "label": "receiver_full_history_control",
+      "ok": true,
+      "text": "{\"goal_version\":\"2.6\",\"release_state\":\"hold\",\"release_requires_timing_pass\":true,\"release_requires_watchdog_resolution\":true,\"speed_m_per_s\":0.80,\"pwm_period_ms\":2.50,\"normal_max_load_kg\":4.00,\"ambient_min_c\":18.0,\"ambient_max_c\":28.0,\"exception_serial\":\"M17\",\"exception_max_load_kg\":2.75,\"exception_temperature_c\":26.0,\"exception_temperature_comparison\":\"strictly_greater\",\"exception_applies_at_boundary\":false,\"v25_original_pass_claim\":\"withdrawn\",\"v25_corrected_p99_ms\":3.20,\"timing_limit_p99_ms\":3.00,\"v26_timing_state\":\"untested\",\"watchdog_failure_count\":3,\"watchdog_total_runs\":5,\"watchdog_test_load_kg\":3.60,\"watchdog_cause\":\"unknown\",\"timing_test_id\":\"B\",\"timing_test_load_kg\":2.00,\"timing_warmup_s\":120,\"zero_substitution_allowed\":false}",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 7.081032583024353,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 11535,
+        "output_tokens": 256
+      },
+      "native_tools": [],
+      "prompt_sha256": "b25f1b68b9f42eba52de99e5e8c9e947deaa81cc782f603718a27a49e2c0303b"
+    },
+    {
+      "label": "receiver_ledger",
+      "ok": true,
+      "text": "{\"goal_version\":\"2.6\",\"release_state\":\"hold\",\"release_requires_timing_pass\":true,\"release_requires_watchdog_resolution\":true,\"speed_m_per_s\":0.80,\"pwm_period_ms\":2.50,\"normal_max_load_kg\":4.00,\"ambient_min_c\":18.0,\"ambient_max_c\":28.0,\"exception_serial\":\"M17\",\"exception_max_load_kg\":2.75,\"exception_temperature_c\":26.0,\"exception_temperature_comparison\":\"strictly_greater\",\"exception_applies_at_boundary\":false,\"v25_original_pass_claim\":\"withdrawn\",\"v25_corrected_p99_ms\":3.20,\"timing_limit_p99_ms\":3.00,\"v26_timing_state\":\"untested\",\"watchdog_failure_count\":3,\"watchdog_total_runs\":5,\"watchdog_test_load_kg\":3.60,\"watchdog_cause\":\"unknown\",\"timing_test_id\":\"B\",\"timing_test_load_kg\":2.00,\"timing_warmup_s\":120,\"zero_substitution_allowed\":\"UNKNOWN\"}",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 9.584576416062191,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 11197,
+        "output_tokens": 328
+      },
+      "native_tools": [],
+      "prompt_sha256": "9825ef1839454115cc49f405e9e54cafd1bc9042337d84abcdcee76b78572198"
+    },
+    {
+      "label": "receiver_prose",
+      "ok": true,
+      "text": "{\"goal_version\":\"2.6\",\"release_state\":\"hold\",\"release_requires_timing_pass\":true,\"release_requires_watchdog_resolution\":true,\"speed_m_per_s\":0.80,\"pwm_period_ms\":2.50,\"normal_max_load_kg\":4.00,\"ambient_min_c\":18.0,\"ambient_max_c\":28.0,\"exception_serial\":\"M17\",\"exception_max_load_kg\":2.75,\"exception_temperature_c\":26.0,\"exception_temperature_comparison\":\"strictly_greater\",\"exception_applies_at_boundary\":false,\"v25_original_pass_claim\":\"withdrawn\",\"v25_corrected_p99_ms\":3.20,\"timing_limit_p99_ms\":3.00,\"v26_timing_state\":\"untested\",\"watchdog_failure_count\":3,\"watchdog_total_runs\":5,\"watchdog_test_load_kg\":3.60,\"watchdog_cause\":\"unknown\",\"timing_test_id\":\"B\",\"timing_test_load_kg\":2.00,\"timing_warmup_s\":120,\"zero_substitution_allowed\":false}",
+      "errors": [],
+      "model": "gpt-5.6-sol",
+      "reasoning": "low",
+      "elapsed_seconds": 11.846743791829795,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 14059,
+        "output_tokens": 282
+      },
+      "native_tools": [],
+      "prompt_sha256": "77624fad04722dd081f2a3f0a8c00735efb45b8487dda3ac6cdcd938273b0ca2"
+    }
+  ],
+  "frozen_input_sha256": "56233e52c8fa417a9e3ebc6d39d2c0619cb3fa7c8648ff74ffcb70362fe313ff"
+}

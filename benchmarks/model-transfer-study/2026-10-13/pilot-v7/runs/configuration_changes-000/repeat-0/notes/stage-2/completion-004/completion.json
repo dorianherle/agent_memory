@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "save",
+      "text": "Stage 2 work sample 0 verified complete. work.py evaluate(request, policy) starts from a deepcopy of supplied policy defaults, applies layers in order, rejects unknown keys, implements conditional null reset, gated/typed environment parsing, and final exact type validation (bool is not int). Failures return empty config and the required error; successes preserve false/zero/empty strings. report.json matches evaluating every current request with current policy. Checks passed: py_compile, behavioral edge cases, report equality/exact fields, and git diff --check. No unresolved functional limits found.",
+      "payload": {
+        "files": [
+          "work.py",
+          "report.json",
+          "policy.json",
+          "requests.json",
+          "OUTPUT_SCHEMA.json"
+        ]
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 11903,
+    "output_tokens": 274,
+    "cached_input_tokens": 8448,
+    "reasoning_output_tokens": 106
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 10.774190332973376,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

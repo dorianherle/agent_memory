@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy\nfrom work import evaluate\n\ndef chk(name,request,evidence,policy,want):\n    before=copy.deepcopy((request,evidence,policy))\n    got=evaluate(request,evidence,policy)\n    assert got==want,(name,got,want)\n    assert (request,evidence,policy)==before,(name,'mutated')\n\np={'required_conditions':['z','calibration','a'],'require_verified':True}\nchk('missing',{'claim':'c','conditions':{'z':1}},[],p,{'status':'unknown','value':None,'sources':[],'unknowns':['a','calibration']})\nreq={'claim':'c','conditions':{'mode':'x','calibration':None}}\nev=[{'source':'old','claim':'c','conditions':{'mode':'x','calibration':None},'value':False,'verified':True},{'source':'new-unverified','claim':'c','conditions':{'mode':'x','calibration':None},'value':True,'verified':False,'supersedes':['old']},{'source':'zero','claim':'c','conditions':{'mode':'x','calibration':0},'value':True,'verified':True}]\nchk('null-not-zero-and-ineligible-superseder',req,ev,{'required_conditions':['mode','calibration'],'require_verified':True},{'status':'unsupported','value':False,'sources':['old'],'unknowns':[]})\nreq2={'claim':'c','conditions':{'mode':'x'}}\nev2=[{'source':'z','claim':'c','conditions':{'mode':'x'},'value':{'b':2,'a':1},'verified':True},{'source':'a','claim':'c','conditions':{'mode':'x'},'value':{'a':1,'b':2},'verified':True},{'source':'old','claim':'c','conditions':{'mode':'x'},'value':99,'verified':True},{'source':'new','claim':'c','conditions':{'mode':'x'},'value':{'a':1,'b':2},'verified':True,'supersedes':'old'},{'source':'w','claim':'c','conditions':{'mode':'x'},'value':0,'verified':True,'withdrawn':True}]\nchk('agreement-canonical-and-supersession',req2,ev2,{'required_conditions':['mode'],'require_verified':False},{'status':'supported','value':{'b':2,'a':1},'sources':['a','new','z'],'unknowns':[]})\nev3=[{'source':'b','claim':'c','conditions':{'mode':'x'},'value':1},{'source':'a','claim':'c','conditions':{'mode':'x'},'value':True}]\nchk('typed-conflict',req2,ev3,{'required_conditions':['mode']},{'status':'conflict','value':None,'sources':['a','b'],'unknowns':['source disagreement']})\nprint('boundary checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 29465,
+    "output_tokens": 1822,
+    "cached_input_tokens": 20480,
+    "reasoning_output_tokens": 439
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 34.426911167101935,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

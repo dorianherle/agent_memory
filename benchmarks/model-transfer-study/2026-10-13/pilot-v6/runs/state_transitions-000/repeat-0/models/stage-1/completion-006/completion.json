@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy, json\nfrom work import evaluate\npolicy=json.load(open('policy.json'))\nreport=json.load(open('report.json'))\nrequests=json.load(open('requests.json'))\nassert report == [evaluate(r, policy) for r in requests]\nprobes=[\n({'from':'draft','to':'ready'}, {'ok':True,'value':'ready','reason':'ok'}),\n({'from':'none','to':'ready','role':'operator_0','retry':True,'attempts':0}, {'ok':False,'value':None,'reason':'blocked'}),\n({'from':'ready','to':'running','role':'wrong','retry':True,'attempts':0}, {'ok':False,'value':None,'reason':'permission'}),\n({'from':'ready','to':'running','role':'operator_0','retry':True,'attempts':0}, {'ok':True,'value':'running','reason':'ok'}),\n({'from':'running','to':'done','retry':True,'attempts':1}, {'ok':True,'value':'done','reason':'ok'}),\n({'from':'running','to':'done','retry':True,'attempts':2}, {'ok':False,'value':None,'reason':'retry_limit'}),\n({'from':'running','to':'done','retry':True,'attempts':False}, {'ok':False,'value':None,'reason':'retry_limit'}),\n({'from':'running','to':'done','retry':False,'attempts':99}, {'ok':True,'value':'done','reason':'ok'})\n]\nfor request, expected in probes:\n    request_before=copy.deepcopy(request); policy_before=copy.deepcopy(policy)\n    assert evaluate(request, policy)==expected\n    assert request==request_before and policy==policy_before\nprint(json.dumps({'fixture_count':len(requests),'probe_count':len(probes),'all_passed':True,'inputs_unchanged':True}))"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 12127,
+    "output_tokens": 653,
+    "cached_input_tokens": 7808,
+    "reasoning_output_tokens": 197
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 21.653956375084817,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "save",
+      "text": "Milestone verified complete: work.py implements the required edge lookup, blocked/permission/retry_limit ordering and outcomes, exact-int retry attempts validation excluding bool, successful destination return, and input immutability. report.json matches evaluating every current request with policy.json; evidence.json is absent. Local checks passed. No unresolved limits or questions.",
+      "payload": {
+        "summary": true,
+        "files": [
+          "work.py",
+          "report.json",
+          "policy.json",
+          "requests.json"
+        ]
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 10839,
+    "output_tokens": 300,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 180
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 11.367707333993167,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

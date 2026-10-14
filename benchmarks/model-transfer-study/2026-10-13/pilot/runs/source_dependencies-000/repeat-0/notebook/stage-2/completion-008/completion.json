@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import json; from work import evaluate; reqs=json.load(open('requests.json')); pol=json.load(open('policy.json')); print(json.dumps([evaluate(r,pol) for r in reqs], sort_keys=True));\n# focused checks: complete states, missing equivalence, ignored/undeclared, uniqueness/sort, immutability\nimport copy\ncases=[({'declared':['b','a','a','ignored'],'saved':{'a':{'kind':'file','hash':'1','name':'old'},'b':{'kind':'missing'},'ignored':{'kind':'file','hash':'1'},'extra':1},'current':{'a':{'hash':'1','kind':'file','name':'new'},'ignored':{'kind':'file','hash':'2'},'extra':2}}, {'ignored':['ignored']}, {'needs_review':True,'changed':['a']}), ({'declared':['x'],'saved':{},'current':{'x':{'kind':'missing'}}},{'ignored':[]},{'needs_review':False,'changed':[]})]\nfor r,p,want in cases:\n rb,pb=copy.deepcopy(r),copy.deepcopy(p); got=evaluate(r,p); assert got==want,(got,want); assert r==rb and p==pb\nprint('checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 13884,
+    "output_tokens": 365,
+    "cached_input_tokens": 10624,
+    "reasoning_output_tokens": 57
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 14.635383124928921,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

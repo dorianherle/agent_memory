@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import work\n\np={\"defaults\":{\"b\":True,\"i\":3,\"s\":\"x\"},\"types\":{\"b\":\"boolean\",\"i\":\"integer\",\"s\":\"string\"},\"null_resets\":True,\"environment\":True}\ncases=[\n ({\"layers\":[{\"b\":False},{\"i\":0,\"s\":\"\"}]}, True, {\"b\":False,\"i\":0,\"s\":\"\"}),\n ({\"layers\":[{\"i\":None}]}, True, {\"b\":True,\"i\":3,\"s\":\"x\"}),\n ({\"layers\":[{\"x\":1}]}, False, \"unknown_key\"),\n ({\"layers\":[{\"i\":True}]}, False, \"type\"),\n ({\"environment\":{\"b\":\"false\",\"i\":\"-12\",\"s\":\"\"}}, True, {\"b\":False,\"i\":-12,\"s\":\"\"}),\n ({\"environment\":{\"b\":\"False\"}}, False, \"environment\"),\n ({\"environment\":{\"i\":\" 1\"}}, False, \"environment\"),\n ({\"environment\":{\"x\":\"1\"}}, False, \"unknown_key\"),\n]\nfor req,ok,want in cases:\n r=work.evaluate(req,p); assert r[\"ok\"] is ok, (req,r); assert (r[\"config\"] if ok else r[\"error\"])==want,(req,r,want)\np2=dict(p,null_resets=False); assert work.evaluate({\"layers\":[{\"s\":None}]},p2)[\"error\"]==\"type\"\np3=dict(p,environment=False); assert work.evaluate({\"environment\":{\"i\":\"1\"}},p3)[\"error\"]==\"environment\"\nprint(\"all checks passed\")"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 19759,
+    "output_tokens": 765,
+    "cached_input_tokens": 16128,
+    "reasoning_output_tokens": 128
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 18.962014874909073,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

@@ -1,0 +1,59 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy,json\nfrom work import evaluate\n\ndef check(req, ev, pol, expected):\n    frozen=copy.deepcopy((req,ev,pol))\n    got=evaluate(req,ev,pol)\n    assert got==expected,(got,expected)\n    assert (req,ev,pol)==frozen\n    assert set(got)=={'status','value','sources','unknowns'} and len(got)==4\n\npol={'required_conditions':['site'],'require_verified':True}\nreq={'claim':'x','conditions':{'site':'A','extra':9}}\ncheck(req,[{'source':'old','claim':'x','value':1,'conditions':{'site':'A'},'verified':True},{'source':'bad-new','claim':'x','value':2,'conditions':{'site':'B'},'verified':True,'supersedes':['old']}],pol,{'status':'supported','value':1,'sources':['old'],'unknowns':[]})\ncheck(req,[{'source':'old','claim':'x','value':1,'conditions':{'site':'A'},'verified':True},{'source':'new','claim':'x','value':2,'conditions':{'site':'A'},'verified':True,'supersedes':'old'}],pol,{'status':'supported','value':2,'sources':['new'],'unknowns':[]})\ncheck(req,[{'source':'u','claim':'x','value':0,'conditions':{'site':'A'},'verified':False}],pol,{'status':'unknown','value':None,'sources':[],'unknowns':['no matching evidence']})\ncheck(req,[{'source':'n','claim':'x','value':None,'conditions':{'site':'A'},'verified':True}],pol,{'status':'supported','value':None,'sources':['n'],'unknowns':[]})\nwith open('OUTPUT_SCHEMA.json') as f: schema=json.load(f)\nassert schema['additionalProperties'] is False\nwith open('requests.json') as f: requests=json.load(f)\nwith open('evidence.json') as f: evidence=json.load(f)\nwith open('policy.json') as f: policy=json.load(f)\nwith open('report.json') as f: report=json.load(f)\nassert report==[evaluate(r,evidence,policy) for r in requests]\nprint('boundary checks passed')"
+            ]
+          }
+        },
+        {
+          "action": "memory",
+          "arguments": {
+            "action": "save",
+            "text": "Stage 2 implementation in work.py obeys required-condition matching, verified/withdrawn filters, eligible-only supersession, canonical JSON agreement, Boolean-false unsupported status, exact four-field output, and input immutability. Current report.json equals evaluate over requests.json with current evidence.json and policy.json. Boundary checks also cover ineligible superseders, string supersedes, unverified exclusion, and an agreed null value.",
+            "payload": {
+              "files": [
+                "work.py",
+                "report.json",
+                "TASK.md",
+                "OUTPUT_SCHEMA.json",
+                "requests.json",
+                "policy.json",
+                "evidence.json"
+              ]
+            }
+          }
+        },
+        {
+          "action": "memory",
+          "arguments": {
+            "action": "save",
+            "text": "Unresolved limits: malformed inputs, missing/non-string source IDs, duplicate source IDs, and non-JSON values are unspecified and untested. Supersession cycles and transitive intent are not defined; implementation removes every directly named source ID when named by another eligible record. Extra non-required request/record conditions are not used for matching because the contract specifies required conditions."
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 13818,
+    "output_tokens": 1265,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 487
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 36.02525983308442,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

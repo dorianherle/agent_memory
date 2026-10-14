@@ -1,0 +1,17 @@
+You prepare memory for a fresh agent. The agent must answer later questions about the same workflow. Use ASD-STE100 style. Use at most 220 tokens. Return only the memory packet. Write a compact handoff packet that identifies a reusable semantic rule when the observations support one. State its conditions and exceptions. Distinguish inferred rules from observations. If no general rule is supported, retain specific cases and state the limits. Do not invent evidence.
+HISTORY:
+These chat records describe independent trials at a conversion desk. Each result was observed directly. No other trial results were recorded.
+User: Run tool n17 on CSV with operator blue.
+Tool: Result: usable.
+User: Run tool n17 on JSON with operator blue.
+Tool: Result: unusable.
+User: Run tool m42 on CSV with operator blue.
+Tool: Result: unusable.
+User: Run tool m42 on JSON with operator green.
+Tool: Result: usable.
+User: Run tool p09 on XML with operator red.
+Tool: Result: usable.
+User: Run tool p09 on CSV with operator green.
+Tool: Result: unusable.
+Assistant: I wonder whether the operator's color controls everything.
+User: We have not tested further combinations.

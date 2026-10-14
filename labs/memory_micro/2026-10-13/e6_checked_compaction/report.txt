@@ -1,0 +1,19 @@
+E6: Checked aggressive compaction.
+Conclusion: inconclusive.
+This result applies only to one constructed history.
+Repair used: True. Checked packet accepted: False. Rejection: repaired_packet_exceeds_cap.
+initial packet-size estimate: 174 tokens. Cap: 160. Encoding: o200k_base.
+checked packet-size estimate: 161 tokens. Cap: 160. Encoding: o200k_base.
+Public check, initial: 6 of 6 groups passed.
+Hidden receiver, unchecked: 10 of 10 groups passed.
+Hidden receiver, checked: 10 of 10 groups passed.
+Hidden receiver, full_history_control: 10 of 10 groups passed.
+Calls: 6. Native input tokens: 65104. Native output tokens: 1144.
+Check and repair overhead: 2 calls, 21709 native input tokens, 424 native output tokens.
+Elapsed time: 33.3 s.
+Native usage includes fixed CLI context. Packet size is not total model-call token use.
+No general reliability or fundamental-truth claim is supported.
+The initial public preservation check passed all 6 groups. The only failed check sent to repair was SIZE.
+Both hidden receivers passed 10 of 10 groups. The observed hidden-accuracy change was zero.
+The initial packet exceeded the cap by 14 estimated tokens. The repaired packet exceeded it by 1 estimated token and was rejected.
+The checked hidden score is diagnostic because no repaired packet was accepted. No second repair was attempted.

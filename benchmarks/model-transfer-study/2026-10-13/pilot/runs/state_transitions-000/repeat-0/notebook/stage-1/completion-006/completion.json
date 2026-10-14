@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import json, copy, work\npolicy=json.load(open('policy.json'))\nrequests=json.load(open('requests.json'))\n# Current report inputs\nprint(json.dumps([work.evaluate(r, policy) for r in requests]))\n# Boundary, precedence, and immutability checks\ncases=[\n ({'from':'x','to':'y'}, {'edges':{},'retry_limit':2}, {'ok':False,'value':None,'reason':'blocked'}),\n ({'from':'a','to':'b','role':'wrong','retry':True,'attempts':99}, {'edges':{'a>b':{'role':'right'}},'retry_limit':2}, {'ok':False,'value':None,'reason':'permission'}),\n ({'from':'a','to':'b','retry':True,'attempts':False}, {'edges':{'a>b':{}},'retry_limit':2}, {'ok':False,'value':None,'reason':'retry_limit'}),\n ({'from':'a','to':'b','retry':True,'attempts':0}, {'edges':{'a>b':{}},'retry_limit':2}, {'ok':True,'value':'b','reason':'ok'}),\n ({'from':'a','to':'b','retry':True,'attempts':1}, {'edges':{'a>b':{}},'retry_limit':2}, {'ok':True,'value':'b','reason':'ok'}),\n ({'from':'a','to':'b','retry':True,'attempts':2}, {'edges':{'a>b':{}},'retry_limit':2}, {'ok':False,'value':None,'reason':'retry_limit'}),\n ({'from':'a','to':'b','retry':True,'attempts':-1}, {'edges':{'a>b':{}},'retry_limit':2}, {'ok':False,'value':None,'reason':'retry_limit'}),\n]\nfor req, pol, expected in cases:\n before=(copy.deepcopy(req),copy.deepcopy(pol)); got=work.evaluate(req,pol); assert got==expected,(got,expected); assert (req,pol)==before\nprint('checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 13822,
+    "output_tokens": 599,
+    "cached_input_tokens": 12672,
+    "reasoning_output_tokens": 98
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 22.72672350006178,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

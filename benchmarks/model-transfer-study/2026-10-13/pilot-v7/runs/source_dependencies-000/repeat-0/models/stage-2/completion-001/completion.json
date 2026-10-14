@@ -1,0 +1,72 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "list",
+          "arguments": {
+            "path": "."
+          }
+        },
+        {
+          "action": "read",
+          "arguments": {
+            "path": "TASK.md"
+          }
+        },
+        {
+          "action": "read",
+          "arguments": {
+            "path": "OUTPUT_SCHEMA.json"
+          }
+        },
+        {
+          "action": "read",
+          "arguments": {
+            "path": "work.py"
+          }
+        },
+        {
+          "action": "read",
+          "arguments": {
+            "path": "requests.json"
+          }
+        },
+        {
+          "action": "read",
+          "arguments": {
+            "path": "policy.json"
+          }
+        },
+        {
+          "action": "read",
+          "arguments": {
+            "path": "evidence.json"
+          }
+        },
+        {
+          "action": "read",
+          "arguments": {
+            "path": "stored-model.json"
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 10248,
+    "output_tokens": 205,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 67
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 7.07250270806253,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

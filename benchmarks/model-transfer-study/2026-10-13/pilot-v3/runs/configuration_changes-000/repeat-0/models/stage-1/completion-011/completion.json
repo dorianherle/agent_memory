@@ -1,0 +1,263 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "model_propose",
+      "id": null,
+      "payload": {
+        "schema": 1,
+        "title": "Stage 1 layered configuration evaluation",
+        "inputs": {
+          "request": "object",
+          "policy": "object",
+          "evidence": "array"
+        },
+        "rules": [
+          {
+            "id": "ordered_layers",
+            "target": "status",
+            "claim": "Begin with a copy of policy.defaults and apply request.layers in order, preserving explicit false, zero, and empty strings.",
+            "when": {
+              "value": true
+            },
+            "then": {
+              "value": "evaluate_layers_then_environment_then_types"
+            },
+            "evidence": [
+              "c1c59c44"
+            ],
+            "dependencies": [
+              "TASK.md",
+              "work.py"
+            ]
+          },
+          {
+            "id": "unknown_keys",
+            "target": "status",
+            "claim": "Any layer or environment key absent from policy.defaults fails with unknown_key and an empty config.",
+            "when": {
+              "op": "any",
+              "items": {
+                "var": "evidence"
+              },
+              "as": "item",
+              "test": {
+                "op": "eq",
+                "args": [
+                  {
+                    "var": "item.kind"
+                  },
+                  {
+                    "value": "unknown_key"
+                  }
+                ]
+              }
+            },
+            "then": {
+              "value": "unknown_key"
+            },
+            "evidence": [
+              "c1c59c44"
+            ],
+            "dependencies": [
+              "TASK.md",
+              "work.py"
+            ]
+          },
+          {
+            "id": "null_behavior",
+            "target": "status",
+            "claim": "A null layer value resets to its default only when policy.null_resets is exactly true; otherwise final exact type validation applies.",
+            "when": {
+              "op": "eq",
+              "args": [
+                {
+                  "var": "evidence.0.kind"
+                },
+                {
+                  "value": "null"
+                }
+              ]
+            },
+            "then": {
+              "op": "if",
+              "args": [
+                {
+                  "op": "eq",
+                  "args": [
+                    {
+                      "var": "policy.null_resets"
+                    },
+                    {
+                      "value": true
+                    }
+                  ]
+                },
+                {
+                  "value": "reset_to_default"
+                },
+                {
+                  "value": "type"
+                }
+              ]
+            },
+            "evidence": [
+              "c1c59c44"
+            ],
+            "dependencies": [
+              "TASK.md",
+              "work.py"
+            ]
+          },
+          {
+            "id": "environment_behavior",
+            "target": "status",
+            "claim": "Environment overrides require policy.environment exactly true and known keys; booleans accept only exact true/false strings and integers only signed decimal strings.",
+            "when": {
+              "op": "eq",
+              "args": [
+                {
+                  "var": "evidence.0.kind"
+                },
+                {
+                  "value": "environment"
+                }
+              ]
+            },
+            "then": {
+              "value": "parse_environment_or_fail"
+            },
+            "evidence": [
+              "c1c59c44"
+            ],
+            "dependencies": [
+              "TASK.md",
+              "work.py"
+            ]
+          },
+          {
+            "id": "exact_types",
+            "target": "status",
+            "claim": "Validate declared types only after layers and environment; booleans are not integers and type failures have empty config.",
+            "when": {
+              "op": "eq",
+              "args": [
+                {
+                  "var": "evidence.0.kind"
+                },
+                {
+                  "value": "type_check"
+                }
+              ]
+            },
+            "then": {
+              "value": "exact_type_check"
+            },
+            "evidence": [
+              "c1c59c44"
+            ],
+            "dependencies": [
+              "TASK.md",
+              "work.py"
+            ]
+          }
+        ],
+        "cases": [
+          {
+            "id": "current_request",
+            "target": "status",
+            "inputs": {
+              "request": {
+                "layers": [
+                  {
+                    "enabled": false
+                  },
+                  {
+                    "retries": 0
+                  }
+                ]
+              },
+              "policy": {
+                "variant": 0,
+                "defaults": {
+                  "enabled": true,
+                  "retries": 3,
+                  "label": "job_0"
+                },
+                "types": {
+                  "enabled": "boolean",
+                  "retries": "integer",
+                  "label": "string"
+                },
+                "null_resets": false,
+                "environment": false
+              },
+              "evidence": []
+            },
+            "expected": "evaluate_layers_then_environment_then_types",
+            "evidence": [
+              "c1c59c44"
+            ],
+            "challenge": false
+          },
+          {
+            "id": "bool_not_integer",
+            "target": "status",
+            "inputs": {
+              "request": {
+                "layers": [
+                  {
+                    "retries": true
+                  }
+                ]
+              },
+              "policy": {
+                "defaults": {
+                  "enabled": true,
+                  "retries": 3,
+                  "label": "job_0"
+                },
+                "types": {
+                  "enabled": "boolean",
+                  "retries": "integer",
+                  "label": "string"
+                },
+                "null_resets": false,
+                "environment": false
+              },
+              "evidence": [
+                {
+                  "kind": "type_check"
+                }
+              ]
+            },
+            "expected": "exact_type_check",
+            "evidence": [
+              "c1c59c44"
+            ],
+            "challenge": true
+          }
+        ],
+        "alternatives": [],
+        "unresolved": [
+          "Behavior is unspecified for malformed non-object layers or environment containers, missing type declarations, and defaults keys absent from policy.types."
+        ]
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 24049,
+    "output_tokens": 2059,
+    "cached_input_tokens": 17664,
+    "reasoning_output_tokens": 381
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 38.729413457913324,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

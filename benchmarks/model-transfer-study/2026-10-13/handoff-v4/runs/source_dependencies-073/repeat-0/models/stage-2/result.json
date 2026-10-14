@@ -1,0 +1,2022 @@
+{
+  "stop": "completion_protocol_failure",
+  "tool_calls": 17,
+  "elapsed_seconds": 171.27863770816475,
+  "usage_complete": true,
+  "tokens": 187531,
+  "known_tokens": 187531,
+  "input_tokens": 181847,
+  "output_tokens": 5684,
+  "cached_input_tokens": 108672,
+  "reasoning_output_tokens": 3082,
+  "model_probes": {
+    "target": "needs_review",
+    "predictions": {
+      "ok": true,
+      "result": [
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        },
+        {
+          "status": "unknown",
+          "reason": "Model needs review",
+          "checks": {
+            "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+            "status": "blocked",
+            "issues": [
+              "Evidence or dependency versions changed"
+            ],
+            "uncovered_rules": [],
+            "missing_evidence": [],
+            "changed_dependencies": [
+              "TASK.md",
+              "requests.json"
+            ],
+            "alternatives": [],
+            "complexity": {
+              "cases": 2,
+              "complete_bytes": 2096,
+              "rules": 1,
+              "working_bytes": 1034
+            },
+            "unresolved": [
+              "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+            ],
+            "passed": 2,
+            "total": 2,
+            "failed_cases": [],
+            "omitted_failed_cases": 0
+          }
+        }
+      ]
+    },
+    "expected": [
+      false,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      true,
+      false
+    ]
+  },
+  "stage": 2,
+  "grade": {
+    "full_pass": true,
+    "passed": 30,
+    "total": 30,
+    "checks": [
+      {
+        "check": "case_0",
+        "passed": true
+      },
+      {
+        "check": "case_1",
+        "passed": true
+      },
+      {
+        "check": "case_2",
+        "passed": true
+      },
+      {
+        "check": "case_3",
+        "passed": true
+      },
+      {
+        "check": "case_4",
+        "passed": true
+      },
+      {
+        "check": "case_5",
+        "passed": true
+      },
+      {
+        "check": "case_6",
+        "passed": true
+      },
+      {
+        "check": "case_7",
+        "passed": true
+      },
+      {
+        "check": "case_8",
+        "passed": true
+      },
+      {
+        "check": "case_9",
+        "passed": true
+      },
+      {
+        "check": "case_10",
+        "passed": true
+      },
+      {
+        "check": "case_11",
+        "passed": true
+      },
+      {
+        "check": "case_12",
+        "passed": true
+      },
+      {
+        "check": "case_13",
+        "passed": true
+      },
+      {
+        "check": "case_14",
+        "passed": true
+      },
+      {
+        "check": "case_15",
+        "passed": true
+      },
+      {
+        "check": "case_16",
+        "passed": true
+      },
+      {
+        "check": "case_17",
+        "passed": true
+      },
+      {
+        "check": "case_18",
+        "passed": true
+      },
+      {
+        "check": "case_19",
+        "passed": true
+      },
+      {
+        "check": "case_20",
+        "passed": true
+      },
+      {
+        "check": "case_21",
+        "passed": true
+      },
+      {
+        "check": "case_22",
+        "passed": true
+      },
+      {
+        "check": "case_23",
+        "passed": true
+      },
+      {
+        "check": "case_24",
+        "passed": true
+      },
+      {
+        "check": "case_25",
+        "passed": true
+      },
+      {
+        "check": "case_26",
+        "passed": true
+      },
+      {
+        "check": "case_27",
+        "passed": true
+      },
+      {
+        "check": "all_cases_returned",
+        "passed": true
+      },
+      {
+        "check": "current_source_report",
+        "passed": true
+      }
+    ],
+    "unsupported_conclusions": 0,
+    "missed_source_changes": 0
+  },
+  "memory": {
+    "ok": true,
+    "result": {
+      "notes": 6,
+      "model": {
+        "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+        "event": "accepted",
+        "checks": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": true,
+              "expected": true,
+              "id": "independent_mixed_boundary",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "declared_state_change_requires_review"
+                ],
+                "status": "predicted",
+                "value": true
+              }
+            },
+            {
+              "challenge": false,
+              "expected": false,
+              "id": "absent_equals_explicit_missing",
+              "pass": true,
+              "result": {
+                "rules": [
+                  "declared_state_change_requires_review"
+                ],
+                "status": "predicted",
+                "value": false
+              }
+            }
+          ],
+          "changed_dependencies": [],
+          "complexity": {
+            "cases": 2,
+            "complete_bytes": 2096,
+            "rules": 1,
+            "working_bytes": 1034
+          },
+          "id": "632e52d2777e0a1f53d9b978e8234830f53557f5",
+          "issues": [],
+          "missing_evidence": [],
+          "status": "tested",
+          "uncovered_rules": [],
+          "unresolved": [
+            "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+          ]
+        },
+        "complexity": {
+          "cases": 2,
+          "complete_bytes": 2096,
+          "rules": 1,
+          "working_bytes": 1034
+        },
+        "fingerprints": {
+          "TASK.md": {
+            "sha256": "f9c1224be9dfe09419aebd94061835fb78dc1e88fd29d47aadc4d024728fcac4",
+            "state": "file"
+          },
+          "policy.json": {
+            "sha256": "b57cc760dd935f75d2f86c818cf3ec3d57d693496fc7b6d4ce7be35b014fd841",
+            "state": "file"
+          },
+          "report.json": {
+            "sha256": "cd5f4dd3e24be317071ce439fb1e9fe1c053fa6c004e27d0ba40447f7ee69638",
+            "state": "file"
+          },
+          "requests.json": {
+            "sha256": "3c37187e1b32d932194c72cb0bfd5f7d7c3d789427838f801c7bbc50206dc09a",
+            "state": "file"
+          },
+          "work.py": {
+            "sha256": "18b27993ee9680c35063c64ff0698f947c099712f21ef57255e00d70aa831fa2",
+            "state": "file"
+          }
+        },
+        "model": {
+          "alternatives": [],
+          "cases": [
+            {
+              "challenge": true,
+              "evidence": [
+                "6703b2a3efb449bda4dc7ac967789158b6fd5a90"
+              ],
+              "expected": true,
+              "id": "independent_mixed_boundary",
+              "inputs": {
+                "evidence": [],
+                "policy": {
+                  "ignored": [
+                    "ignored"
+                  ]
+                },
+                "request": {
+                  "current": {
+                    "a": {
+                      "hash": "x",
+                      "kind": "file",
+                      "meta": 1
+                    },
+                    "b": {
+                      "hash": "y",
+                      "kind": "file"
+                    },
+                    "extra": {
+                      "hash": "new",
+                      "kind": "file"
+                    },
+                    "ignored": {
+                      "hash": "2",
+                      "kind": "file"
+                    }
+                  },
+                  "declared": [
+                    "b",
+                    "a",
+                    "a",
+                    "ignored"
+                  ],
+                  "saved": {
+                    "a": {
+                      "hash": "x",
+                      "kind": "file",
+                      "meta": 1
+                    },
+                    "b": {
+                      "hash": "z",
+                      "kind": "file"
+                    },
+                    "extra": {
+                      "hash": "old",
+                      "kind": "file"
+                    },
+                    "ignored": {
+                      "hash": "1",
+                      "kind": "file"
+                    }
+                  }
+                }
+              },
+              "target": "needs_review"
+            },
+            {
+              "challenge": false,
+              "evidence": [
+                "6703b2a3efb449bda4dc7ac967789158b6fd5a90"
+              ],
+              "expected": false,
+              "id": "absent_equals_explicit_missing",
+              "inputs": {
+                "evidence": [],
+                "policy": {},
+                "request": {
+                  "current": {
+                    "x": {
+                      "kind": "missing"
+                    }
+                  },
+                  "declared": [
+                    "x"
+                  ],
+                  "saved": {}
+                }
+              },
+              "target": "needs_review"
+            }
+          ],
+          "inputs": {
+            "evidence": "array",
+            "policy": "object",
+            "request": "object"
+          },
+          "resolutions": [],
+          "rules": [
+            {
+              "claim": "Review is needed exactly when at least one declared, non-ignored path has a different complete JSON state between saved and current; an absent entry is equivalent to {kind:missing}.",
+              "dependencies": [
+                "work.py"
+              ],
+              "evidence": [
+                "6703b2a3efb449bda4dc7ac967789158b6fd5a90"
+              ],
+              "id": "declared_state_change_requires_review",
+              "target": "needs_review",
+              "then": {
+                "as": "path",
+                "items": {
+                  "args": [
+                    {
+                      "var": "request"
+                    },
+                    {
+                      "value": "declared"
+                    },
+                    {
+                      "value": []
+                    }
+                  ],
+                  "op": "get"
+                },
+                "op": "any",
+                "test": {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "var": "path"
+                            },
+                            {
+                              "args": [
+                                {
+                                  "var": "policy"
+                                },
+                                {
+                                  "value": "ignored"
+                                },
+                                {
+                                  "value": []
+                                }
+                              ],
+                              "op": "get"
+                            }
+                          ],
+                          "op": "in"
+                        }
+                      ],
+                      "op": "not"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "saved"
+                                },
+                                {
+                                  "value": {}
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "var": "path"
+                            },
+                            {
+                              "value": {
+                                "kind": "missing"
+                              }
+                            }
+                          ],
+                          "op": "get"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "var": "request"
+                                },
+                                {
+                                  "value": "current"
+                                },
+                                {
+                                  "value": {}
+                                }
+                              ],
+                              "op": "get"
+                            },
+                            {
+                              "var": "path"
+                            },
+                            {
+                              "value": {
+                                "kind": "missing"
+                              }
+                            }
+                          ],
+                          "op": "get"
+                        }
+                      ],
+                      "op": "ne"
+                    }
+                  ],
+                  "op": "and"
+                }
+              },
+              "when": {
+                "value": true
+              }
+            }
+          ],
+          "schema": 1,
+          "title": "Source dependency review decision",
+          "unresolved": [
+            "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+          ]
+        },
+        "parent": null,
+        "proposal": "632e52d2777e0a1f53d9b978e8234830f53557f5",
+        "reason": "Agent proposed a model revision",
+        "revision": 1
+      },
+      "checks": {
+        "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+        "status": "blocked",
+        "issues": [
+          "Evidence or dependency versions changed"
+        ],
+        "cases": [
+          {
+            "id": "independent_mixed_boundary",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": true,
+              "rules": [
+                "declared_state_change_requires_review"
+              ]
+            },
+            "expected": true,
+            "challenge": true
+          },
+          {
+            "id": "absent_equals_explicit_missing",
+            "pass": true,
+            "result": {
+              "status": "predicted",
+              "value": false,
+              "rules": [
+                "declared_state_change_requires_review"
+              ]
+            },
+            "expected": false,
+            "challenge": false
+          }
+        ],
+        "uncovered_rules": [],
+        "missing_evidence": [],
+        "changed_dependencies": [
+          "TASK.md",
+          "requests.json"
+        ],
+        "alternatives": [],
+        "complexity": {
+          "cases": 2,
+          "complete_bytes": 2096,
+          "rules": 1,
+          "working_bytes": 1034
+        },
+        "unresolved": [
+          "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+        ]
+      },
+      "evidence": [
+        {
+          "id": "6703b2a3efb449bda4dc7ac967789158b6fd5a90",
+          "text": "Implemented work.py evaluate(request, policy): examines each unique declared path excluding policy.ignored, treats absent saved/current entries as {kind:missing}, compares complete canonical JSON values, returns lexically sorted changed paths and needs_review=bool(changed), and does not mutate inputs. Verified 6 independently constructed boundary cases: duplicate declarations, ignored and irrelevant changes, removal, appearance, absent-vs-explicit missing equivalence, object-key order equivalence, and nested metadata difference. Verified report.json equals evaluations for current requests.json/policy.json; py_compile passed. Limit: inputs are expected to be JSON-compatible; non-finite floats raise ValueError by design.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "report.json",
+              "TASK.md",
+              "requests.json",
+              "policy.json"
+            ]
+          }
+        },
+        {
+          "id": "9cb7a0e24bf75eddf949ca9972e483782ba61df9",
+          "text": "Milestone complete: implemented and locally verified Stage 1 source dependency evaluation and generated report.json. Evidence note 6703b2a3 contains behavior, boundary checks, source paths, and the unresolved JSON-compatibility/non-finite-number limit.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "report.json",
+              "TASK.md",
+              "requests.json",
+              "policy.json"
+            ],
+            "summary": true
+          }
+        },
+        {
+          "id": "632e52d2777e0a1f53d9b978e8234830f53557f5",
+          "text": "Task model proposed: Source dependency review decision",
+          "payload": {
+            "agent": "agent",
+            "model_event": "proposed",
+            "task_model": {
+              "complexity": {
+                "cases": 2,
+                "complete_bytes": 2096,
+                "rules": 1,
+                "working_bytes": 1034
+              },
+              "fingerprints": {
+                "TASK.md": {
+                  "sha256": "f9c1224be9dfe09419aebd94061835fb78dc1e88fd29d47aadc4d024728fcac4",
+                  "state": "file"
+                },
+                "policy.json": {
+                  "sha256": "b57cc760dd935f75d2f86c818cf3ec3d57d693496fc7b6d4ce7be35b014fd841",
+                  "state": "file"
+                },
+                "report.json": {
+                  "sha256": "cd5f4dd3e24be317071ce439fb1e9fe1c053fa6c004e27d0ba40447f7ee69638",
+                  "state": "file"
+                },
+                "requests.json": {
+                  "sha256": "3c37187e1b32d932194c72cb0bfd5f7d7c3d789427838f801c7bbc50206dc09a",
+                  "state": "file"
+                },
+                "work.py": {
+                  "sha256": "18b27993ee9680c35063c64ff0698f947c099712f21ef57255e00d70aa831fa2",
+                  "state": "file"
+                }
+              },
+              "model": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "6703b2a3efb449bda4dc7ac967789158b6fd5a90"
+                    ],
+                    "expected": true,
+                    "id": "independent_mixed_boundary",
+                    "inputs": {
+                      "evidence": [],
+                      "policy": {
+                        "ignored": [
+                          "ignored"
+                        ]
+                      },
+                      "request": {
+                        "current": {
+                          "a": {
+                            "hash": "x",
+                            "kind": "file",
+                            "meta": 1
+                          },
+                          "b": {
+                            "hash": "y",
+                            "kind": "file"
+                          },
+                          "extra": {
+                            "hash": "new",
+                            "kind": "file"
+                          },
+                          "ignored": {
+                            "hash": "2",
+                            "kind": "file"
+                          }
+                        },
+                        "declared": [
+                          "b",
+                          "a",
+                          "a",
+                          "ignored"
+                        ],
+                        "saved": {
+                          "a": {
+                            "hash": "x",
+                            "kind": "file",
+                            "meta": 1
+                          },
+                          "b": {
+                            "hash": "z",
+                            "kind": "file"
+                          },
+                          "extra": {
+                            "hash": "old",
+                            "kind": "file"
+                          },
+                          "ignored": {
+                            "hash": "1",
+                            "kind": "file"
+                          }
+                        }
+                      }
+                    },
+                    "target": "needs_review"
+                  },
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "6703b2a3efb449bda4dc7ac967789158b6fd5a90"
+                    ],
+                    "expected": false,
+                    "id": "absent_equals_explicit_missing",
+                    "inputs": {
+                      "evidence": [],
+                      "policy": {},
+                      "request": {
+                        "current": {
+                          "x": {
+                            "kind": "missing"
+                          }
+                        },
+                        "declared": [
+                          "x"
+                        ],
+                        "saved": {}
+                      }
+                    },
+                    "target": "needs_review"
+                  }
+                ],
+                "inputs": {
+                  "evidence": "array",
+                  "policy": "object",
+                  "request": "object"
+                },
+                "resolutions": [],
+                "rules": [
+                  {
+                    "claim": "Review is needed exactly when at least one declared, non-ignored path has a different complete JSON state between saved and current; an absent entry is equivalent to {kind:missing}.",
+                    "dependencies": [
+                      "work.py"
+                    ],
+                    "evidence": [
+                      "6703b2a3efb449bda4dc7ac967789158b6fd5a90"
+                    ],
+                    "id": "declared_state_change_requires_review",
+                    "target": "needs_review",
+                    "then": {
+                      "as": "path",
+                      "items": {
+                        "args": [
+                          {
+                            "var": "request"
+                          },
+                          {
+                            "value": "declared"
+                          },
+                          {
+                            "value": []
+                          }
+                        ],
+                        "op": "get"
+                      },
+                      "op": "any",
+                      "test": {
+                        "args": [
+                          {
+                            "args": [
+                              {
+                                "args": [
+                                  {
+                                    "var": "path"
+                                  },
+                                  {
+                                    "args": [
+                                      {
+                                        "var": "policy"
+                                      },
+                                      {
+                                        "value": "ignored"
+                                      },
+                                      {
+                                        "value": []
+                                      }
+                                    ],
+                                    "op": "get"
+                                  }
+                                ],
+                                "op": "in"
+                              }
+                            ],
+                            "op": "not"
+                          },
+                          {
+                            "args": [
+                              {
+                                "args": [
+                                  {
+                                    "args": [
+                                      {
+                                        "var": "request"
+                                      },
+                                      {
+                                        "value": "saved"
+                                      },
+                                      {
+                                        "value": {}
+                                      }
+                                    ],
+                                    "op": "get"
+                                  },
+                                  {
+                                    "var": "path"
+                                  },
+                                  {
+                                    "value": {
+                                      "kind": "missing"
+                                    }
+                                  }
+                                ],
+                                "op": "get"
+                              },
+                              {
+                                "args": [
+                                  {
+                                    "args": [
+                                      {
+                                        "var": "request"
+                                      },
+                                      {
+                                        "value": "current"
+                                      },
+                                      {
+                                        "value": {}
+                                      }
+                                    ],
+                                    "op": "get"
+                                  },
+                                  {
+                                    "var": "path"
+                                  },
+                                  {
+                                    "value": {
+                                      "kind": "missing"
+                                    }
+                                  }
+                                ],
+                                "op": "get"
+                              }
+                            ],
+                            "op": "ne"
+                          }
+                        ],
+                        "op": "and"
+                      }
+                    },
+                    "when": {
+                      "value": true
+                    }
+                  }
+                ],
+                "schema": 1,
+                "title": "Source dependency review decision",
+                "unresolved": [
+                  "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+                ]
+              },
+              "parent": null,
+              "reason": "Agent proposed a model revision",
+              "revision": 1
+            }
+          }
+        },
+        {
+          "id": "214201d00b06011d086eb4d61c181f9c05f5a63b",
+          "text": "Task model active: Source dependency review decision",
+          "payload": {
+            "agent": "agent",
+            "model_event": "accepted",
+            "task_model": {
+              "checks": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": true,
+                    "expected": true,
+                    "id": "independent_mixed_boundary",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "declared_state_change_requires_review"
+                      ],
+                      "status": "predicted",
+                      "value": true
+                    }
+                  },
+                  {
+                    "challenge": false,
+                    "expected": false,
+                    "id": "absent_equals_explicit_missing",
+                    "pass": true,
+                    "result": {
+                      "rules": [
+                        "declared_state_change_requires_review"
+                      ],
+                      "status": "predicted",
+                      "value": false
+                    }
+                  }
+                ],
+                "changed_dependencies": [],
+                "complexity": {
+                  "cases": 2,
+                  "complete_bytes": 2096,
+                  "rules": 1,
+                  "working_bytes": 1034
+                },
+                "id": "632e52d2777e0a1f53d9b978e8234830f53557f5",
+                "issues": [],
+                "missing_evidence": [],
+                "status": "tested",
+                "uncovered_rules": [],
+                "unresolved": [
+                  "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+                ]
+              },
+              "complexity": {
+                "cases": 2,
+                "complete_bytes": 2096,
+                "rules": 1,
+                "working_bytes": 1034
+              },
+              "fingerprints": {
+                "TASK.md": {
+                  "sha256": "f9c1224be9dfe09419aebd94061835fb78dc1e88fd29d47aadc4d024728fcac4",
+                  "state": "file"
+                },
+                "policy.json": {
+                  "sha256": "b57cc760dd935f75d2f86c818cf3ec3d57d693496fc7b6d4ce7be35b014fd841",
+                  "state": "file"
+                },
+                "report.json": {
+                  "sha256": "cd5f4dd3e24be317071ce439fb1e9fe1c053fa6c004e27d0ba40447f7ee69638",
+                  "state": "file"
+                },
+                "requests.json": {
+                  "sha256": "3c37187e1b32d932194c72cb0bfd5f7d7c3d789427838f801c7bbc50206dc09a",
+                  "state": "file"
+                },
+                "work.py": {
+                  "sha256": "18b27993ee9680c35063c64ff0698f947c099712f21ef57255e00d70aa831fa2",
+                  "state": "file"
+                }
+              },
+              "model": {
+                "alternatives": [],
+                "cases": [
+                  {
+                    "challenge": true,
+                    "evidence": [
+                      "6703b2a3efb449bda4dc7ac967789158b6fd5a90"
+                    ],
+                    "expected": true,
+                    "id": "independent_mixed_boundary",
+                    "inputs": {
+                      "evidence": [],
+                      "policy": {
+                        "ignored": [
+                          "ignored"
+                        ]
+                      },
+                      "request": {
+                        "current": {
+                          "a": {
+                            "hash": "x",
+                            "kind": "file",
+                            "meta": 1
+                          },
+                          "b": {
+                            "hash": "y",
+                            "kind": "file"
+                          },
+                          "extra": {
+                            "hash": "new",
+                            "kind": "file"
+                          },
+                          "ignored": {
+                            "hash": "2",
+                            "kind": "file"
+                          }
+                        },
+                        "declared": [
+                          "b",
+                          "a",
+                          "a",
+                          "ignored"
+                        ],
+                        "saved": {
+                          "a": {
+                            "hash": "x",
+                            "kind": "file",
+                            "meta": 1
+                          },
+                          "b": {
+                            "hash": "z",
+                            "kind": "file"
+                          },
+                          "extra": {
+                            "hash": "old",
+                            "kind": "file"
+                          },
+                          "ignored": {
+                            "hash": "1",
+                            "kind": "file"
+                          }
+                        }
+                      }
+                    },
+                    "target": "needs_review"
+                  },
+                  {
+                    "challenge": false,
+                    "evidence": [
+                      "6703b2a3efb449bda4dc7ac967789158b6fd5a90"
+                    ],
+                    "expected": false,
+                    "id": "absent_equals_explicit_missing",
+                    "inputs": {
+                      "evidence": [],
+                      "policy": {},
+                      "request": {
+                        "current": {
+                          "x": {
+                            "kind": "missing"
+                          }
+                        },
+                        "declared": [
+                          "x"
+                        ],
+                        "saved": {}
+                      }
+                    },
+                    "target": "needs_review"
+                  }
+                ],
+                "inputs": {
+                  "evidence": "array",
+                  "policy": "object",
+                  "request": "object"
+                },
+                "resolutions": [],
+                "rules": [
+                  {
+                    "claim": "Review is needed exactly when at least one declared, non-ignored path has a different complete JSON state between saved and current; an absent entry is equivalent to {kind:missing}.",
+                    "dependencies": [
+                      "work.py"
+                    ],
+                    "evidence": [
+                      "6703b2a3efb449bda4dc7ac967789158b6fd5a90"
+                    ],
+                    "id": "declared_state_change_requires_review",
+                    "target": "needs_review",
+                    "then": {
+                      "as": "path",
+                      "items": {
+                        "args": [
+                          {
+                            "var": "request"
+                          },
+                          {
+                            "value": "declared"
+                          },
+                          {
+                            "value": []
+                          }
+                        ],
+                        "op": "get"
+                      },
+                      "op": "any",
+                      "test": {
+                        "args": [
+                          {
+                            "args": [
+                              {
+                                "args": [
+                                  {
+                                    "var": "path"
+                                  },
+                                  {
+                                    "args": [
+                                      {
+                                        "var": "policy"
+                                      },
+                                      {
+                                        "value": "ignored"
+                                      },
+                                      {
+                                        "value": []
+                                      }
+                                    ],
+                                    "op": "get"
+                                  }
+                                ],
+                                "op": "in"
+                              }
+                            ],
+                            "op": "not"
+                          },
+                          {
+                            "args": [
+                              {
+                                "args": [
+                                  {
+                                    "args": [
+                                      {
+                                        "var": "request"
+                                      },
+                                      {
+                                        "value": "saved"
+                                      },
+                                      {
+                                        "value": {}
+                                      }
+                                    ],
+                                    "op": "get"
+                                  },
+                                  {
+                                    "var": "path"
+                                  },
+                                  {
+                                    "value": {
+                                      "kind": "missing"
+                                    }
+                                  }
+                                ],
+                                "op": "get"
+                              },
+                              {
+                                "args": [
+                                  {
+                                    "args": [
+                                      {
+                                        "var": "request"
+                                      },
+                                      {
+                                        "value": "current"
+                                      },
+                                      {
+                                        "value": {}
+                                      }
+                                    ],
+                                    "op": "get"
+                                  },
+                                  {
+                                    "var": "path"
+                                  },
+                                  {
+                                    "value": {
+                                      "kind": "missing"
+                                    }
+                                  }
+                                ],
+                                "op": "get"
+                              }
+                            ],
+                            "op": "ne"
+                          }
+                        ],
+                        "op": "and"
+                      }
+                    },
+                    "when": {
+                      "value": true
+                    }
+                  }
+                ],
+                "schema": 1,
+                "title": "Source dependency review decision",
+                "unresolved": [
+                  "Inputs are expected to be JSON-compatible; behavior for non-finite numeric values is intentionally outside the tested conditions."
+                ]
+              },
+              "parent": null,
+              "proposal": "632e52d2777e0a1f53d9b978e8234830f53557f5",
+              "reason": "Agent proposed a model revision",
+              "revision": 1
+            }
+          }
+        },
+        {
+          "id": "fc87cbec8026272ba4384502896fa923122afaf4",
+          "text": "Stage 2 implementation in work.py compares canonical complete JSON states for every unique declared non-ignored path, treats an absent mapping entry as {kind:missing}, sorts changed paths, sets needs_review from changed, and does not mutate inputs. Independent boundary checks covered duplicates, ignored paths, missing equivalence, nested key-order canonicalization, array-order changes, irrelevant paths, and input immutability; all passed.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "TASK.md"
+            ]
+          }
+        },
+        {
+          "id": "743919ea66c5f759bdac4a805d86bd55844c8847",
+          "text": "Current report.json was verified equal to evaluating every request in requests.json under policy.json. evidence.json is absent. Known limit: inputs are expected to be JSON-compatible; non-finite numbers are rejected by canonicalization and remain outside tested conditions.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "report.json",
+              "requests.json",
+              "policy.json"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

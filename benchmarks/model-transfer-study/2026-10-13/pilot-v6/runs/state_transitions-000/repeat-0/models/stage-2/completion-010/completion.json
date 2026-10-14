@@ -1,0 +1,62 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "model_handoff",
+      "id": "2a55eb7df011ea5c72889b5bbbc45ba4c98518a2",
+      "payload": {
+        "observations": [
+          {
+            "id": "stage2_edge_retry_requires_attempts",
+            "target": "status",
+            "inputs": {
+              "attempts_valid": false,
+              "edge_exists": true,
+              "retry": true,
+              "role_matches": true,
+              "role_required": false,
+              "to": "ready"
+            },
+            "expected": "retry_limit",
+            "evidence": [
+              "288f31da"
+            ],
+            "challenge": true
+          },
+          {
+            "id": "stage2_request_retry_does_not_activate_edge_retry",
+            "target": "status",
+            "inputs": {
+              "attempts_valid": false,
+              "edge_exists": true,
+              "retry": false,
+              "role_matches": true,
+              "role_required": false,
+              "to": "ready"
+            },
+            "expected": "ok",
+            "evidence": [
+              "288f31da"
+            ],
+            "challenge": true
+          }
+        ]
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 38153,
+    "output_tokens": 1148,
+    "cached_input_tokens": 26112,
+    "reasoning_output_tokens": 768
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 26.979388208128512,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

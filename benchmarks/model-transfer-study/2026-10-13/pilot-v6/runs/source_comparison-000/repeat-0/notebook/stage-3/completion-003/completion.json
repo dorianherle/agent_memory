@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy,json,py_compile; from work import evaluate; py_compile.compile('work.py',doraise=True); r={'claim':'x','conditions':{'a':1,'b':2}}; p={'required_conditions':['b','a'],'require_verified':True}; e=[{'source':'old','claim':'x','value':1,'conditions':{'a':1,'b':2},'verified':True},{'source':'new','claim':'x','value':2,'conditions':{'a':1,'b':2},'verified':True,'supersedes':['old']}]; before=copy.deepcopy((r,e,p)); assert evaluate(r,e,p)=={'status':'supported','value':2,'sources':['new'],'unknowns':[]}; assert (r,e,p)==before; assert evaluate({'claim':'x','conditions':{'a':1}},[],p)=={'status':'unknown','value':None,'sources':[],'unknowns':['b']}; c=[{'source':'z','claim':'x','value':{'b':2,'a':1},'conditions':{'a':1,'b':2},'verified':True},{'source':'a','claim':'x','value':{'a':1,'b':2},'conditions':{'a':1,'b':2},'verified':True}]; assert evaluate(r,c,p)=={'status':'supported','value':{'b':2,'a':1},'sources':['a','z'],'unknowns':[]}; d=[{'source':'b','claim':'x','value':0,'conditions':{'a':1,'b':2},'verified':True},{'source':'a','claim':'x','value':False,'conditions':{'a':1,'b':2},'verified':True}]; assert evaluate(r,d,p)=={'status':'conflict','value':None,'sources':['a','b'],'unknowns':['source disagreement']}; f=[{'source':'f','claim':'x','value':False,'conditions':{'a':1,'b':2},'verified':True}]; assert evaluate(r,f,p)=={'status':'unsupported','value':False,'sources':['f'],'unknowns':[]}; requests=json.load(open('requests.json')); evidence=json.load(open('evidence.json')); policy=json.load(open('policy.json')); report=json.load(open('report.json')); assert report==[evaluate(x,evidence,policy) for x in requests]; print('all checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 23224,
+    "output_tokens": 979,
+    "cached_input_tokens": 17792,
+    "reasoning_output_tokens": 404
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 19.96821212512441,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

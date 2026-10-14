@@ -1,0 +1,23 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "read",
+    "arguments": {
+      "path": "work.py"
+    }
+  },
+  "usage": {
+    "input_tokens": 13148,
+    "output_tokens": 60,
+    "cached_input_tokens": 12928,
+    "reasoning_output_tokens": 32
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 7.853591916849837,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

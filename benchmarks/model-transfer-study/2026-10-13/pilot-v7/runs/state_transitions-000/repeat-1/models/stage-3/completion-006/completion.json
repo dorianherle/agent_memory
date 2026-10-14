@@ -1,0 +1,42 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "model_predict",
+      "name": "result",
+      "payload": {
+        "request": {
+          "from": "s",
+          "to": "t",
+          "role": "wrong",
+          "attempts": true
+        },
+        "policy": {
+          "edges": {
+            "s>t": {
+              "role": "admin",
+              "retry": true
+            }
+          },
+          "retry_limit": 2
+        },
+        "evidence": []
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 14882,
+    "output_tokens": 1081,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 1000
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 27.822595916921273,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

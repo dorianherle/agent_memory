@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy,json; from work import evaluate\n\ndef check(req,ev,pol,expected):\n    before=copy.deepcopy((req,ev,pol)); got=evaluate(req,ev,pol); assert got==expected,(got,expected); assert (req,ev,pol)==before; assert list(got)==['status','value','sources','unknowns']\nbase={'required_conditions':['a'],'require_verified':True}\ncheck({'claim':'x','conditions':{}},[],base,{'status':'unknown','value':None,'sources':[],'unknowns':['a']})\ncheck({'claim':'x','conditions':{'a':1}},[],base,{'status':'unknown','value':None,'sources':[],'unknowns':['no matching evidence']})\ncheck({'claim':'x','conditions':{'a':1}},[{'source':'s','claim':'x','value':False,'conditions':{'a':1},'verified':True}],base,{'status':'unsupported','value':False,'sources':['s'],'unknowns':[]})\ncheck({'claim':'x','conditions':{'a':1}},[{'source':'b','claim':'x','value':1,'conditions':{'a':1},'verified':True},{'source':'a','claim':'x','value':2,'conditions':{'a':1},'verified':True}],base,{'status':'conflict','value':None,'sources':['a','b'],'unknowns':['source disagreement']})\ncheck({'claim':'x','conditions':{'a':1}},[{'source':'old','claim':'x','value':1,'conditions':{'a':1},'verified':True},{'source':'new','claim':'x','value':2,'conditions':{'a':1},'verified':True,'supersedes':['old']}],base,{'status':'supported','value':2,'sources':['new'],'unknowns':[]})\ncheck({'claim':'x','conditions':{'a':1}},[{'source':'u','claim':'x','value':9,'conditions':{'a':1},'verified':False},{'source':'w','claim':'x','value':8,'conditions':{'a':1},'verified':True,'withdrawn':True},{'source':'m','claim':'y','value':7,'conditions':{'a':1},'verified':True}],base,{'status':'unknown','value':None,'sources':[],'unknowns':['no matching evidence']})\ncheck({'claim':'x','conditions':{'a':{'b':1,'a':2}}},[{'source':'s','claim':'x','value':{'z':0,'a':1},'conditions':{'a':{'a':2,'b':1}},'verified':True},{'source':'t','claim':'x','value':{'a':1,'z':0},'conditions':{'a':{'b':1,'a':2}},'verified':True}],base,{'status':'supported','value':{'z':0,'a':1},'sources':['s','t'],'unknowns':[]})\nwith open('requests.json') as f:r=json.load(f)\nwith open('evidence.json') as f:e=json.load(f)\nwith open('policy.json') as f:p=json.load(f)\nwith open('report.json') as f:report=json.load(f)\nassert report==[evaluate(x,e,p) for x in r]\nprint('all checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 11007,
+    "output_tokens": 985,
+    "cached_input_tokens": 7808,
+    "reasoning_output_tokens": 205
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 21.961254332913086,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

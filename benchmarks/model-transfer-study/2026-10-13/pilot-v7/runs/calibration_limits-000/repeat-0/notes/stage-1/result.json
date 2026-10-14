@@ -1,0 +1,141 @@
+{
+  "stop": "finished",
+  "tool_calls": 12,
+  "elapsed_seconds": 143.61998741608113,
+  "usage_complete": true,
+  "tokens": 117122,
+  "known_tokens": 117122,
+  "input_tokens": 111332,
+  "output_tokens": 5790,
+  "cached_input_tokens": 68352,
+  "reasoning_output_tokens": 2219,
+  "stage": 1,
+  "grade": {
+    "full_pass": true,
+    "passed": 23,
+    "total": 23,
+    "checks": [
+      {
+        "check": "case_0",
+        "passed": true
+      },
+      {
+        "check": "case_1",
+        "passed": true
+      },
+      {
+        "check": "case_2",
+        "passed": true
+      },
+      {
+        "check": "case_3",
+        "passed": true
+      },
+      {
+        "check": "case_4",
+        "passed": true
+      },
+      {
+        "check": "case_5",
+        "passed": true
+      },
+      {
+        "check": "case_6",
+        "passed": true
+      },
+      {
+        "check": "case_7",
+        "passed": true
+      },
+      {
+        "check": "case_8",
+        "passed": true
+      },
+      {
+        "check": "case_9",
+        "passed": true
+      },
+      {
+        "check": "case_10",
+        "passed": true
+      },
+      {
+        "check": "case_11",
+        "passed": true
+      },
+      {
+        "check": "case_12",
+        "passed": true
+      },
+      {
+        "check": "case_13",
+        "passed": true
+      },
+      {
+        "check": "case_14",
+        "passed": true
+      },
+      {
+        "check": "case_15",
+        "passed": true
+      },
+      {
+        "check": "case_16",
+        "passed": true
+      },
+      {
+        "check": "case_17",
+        "passed": true
+      },
+      {
+        "check": "case_18",
+        "passed": true
+      },
+      {
+        "check": "case_19",
+        "passed": true
+      },
+      {
+        "check": "case_20",
+        "passed": true
+      },
+      {
+        "check": "all_cases_returned",
+        "passed": true
+      },
+      {
+        "check": "current_source_report",
+        "passed": true
+      }
+    ],
+    "unsupported_conclusions": 0,
+    "missed_source_changes": 0
+  },
+  "memory": {
+    "ok": true,
+    "result": {
+      "notes": 1,
+      "model": null,
+      "checks": {
+        "status": "absent"
+      },
+      "evidence": [
+        {
+          "id": "d4c967c8e1218f91475867fe2443943a8bdd015c",
+          "text": "Implemented and locally verified evaluate(request, evidence, policy): filters by claim, withdrawal, verification policy, and exact required-condition values; reports sorted missing conditions; applies eligible-record supersession; compares canonical JSON values; distinguishes Boolean false as unsupported; preserves inputs; and uses caller arguments. report.json equals evaluation of current requests.json against current evidence.json and policy.json and conforms to OUTPUT_SCHEMA.json. No unresolved limits observed in the specified valid-JSON input domain.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "report.json",
+              "OUTPUT_SCHEMA.json",
+              "requests.json",
+              "evidence.json",
+              "policy.json"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

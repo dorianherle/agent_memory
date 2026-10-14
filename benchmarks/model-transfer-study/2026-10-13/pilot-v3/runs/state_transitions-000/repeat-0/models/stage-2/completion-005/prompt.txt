@@ -1,0 +1,55 @@
+You are an agent in a controlled work study. Use only the study tool protocol.
+Do not call any native Codex tool. The completion process has no project files.
+Return one JSON object: action plus arguments_json (a JSON-encoded object).
+Actions:
+read {path}; write {path,content}; list {path}; run {command:[program,arg,...]};
+memory {action:save|find|history|open_questions|delete,text?,query?,ids?,payload?};
+finish {}. Commands run offline in the project container, with Python and Git.
+Use current files and local tests. Complete work.py and report.json. Save durable
+findings and unresolved questions before finish. You may store concise reusable
+rules in ordinary notes. Do not invent observations. Tool errors can be repaired.
+Save source-bound findings with payload {files:[relative_source_paths]} when useful.
+The history below contains every previous study tool call and its full result.
+
+This method requires model transfer. At the start, call model_get. Before finish,
+create or revise an accepted task model from actual local observations. A note
+alone is not a model handoff. Preserve prior cases and meaningful conditions.
+Call model_check before accept. Call model_reduce on the tested active model;
+if it proposes a passing revision, accept it. Also call model_predict for a
+recorded case. Do not require size reduction when new evidence needs more rules.
+Executable model memory also supports actions model_get, model_propose,
+model_check, model_accept, model_reduce, model_predict. Propose arguments:
+{action:model_propose,id:active_model_id_or_null,payload:model}. Accept/check:
+{action:model_accept_or_model_check,id:proposal_id}. Predict:
+{action:model_predict,name:target,payload:inputs}. Get {action:model_get,full:false}.
+Model schema: {schema:1,title,inputs:{name:type},rules:[{id,target,claim,when,then,
+evidence:[saved_note_ids],dependencies:[relative_files]}],cases:[{id,target,inputs,
+expected,evidence:[saved_note_ids],challenge:bool}],alternatives:[],unresolved:[]}.
+Expressions: {value:literal}, {var:input_or_nested_field}, {op:operator,args:[expressions]}.
+Operators eq,ne,lt,le,gt,ge,in,not,and,or,len,add,sub,if; collection all/any:
+{op:all_or_any,items:expression,as:alias,test:expression}. Input types string,
+number,integer,boolean,array,object. Every target needs a challenge observation.
+All saved cases must pass before accept. Changed dependencies block old rules;
+new source evidence needs a new challenge. Reduction creates a proposal and
+never accepts it. The next agent receives the working model first. Build and
+revise models for handoff; retain raw evidence, limits, and important conditions.
+For comparable unseen-case probes, use inputs request:object, policy:object, and
+evidence:array for research when possible. Useful targets are ok, needs_review,
+or status. Other input schemes are permitted and will be reported as unprobed.
+
+Current task:
+Stage 2: state_transitions; work sample 0.
+Implement evaluate(request, policy). Return {ok, value, reason}. Look up from>to in policy.edges. Missing edges are blocked. Enforce each edge's role before retry checks. A retry needs an actual integer attempts (not bool), in [0, retry_limit). On success value is to and reason is ok. On failure value is null and reason is blocked, permission, or retry_limit. Do not modify inputs.
+Write work.py with this API. Also write report.json as a JSON array of evaluate results for requests.json, using current policy.json and evidence.json when present. Keep prior supported behavior. Use actual local checks. Store findings and unresolved limits for the next agent.
+
+Initial memory (maximum 1200 characters):
+## Handoff
+[acdc6166] [stale] Verified completion: work.py implements evaluate(request, policy) with missing-edge blocking, role c…
+
+## Task model
+[7265cec3] r1 blocked; 4 rules. Read model_get for conditions.
+Needs review: Evidence or dependency versions changed
+0 alternatives; 1 unresolved results.
+Tool calls used: 5/40.
+History:
+[{"type": "tool", "number": 1, "action": "memory", "arguments": {"action": "model_get", "full": false}, "result": {"ok": true, "result": "{\"id\": \"7265cec319b4bbf9d7193f5b68e2d152261364eb\", \"event\": \"accepted\", \"parent\": null, \"revision\": 1, \"model\": {\"alternatives\": [], \"inputs\": {\"attempts_valid\": \"boolean\", \"edge_exists\": \"boolean\", \"evidence\": \"array\", \"policy\": \"object\", \"request\": \"object\", \"retry_requested\": \"boolean\", \"role_allowed\": \"boolean\"}, \"resolutions\": [], \"rules\": [{\"claim\": \"A requested transition missing from policy.edges is blocked.\", \"dependencies\": [\"TASK.md\", \"policy.json\", \"work.py\"], \"evidence\": [\"89a660e2daab8226eea7f5d10c639ca3d4b97e48\"], \"id\": \"missing_edge\", \"target\": \"status\", \"then\": {\"value\": \"blocked\"}, \"when\": {\"args\": [{\"var\": \"edge_exists\"}, {\"value\": false}], \"op\": \"eq\"}}, {\"claim\": \"An existing edge whose role requirement is not met is denied before retry validation.\", \"dependencies\": [\"TASK.md\", \"policy.json\", \"work.py\"], \"evidence\": [\"89a660e2daab8226eea7f5d10c639ca3d4b97e48\"], \"id\": \"role_denied\", \"target\": \"status\", \"then\": {\"value\": \"permission\"}, \"when\": {\"args\": [{\"args\": [{\"var\": \"edge_exists\"}, {\"value\": true}], \"op\": \"eq\"}, {\"args\": [{\"var\": \"role_allowed\"}, {\"value\": false}], \"op\": \"eq\"}], \"op\": \"and\"}}, {\"claim\": \"A permitted existing edge requested as a retry fails when attempts is not a non-boolean integer in [0, retry_limit).\", \"dependencies\": [\"TASK.md\", \"policy.json\", \"work.py\"], \"evidence\": [\"89a660e2daab8226eea7f5d10c639ca3d4b97e48\"], \"id\": \"invalid_retry\", \"target\": \"status\", \"then\": {\"value\": \"retry_limit\"}, \"when\": {\"args\": [{\"args\": [{\"var\": \"edge_exists\"}, {\"value\": true}], \"op\": \"eq\"}, {\"args\": [{\"var\": \"role_allowed\"}, {\"value\": true}], \"op\": \"eq\"}, {\"args\": [{\"var\": \"retry_requested\"}, {\"value\": true}], \"op\": \"eq\"}, {\"args\": [{\"var\": \"attempts_valid\"}, {\"value\": false}], \"op\": \"eq\"}], \"op\": \"and\"}}, {\"claim\": \"An existing permitted edge succeeds unless a requested retry has invalid attempts.\", \"dependencies\": [\"TASK.md\", \"policy.json\", \"work.py\"], \"evidence\": [\"89a660e2daab8226eea7f5d10c639ca3d4b97e48\"], \"id\": \"allowed_transition\", \"target\": \"status\", \"then\": {\"value\": \"ok\"}, \"when\": {\"args\": [{\"args\": [{\"var\": \"edge_exists\"}, {\"value\": true}], \"op\": \"eq\"}, {\"args\": [{\"var\": \"role_allowed\"}, {\"value\": true}], \"op\": \"eq\"}, {\"args\": [{\"args\": [{\"var\": \"retry_requested\"}, {\"value\": false}], \"op\": \"eq\"}, {\"args\": [{\"var\": \"attempts_valid\"}, {\"value\": true}], \"op\": \"eq\"}], \"op\": \"or\"}], \"op\": \"and\"}}], \"schema\": 1, \"title\": \"Policy-controlled state transition evaluation\", \"unresolved\": [\"No evidence.json file was present; evidence-dependent behavior is unobserved.\"]}, \"case_count\": 4, \"complexity\": {\"cases\": 4, \"complete_bytes\": 3613, \"rules\": 4, \"working_bytes\": 2065}, \"checks\": {\"id\": \"7265cec319b4bbf9d7193f5b68e2d152261364eb\", \"status\": \"blocked\", \"issues\": [\"Evidence or dependency versions changed\"], \"uncovered_rules\": [], \"missing_evidence\": [], \"changed_dependencies\": [\"TASK.md\", \"policy.json\"], \"alternatives\": [], \"complexity\": {\"cases\": 4, \"complete_bytes\": 3613, \"rules\": 4, \"working_bytes\": 2065}, \"unresolved\": [\"No evidence.json file was present; evidence-dependent behavior is unobserved.\"], \"passed\": 4, \"total\": 4, \"failed_cases\": [], \"omitted_failed_cases\": 0}}"}}, {"type": "tool", "number": 2, "action": "list", "arguments": {"path": "."}, "result": {"ok": true, "result": [".agent_memory", ".git", "TASK.md", "policy.json", "report.json", "requests.json", "work.py"]}}, {"type": "tool", "number": 3, "action": "read", "arguments": {"path": "TASK.md"}, "result": {"ok": true, "result": {"content": "Stage 2: state_transitions; work sample 0.\nImplement evaluate(request, policy). Return {ok, value, reason}. Look up from>to in policy.edges. Missing edges are blocked. Enforce each edge's role before retry checks. A retry needs an actual integer attempts (not bool), in [0, retry_limit). On success value is to and reason is ok. On failure value is null and reason is blocked, permission, or retry_limit. Do not modify inputs.\nWrite work.py with this API. Also write report.json as a JSON array of evaluate results for requests.json, using current policy.json and evidence.json when present. Keep prior supported behavior. Use actual local checks. Store findings and unresolved limits for the next agent.\n"}}}, {"type": "tool", "number": 4, "action": "read", "arguments": {"path": "work.py"}, "result": {"ok": true, "result": {"content": "\"\"\"Evaluate policy-controlled state transitions.\"\"\"\n\n\ndef evaluate(request, policy):\n    \"\"\"Return the result of a requested state transition without mutation.\"\"\"\n    edge_key = f\"{request.get('from')}>{request.get('to')}\"\n    edge = policy.get(\"edges\", {}).get(edge_key)\n\n    if edge is None:\n        return {\"ok\": False, \"value\": None, \"reason\": \"blocked\"}\n\n    required_role = edge.get(\"role\")\n    if required_role is not None and request.get(\"role\") != required_role:\n        return {\"ok\": False, \"value\": None, \"reason\": \"permission\"}\n\n    if request.get(\"retry\") is True:\n        attempts = request.get(\"attempts\")\n        retry_limit = policy.get(\"retry_limit\")\n        valid_attempts = (\n            isinstance(attempts, int)\n            and not isinstance(attempts, bool)\n            and isinstance(retry_limit, int)\n            and not isinstance(retry_limit, bool)\n            and 0 <= attempts < retry_limit\n        )\n        if not valid_attempts:\n            return {\"ok\": False, \"value\": None, \"reason\": \"retry_limit\"}\n\n    return {\"ok\": True, \"value\": request.get(\"to\"), \"reason\": \"ok\"}\n"}}}, {"type": "tool", "number": 5, "action": "read", "arguments": {"path": "policy.json"}, "result": {"ok": true, "result": {"content": "{\n  \"variant\": 0,\n  \"edges\": {\n    \"draft>ready\": {},\n    \"ready>running\": {\n      \"role\": \"operator_0\"\n    },\n    \"running>done\": {},\n    \"failed>ready\": {\n      \"retry\": true\n    }\n  },\n  \"retry_limit\": 2\n}"}}}]

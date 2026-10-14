@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import json,re; from work import evaluate\np={'defaults':{'b':True,'i':2,'s':'x'},'types':{'b':'boolean','i':'integer','s':'string'},'null_resets':True,'environment':True}\ncases=[({'layers':[{'b':False,'i':0,'s':''}]},{'ok':True,'config':{'b':False,'i':0,'s':''},'error':None}),({'layers':[{'i':9},{'i':None}]},{'ok':True,'config':{'b':True,'i':2,'s':'x'},'error':None}),({'layers':[{'z':1}]},{'ok':False,'config':{},'error':'unknown_key'}),({'environment':{'b':'false','i':'-01','s':''}},{'ok':True,'config':{'b':False,'i':-1,'s':''},'error':None}),({'environment':{'b':'False'}},{'ok':False,'config':{},'error':'environment'}),({'environment':{'i':'+1'}},{'ok':False,'config':{},'error':'environment'}),({'environment':{'i':' 1'}},{'ok':False,'config':{},'error':'environment'}),({'environment':{'i':'1.0'}},{'ok':False,'config':{},'error':'environment'}),({'environment':{'s':3}},{'ok':False,'config':{},'error':'type'}),({'layers':[{'i':True}]},{'ok':False,'config':{},'error':'type'})]\nfor n,(r,want) in enumerate(cases):\n got=evaluate(r,p)\n assert got==want,(n,got,want)\nassert [evaluate(r,json.load(open('policy.json'))) for r in json.load(open('requests.json'))]==json.load(open('report.json'))\nprint('all checks passed')"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-m",
+              "py_compile",
+              "work.py"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "status",
+              "--short"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 26036,
+    "output_tokens": 1034,
+    "cached_input_tokens": 19072,
+    "reasoning_output_tokens": 497
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 23.896888749906793,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

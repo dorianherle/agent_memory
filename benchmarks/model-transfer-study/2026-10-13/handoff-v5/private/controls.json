@@ -1,0 +1,44 @@
+[
+  {
+    "task": "source_dependencies-073",
+    "stage": 1,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "source_dependencies-073",
+    "stage": 2,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "source_dependencies-073",
+    "stage": 3,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "calibration_limits-073",
+    "stage": 1,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "calibration_limits-073",
+    "stage": 2,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  },
+  {
+    "task": "calibration_limits-073",
+    "stage": 3,
+    "reference_pass": true,
+    "constant_control_rejected": true,
+    "incomplete_control_rejected": true
+  }
+]

@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "model_predict",
+      "name": "status",
+      "payload": {
+        "request": {
+          "layers": [
+            {
+              "enabled": false
+            },
+            {
+              "retries": 0
+            }
+          ]
+        },
+        "policy": {
+          "variant": 0,
+          "defaults": {
+            "enabled": true,
+            "retries": 3,
+            "label": "job_0"
+          },
+          "types": {
+            "enabled": "boolean",
+            "retries": "integer",
+            "label": "string"
+          },
+          "null_resets": false,
+          "environment": false
+        },
+        "evidence": []
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 14212,
+    "output_tokens": 186,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 77
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 8.348602874903008,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

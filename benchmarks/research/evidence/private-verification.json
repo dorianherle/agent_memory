@@ -1,0 +1,50 @@
+{
+  "status": "private development verification",
+  "public_release": false,
+  "platform": "macOS",
+  "python": "3.14",
+  "full_suite": {
+    "passed": 259,
+    "skipped": 1,
+    "warnings": 1,
+    "elapsed_seconds": 86.84,
+    "skip": "Live Gemini embedding test: no API key provided.",
+    "warning": "MCP lifespan field has an unresolved Pydantic forward reference."
+  },
+  "runner_regressions": {
+    "before_fix": {
+      "passed": 1,
+      "failed": 2
+    },
+    "after_fix": {
+      "runner_suite_passed": 17
+    }
+  },
+  "wheel": {
+    "file": "agent_memory-0.1.0-py3-none-any.whl",
+    "sha256": "9e6f3a6874883e5e3a2eb0e891c158575c9163878ac5e5f48996e996056d9f2a",
+    "build": "passed",
+    "install": "passed",
+    "save_find_packet": "passed",
+    "studio_assets": "present",
+    "limits": "Dependencies shared with the existing project environment; not a clean dependency installation."
+  },
+  "demo": {
+    "fresh_process": true,
+    "stale_claim_marked": true,
+    "old_length": 1.0,
+    "current_length": 1.7,
+    "old_note": "1f57dee278d82e10fbf1915284fdd483eede31ae",
+    "new_report": {
+      "length": 1.7,
+      "observed_order": 1.9995654545085917,
+      "extrapolated": 3.415088083149547,
+      "analytical_reference": 3.4150880280586016,
+      "relative_error": 1.6131632663805927e-08,
+      "qualified": true,
+      "evidence_type": "numerical finite-difference study with analytical check"
+    },
+    "model_calls": 0,
+    "claim": "deterministic_workflow_example"
+  }
+}

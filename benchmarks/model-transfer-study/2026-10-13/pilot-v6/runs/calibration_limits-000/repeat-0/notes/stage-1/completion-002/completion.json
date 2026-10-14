@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "write",
+    "arguments": {
+      "path": "work.py",
+      "content": "\"\"\"Evaluate requests against evidence under a policy.\"\"\"\n\nimport json\n\n\ndef _canonical_json(value):\n    return json.dumps(value, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False, allow_nan=False)\n\n\ndef _source_ids(value):\n    if value is None:\n        return ()\n    if isinstance(value, (list, tuple, set)):\n        return tuple(value)\n    return (value,)\n\n\ndef evaluate(request, evidence, policy):\n    required = policy.get(\"required_conditions\", [])\n    request_conditions = request.get(\"conditions\", {})\n    missing = sorted(name for name in required if name not in request_conditions)\n    if missing:\n        return {\"status\": \"unknown\", \"value\": None, \"sources\": [], \"unknowns\": missing}\n\n    eligible = []\n    for record in evidence:\n        if record.get(\"claim\") != request.get(\"claim\"):\n            continue\n        if record.get(\"withdrawn\", False):\n            continue\n        if policy.get(\"require_verified\", False) and record.get(\"verified\") is not True:\n            continue\n        record_conditions = record.get(\"conditions\", {})\n        if any(name not in record_conditions or record_conditions[name] != request_conditions[name] for name in required):\n            continue\n        eligible.append(record)\n\n    superseded = set()\n    for record in eligible:\n        source = record.get(\"source\")\n        for old_source in _source_ids(record.get(\"supersedes\")):\n            if old_source != source:\n                superseded.add(old_source)\n    eligible = [record for record in eligible if record.get(\"source\") not in superseded]\n\n    if not eligible:\n        return {\"status\": \"unknown\", \"value\": None, \"sources\": [], \"unknowns\": [\"no matching evidence\"]}\n\n    sources = sorted(record[\"source\"] for record in eligible)\n    values = {}\n    for record in eligible:\n        value = record.get(\"value\")\n        values.setdefault(_canonical_json(value), value)\n    if len(values) != 1:\n        return {\"status\": \"conflict\", \"value\": None, \"sources\": sources, \"unknowns\": [\"source disagreement\"]}\n\n    value = next(iter(values.values()))\n    return {\"status\": \"unsupported\" if value is False else \"supported\", \"value\": value, \"sources\": sources, \"unknowns\": []}\n"
+    }
+  },
+  "usage": {
+    "input_tokens": 21216,
+    "output_tokens": 2251,
+    "cached_input_tokens": 16128,
+    "reasoning_output_tokens": 585
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 33.025373083073646,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

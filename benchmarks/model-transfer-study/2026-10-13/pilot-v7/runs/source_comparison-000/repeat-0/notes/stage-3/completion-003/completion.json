@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "run",
+    "arguments": {
+      "command": [
+        "python",
+        "-c",
+        "import copy, json\nfrom work import evaluate\n\ndef chk(req, ev, pol, exp):\n    req0=copy.deepcopy(req); ev0=copy.deepcopy(ev); pol0=copy.deepcopy(pol)\n    got=evaluate(req,ev,pol)\n    assert got==exp,(got,exp)\n    assert (req,ev,pol)==(req0,ev0,pol0)\n    assert list(got)==['status','value','sources','unknowns']\n\np={'required_conditions':['b','a'],'require_verified':True}\nchk({'claim':'x','conditions':{'a':1}},[],p,{'status':'unknown','value':None,'sources':[],'unknowns':['b']})\nchk({'claim':'x','conditions':{'a':1,'b':2}},[],p,{'status':'unknown','value':None,'sources':[],'unknowns':['no matching evidence']})\nbase={'claim':'x','conditions':{'a':1,'b':2},'verified':True}\nchk({'claim':'x','conditions':{'a':1,'b':2}},[dict(base,source='z',value={'q':[1,2]}),dict(base,source='a',value={'q':[1,2]})],p,{'status':'supported','value':{'q':[1,2]},'sources':['a','z'],'unknowns':[]})\nchk({'claim':'x','conditions':{'a':1,'b':2}},[dict(base,source='z',value=1),dict(base,source='a',value=2)],p,{'status':'conflict','value':None,'sources':['a','z'],'unknowns':['source disagreement']})\nchk({'claim':'x','conditions':{'a':1,'b':2}},[dict(base,source='old',value=1),dict(base,source='new',value=False,supersedes=['old'])],p,{'status':'unsupported','value':False,'sources':['new'],'unknowns':[]})\nchk({'claim':'x','conditions':{'a':1,'b':2}},[dict(base,source='w',value=1,withdrawn=True),dict(base,source='u',value=1,verified=False),dict(base,source='m',value=1,conditions={'a':1,'b':3})],p,{'status':'unknown','value':None,'sources':[],'unknowns':['no matching evidence']})\nwith open('requests.json') as f: rs=json.load(f)\nwith open('evidence.json') as f: ev=json.load(f)\nwith open('policy.json') as f: pol=json.load(f)\nwith open('report.json') as f: report=json.load(f)\nassert [evaluate(r,ev,pol) for r in rs]==report\nprint('all checks passed')"
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 23130,
+    "output_tokens": 968,
+    "cached_input_tokens": 17792,
+    "reasoning_output_tokens": 281
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 20.388953999849036,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

@@ -1,0 +1,56 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "read",
+          "arguments": {
+            "path": "TASK.md"
+          }
+        },
+        {
+          "action": "read",
+          "arguments": {
+            "path": "SOURCES.md"
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import json,copy,work\nR={'claim':'c','conditions':{'a':1}}\nP={'required_conditions':['a'],'require_verified':True}\nE=[{'source':'old','claim':'c','value':1,'conditions':{'a':1},'verified':True},{'source':'new','claim':'c','value':2,'conditions':{'a':1},'verified':True,'supersedes':['old']}]\nr0,e0,p0=copy.deepcopy(R),copy.deepcopy(E),copy.deepcopy(P)\nassert work.evaluate(R,E,P)=={'status':'supported','value':2,'sources':['new'],'unknowns':[]}\nassert work.evaluate({'claim':'c','conditions':{}},E,P)=={'status':'unknown','value':None,'sources':[],'unknowns':['a']}\nassert work.evaluate({'claim':'z','conditions':{'a':1}},E,P)=={'status':'unknown','value':None,'sources':[],'unknowns':['no matching evidence']}\nassert (R,E,P)==(r0,e0,p0)\nprint('checks passed')"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import json,work\nr=json.load(open('requests.json'));e=json.load(open('evidence.json'));p=json.load(open('policy.json'));print(json.dumps([work.evaluate(x,e,p) for x in r],indent=2))"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 21708,
+    "output_tokens": 938,
+    "cached_input_tokens": 16896,
+    "reasoning_output_tokens": 253
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 21.044593416154385,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

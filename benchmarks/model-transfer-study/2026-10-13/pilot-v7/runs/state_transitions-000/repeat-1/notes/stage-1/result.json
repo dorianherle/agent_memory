@@ -1,0 +1,270 @@
+{
+  "stop": "finished",
+  "tool_calls": 19,
+  "elapsed_seconds": 115.84639308298938,
+  "usage_complete": true,
+  "tokens": 145340,
+  "known_tokens": 145340,
+  "input_tokens": 141827,
+  "output_tokens": 3513,
+  "cached_input_tokens": 108160,
+  "reasoning_output_tokens": 1592,
+  "stage": 1,
+  "grade": {
+    "full_pass": true,
+    "passed": 49,
+    "total": 49,
+    "checks": [
+      {
+        "check": "case_0",
+        "passed": true
+      },
+      {
+        "check": "case_1",
+        "passed": true
+      },
+      {
+        "check": "case_2",
+        "passed": true
+      },
+      {
+        "check": "case_3",
+        "passed": true
+      },
+      {
+        "check": "case_4",
+        "passed": true
+      },
+      {
+        "check": "case_5",
+        "passed": true
+      },
+      {
+        "check": "case_6",
+        "passed": true
+      },
+      {
+        "check": "case_7",
+        "passed": true
+      },
+      {
+        "check": "case_8",
+        "passed": true
+      },
+      {
+        "check": "case_9",
+        "passed": true
+      },
+      {
+        "check": "case_10",
+        "passed": true
+      },
+      {
+        "check": "case_11",
+        "passed": true
+      },
+      {
+        "check": "case_12",
+        "passed": true
+      },
+      {
+        "check": "case_13",
+        "passed": true
+      },
+      {
+        "check": "case_14",
+        "passed": true
+      },
+      {
+        "check": "case_15",
+        "passed": true
+      },
+      {
+        "check": "case_16",
+        "passed": true
+      },
+      {
+        "check": "case_17",
+        "passed": true
+      },
+      {
+        "check": "case_18",
+        "passed": true
+      },
+      {
+        "check": "case_19",
+        "passed": true
+      },
+      {
+        "check": "case_20",
+        "passed": true
+      },
+      {
+        "check": "case_21",
+        "passed": true
+      },
+      {
+        "check": "case_22",
+        "passed": true
+      },
+      {
+        "check": "case_23",
+        "passed": true
+      },
+      {
+        "check": "case_24",
+        "passed": true
+      },
+      {
+        "check": "case_25",
+        "passed": true
+      },
+      {
+        "check": "case_26",
+        "passed": true
+      },
+      {
+        "check": "case_27",
+        "passed": true
+      },
+      {
+        "check": "case_28",
+        "passed": true
+      },
+      {
+        "check": "case_29",
+        "passed": true
+      },
+      {
+        "check": "case_30",
+        "passed": true
+      },
+      {
+        "check": "case_31",
+        "passed": true
+      },
+      {
+        "check": "case_32",
+        "passed": true
+      },
+      {
+        "check": "case_33",
+        "passed": true
+      },
+      {
+        "check": "case_34",
+        "passed": true
+      },
+      {
+        "check": "case_35",
+        "passed": true
+      },
+      {
+        "check": "case_36",
+        "passed": true
+      },
+      {
+        "check": "case_37",
+        "passed": true
+      },
+      {
+        "check": "case_38",
+        "passed": true
+      },
+      {
+        "check": "case_39",
+        "passed": true
+      },
+      {
+        "check": "case_40",
+        "passed": true
+      },
+      {
+        "check": "case_41",
+        "passed": true
+      },
+      {
+        "check": "case_42",
+        "passed": true
+      },
+      {
+        "check": "case_43",
+        "passed": true
+      },
+      {
+        "check": "case_44",
+        "passed": true
+      },
+      {
+        "check": "case_45",
+        "passed": true
+      },
+      {
+        "check": "case_46",
+        "passed": true
+      },
+      {
+        "check": "all_cases_returned",
+        "passed": true
+      },
+      {
+        "check": "current_source_report",
+        "passed": true
+      }
+    ],
+    "unsupported_conclusions": 0,
+    "missed_source_changes": 0
+  },
+  "memory": {
+    "ok": true,
+    "result": {
+      "notes": 3,
+      "model": null,
+      "checks": {
+        "status": "absent"
+      },
+      "evidence": [
+        {
+          "id": "2b8c29cad5af9a67ee9dc49b76320887cf7eda0d",
+          "text": "Implemented work.py evaluate(request, policy): missing edges are blocked; edge role is enforced before retry validation; retries require a non-bool integer attempts in [0, retry_limit); inputs are not mutated; results contain exactly ok/value/reason. Generated report.json from current requests.json and policy.json. Local assertions and git diff --check passed.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "report.json",
+              "requests.json",
+              "policy.json",
+              "OUTPUT_SCHEMA.json"
+            ]
+          }
+        },
+        {
+          "id": "abf896ddd6ca1c3823a7fa10bd0d67eb4cbd0e3d",
+          "text": "Unresolved limit: evidence.json is absent, so report generation used current policy.json only; no evidence-specific behavior was inferable or required by the state-transition API.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "TASK.md"
+            ]
+          }
+        },
+        {
+          "id": "fa144b3a26e80330569f139af0e8f27cffcf64d0",
+          "text": "Milestone complete: implemented and locally verified state-transition evaluation and generated the matching report. Missing edges block; role permission precedes retry validation; retry attempts must be a non-bool integer within policy bounds; outputs have exactly the schema fields; inputs remain unchanged. report.json matches evaluation of all current requests. evidence.json was absent.",
+          "payload": {
+            "agent": "agent",
+            "files": [
+              "work.py",
+              "report.json",
+              "requests.json",
+              "policy.json",
+              "OUTPUT_SCHEMA.json",
+              "TASK.md"
+            ],
+            "summary": true
+          }
+        }
+      ]
+    }
+  }
+}

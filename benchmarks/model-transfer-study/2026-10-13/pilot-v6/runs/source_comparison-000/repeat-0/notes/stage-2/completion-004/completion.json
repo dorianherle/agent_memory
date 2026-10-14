@@ -1,0 +1,57 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy,json; from work import evaluate\nreq={'claim':'c','conditions':{'b':{'y':2,'x':1},'a':[1,2]}}; pol={'required_conditions':['b','a'],'require_verified':True}; ev=[{'source':'old','claim':'c','value':{'x':1,'y':[2]},'conditions':{'a':[1,2],'b':{'x':1,'y':2}},'verified':True},{'source':'new','claim':'c','value':{'y':[2],'x':1},'conditions':{'a':[1,2],'b':{'x':1,'y':2}},'verified':True,'supersedes':['old']},{'source':'withdrawn','claim':'c','value':9,'conditions':req['conditions'],'verified':True,'withdrawn':True},{'source':'unverified','claim':'c','value':9,'conditions':req['conditions']}]; before=copy.deepcopy((req,ev,pol)); assert evaluate(req,ev,pol)=={'status':'supported','value':{'y':[2],'x':1},'sources':['new'],'unknowns':[]}; assert (req,ev,pol)==before; assert evaluate({'claim':'c','conditions':{}},ev,pol)=={'status':'unknown','value':None,'sources':[],'unknowns':['a','b']}; conflict=[{'source':'z','claim':'c','value':1,'conditions':req['conditions'],'verified':True},{'source':'a','claim':'c','value':2,'conditions':req['conditions'],'verified':True}]; assert evaluate(req,conflict,pol)=={'status':'conflict','value':None,'sources':['a','z'],'unknowns':['source disagreement']}; assert evaluate({'claim':'none','conditions':req['conditions']},ev,pol)=={'status':'unknown','value':None,'sources':[],'unknowns':['no matching evidence']}; assert evaluate({'claim':'f','conditions':{}},[{'source':'s','claim':'f','value':False,'conditions':{}}],{'required_conditions':[]})=={'status':'unsupported','value':False,'sources':['s'],'unknowns':[]}; requests=json.load(open('requests.json')); evidence=json.load(open('evidence.json')); policy=json.load(open('policy.json')); report=json.load(open('report.json')); assert report==[evaluate(r,evidence,policy) for r in requests]; print('all checks passed')"
+            ]
+          }
+        },
+        {
+          "action": "memory",
+          "arguments": {
+            "action": "save",
+            "text": "Stage 2 work sample 0 complete. work.py evaluate filters by claim, withdrawal, exact canonical JSON matches for required conditions, and optional verified status; reports sorted missing conditions, applies supersession only among eligible records, detects canonical JSON agreement/conflict, preserves Boolean false as unsupported, deep-copies returned values, and does not mutate inputs. report.json was regenerated: vertical_rate=32 from S2 (which supersedes S1), device_validated=false from D1. Local assertions cover filtering, canonical object comparisons, supersession, conflicts, missing/no evidence, false, input immutability, and report consistency.",
+            "payload": {
+              "files": [
+                "work.py",
+                "report.json",
+                "requests.json",
+                "evidence.json",
+                "policy.json"
+              ]
+            }
+          }
+        },
+        {
+          "action": "memory",
+          "arguments": {
+            "action": "save",
+            "text": "Unresolved limit: canonical JSON comparison intentionally requires JSON-serializable values and rejects NaN/Infinity via allow_nan=False, consistent with the task's canonical JSON wording. Evidence source IDs are assumed present and sortable, as required output calls for sorted source IDs."
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 13195,
+    "output_tokens": 870,
+    "cached_input_tokens": 6528,
+    "reasoning_output_tokens": 70
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 13.912069084122777,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

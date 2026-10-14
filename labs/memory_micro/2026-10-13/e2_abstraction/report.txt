@@ -1,0 +1,31 @@
+E2: Private constructed abstraction screen
+This screen does not prove general law discovery.
+Protocol SHA256: 9f92c3fcf022d6e7488b97b9e1f61fbcddb45156edcee949c2508ae5e03edeab
+Calls attempted: 10
+Wall time: 49.85 seconds
+Native usage: {"input_tokens": 122067, "output_tokens": 1302, "complete": true}
+Packet sizes use o200k_base. Native CLI input has fixed overhead.
+
+History: release. Size: 537 tokens.
+full: {"score": {"answers": {"T1": "unusable", "T2": "usable", "T3": "usable", "U1": "usable", "U2": "unusable", "U3": "unusable", "U4": "usable", "U5": "unusable", "U6": "usable", "U7": "unusable", "U8": "unusable"}, "counts": {"observed": {"correct": 3, "total": 3}, "unseen": {"correct": 8, "total": 8}}, "failures": [], "parse_error": null, "all_pass": true}, "size": null, "pass": null}
+summary: {"score": {"answers": {"T1": "unusable", "T2": "usable", "T3": "usable", "U1": "usable", "U2": "unusable", "U3": "unusable", "U4": "usable", "U5": "unusable", "U6": "usable", "U7": "unusable", "U8": "unusable"}, "counts": {"observed": {"correct": 3, "total": 3}, "unseen": {"correct": 8, "total": 8}}, "failures": [], "parse_error": null, "all_pass": true}, "size": {"packet_tokens": 232, "packet_utf8_bytes": 1031, "within_target": false}, "pass": false}
+rules: {"score": {"answers": {"T1": "unusable", "T2": "usable", "T3": "usable", "U1": "usable", "U2": "unusable", "U3": "unusable", "U4": "usable", "U5": "unusable", "U6": "usable", "U7": "unusable", "U8": "unusable"}, "counts": {"observed": {"correct": 3, "total": 3}, "unseen": {"correct": 8, "total": 8}}, "failures": [], "parse_error": null, "all_pass": true}, "size": {"packet_tokens": 145, "packet_utf8_bytes": 749, "within_target": true}, "pass": true}
+
+History: independent. Size: 156 tokens.
+full: {"score": {"answers": {"T1": "usable", "T2": "unusable", "T3": "usable", "U1": "unknown", "U2": "unknown", "U3": "unknown", "U4": "unknown"}, "counts": {"observed": {"correct": 3, "total": 3}, "unseen": {"correct": 4, "total": 4}}, "failures": [], "parse_error": null, "all_pass": true}, "size": null, "pass": null}
+summary: {"score": {"answers": {"T1": "usable", "T2": "unusable", "T3": "usable", "U1": "unknown", "U2": "unknown", "U3": "unknown", "U4": "unknown"}, "counts": {"observed": {"correct": 3, "total": 3}, "unseen": {"correct": 4, "total": 4}}, "failures": [], "parse_error": null, "all_pass": true}, "size": {"packet_tokens": 108, "packet_utf8_bytes": 424, "within_target": true}, "pass": true}
+rules: {"score": {"answers": {"T1": "usable", "T2": "unusable", "T3": "usable", "U1": "unknown", "U2": "unknown", "U3": "unknown", "U4": "unknown"}, "counts": {"observed": {"correct": 3, "total": 3}, "unseen": {"correct": 4, "total": 4}}, "failures": [], "parse_error": null, "all_pass": true}, "size": {"packet_tokens": 156, "packet_utf8_bytes": 641, "within_target": true}, "pass": true}
+
+Failures: {}
+Next test: Repeat with held-out workflow families and histories where an apparent rule has a late exception. Test whether a packet changes its rule or preserves an explicit uncertainty.
+Limits: One run per arm. Histories are constructed. Receiver questions provide state fields. The LLM may use pretrained knowledge. A shorter packet does not establish total token savings.
+
+Interpretation:
+All receivers passed every observed and unseen question. No prediction advantage was measured for the rule prompt.
+The ordinary summary also inferred the shared release rule. It failed only the frozen 220-token size target: its estimated size was 232 tokens.
+The release rule packet used an estimated 145 tokens. This is 37.5 percent less than the summary packet.
+For the independent control, the rule packet used an estimated 156 tokens. The summary used 108. The rule packet was 44.4 percent longer.
+These packet sizes are o200k_base estimates. Native usage is the recorded model-call usage. Input overhead differed between call waves.
+The native total was 122,067 input tokens and 1,302 output tokens. All 10 calls have native usage events.
+This screen tested one handoff. It did not test progressive handoffs, fine-tuning, latent memory, or discovery beyond this constructed workflow.
+The rule packet placed a general relationship under Observations. Statement-level source grounding needs a separate test.

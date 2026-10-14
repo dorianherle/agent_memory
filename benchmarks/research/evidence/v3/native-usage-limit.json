@@ -1,0 +1,12 @@
+{
+  "cli_version": "0.155.1",
+  "configured_model": "gpt-6.1-sol",
+  "authentication": "ChatGPT",
+  "probe": "Minimal no-tool readiness response with codex exec --json --ephemeral",
+  "status": "failed before a model completion",
+  "backend_error": "The 'gpt-6.1-sol' model is not supported when using Codex with a ChatGPT account.",
+  "native_token_usage_available": false,
+  "cost_savings_claimed": false,
+  "model_override_used": false,
+  "fallback": "Fresh collaboration agents with inherited root settings"
+}

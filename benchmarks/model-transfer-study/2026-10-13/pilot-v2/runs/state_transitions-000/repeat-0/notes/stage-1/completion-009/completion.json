@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "memory",
+    "arguments": {
+      "action": "find",
+      "query": "state_transitions evaluate retry attempts role blocked permission retry_limit"
+    }
+  },
+  "usage": {
+    "input_tokens": 18742,
+    "output_tokens": 318,
+    "cached_input_tokens": 15616,
+    "reasoning_output_tokens": 236
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 14.32896054093726,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

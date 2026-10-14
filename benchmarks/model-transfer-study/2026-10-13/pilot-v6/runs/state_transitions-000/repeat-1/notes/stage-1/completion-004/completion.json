@@ -1,0 +1,68 @@
+{
+  "ok": true,
+  "errors": [],
+  "decision": {
+    "action": "batch",
+    "arguments": {
+      "calls": [
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "python",
+              "-c",
+              "import copy,json; from work import evaluate\n\ndef check(req,pol,expected):\n a=copy.deepcopy(req); b=copy.deepcopy(pol); got=evaluate(req,pol); assert got==expected,(req,got,expected); assert req==a and pol==b\np={'edges':{'a>b':{},'b>c':{'role':'op'}},'retry_limit':2}\ncheck({'from':'a','to':'x'},p,{'ok':False,'value':None,'reason':'blocked'})\ncheck({'from':'b','to':'c','role':'bad','attempts':9},p,{'ok':False,'value':None,'reason':'permission'})\nfor n in (0,1): check({'from':'a','to':'b','attempts':n},p,{'ok':True,'value':'b','reason':'ok'})\nfor n in (-1,2,True,False,1.0,'1',None): check({'from':'a','to':'b','attempts':n},p,{'ok':False,'value':None,'reason':'retry_limit'})\nrequests=json.load(open('requests.json')); policy=json.load(open('policy.json')); actual=[evaluate(x,policy) for x in requests]; assert actual==json.load(open('report.json')); print('all checks passed')"
+            ]
+          }
+        },
+        {
+          "action": "run",
+          "arguments": {
+            "command": [
+              "git",
+              "diff",
+              "--",
+              "work.py",
+              "report.json"
+            ]
+          }
+        },
+        {
+          "action": "memory",
+          "arguments": {
+            "action": "save",
+            "text": "Implemented work.py evaluate(request, policy): composite from>to edge lookup; missing edge blocked; required edge role checked before retry validation; attempts must be a non-bool int with 0 <= attempts < integer non-bool retry_limit; returns stable {ok,value,reason} objects without input mutation. Generated report.json from current policy.json and requests.json; no evidence.json was present. Verified syntax, report equality, input immutability, role-before-retry precedence, and retry boundaries/types.",
+            "payload": {
+              "files": [
+                "work.py",
+                "report.json",
+                "policy.json",
+                "requests.json"
+              ]
+            }
+          }
+        },
+        {
+          "action": "memory",
+          "arguments": {
+            "action": "save",
+            "text": "Unresolved limits: behavior for structurally invalid policies (for example, non-object edges or edge definitions) is unspecified by TASK.md and was not broadened beyond valid policy-shaped inputs."
+          }
+        }
+      ]
+    }
+  },
+  "usage": {
+    "input_tokens": 21973,
+    "output_tokens": 873,
+    "cached_input_tokens": 17152,
+    "reasoning_output_tokens": 303
+  },
+  "usage_complete": true,
+  "native_tool_calls": 0,
+  "events": 4,
+  "elapsed_seconds": 17.535377540858462,
+  "timed_out": false,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}

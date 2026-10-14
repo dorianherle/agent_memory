@@ -1,0 +1,23 @@
+{
+  "controls": [
+    {
+      "case": "convergence",
+      "positive_passed": 11,
+      "total": 11,
+      "negative_passed": 0
+    },
+    {
+      "case": "vector_error",
+      "positive_passed": 11,
+      "total": 11,
+      "negative_passed": 0
+    },
+    {
+      "case": "runtime_audit",
+      "positive_passed": 11,
+      "total": 11,
+      "negative_passed": 0
+    }
+  ],
+  "passed": true
+}

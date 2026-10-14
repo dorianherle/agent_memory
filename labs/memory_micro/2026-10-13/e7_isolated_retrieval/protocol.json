@@ -1,0 +1,595 @@
+{
+  "experiment": "E7 isolated retrieval diagnostic",
+  "frozen_before_calls": true,
+  "classification": "Adaptive diagnostic on the known E4 fixture. Not an independent confirmation or abstraction test.",
+  "model": "gpt-5.6-sol",
+  "reasoning": "low",
+  "fixed_query_ids": [
+    "quarry_correction",
+    "quarry_rare_lateral",
+    "quarry_tail",
+    "quarry_absent"
+  ],
+  "tests": [
+    {
+      "id": "quarry_correction",
+      "query": "For Quarry etch, what is the current chuck temperature setpoint?",
+      "answer": "135 C",
+      "source": "Q08"
+    },
+    {
+      "id": "quarry_rare_lateral",
+      "query": "For Quarry etch, can I assume that the lateral etch rate is zero?",
+      "answer": "No; unknown",
+      "source": "Q09"
+    },
+    {
+      "id": "quarry_tail",
+      "query": "For Quarry etch, what is the cooling hold duration?",
+      "answer": "11 minutes",
+      "source": "Q21"
+    },
+    {
+      "id": "quarry_absent",
+      "query": "What is the release date of Quarry etch?",
+      "answer": "UNKNOWN",
+      "source": "NONE"
+    }
+  ],
+  "source_hashes": {
+    "e4_query_memory/script.py": "b7ee207d7c32e22b59a3aa9a7abd628340bb589d198616b2c64983a7531afc36",
+    "e4_query_memory/archive.json": "533917c16e274ade83654f0c8e4fd45c3d6c8fb0db88cc8de3c94fc701f6fe16",
+    "e4_query_memory/global_packet_capped.txt": "d6a8e68ce8c1488a8831e9c500f2742687b7d5924ec41d593d70b99664a415dd",
+    "e4_query_memory/protocol.json": "11bd29dd3cfaf118b2ef50a9af06ef989f82656673e56b192ef6965244c41843"
+  },
+  "global_packet": "Sparrow beam: Build a low-power 1550-nm alignment module, R6. Normal limit 17 mW (S08 replaces S02); ice limit 3 mW. Aperture 42 µm; output P4; FC/APC. Never use blue binder on vacuum surfaces. Preserve failed tests. Qualify at 65 °C; four tests remain; repeat 37 times. PD-728; owner Mira Chen. [S01-S24]\nQuarry etch: Qualify Q-11 in E2. Chuck 135 °C (Q08 replaces Q02); 7 mTorr; 93 s. Sapphire/chromium. Lateral rate unknown—never assume zero. No acetone. File quarry_Q11.yaml. [Q01-Q24]",
+  "global_tokens": 164,
+  "packet_limit_tokens": 180,
+  "retrieval_algorithm": "Exact reuse of E4 retrieve(query, archive)",
+  "retrieval": [
+    {
+      "query": "For Quarry etch, what is the current chuck temperature setpoint?",
+      "query_terms": {
+        "quarry": 1,
+        "etch": 1,
+        "chuck": 1,
+        "temperature": 1,
+        "setpoint": 1
+      },
+      "project_filter": [
+        "Quarry etch"
+      ],
+      "ranked": [
+        {
+          "source": "Q08",
+          "score": 14.4425186157032
+        },
+        {
+          "source": "Q02",
+          "score": 14.4425186157032
+        },
+        {
+          "source": "Q24",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q23",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q22",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q21",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q20",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q19",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q18",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q17",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q16",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q15",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q14",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q13",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q12",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q11",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q10",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q09",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q07",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q06",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q05",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q04",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q03",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q01",
+          "score": 3.4919236578571473
+        }
+      ],
+      "selected_sources": [
+        "Q08",
+        "Q02",
+        "Q24",
+        "Q23",
+        "Q22",
+        "Q21",
+        "Q20",
+        "Q19",
+        "Q18",
+        "Q06"
+      ],
+      "context": "[Q08] Quarry etch: Correction: chuck temperature setpoint is now 135 C. This replaces the previous 120 C setpoint.\n[Q02] Quarry etch: The chuck temperature setpoint is 120 C.\n[Q24] Quarry etch: The backup gas line is G3.\n[Q23] Quarry etch: The process file name is quarry_Q11.yaml.\n[Q22] Quarry etch: The inspection microscope objective is 20x.\n[Q21] Quarry etch: The cooling hold is 11 minutes.\n[Q20] Quarry etch: The sample carrier label is CR-82.\n[Q19] Quarry etch: The metrology owner is Tomas Reed.\n[Q18] Quarry etch: The target vertical depth is 610 nm.\n[Q06] Quarry etch: The run uses chamber E2.",
+      "tokens": 180,
+      "record_count": 10
+    },
+    {
+      "query": "For Quarry etch, can I assume that the lateral etch rate is zero?",
+      "query_terms": {
+        "quarry": 1,
+        "etch": 2,
+        "assume": 1,
+        "that": 1,
+        "lateral": 1,
+        "rate": 1,
+        "zero": 1
+      },
+      "project_filter": [
+        "Quarry etch"
+      ],
+      "ranked": [
+        {
+          "source": "Q09",
+          "score": 15.24102631192097
+        },
+        {
+          "source": "Q24",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q23",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q22",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q21",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q20",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q19",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q18",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q17",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q16",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q15",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q14",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q13",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q12",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q11",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q10",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q08",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q07",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q06",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q05",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q04",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q03",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q02",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q01",
+          "score": 3.4919236578571473
+        }
+      ],
+      "selected_sources": [
+        "Q09",
+        "Q24",
+        "Q23",
+        "Q22",
+        "Q21",
+        "Q20",
+        "Q19",
+        "Q18",
+        "Q17",
+        "Q16"
+      ],
+      "context": "[Q09] Quarry etch: Rare constraint: lateral etch rate is unknown. Never replace it with an assumed zero.\n[Q24] Quarry etch: The backup gas line is G3.\n[Q23] Quarry etch: The process file name is quarry_Q11.yaml.\n[Q22] Quarry etch: The inspection microscope objective is 20x.\n[Q21] Quarry etch: The cooling hold is 11 minutes.\n[Q20] Quarry etch: The sample carrier label is CR-82.\n[Q19] Quarry etch: The metrology owner is Tomas Reed.\n[Q18] Quarry etch: The target vertical depth is 610 nm.\n[Q17] Quarry etch: The mask thickness is 180 nm.\n[Q16] Quarry etch: The wafer diameter is 100 mm.",
+      "tokens": 175,
+      "record_count": 10
+    },
+    {
+      "query": "For Quarry etch, what is the cooling hold duration?",
+      "query_terms": {
+        "quarry": 1,
+        "etch": 1,
+        "cooling": 1,
+        "hold": 1,
+        "duration": 1
+      },
+      "project_filter": [
+        "Quarry etch"
+      ],
+      "ranked": [
+        {
+          "source": "Q21",
+          "score": 12.32737702508388
+        },
+        {
+          "source": "Q11",
+          "score": 7.504185233362349
+        },
+        {
+          "source": "Q24",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q23",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q22",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q20",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q19",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q18",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q17",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q16",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q15",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q14",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q13",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q12",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q10",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q09",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q08",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q07",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q06",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q05",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q04",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q03",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q02",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q01",
+          "score": 3.4919236578571473
+        }
+      ],
+      "selected_sources": [
+        "Q21",
+        "Q11",
+        "Q24",
+        "Q23",
+        "Q22",
+        "Q20",
+        "Q19",
+        "Q18",
+        "Q17",
+        "Q16",
+        "Q05"
+      ],
+      "context": "[Q21] Quarry etch: The cooling hold is 11 minutes.\n[Q11] Quarry etch: The etch duration is 93 seconds.\n[Q24] Quarry etch: The backup gas line is G3.\n[Q23] Quarry etch: The process file name is quarry_Q11.yaml.\n[Q22] Quarry etch: The inspection microscope objective is 20x.\n[Q20] Quarry etch: The sample carrier label is CR-82.\n[Q19] Quarry etch: The metrology owner is Tomas Reed.\n[Q18] Quarry etch: The target vertical depth is 610 nm.\n[Q17] Quarry etch: The mask thickness is 180 nm.\n[Q16] Quarry etch: The wafer diameter is 100 mm.\n[Q05] Quarry etch: The mask material is chromium.",
+      "tokens": 180,
+      "record_count": 11
+    },
+    {
+      "query": "What is the release date of Quarry etch?",
+      "query_terms": {
+        "release": 1,
+        "date": 1,
+        "quarry": 1,
+        "etch": 1
+      },
+      "project_filter": [
+        "Quarry etch"
+      ],
+      "ranked": [
+        {
+          "source": "Q24",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q23",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q22",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q21",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q20",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q19",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q18",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q17",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q16",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q15",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q14",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q13",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q12",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q11",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q10",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q09",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q08",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q07",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q06",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q05",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q04",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q03",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q02",
+          "score": 3.4919236578571473
+        },
+        {
+          "source": "Q01",
+          "score": 3.4919236578571473
+        }
+      ],
+      "selected_sources": [
+        "Q24",
+        "Q23",
+        "Q22",
+        "Q21",
+        "Q20",
+        "Q19",
+        "Q18",
+        "Q17",
+        "Q16",
+        "Q15",
+        "Q05"
+      ],
+      "context": "[Q24] Quarry etch: The backup gas line is G3.\n[Q23] Quarry etch: The process file name is quarry_Q11.yaml.\n[Q22] Quarry etch: The inspection microscope objective is 20x.\n[Q21] Quarry etch: The cooling hold is 11 minutes.\n[Q20] Quarry etch: The sample carrier label is CR-82.\n[Q19] Quarry etch: The metrology owner is Tomas Reed.\n[Q18] Quarry etch: The target vertical depth is 610 nm.\n[Q17] Quarry etch: The mask thickness is 180 nm.\n[Q16] Quarry etch: The wafer diameter is 100 mm.\n[Q15] Quarry etch: The ICP source power is 320 W.\n[Q05] Quarry etch: The mask material is chromium.",
+      "tokens": 180,
+      "record_count": 11
+    }
+  ],
+  "calls": 12,
+  "concurrency": 4,
+  "maximum_seconds": 180,
+  "receiver_isolation": "One query and its assigned memory in each separate fresh model-only helper call. No other query or context is supplied.",
+  "semantic_normalization_map": {
+    "135 °c": "135 c",
+    "135°c": "135 c",
+    "135 degrees c": "135 c",
+    "135 degrees celsius": "135 c",
+    "135 celsius": "135 c",
+    "11 min": "11 minutes",
+    "11 mins": "11 minutes",
+    "11 minute": "11 minutes",
+    "660 s": "11 minutes",
+    "660 seconds": "11 minutes",
+    "no; unknown.": "no; unknown",
+    "unknown.": "unknown",
+    "not specified": "unknown",
+    "not set": "unknown",
+    "not known": "unknown"
+  },
+  "other_normalization": "Lowercase, strip outer whitespace, and combine repeated whitespace. No other answer equivalences are accepted.",
+  "source_scoring": "Exact original source ID; case-insensitive NONE accepted.",
+  "expected_values": "Original E4 values reused without changes.",
+  "tokenizer": "o200k_base estimate; native usage recorded separately",
+  "blind_spots": [
+    "Known fixture selected after E4 outcomes",
+    "Four questions",
+    "One model",
+    "One repetition",
+    "Fixed project-name lexical retrieval",
+    "Global packet produced by an earlier adaptive writer",
+    "No new writer or training",
+    "No native task continuation",
+    "No fundamental-rule discovery",
+    "No statistical confirmation"
+  ]
+}

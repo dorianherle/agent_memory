@@ -1,0 +1,154 @@
+{
+  "passed": true,
+  "immutable_files_checked": 196,
+  "paired_stage1_code_and_note_hashes_match": true,
+  "stage2_is_sequential_arm_continuation": true,
+  "no_hidden_grader_feedback_to_workers": true,
+  "isolation": "Instruction-scoped. No OS read barrier is claimed.",
+  "traces": [
+    {
+      "stage": 1,
+      "condition": "memory",
+      "trial": 1,
+      "task": "research",
+      "helper_reads": 1,
+      "helper_returned_chars": 8439,
+      "limit": "Helper output only. Excludes source, packet, and other tool reads. Not native model tokens or cost."
+    },
+    {
+      "stage": 1,
+      "condition": "memory",
+      "trial": 1,
+      "task": "software",
+      "helper_reads": 1,
+      "helper_returned_chars": 9137,
+      "limit": "Helper output only. Excludes source, packet, and other tool reads. Not native model tokens or cost."
+    },
+    {
+      "stage": 1,
+      "condition": "memory",
+      "trial": 2,
+      "task": "research",
+      "helper_reads": 1,
+      "helper_returned_chars": 7853,
+      "limit": "Helper output only. Excludes source, packet, and other tool reads. Not native model tokens or cost."
+    },
+    {
+      "stage": 1,
+      "condition": "memory",
+      "trial": 2,
+      "task": "software",
+      "helper_reads": 1,
+      "helper_returned_chars": 9082,
+      "limit": "Helper output only. Excludes source, packet, and other tool reads. Not native model tokens or cost."
+    },
+    {
+      "stage": 1,
+      "condition": "notebook",
+      "trial": 1,
+      "task": "research",
+      "helper_reads": 1,
+      "helper_returned_chars": 8334,
+      "limit": "Helper output only. Excludes source, packet, and other tool reads. Not native model tokens or cost."
+    },
+    {
+      "stage": 1,
+      "condition": "notebook",
+      "trial": 1,
+      "task": "software",
+      "helper_reads": 1,
+      "helper_returned_chars": 9032,
+      "limit": "Helper output only. Excludes source, packet, and other tool reads. Not native model tokens or cost."
+    },
+    {
+      "stage": 1,
+      "condition": "notebook",
+      "trial": 2,
+      "task": "research",
+      "helper_reads": 1,
+      "helper_returned_chars": 7748,
+      "limit": "Helper output only. Excludes source, packet, and other tool reads. Not native model tokens or cost."
+    },
+    {
+      "stage": 1,
+      "condition": "notebook",
+      "trial": 2,
+      "task": "software",
+      "helper_reads": 1,
+      "helper_returned_chars": 8977,
+      "limit": "Helper output only. Excludes source, packet, and other tool reads. Not native model tokens or cost."
+    },
+    {
+      "stage": 2,
+      "condition": "memory",
+      "trial": 1,
+      "task": "research",
+      "helper_reads": 1,
+      "helper_returned_chars": 13891,
+      "limit": "Helper output only. Excludes source, packet, and other tool reads. Not native model tokens or cost."
+    },
+    {
+      "stage": 2,
+      "condition": "memory",
+      "trial": 1,
+      "task": "software",
+      "helper_reads": 1,
+      "helper_returned_chars": 16242,
+      "limit": "Helper output only. Excludes source, packet, and other tool reads. Not native model tokens or cost."
+    },
+    {
+      "stage": 2,
+      "condition": "memory",
+      "trial": 2,
+      "task": "research",
+      "helper_reads": 1,
+      "helper_returned_chars": 14494,
+      "limit": "Helper output only. Excludes source, packet, and other tool reads. Not native model tokens or cost."
+    },
+    {
+      "stage": 2,
+      "condition": "memory",
+      "trial": 2,
+      "task": "software",
+      "helper_reads": 1,
+      "helper_returned_chars": 16293,
+      "limit": "Helper output only. Excludes source, packet, and other tool reads. Not native model tokens or cost."
+    },
+    {
+      "stage": 2,
+      "condition": "notebook",
+      "trial": 1,
+      "task": "research",
+      "helper_reads": 1,
+      "helper_returned_chars": 13469,
+      "limit": "Helper output only. Excludes source, packet, and other tool reads. Not native model tokens or cost."
+    },
+    {
+      "stage": 2,
+      "condition": "notebook",
+      "trial": 1,
+      "task": "software",
+      "helper_reads": 1,
+      "helper_returned_chars": 15692,
+      "limit": "Helper output only. Excludes source, packet, and other tool reads. Not native model tokens or cost."
+    },
+    {
+      "stage": 2,
+      "condition": "notebook",
+      "trial": 2,
+      "task": "research",
+      "helper_reads": 1,
+      "helper_returned_chars": 14271,
+      "limit": "Helper output only. Excludes source, packet, and other tool reads. Not native model tokens or cost."
+    },
+    {
+      "stage": 2,
+      "condition": "notebook",
+      "trial": 2,
+      "task": "software",
+      "helper_reads": 1,
+      "helper_returned_chars": 15690,
+      "limit": "Helper output only. Excludes source, packet, and other tool reads. Not native model tokens or cost."
+    }
+  ]
+}

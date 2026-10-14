@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "text": "{\"k9_at_boundary_allowed\":true,\"k9_above_boundary_allowed\":false,\"other_batch_short_exposure_allowed\":false,\"recorded_trial_passes_current_limit\":false,\"earlier_success_is_valid\":false,\"first_column\":\"wavelength_nm\",\"second_column\":\"intensity_counts\",\"value_for_missing_calibration\":\"UNKNOWN\",\"ready_for_release\":false,\"revision4_tested\":false,\"raw_overwrite_permitted\":false,\"noise_established_as_cable_fault\":false}",
+  "errors": [],
+  "model": "gpt-5.6-sol",
+  "reasoning": "low",
+  "elapsed_seconds": 6.695938625140116,
+  "usage_complete": true,
+  "usage": {
+    "input_tokens": 10825,
+    "output_tokens": 183
+  },
+  "native_tools": [],
+  "prompt_sha256": "c28a522a7f7da5866202b94e1b6da060a4eb683e0dff56c1c68c6c5fbfafa46d"
+}

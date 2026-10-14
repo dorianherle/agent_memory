@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import json
+import inspect
 import os
 import shutil
 import subprocess
 import sys
+import threading
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -34,6 +36,7 @@ CODEX_MODELS_FALLBACK = (
     {"id": "gpt-5.2", "name": "GPT-5.2"},
 )
 DEFAULT_CODEX_MODEL = "gpt-5.6-luna"
+TURN_SECONDS = 180  # ponytail: hard cap; per-model budgets if short goals die mid-write
 
 
 def observe_pytest(workspace: str | Path, extra: list[str] | None = None) -> dict:
@@ -64,9 +67,10 @@ def bootstrap_prompt(record: dict) -> str:
     return (
         f"Goal [{record['id']}] {record.get('goal') or record['title']}\n"
         f"Workspace: {record['workspace']}\n\n"
-        "Inspect this repository. Write pytest(s) that encode the goal's "
-        "acceptance criteria. Do not implement the feature. The new tests "
-        "must fail on the current tree.\n"
+        "Inspect only what this goal needs. Write at most three pytest "
+        "functions in one new test_*.py that encode the goal's acceptance "
+        "criteria. Do not implement the feature. Do not wander the rest of "
+        "the repository. Stop as soon as the new tests fail.\n"
         "This workspace is the goal tree. Memory tools here need no goal=; "
         "from the parent repo pass goal=" + record["id"] + "."
     )
@@ -83,6 +87,9 @@ def work_prompt(record: dict, packet: str, pytest_result: dict) -> str:
         "that test fails for the "
         "reported reason. Then make the failing tests pass. Do not retry an "
         "approach that produced this same failure. Do not weaken the tests."
+        " Read the active task model with memory_model(get). Use actual test "
+        "results to propose a better model at handoff. Check the proposal before "
+        "accepting it. Keep earlier cases and unresolved alternatives."
     )
 
 
@@ -92,8 +99,9 @@ def review_prompt(record: dict, packet: str, pytest_result: dict) -> str:
         f"Last pytest ({pytest_result.get('summary', '')}):\n"
         f"{pytest_result.get('tail', '')}\n\n"
         "You are the Thinker. Review why the last coder failed. Refine the "
-        "failing tests or reject the failed approach. Do not implement the "
-        "feature. Tests must still fail for a real reason."
+        "failing tests or reject the failed approach. Touch only the test "
+        "file. Do not implement the feature. Tests must still fail for a "
+        "real reason. Stop as soon as they fail."
     )
 
 
@@ -110,10 +118,23 @@ def _phase_for(role: str, last: dict) -> str:
 
 
 def _call_worker(worker: Worker, prompt: str, cwd: Path, **extra) -> None:
+    # Inspect compatibility before executing. A TypeError raised inside an
+    # experiment must propagate, not trigger a second invocation.
     try:
+        signature = inspect.signature(worker)
+    except (TypeError, ValueError):
         worker(prompt, cwd, **extra)
-    except TypeError:
-        worker(prompt, cwd)
+        return
+    parameters = signature.parameters
+    accepts_all = any(p.kind is inspect.Parameter.VAR_KEYWORD for p in parameters.values())
+    options = extra if accepts_all else {
+        name: value for name, value in extra.items()
+        if name in parameters and parameters[name].kind in (
+            inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.KEYWORD_ONLY
+        )
+    }
+    signature.bind(prompt, cwd, **options)
+    worker(prompt, cwd, **options)
 
 
 def _save_observe(workspace: Path, agent: int, result: dict, next_step: str) -> None:
@@ -488,6 +509,16 @@ def codex_worker(prompt: str, cwd: Path, *, model: str | None = None, run=None, 
         text=True,
     )
     _ACTIVE["proc"] = proc
+    timed_out = False
+
+    def expire() -> None:
+        nonlocal timed_out
+        time.sleep(TURN_SECONDS)
+        if proc.poll() is None:
+            timed_out = True
+            proc.terminate()
+
+    threading.Thread(target=expire, daemon=True).start()
     try:
         stream = proc.stdout
         if stream is not None:
@@ -496,6 +527,8 @@ def codex_worker(prompt: str, cwd: Path, *, model: str | None = None, run=None, 
                 if text and on_line:
                     on_line(text)
         code = proc.wait()
+        if timed_out:
+            raise RuntimeError(f"codex turn exceeded {TURN_SECONDS}s")
         if code:
             raise RuntimeError(f"codex exec exited {code}")
     finally:

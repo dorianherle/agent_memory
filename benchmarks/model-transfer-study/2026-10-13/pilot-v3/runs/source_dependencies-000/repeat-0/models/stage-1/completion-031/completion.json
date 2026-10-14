@@ -1,0 +1,22 @@
+{
+  "ok": false,
+  "errors": [
+    "Completion exited -9",
+    "No verified native token count",
+    "No final decision"
+  ],
+  "decision": null,
+  "usage": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cached_input_tokens": null,
+    "reasoning_output_tokens": null
+  },
+  "usage_complete": false,
+  "native_tool_calls": 0,
+  "events": 2,
+  "elapsed_seconds": 7.9537281659431756,
+  "timed_out": true,
+  "requested_model": "gpt-5.6-sol",
+  "reasoning": "high"
+}
