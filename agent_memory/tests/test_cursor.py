@@ -156,29 +156,17 @@ class WriteCanvasTests(MemoryTestCase):
         shell = index.read_text()
         payload = data.read_text()
         self.assertIn("agent-memory-live-shell", shell)
-        self.assertIn('content="22"', shell)
-        self.assertIn("toggleBranch", shell)
-        self.assertIn("openBranches", shell)
-        self.assertIn("BRANCH", shell)
-        self.assertIn('id="rail"', shell)
+        self.assertIn('content="23"', shell)
+        self.assertIn('id="history"', shell)
+        self.assertIn('id="state"', shell)
+        self.assertIn('id="actions"', shell)
+        self.assertIn("MEMORY STATE", shell)
+        self.assertIn("memory_find", shell)
         self.assertIn("branch-tab", shell)
-        self.assertIn("lanePlan", shell)
-        self.assertIn("stub:", shell)
-        self.assertIn('id="prompt"', shell)
-        self.assertIn("Findings so far", shell)
-        self.assertIn('"prompt"', payload)
-        self.assertIn("toggleExpand", shell)
-        self.assertIn("getUTCSeconds", shell)
         self.assertIn("openInFinder", shell)
         self.assertIn("MCP tool catalog", shell)
-        self.assertIn("now-files", shell)
-        self.assertIn("trow", shell)
-        self.assertIn("depthOf", shell)
-        self.assertIn("stickRight", shell)
-        self.assertIn("stickBottom", shell)
-        self.assertIn("--lane-w", shell)
-        self.assertIn("commit ", shell)
-        self.assertIn("Message", shell)
+        self.assertIn('"prompt"', payload)
+        self.assertIn('"actions"', payload)
         self.assertIn("window.__AGENT_MEMORY_LIVE__", payload)
         self.assertIn("first step", payload)
         self.assertIn('"root"', payload)
@@ -194,22 +182,37 @@ class WriteCanvasTests(MemoryTestCase):
         self.assertEqual(forced, index)
         self.assertGreaterEqual(index.stat().st_mtime_ns, mtime)
 
+    def test_find_is_recorded_on_the_live_page(self) -> None:
+        self.save("checkout retries duplicate the write")
+        from agent_memory.tools import call_tool
+
+        call_tool(
+            self.memory,
+            "memory",
+            {"action": "find", "text": "checkout"},
+        )
+        index = self.memory.write_live_html()
+        payload = (index.parent / "data.js").read_text()
+        self.assertIn('"action": "find"', payload)
+        self.assertIn("text=checkout", payload)
+        self.assertIn("text=checkout", (index.parent / "actions.js").read_text())
+
     def test_write_live_demo_is_self_contained(self) -> None:
         from agent_memory.live_html import write_live_demo
 
         path = write_live_demo(self.path / "demo.html")
         text = path.read_text()
-        self.assertIn("Memory · demo", text)
+        self.assertIn("agent-memory · demo", text)
         self.assertIn('"demo": true', text)
         self.assertIn("retry", text)
         self.assertIn("pytest", text)
         self.assertIn("live_html.py", text)
-        self.assertIn("Findings so far", text)
-        self.assertIn("id=\"prompt\"", text)
-        self.assertIn("id=\"rail\"", text)
+        self.assertIn('id="state"', text)
+        self.assertIn('id="actions"', text)
+        self.assertIn("memory_find", text)
         self.assertIn("branch-tab", text)
-        self.assertIn("retry", text)
         self.assertIn("explore", text)
+        self.assertIn("query=login p95", text)
         self.assertNotIn('src="data.js"', text)
 
     def test_live_html_hides_deleted(self) -> None:

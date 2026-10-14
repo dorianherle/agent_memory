@@ -2,13 +2,13 @@
 
 Writes into ``.agent_memory/live/``:
 
-- ``index.html`` — UI shell (created once; rewritten when template version changes)
+- ``index.html`` — UI shell (created once; rewritten when the template version changes)
 - ``data.js`` — latest graph payload (rewritten on every durable memory event)
+- ``actions.js`` — recent tool calls, including retrievals (rewritten on each call)
 
-Open ``index.html`` in a browser. The page polls ``data.js`` and re-renders when
-memory changes. A ``Now`` strip polls the reveal helper's ``/working`` endpoint
-for dirty files, live Cursor terminals, and inspect state. The timeline is a
-git-style lane graph so branches are visible.
+Open ``index.html`` in a browser. The page polls and re-renders when memory
+changes. Three cards: commit history, the current state packet, and agent
+actions. Dirty files come from the reveal helper's ``/working`` endpoint.
 """
 
 from __future__ import annotations
@@ -16,10 +16,11 @@ from __future__ import annotations
 import json
 import re
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 # Bump when SHELL_TEMPLATE changes so existing installs pick up the new shell.
-SHELL_VERSION = "22"
+SHELL_VERSION = "23"
 
 SHELL_TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
@@ -27,1207 +28,435 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="agent-memory-live-shell" content="__SHELL_VERSION__">
-<title>Memory · live</title>
+<title>agent-memory</title>
 <style>
   :root {
-    --bg: #0c0c0c;
-    --panel: #141414;
-    --elevated: #1a1a1a;
-    --text: #f2f2f2;
-    --muted: #a0a0a0;
-    --faint: #6b6b6b;
-    --stroke: #2a2a2a;
-    --stroke-strong: #3a3a3a;
-    --accent: #6ea8fe;
-    --summary: #e8a54b;
-    --step: #6ea8fe;
-    --user: #5bc0be;
-    --delete: #e88a9a;
-    --rail: #3a3a3a;
-    --warn: #e8a54b;
+    --bg: #f4f7fb;
+    --ink: #0f172a;
+    --muted: #64748b;
+    --faint: #94a3b8;
+    --line: #e2e8f0;
+    --card: #ffffff;
+    --navy: #0b1220;
+    --teal: #0f766e;
+    --blue: #2563eb;
+    --amber: #b45309;
   }
   * { box-sizing: border-box; }
-  html, body {
-    margin: 0;
-    height: 100%;
-    background: var(--bg);
-    color: var(--text);
-    font: 13px/1.45 ui-sans-serif, system-ui, -apple-system, sans-serif;
-  }
+  html, body { margin: 0; min-height: 100%; }
   body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100%;
+    background: var(--bg);
+    color: var(--ink);
+    font: 14px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
   }
-  header {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    padding: 10px 14px 8px;
-    border-bottom: 1px solid var(--stroke);
+  button, input { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 36px 20px 56px; }
+  header { text-align: center; }
+  .logo { display: inline-flex; filter: drop-shadow(0 8px 16px rgba(15, 23, 42, 0.12)); }
+  h1 {
+    margin: 14px 0 8px;
+    font-size: 40px;
+    line-height: 1;
+    font-weight: 750;
+    letter-spacing: -1.4px;
   }
-  header h1 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 650;
-    letter-spacing: -0.02em;
+  .lede {
+    margin: 0 auto;
+    max-width: 640px;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.55;
   }
-  header .branch {
-    display: flex;
-    flex-wrap: wrap;
+  .lede strong { color: var(--ink); font-weight: 650; }
+  .status {
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
-    color: var(--muted);
-    font-size: 12px;
-  }
-  header .branch button {
-    background: none;
-    border: 0;
-    padding: 0;
-    color: var(--muted);
-    cursor: pointer;
-    font: inherit;
-  }
-  header .branch button:hover { color: var(--text); }
-  header .branch button.focus { color: var(--text); font-weight: 650; }
-  header .branch button.here {
-    box-shadow: inset 0 -2px 0 var(--accent);
-  }
-  header .branch-tab {
-    padding: 2px 9px !important;
-    border-radius: 999px !important;
-    border: 1px solid var(--b, var(--stroke-strong)) !important;
-    background: color-mix(in srgb, var(--b, var(--accent)) 16%, transparent) !important;
-    color: var(--text) !important;
-    font: 11px/1.3 ui-sans-serif, system-ui, sans-serif !important;
-    font-weight: 650 !important;
-  }
-  header .branch-tab.focus {
-    background: color-mix(in srgb, var(--b, var(--accent)) 32%, transparent) !important;
-    box-shadow: inset 0 0 0 1px var(--b, var(--accent));
-  }
-  header .branch-label {
-    font-size: 10px;
-    font-weight: 650;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  header .branch-tab.here::after {
-    content: " · you";
+    gap: 7px;
+    margin: 14px 0 0;
     color: var(--faint);
-    font-weight: 500;
+    font: 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
   }
-  header .status {
-    margin-left: auto;
-    color: var(--faint);
-    font-size: 11px;
-    font-variant-numeric: tabular-nums;
-  }
-  header .status.live { color: var(--user); }
-  .legend {
-    display: flex;
-    gap: 14px;
-    padding: 6px 14px 0;
-    color: var(--muted);
-    font-size: 11px;
-  }
-  .legend span { display: inline-flex; align-items: center; gap: 6px; }
-  .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 99px;
-    background: var(--step);
-  }
-  .dot.summary { background: var(--summary); }
-  .dot.user { background: var(--user); }
-  .dot.open_question { background: var(--warn); }
-  .crumbs {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px 8px;
-    font-size: 12px;
-  }
-  .crumbs button {
-    background: none;
-    border: 0;
-    padding: 0;
-    color: var(--muted);
-    cursor: pointer;
-    font: inherit;
-  }
-  .crumbs button:hover { color: var(--text); }
-  .crumbs .here { color: var(--text); font-weight: 600; cursor: default; }
-  .crumbs .sep { color: var(--faint); }
-  main {
-    flex: 1;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
-    gap: 0;
-    min-height: 0;
-  }
-  @media (max-width: 860px) {
-    main { grid-template-columns: 1fr; }
-    #rail { border-left: 0; border-top: 1px solid var(--stroke); max-height: 48vh; }
-    .now-grid { grid-template-columns: 1fr; }
-  }
-  #list {
-    overflow: auto;
-    padding: 10px 0 20px;
-  }
-  #rail {
-    border-left: 1px solid var(--stroke);
-    background: var(--panel);
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-  }
-  #detail {
-    padding: 10px 12px 16px;
-    border-bottom: 1px solid var(--stroke);
-  }
-  #detail .empty {
-    color: var(--faint);
-    margin-top: 8px;
-  }
-  #detail h2 {
-    margin: 0 0 8px;
-    font-size: 16px;
-    font-weight: 650;
-    letter-spacing: -0.01em;
-  }
-  #detail .meta-line {
-    color: var(--muted);
-    font-size: 12px;
-    margin-bottom: 14px;
-  }
-  #detail .subgraph {
-    display: inline-block;
-    margin-bottom: 14px;
-    padding: 6px 10px;
-    border-radius: 8px;
-    border: 1px solid var(--stroke-strong);
-    background: var(--elevated);
-    color: var(--text);
-    font: inherit;
-    cursor: pointer;
-  }
-  #detail .subgraph:hover { border-color: var(--accent); }
-  #detail .section {
-    margin-top: 16px;
-  }
-  #detail .section:first-of-type { margin-top: 8px; }
-  #detail .section-head {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-  #detail .section-head h3 {
-    margin: 0;
-    font-size: 11px;
-    font-weight: 650;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  #detail .copy {
-    margin-left: auto;
-    background: var(--elevated);
-    border: 1px solid var(--stroke-strong);
-    color: var(--muted);
-    border-radius: 6px;
-    padding: 2px 8px;
-    font: 10px/1.4 ui-sans-serif, system-ui, sans-serif;
-    cursor: pointer;
-  }
-  #detail .copy:hover { color: var(--text); border-color: var(--accent); }
-  #detail .body {
-    white-space: pre-wrap;
-    word-break: break-word;
-    font: 12.5px/1.55 ui-sans-serif, system-ui, -apple-system, sans-serif;
-    color: var(--text);
-  }
-  #detail .body.mono {
-    font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
-    background: var(--elevated);
-    border: 1px solid var(--stroke);
-    border-radius: 8px;
-    padding: 10px 12px;
-    max-height: min(55vh, 520px);
-    overflow: auto;
-  }
-  #detail .body a.path,
-  #detail .paths a {
-    color: var(--accent);
-    text-decoration: underline;
-    text-underline-offset: 2px;
-    cursor: pointer;
-    word-break: break-all;
-  }
-  #detail .body a.path:hover,
-  #detail .paths a:hover { color: var(--text); }
-  #detail .paths {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 0 0 14px;
-  }
-  #detail .paths a {
-    display: inline-block;
-    max-width: 100%;
-    padding: 5px 9px;
-    border-radius: 8px;
-    border: 1px solid var(--stroke-strong);
-    background: var(--elevated);
-    text-decoration: none;
-    font: 11px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
-    color: var(--accent);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  #detail .paths a:hover {
-    border-color: var(--accent);
-    color: var(--text);
-  }
-  #now {
-    padding: 8px 12px 10px;
-    border-top: 1px solid var(--stroke);
-    background: var(--panel);
-    margin-top: auto;
-  }
-  .now-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-  .now-head {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-    margin-bottom: 8px;
-  }
-  .now-head h2 {
-    margin: 0;
-    font-size: 11px;
-    font-weight: 650;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .now-head .meta {
-    color: var(--faint);
-    font-size: 11px;
-  }
-  #now-run, #now-files {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    max-height: 16vh;
-    overflow: auto;
-  }
-  #now-run li, #now-files li {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    min-width: 0;
-  }
-  #now-run .pulse {
-    flex: 0 0 7px;
+  .status::before {
+    content: "";
     width: 7px;
     height: 7px;
-    margin-top: 5px;
     border-radius: 99px;
-    background: var(--user);
-    animation: pulse 1.4s ease-in-out infinite;
+    background: currentColor;
   }
-  #now-run .pulse.warn { background: var(--warn); }
-  #now-run .pulse.idle {
-    background: var(--faint);
-    animation: none;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.35; }
-  }
-  #now-run .cmd {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
-  }#now-run .cmd .who { color: var(--muted); font-family: inherit; }
-  #now-files .dir {
-    color: var(--faint);
-    font: 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
-    margin-top: 4px;
-  }
-  #now-files .dir:first-child { margin-top: 0; }
-  #now-files .code {
-    flex: 0 0 2.2em;
-    color: var(--summary);
-    font: 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-weight: 650;
-  }
-  #questions {
-    display: none;
-    border: 1px solid var(--warn);
-    background: color-mix(in srgb, var(--warn) 12%, transparent);
-    border-radius: 8px;
-    margin: 0 20px 8px;
-    padding: 8px 12px;
-    font-size: 12px;
-    line-height: 1.45;
-  }
-  #questions .q-head {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    font-weight: 650;
-    color: var(--warn);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-size: 10px;
-  }
-  #questions .q-text { margin-top: 3px; }
-  #questions .q-item { margin-top: 6px; }
-  #questions .q-deps button {
-    background: none;
-    border: 0;
-    padding: 0;
-    color: var(--muted);
-    cursor: pointer;
-    font: inherit;
-    text-decoration: underline dotted;
-  }
-  #prompt {
-    display: none;
-    padding: 8px 12px 10px;
-    background: var(--panel);
-  }
-  #prompt .prompt-head {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-  #prompt .prompt-head h2 {
-    margin: 0;
-    font-size: 11px;
-    font-weight: 650;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  #prompt .prompt-head .meta {
-    color: var(--faint);
-    font-size: 11px;
-  }
-  #prompt .copy {
-    margin-left: auto;
-    background: var(--elevated);
-    border: 1px solid var(--stroke-strong);
-    color: var(--muted);
-    border-radius: 6px;
-    padding: 2px 8px;
-    font: 10px/1.4 ui-sans-serif, system-ui, sans-serif;
-    cursor: pointer;
-  }
-  #prompt .copy:hover { color: var(--text); border-color: var(--accent); }
-  .prompt-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .prompt-col {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .prompt-block h3 {
-    margin: 0 0 2px;
-    font-size: 10px;
-    font-weight: 650;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .prompt-block .who {
-    color: var(--faint);
-    font: 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
-    margin-bottom: 2px;
-  }
-  .prompt-block .who button {
-    background: none;
-    border: 0;
-    padding: 0;
-    color: var(--accent);
-    cursor: pointer;
-    font: inherit;
-    text-decoration: underline dotted;
-  }
-  .prompt-block .who .stale { color: var(--warn); }
-  .prompt-block .body {
-    white-space: pre-wrap;
-    word-break: break-word;
-    font: 12px/1.4 ui-sans-serif, system-ui, -apple-system, sans-serif;
-    color: var(--text);
-    background: var(--elevated);
-    border: 1px solid var(--stroke);
-    border-radius: 6px;
-    padding: 6px 8px;
-    max-height: 7.2em;
-    overflow: auto;
-  }
-  .prompt-block .q-deps { margin-top: 4px; }
-  .prompt-block .q-deps button {
-    background: none;
-    border: 0;
-    padding: 0;
-    margin-right: 6px;
-    color: var(--muted);
-    cursor: pointer;
-    font: inherit;
-    text-decoration: underline dotted;
-  }
-  #now-files .code.st-A,
-  #now-files .code.st-qq { color: var(--user); }
-  #now-files .code.st-D { color: var(--delete); }
-  #now-files a {
-    color: var(--accent);
-    text-decoration: none;
-    font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    min-width: 0;
-  }
-  #now-files a:hover { color: var(--text); }
-  .age {
-    margin-left: auto;
-    color: var(--faint);
-    font: 11px/1.3 ui-sans-serif, system-ui, sans-serif;
-    font-variant-numeric: tabular-nums;
-    flex: 0 0 auto;
-  }
-  .graph {
-    --lanes: 1;
-    --lane-w: 100%;
-    position: relative;
-    width: calc(var(--lanes) * var(--lane-w));
-    min-width: 100%;
-  }
-  .graph svg.rails {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 0;
-  }
-  .trow {
+  .status.live { color: var(--teal); }
+  .grid {
     display: grid;
-    grid-template-columns: repeat(var(--lanes, 1), var(--lane-w));
-    align-items: center;
-    min-height: 52px;
-    position: relative;
-    z-index: 1;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr) minmax(0, 0.96fr);
+    gap: 16px;
+    align-items: stretch;
+    margin-top: 28px;
   }
-  .cell {
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: 0 1px 1px rgba(15, 23, 42, 0.04), 0 10px 28px rgba(15, 23, 42, 0.05);
+    min-height: 460px;
     display: flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
-    width: var(--lane-w);
-    min-height: 52px;
-    padding: 4px 18px 4px 14px;
+    flex-direction: column;
+    overflow: hidden;
   }
-  .gutter {
-    position: relative;
-    flex: 0 0 16px;
-    width: 16px;
-    height: 16px;
+  .card-h {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 13px 14px;
+    border-bottom: 1px solid var(--line);
+    font: 12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
   }
-  .gutter .commit {
+  .card-h strong { font-weight: 650; }
+  .card-h span { color: var(--muted); font-size: 11px; white-space: nowrap; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 12px 0; }
+  .tabs[hidden] { display: none; }
+  .branch-tab {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 999px;
+    padding: 3px 9px;
+    font-size: 11px;
+    font-weight: 650;
+    color: #334155;
+  }
+  .branch-tab.here { background: var(--ink); border-color: var(--ink); color: #fff; }
+  #commits { position: relative; flex: 1; overflow: auto; padding: 6px 0 8px; max-height: 560px; }
+  .spine {
     position: absolute;
-    left: 50%;
-    top: 50%;
+    left: 20px;
+    top: 18px;
+    bottom: 18px;
+    width: 2px;
+    background: #e2e8f0;
+  }
+  .entry { position: relative; }
+  .commit {
+    display: grid;
+    grid-template-columns: 18px 62px max-content minmax(0, 1fr);
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+    padding: 7px 14px 7px 12px;
+    border: 0;
+    background: transparent;
+    text-align: left;
+  }
+  .commit:hover, .commit.on { background: #f8fafc; }
+  .dot {
     width: 12px;
     height: 12px;
     border-radius: 99px;
-    background: var(--b, var(--step));
-    transform: translate(-50%, -50%);
-    z-index: 1;
-    box-shadow: 0 0 0 3px var(--bg);
-  }
-  .gutter .commit.kind-summary { background: var(--summary); }
-  .gutter .commit.kind-user { background: var(--user); }
-  .gutter .commit.current {
-    box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--b, var(--accent));
-  }
-  .gutter .commit.other, .gutter .commit.stub {
-    background: var(--b, var(--summary));
-  }
-  .card {
+    border: 2px solid var(--ink);
+    background: #fff;
     position: relative;
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    background: transparent;
-    border: 0;
+    z-index: 1;
+    justify-self: center;
+  }
+  .dot.goal { border-color: var(--blue); background: #dbeafe; }
+  .dot.summary { border-color: var(--teal); background: #ccfbf1; }
+  .dot.handoff { border-color: var(--ink); background: var(--ink); }
+  .dot.user { border-color: var(--blue); background: #fff; }
+  .dot.open { border-color: #d97706; background: #fef3c7; }
+  .dot.current { box-shadow: 0 0 0 3px #dbeafe; }
+  .sha { font: 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 650; }
+  .pill {
+    font: 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-weight: 650;
+    padding: 3px 6px;
     border-radius: 6px;
-    padding: 4px 6px;
-    cursor: pointer;
+    border: 1px solid var(--line);
+    background: #f8fafc;
+    color: var(--ink);
   }
-  .card:hover .title span { color: var(--accent); }
-  .card.selected .title span, .card.current .title span { color: var(--text); }
-  .card.selected, .card.current {
-    background: color-mix(in srgb, var(--b, var(--accent)) 12%, transparent);
-  }
-  .card .title {
-    font-weight: 600;
-    font-size: 12px;
-    margin: 0;
-    min-width: 0;
-    flex: 1;
-  }
-  .card .title span {
-    display: block;
+  .pill.goal { color: #1d4ed8; background: #eff6ff; border-color: #bfdbfe; }
+  .pill.summary { color: var(--teal); background: #f0fdfa; border-color: #99f6e4; }
+  .pill.open { color: var(--amber); background: #fffbeb; border-color: #fde68a; }
+  .pill.user { color: #1d4ed8; background: #eff6ff; border-color: #bfdbfe; }
+  .title {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: #475569;
+    font-size: 13px;
   }
-  .card.stub {
-    flex: 0 1 auto;
-    width: fit-content;
-    max-width: 100%;
-    padding: 3px 10px;
-    border-radius: 999px;
-    border: 1px solid var(--b, var(--summary));
-    background: color-mix(in srgb, var(--b, var(--summary)) 18%, var(--elevated));
-    font: 11px/1.3 ui-sans-serif, system-ui, sans-serif;
+  .msg, .catalog {
+    margin: 0 14px 8px 42px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: #f8fafc;
+    white-space: pre-wrap;
+    font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: #334155;
+  }
+  .catalog { white-space: pre-wrap; }
+  .catalog summary { cursor: pointer; font-weight: 650; }
+  .files { border-top: 1px solid var(--line); padding: 8px 12px 12px; }
+  .file {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 6px;
+    padding: 7px 8px;
+    border: 0;
+    border-radius: 8px;
+    background: #f8fafc;
+    text-align: left;
+    font: 12px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  .file .path { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #334155; }
+  .ok { color: var(--teal); font-weight: 650; white-space: nowrap; }
+  .stale {
+    color: var(--amber);
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    border-radius: 6px;
+    padding: 1px 6px;
+    font-weight: 650;
+    white-space: nowrap;
+  }
+  .state {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: #e2e8f0;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
+  }
+  .state .card-h { border-bottom-color: #1e293b; }
+  .state .card-h span { color: #94a3b8; }
+  #state-body { flex: 1; overflow: auto; padding: 6px 0 12px; }
+  .sec { display: grid; grid-template-columns: 3px minmax(0, 1fr); gap: 10px; padding: 12px 14px 4px; }
+  .bar { border-radius: 99px; background: #64748b; }
+  .bar.goal { background: #3b82f6; }
+  .bar.steer { background: #64748b; }
+  .bar.handoff { background: #2dd4bf; }
+  .bar.open { background: #f59e0b; }
+  .bar.related { background: #f59e0b; }
+  .sec h3 {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 0 0 6px;
+    font: 650 12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: #93c5fd;
+  }
+  .sec.handoff h3 { color: #5eead4; }
+  .sec.steer h3 { color: #cbd5e1; }
+  .sec.open h3, .sec.related h3 { color: #fcd34d; }
+  .bud { color: #64748b; font-weight: 500; }
+  .line, .more {
+    margin: 0 0 4px;
+    font: 12.5px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: #e2e8f0;
+  }
+  .more { color: #94a3b8; }
+  button.id {
+    border: 0;
+    background: none;
+    padding: 0;
+    color: #60a5fa;
+    font: inherit;
     font-weight: 650;
   }
-  .card.stub .title { flex: none; }
-  .card .meta {
-    color: var(--muted);
-    font-size: 10px;
-    flex: 0 0 auto;
+  button.id:hover { text-decoration: underline; }
+  .mark {
+    color: #fbbf24;
+    font-weight: 650;
   }
-  .card .when {
-    margin: 0;
-    color: var(--faint);
-    font: 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
-    flex: 0 0 auto;
+  #running[hidden] { display: none; }
+  #running { padding: 8px 14px 0; }
+  .run {
+    margin: 0 0 6px;
+    color: var(--muted);
+    font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #action-list { flex: 1; overflow: auto; max-height: 640px; }
+  .act { padding: 10px 14px; border-bottom: 1px solid #f1f5f9; }
+  .act-top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+  .tool { font: 12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 700; }
+  .tool.find { color: #1d4ed8; }
+  .tool.summarize { color: var(--teal); }
+  .tool.delete { color: #be123c; }
+  .when { color: var(--faint); font: 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .detail {
+    margin: 6px 0 0;
+    padding: 6px 8px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #334155;
+    font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
+    overflow-wrap: anywhere;
+  }
+  .empty { margin: 8px 14px; color: var(--muted); font-size: 13px; }
+  .empty.light { color: #94a3b8; }
+  @media (max-width: 980px) {
+    .grid { grid-template-columns: 1fr; }
+    h1 { font-size: 32px; }
+    .card { min-height: 0; }
   }
 </style>
 </head>
 <body>
-<header>
-  <h1>Memory</h1>
-  <div class="branch" id="branch">—</div>
-  <div class="status" id="status">connecting…</div>
-</header>
-<div class="legend">
-  <span><i class="dot summary"></i>summary</span>
-  <span><i class="dot"></i>commit</span>
-  <span><i class="dot user"></i>user</span>
-  <span><i class="dot open_question"></i>open</span>
+<div class="wrap">
+  <header>
+    <div class="logo" aria-hidden="true">
+      <svg width="56" height="56" viewBox="0 0 64 64">
+        <rect width="64" height="64" rx="16" fill="#0B1220"/>
+        <path d="M23 18 L43 32 L23 46" fill="none" stroke="#E2E8F0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="23" cy="18" r="4.4" fill="#0B1220" stroke="#F8FAFC" stroke-width="2.3"/>
+        <circle cx="23" cy="46" r="4.4" fill="#0B1220" stroke="#F8FAFC" stroke-width="2.3"/>
+        <circle cx="43" cy="32" r="5.3" fill="#2DD4BF"/>
+      </svg>
+    </div>
+    <h1>agent-memory</h1>
+    <p class="lede">Local, Git-backed engineering notebook for <strong>multi-session AI agents</strong> — keeping uncut notes, file snapshots, and a bounded state packet across fresh contexts.</p>
+    <p class="status" id="status">connecting…</p>
+  </header>
+  <div class="grid">
+    <section class="card" id="history" aria-label="Commit history">
+      <div class="card-h"><strong>1. .agent_memory/</strong><span>Git DAG + SHA-256</span></div>
+      <div class="tabs" id="branches" hidden></div>
+      <div id="commits"></div>
+      <div class="files" id="files"></div>
+    </section>
+    <section class="card state" id="state" aria-label="Memory state">
+      <div class="card-h"><strong>2. # MEMORY STATE</strong><span id="state-budget">≤ 1,200 chars</span></div>
+      <div id="state-body"></div>
+    </section>
+    <section class="card" id="actions" aria-label="Agent actions">
+      <div class="card-h"><strong>3. Lookup</strong><span>Uncut recall</span></div>
+      <div id="running" hidden></div>
+      <div id="action-list"></div>
+    </section>
+  </div>
 </div>
-<nav class="crumbs" id="crumbs"></nav>
-<section id="questions">
-  <div class="q-head"><span>Open questions</span></div>
-  <div id="questions-list"></div>
-</section>
-<main>
-  <section id="list"></section>
-  <aside id="rail">
-    <section id="detail" style="display:none"></section>
-    <section id="prompt">
-      <div class="prompt-head">
-        <h2>Prompt</h2>
-        <span class="meta" id="prompt-meta"></span>
-        <button type="button" class="copy" id="prompt-copy">Copy injected</button>
-      </div>
-      <div class="prompt-grid">
-        <div class="prompt-col" id="prompt-pinned"></div>
-        <div class="prompt-col" id="prompt-findings"></div>
-      </div>
-    </section>
-    <section id="now">
-      <div class="now-grid">
-        <div>
-          <div class="now-head">
-            <h2>Running</h2>
-            <span class="meta" id="now-run-meta"></span>
-          </div>
-          <ul id="now-run"></ul>
-        </div>
-        <div>
-          <div class="now-head">
-            <h2>Files</h2>
-            <span class="meta" id="now-files-meta">checking files…</span>
-          </div>
-          <ul id="now-files"></ul>
-        </div>
-      </div>
-    </section>
-  </aside>
-</main>
 <script src="data.js"></script>
 <script>
 (function () {
   const POLL_MS = 1500;
-  const STORE_KEY = "agent-memory-live-ui-v1";
-  const state = loadState();
-  let lastHash = "";
+  const STORE_KEY = "agent-memory-live-ui-v2";
+  const TOOLS = {
+    find: "memory_find",
+    save: "memory_save",
+    summarize: "memory_summarize",
+    delete: "memory_delete",
+    branch: "memory_branch",
+    inspect: "memory_inspect",
+    inspect_done: "memory_inspect_done",
+    open_questions: "memory_open_questions",
+    goal_create: "memory_goal_create",
+    goal_use: "memory_goal_use"
+  };
   let graph = window.__AGENT_MEMORY_LIVE__ || { nodes: [], edges: [], branches: [] };
+  let lastHash = "";
   let lastNow = null;
-  let stickRight = true;
-  let stickBottom = true;
-  let lastRails = null;
+  const state = loadState();
 
   function loadState() {
-    try {
-      return JSON.parse(sessionStorage.getItem(STORE_KEY) || "{}") || {};
-    } catch (_) {
-      return {};
-    }
+    try { return JSON.parse(sessionStorage.getItem(STORE_KEY) || "{}") || {}; }
+    catch (_) { return {}; }
   }
   function saveState() {
-    sessionStorage.setItem(
-      STORE_KEY,
-      JSON.stringify({
-        trail: state.trail || [],
-        selected: state.selected || null,
-        branch: state.branch || null,
-        expanded: state.expanded || [],
-        openBranches: state.openBranches || [],
-      })
-    );
+    sessionStorage.setItem(STORE_KEY, JSON.stringify({
+      selected: state.selected || null,
+      branch: state.branch || null,
+      expanded: state.expanded || []
+    }));
   }
   function byId() {
     const map = {};
     (graph.nodes || []).forEach((n) => { map[n.id] = n; });
     return map;
   }
+  function isDemo() { return !!(graph && graph.demo); }
+  function projectRoot() { return String((graph && graph.root) || "").replace(/\/+$/, ""); }
+  function repoName() {
+    const parts = projectRoot().split("/").filter(Boolean);
+    return parts.length ? parts[parts.length - 1] : "";
+  }
+  function firstLine(text) { return String(text || "").trim().split("\n")[0]; }
+  function restLines(text) {
+    return String(text || "").trim().split("\n").slice(1).map((s) => s.trim()).filter(Boolean).slice(0, 3);
+  }
+  function shortId(id) { return String(id || "").slice(0, 7); }
   function formatWhen(iso) {
     if (!iso) return "";
     const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return String(iso).slice(0, 19).replace("T", " ");
-    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    const dd = String(d.getUTCDate()).padStart(2, "0");
-    const hh = String(d.getUTCHours()).padStart(2, "0");
-    const mm = String(d.getUTCMinutes()).padStart(2, "0");
-    const ss = String(d.getUTCSeconds()).padStart(2, "0");
-    return months[d.getUTCMonth()] + " " + dd + ", " + hh + ":" + mm + ":" + ss + " UTC";
-  }
-  function projectRoot() {
-    return String((graph && graph.root) || "").replace(/\/+$/, "");
-  }
-  function toFileUrl(absPath) {
-    const parts = String(absPath).split("/");
-    const encoded = parts.map((p, i) => (i === 0 && p === "" ? "" : encodeURIComponent(p))).join("/");
-    return "file://" + encoded;
-  }
-  function resolvePath(raw) {
-    let p = String(raw || "").trim().replace(/^['"`]+|['"`]+$/g, "");
-    if (!p) return null;
-    if (p.startsWith("file://")) {
-      try { p = decodeURI(p.replace(/^file:\/\//, "")); } catch (_) {}
-    }
-    if (p.startsWith("~/")) {
-      return null;
-    }
-    if (p.startsWith("/")) return p;
-    const root = projectRoot();
-    if (!root) return null;
-    if (p.startsWith("./")) p = p.slice(2);
-    while (p.startsWith("../")) {
-      p = p.slice(3);
-    }
-    return root + "/" + p.replace(/^\/+/, "");
-  }
-  function extractPaths(text) {
-    const src = String(text || "");
-    const found = [];
-    const seen = new Set();
-    const push = (raw) => {
-      const abs = resolvePath(raw);
-      if (!abs || seen.has(abs)) return;
-      if (abs === "/" || abs.length < 4) return;
-      seen.add(abs);
-      found.push({ raw: String(raw).trim(), abs });
-    };
-    const absRe = /(?:^|[\s`'"(=\[]|file:\/\/)(\/(?:Users|home|tmp|var|private|Volumes|opt|Library|mnt|Applications)\/[^\s`'":\]\)]+)/g;
-    const relRe = /(?:^|[\s`'"(=\[]|file:\/\/)((?:\.\.?\/)?(?:[\w.-]+\/)+[\w.-]+\.(?:png|jpe?g|gif|webp|svg|pdf|md|py|txt|csv|html?|json|ya?ml|toml|npy|npz|pt|pth|ckpt|onnx|mp4|mov|wav|ipynb))\b/gi;
-    let m;
-    while ((m = absRe.exec(src))) push(m[1].replace(/[.,;:]+$/, ""));
-    while ((m = relRe.exec(src))) push(m[1].replace(/[.,;:]+$/, ""));
-    return found;
-  }
-  function shortPath(abs) {
-    const root = projectRoot();
-    if (root && abs.startsWith(root + "/")) return abs.slice(root.length + 1);
-    const parts = abs.split("/");
-    return parts.length > 2 ? "…/" + parts.slice(-2).join("/") : abs;
-  }
-  function openInFinder(absPath, event) {
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    const reveal = graph && graph.reveal;
-    if (reveal) {
-      fetch(reveal + "?path=" + encodeURIComponent(absPath))
-        .then((r) => {
-          if (!r.ok) throw new Error("reveal failed");
-        })
-        .catch(() => openFolderFallback(absPath));
-      return;
-    }
-    openFolderFallback(absPath);
-  }
-  function openFolderFallback(absPath) {
-    const trimmed = absPath.replace(/\/+$/, "");
-    const parent = trimmed.includes("/") ? trimmed.replace(/\/[^/]+$/, "") || "/" : trimmed;
-    window.open(toFileUrl(parent + "/"), "_blank");
-  }
-  function linkifyBody(text) {
-    const wrap = document.createElement("div");
-    wrap.className = "body";
-    const paths = extractPaths(text);
-    if (!paths.length) {
-      wrap.textContent = text || "";
-      return wrap;
-    }
-    const ordered = paths.slice().sort((a, b) => b.raw.length - a.raw.length);
-    let remaining = String(text || "");
-    const chunks = [];
-    while (remaining.length) {
-      let best = null;
-      let bestAt = -1;
-      ordered.forEach((p) => {
-        const at = remaining.indexOf(p.raw);
-        if (at >= 0 && (bestAt < 0 || at < bestAt)) {
-          best = p;
-          bestAt = at;
-        }
-      });
-      if (!best || bestAt < 0) {
-        chunks.push({ type: "text", value: remaining });
-        break;
-      }
-      if (bestAt > 0) chunks.push({ type: "text", value: remaining.slice(0, bestAt) });
-      chunks.push({ type: "path", value: best.raw, abs: best.abs });
-      remaining = remaining.slice(bestAt + best.raw.length);
-    }
-    chunks.forEach((chunk) => {
-      if (chunk.type === "text") {
-        wrap.appendChild(document.createTextNode(chunk.value));
-        return;
-      }
-      const a = document.createElement("a");
-      a.className = "path";
-      a.href = toFileUrl(chunk.abs);
-      a.textContent = chunk.value;
-      a.title = "Show in Finder: " + chunk.abs;
-      a.addEventListener("click", (e) => openInFinder(chunk.abs, e));
-      wrap.appendChild(a);
-    });
-    return wrap;
-  }
-  function truncate(text, max) {
-    text = String(text || "");
-    return text.length > max ? text.slice(0, max - 1) + "…" : text;
-  }
-  function visibleNodes(all) {
-    const trail = state.trail || [];
-    const focusId = trail.length ? trail[trail.length - 1] : null;
-    const focus = focusId ? all[focusId] : null;
-    if (focus && focus.children && focus.children.length) {
-      return focus.children.filter((id) => all[id]).slice().reverse().map((id) => all[id]);
-    }
-    return (graph.nodes || [])
-      .filter((n) => !n.folded && n.kind !== "delete")
-      .slice()
-      .sort((a, b) => String(b.committed_at || "").localeCompare(String(a.committed_at || "")));
+    if (Number.isNaN(d.getTime())) return "";
+    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
   }
   function setStatus(text, live) {
     const el = document.getElementById("status");
-    el.textContent = text;
+    const name = repoName();
+    el.textContent = name ? (text + " · " + name) : text;
     el.classList.toggle("live", !!live);
   }
-  function workingEndpoint() {
-    if (graph && graph.working) return graph.working;
-    const reveal = graph && graph.reveal;
-    if (!reveal) return null;
-    return String(reveal).replace(/\/reveal\/?$/, "/working");
-  }
-  function formatAge(mtime) {
-    if (!mtime) return "";
-    const sec = Math.max(0, (Date.now() / 1000) - Number(mtime));
-    if (sec < 60) return Math.floor(sec) + "s ago";
-    if (sec < 3600) return Math.floor(sec / 60) + "m ago";
-    if (sec < 86400) return Math.floor(sec / 3600) + "h ago";
-    return Math.floor(sec / 86400) + "d ago";
-  }
-  function formatDuration(ms) {
-    const sec = Math.max(0, Math.floor(Number(ms || 0) / 1000));
-    if (sec < 60) return sec + "s";
-    if (sec < 3600) return Math.floor(sec / 60) + "m " + (sec % 60) + "s";
-    return Math.floor(sec / 3600) + "h " + Math.floor((sec % 3600) / 60) + "m";
-  }
-  function latestVisible() {
-    const nodes = (graph.nodes || []).filter((n) => !n.folded && n.kind !== "delete");
-    nodes.sort((a, b) => String(b.committed_at || "").localeCompare(String(a.committed_at || "")));
-    return nodes[0] || null;
-  }
-  function addNowRow(list, { pulse, text, title, age, warn }) {
-    const li = document.createElement("li");
-    const dot = document.createElement("i");
-    dot.className = "pulse" + (warn ? " warn" : pulse ? "" : " idle");
-    const cmd = document.createElement("span");
-    cmd.className = "cmd";
-    cmd.textContent = text;
-    if (title) cmd.title = title;
-    li.appendChild(dot);
-    li.appendChild(cmd);
-    if (age) {
-      const stamp = document.createElement("span");
-      stamp.className = "age";
-      stamp.textContent = age;
-      li.appendChild(stamp);
-    }
-    list.appendChild(li);
-  }
-  function renderNow(data) {
-    lastNow = data || lastNow || {};
-    const run = document.getElementById("now-run");
-    const runMeta = document.getElementById("now-run-meta");
-    const filesEl = document.getElementById("now-files");
-    const filesMeta = document.getElementById("now-files-meta");
-    const processes = (lastNow && lastNow.processes) || [];
-    const inspecting = lastNow && lastNow.inspecting;
-    const files = (lastNow && lastNow.files) || [];
-    const total = (lastNow && lastNow.total) || files.length;
-    const latest = latestVisible();
-
-    run.innerHTML = "";
-    if (inspecting && inspecting.id) {
-      addNowRow(run, {
-        pulse: true,
-        warn: true,
-        text: "inspecting " + String(inspecting.id).slice(0, 8) +
-          (inspecting.branch ? " · return to " + inspecting.branch : ""),
-        title: "Working files are at that snapshot",
-      });
-    }
-    processes.forEach((proc) => {
-      addNowRow(run, {
-        pulse: true,
-        text: proc.command,
-        title: (proc.cwd ? proc.cwd + " · " : "") + "pid " + proc.pid,
-        age: formatDuration(proc.running_for_ms),
-      });
+  function lineage(tip) {
+    const parents = {};
+    (graph.edges || []).forEach((e) => {
+      if ((e.kind || "parent") !== "parent") return;
+      (parents[e.to] = parents[e.to] || []).push(e.from);
     });
-    if (latest) {
-      const working = latest.kind === "user";
-      addNowRow(run, {
-        pulse: working && !processes.length && !inspecting,
-        text: (working ? "turn: " : "last: ") + truncate(latest.title || latest.kind, 56),
-        title: latest.title,
-      });
-    }
-    if (!run.children.length) {
-      addNowRow(run, { pulse: false, text: "idle" });
-    }
-    runMeta.textContent = processes.length
-      ? processes.length + " live"
-      : inspecting
-        ? "inspecting"
-        : "idle";
-
-    filesEl.innerHTML = "";
-    if (!files.length) {
-      filesMeta.textContent = "clean vs last memory save";
-      return;
-    }
-    filesMeta.textContent = total + " changed · vs last memory save";
-    const groups = new Map();
-    files.forEach((f) => {
-      const path = String(f.path || "");
-      const i = path.lastIndexOf("/");
-      const dir = i < 0 ? "" : path.slice(0, i);
-      const name = i < 0 ? path : path.slice(i + 1);
-      if (!groups.has(dir)) groups.set(dir, []);
-      groups.get(dir).push({ file: f, name: name });
-    });
-    groups.forEach((rows, dir) => {
-      if (dir) {
-        const head = document.createElement("li");
-        head.className = "dir";
-        head.textContent = dir + "/";
-        filesEl.appendChild(head);
-      }
-      rows.forEach((row) => {
-        const f = row.file;
-        const li = document.createElement("li");
-        const code = document.createElement("span");
-        const stamp = String(f.status || "?").replace(/\s/g, "");
-        code.className = "code st-" + stamp.replace(/\?/g, "q");
-        code.textContent = f.status || "?";
-        const a = document.createElement("a");
-        const abs = String(f.path || "").startsWith("/")
-          ? f.path
-          : projectRoot() + "/" + f.path;
-        a.href = toFileUrl(abs);
-        a.textContent = row.name;
-        a.title = "Show in Finder: " + abs;
-        a.addEventListener("click", (e) => openInFinder(abs, e));
-        const age = document.createElement("span");
-        age.className = "age";
-        age.textContent = formatAge(f.mtime);
-        li.appendChild(code);
-        li.appendChild(a);
-        li.appendChild(age);
-        filesEl.appendChild(li);
-      });
-    });
-  }
-  function isDemo() {
-    return !!(graph && graph.demo);
-  }
-  function pollWorking() {
-    if (isDemo()) {
-      renderNow(graph.now || { files: [], processes: [], inspecting: null });
-      return;
-    }
-    const url = workingEndpoint();
-    const meta = document.getElementById("now-files-meta");
-    if (!url) {
-      meta.textContent = "no file watcher";
-      renderNow({ files: [], processes: [], inspecting: null });
-      return;
-    }
-    fetch(url)
-      .then((r) => {
-        if (!r.ok) throw new Error("working");
-        return r.json();
-      })
-      .then(renderNow)
-      .catch(() => {
-        if (!document.getElementById("now-files").children.length) {
-          meta.textContent = "waiting for file watcher…";
-        }
-      });
-  }
-  function renderCrumbs(all) {
-    const nav = document.getElementById("crumbs");
-    nav.innerHTML = "";
-    const parts = [{ label: "Live", trail: [] }];
-    (state.trail || []).forEach((id, i) => {
-      const node = all[id];
-      parts.push({
-        label: truncate((node && node.title) || id.slice(0, 8), 28),
-        trail: (state.trail || []).slice(0, i + 1),
-      });
-    });
-    if (state.selected && all[state.selected]) {
-      parts.push({
-        label: truncate(all[state.selected].title || state.selected.slice(0, 8), 28),
-        trail: null,
-        here: true,
-      });
-    }
-    parts.forEach((part, index) => {
-      if (index) {
-        const sep = document.createElement("span");
-        sep.className = "sep";
-        sep.textContent = "/";
-        nav.appendChild(sep);
-      }
-      if (part.here || part.trail === null) {
-        const span = document.createElement("span");
-        span.className = "here";
-        span.textContent = part.label;
-        nav.appendChild(span);
-        return;
-      }
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.textContent = part.label;
-      if (index === parts.length - 1 && !state.selected) btn.className = "here";
-      btn.addEventListener("click", () => {
-        state.trail = part.trail;
-        state.selected = null;
-        saveState();
-        render();
-      });
-      nav.appendChild(btn);
-    });
-  }
-  function addSection(aside, title, text, { mono = false, copyLabel = "Copy" } = {}) {
-    if (!text) return;
-    const section = document.createElement("div");
-    section.className = "section";
-    const head = document.createElement("div");
-    head.className = "section-head";
-    const h3 = document.createElement("h3");
-    h3.textContent = title;
-    head.appendChild(h3);
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "copy";
-    btn.textContent = copyLabel;
-    btn.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(text);
-        btn.textContent = "Copied";
-        setTimeout(() => { btn.textContent = copyLabel; }, 1200);
-      } catch (_) {
-        btn.textContent = "Failed";
-        setTimeout(() => { btn.textContent = copyLabel; }, 1200);
-      }
-    });
-    head.appendChild(btn);
-    section.appendChild(head);
-    const body = linkifyBody(text);
-    if (mono) body.classList.add("mono");
-    section.appendChild(body);
-    aside.appendChild(section);
-  }
-  function renderDetail(all) {
-    const aside = document.getElementById("detail");
-    const entry = state.selected ? all[state.selected] : null;
-    if (!entry) {
-      aside.innerHTML = "";
-      aside.style.display = "none";
-      return;
-    }
-    aside.style.display = "block";
-    const when = formatWhen(entry.committed_at);
-    const kids = (entry.children || []).length;
-    aside.innerHTML = "";
-    const head = document.createElement("div");
-    head.className = "section-head";
-    const h2 = document.createElement("h2");
-    h2.textContent = entry.title || entry.kind || "entry";
-    head.appendChild(h2);
-    aside.appendChild(head);
-    const meta = document.createElement("div");
-    meta.className = "meta-line";
-    meta.textContent = [
-      "commit " + entry.id.slice(0, 8),
-      entry.agent,
-      when,
-    ].filter(Boolean).join(" · ");
-    aside.appendChild(meta);
-    const message = (entry.body || entry.goal || "").trim();
-    addSection(aside, "Message", message || "(empty)", { mono: true });
-    if (kids) {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "subgraph";
-      btn.textContent = "Subgraph (" + kids + ")";
-      btn.addEventListener("click", () => {
-        if (!isExpanded(entry.id)) toggleExpand(entry.id);
-        saveState();
-        render();
-      });
-      aside.appendChild(btn);
-    }
-    const paths = extractPaths(entry.body || "");
-    if (paths.length) {
-      const row = document.createElement("div");
-      row.className = "paths";
-      paths.forEach((p) => {
-        const a = document.createElement("a");
-        a.href = toFileUrl(p.abs);
-        a.textContent = shortPath(p.abs);
-        a.title = "Show in Finder: " + p.abs;
-        a.addEventListener("click", (e) => openInFinder(p.abs, e));
-        row.appendChild(a);
-      });
-      aside.appendChild(row);
-    }
-    if (entry.kind === "user") {
-      if (entry.instructions) {
-        addSection(aside, "1. Memory instructions (prompt text)", entry.instructions, {
-          mono: true,
-        });
-      }
-      if (entry.rule) {
-        addSection(aside, "2. Always-apply rule → system/rules prompt", entry.rule, {
-          mono: true,
-        });
-      }
-      if (entry.mcp_tools) {
-        addSection(aside, "3. MCP tool catalog (also sent as tool schemas)", entry.mcp_tools, {
-          mono: true,
-        });
-      }
-      const stateText = entry.memory_state || entry.injected || "";
-      if (stateText) {
-        addSection(aside, "4. Injected MEMORY STATE", stateText, { mono: true });
-      }
-      if (entry.packet) {
-        addSection(aside, "Full memory packet (copy)", entry.packet, {
-          mono: true,
-          copyLabel: "Copy packet",
-        });
-      }
-    }
-  }
-  const BRANCH_COLORS = ["#e8a54b", "#9386f2", "#e88a9a", "#5bc0be", "#6ea8fe"];
-  function branchColor(name) {
-    const s = String(name || "");
-    let h = 0;
-    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
-    return BRANCH_COLORS[h % BRANCH_COLORS.length];
-  }
-  function currentBranchName() {
-    const row = (graph.branches || []).find((b) => b.current);
-    return (row && row.name) || ((graph.branches || [])[0] || {}).name || "main";
-  }
-  function lineageOf(tipId, parentsOf) {
     const seen = new Set();
-    const stack = tipId ? [tipId] : [];
+    const stack = tip ? [tip] : [];
     while (stack.length) {
       const id = stack.pop();
       if (!id || seen.has(id)) continue;
       seen.add(id);
-      (parentsOf[id] || []).forEach((p) => stack.push(p));
+      (parents[id] || []).forEach((p) => stack.push(p));
     }
     return seen;
   }
-  function attachPoint(tipId, onFocus, parentsOf) {
-    let id = tipId;
-    const seen = new Set();
-    while (id && !seen.has(id)) {
-      if (onFocus.has(id)) return id;
-      seen.add(id);
-      id = (parentsOf[id] || [])[0] || null;
-    }
-    return null;
+  function focusedBranch() {
+    const rows = graph.branches || [];
+    if (state.branch && rows.some((b) => b.name === state.branch)) return state.branch;
+    const current = rows.find((b) => b.current);
+    return (current && current.name) || (rows[0] && rows[0].name) || "";
   }
-  function isBranchOpen(name) {
-    return (state.openBranches || []).indexOf(name) >= 0;
+  function roleOf(n) {
+    const p = graph.prompt || {};
+    if (p.goal && n.id === p.goal.id) return "goal";
+    if (n.kind === "summary") return "summary";
+    if (n.kind === "open_question") return "open";
+    if (n.kind === "user") return "user";
+    const found = p.findings || [];
+    if (found.length && n.id === found[found.length - 1].id) return "handoff";
+    return "step";
   }
-  function isExpanded(id) {
-    return (state.expanded || []).indexOf(id) >= 0;
+  function rowsFor(name) {
+    const all = byId();
+    const branch = (graph.branches || []).find((b) => b.name === name);
+    const keep = branch && branch.tip ? lineage(branch.tip) : null;
+    const nodes = (graph.nodes || []).filter((n) => {
+      if (!n || n.kind === "delete" || n.folded) return false;
+      if (keep && keep.size && !keep.has(n.id)) return false;
+      return true;
+    });
+    nodes.sort((a, b) => String(a.committed_at || "").localeCompare(String(b.committed_at || "")));
+    const out = [];
+    nodes.forEach((n) => {
+      out.push(n);
+      if ((state.expanded || []).indexOf(n.id) >= 0) {
+        (n.children || []).forEach((id) => {
+          if (all[id]) out.push(Object.assign({ child: true }, all[id]));
+        });
+      }
+    });
+    return out;
   }
+  function isExpanded(id) { return (state.expanded || []).indexOf(id) >= 0; }
   function toggleExpand(id) {
     const cur = (state.expanded || []).slice();
     const at = cur.indexOf(id);
@@ -1235,494 +464,328 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     else cur.push(id);
     state.expanded = cur;
   }
-  function focusContext() {
-    const parentsAll = parentMap();
-    const focus = currentBranchName();
-    const tip = ((graph.branches || []).find((b) => b.name === focus) || {}).tip;
-    const onFocus = lineageOf(tip, parentsAll);
-    return { focus: focus, tip: tip, onFocus: onFocus, parentsAll: parentsAll };
-  }
-  function toggleBranch(name, selectId) {
-    const current = currentBranchName();
-    const row = (graph.branches || []).find((b) => b.name === name);
-    state.branch = name;
-    if (name === current) {
-      state.openBranches = [];
-      state.selected = selectId || (row && row.tip) || null;
-      state.reveal = state.selected;
-      saveState();
-      render();
-      return;
+  function selectId(id) {
+    state.selected = id;
+    const node = byId()[id];
+    if (node && node.folded) {
+      (graph.nodes || []).forEach((n) => {
+        if ((n.children || []).indexOf(id) >= 0 && !isExpanded(n.id)) toggleExpand(n.id);
+      });
     }
-    const cur = (state.openBranches || []).slice();
-    const at = cur.indexOf(name);
-    if (at >= 0) cur.splice(at, 1);
-    else cur.push(name);
-    state.openBranches = cur;
-    state.selected = selectId || (row && row.tip) || null;
-    state.reveal = isBranchOpen(name)
-      ? (state.selected || ("stub:" + name))
-      : ("stub:" + name);
     saveState();
     render();
-  }
-  function parentMap(nodes, folds) {
-    const ids = nodes ? new Set(nodes.map((n) => n.id)) : null;
-    const map = {};
-    (graph.edges || []).forEach((e) => {
-      const kind = e.kind || "parent";
-      if (kind !== "parent" && !(folds && kind === "fold")) return;
-      if (ids && (!ids.has(e.from) || !ids.has(e.to))) return;
-      (map[e.to] = map[e.to] || []).push(e.from);
-    });
-    if (folds && nodes) {
-      const have = new Set(nodes.map((n) => n.id));
-      const all = byId();
-      (state.expanded || []).forEach((id) => {
-        const kids = (all[id] && all[id].children) || [];
-        kids.forEach((cid, i) => {
-          const parent = i === 0 ? id : kids[i - 1];
-          if (!have.has(cid) || !have.has(parent)) return;
-          const row = map[cid] || [];
-          if (row.indexOf(parent) < 0) row.push(parent);
-          map[cid] = row;
-        });
-      });
-    }
-    return map;
-  }
-  function graphNodes(all) {
-    const ctx = focusContext();
-    if (!ctx.onFocus.size) {
-      return visibleNodes(all);
-    }
-    const current = currentBranchName();
-    const show = new Set(ctx.onFocus);
-    const stubs = [];
-    (graph.branches || []).forEach((b) => {
-      if ((b.name || "main") === current) return;
-      if (isBranchOpen(b.name)) {
-        lineageOf(b.tip, ctx.parentsAll).forEach((x) => show.add(x));
-        return;
-      }
-      const tip = all[b.tip] || {};
-      stubs.push({
-        id: "stub:" + b.name,
-        stub: true,
-        kind: "stub",
-        branch: b.name,
-        tip: b.tip,
-        attach: attachPoint(b.tip, ctx.onFocus, ctx.parentsAll),
-        title: "BRANCH " + b.name,
-        body: tip.title || "",
-        committed_at: tip.committed_at || "",
-        agent: "",
-      });
-    });
-    (state.expanded || []).forEach((id) => {
-      ((all[id] && all[id].children) || []).forEach((cid) => show.add(cid));
-    });
-    const nodes = (graph.nodes || []).filter(
-      (n) => show.has(n.id) && n.kind !== "delete"
-    );
-    return nodes.concat(stubs);
-  }
-  function lanePlan(ctx, nodes) {
-    const current = currentBranchName();
-    const others = (graph.branches || [])
-      .map((b) => b.name || "main")
-      .filter((name) => name !== current);
-    const order = others.concat([current]);
-    const laneOfName = {};
-    order.forEach((name, i) => { laneOfName[name] = i; });
-    const sets = {};
-    (graph.branches || []).forEach((b) => {
-      sets[b.name] = lineageOf(b.tip, ctx.parentsAll);
-    });
-    const ownerOf = {};
-    const laneOf = {};
-    nodes.forEach((n) => {
-      let name = current;
-      if (n.stub) name = n.branch;
-      else if (!ctx.onFocus.has(n.id)) {
-        const hit = others.find((bn) => sets[bn] && sets[bn].has(n.id));
-        if (hit) name = hit;
-      }
-      ownerOf[n.id] = name;
-      laneOf[n.id] = laneOfName[name] == null ? 0 : laneOfName[name];
-    });
-    return {
-      laneOf: laneOf,
-      ownerOf: ownerOf,
-      laneOfName: laneOfName,
-      laneCount: order.length,
-      order: order,
-    };
-  }
-  function renderRails(wrap, svg, nodes, parentsOf, plan) {
-    const box = wrap.getBoundingClientRect();
-    const dots = {};
-    wrap.querySelectorAll(".cell[data-id]").forEach((cell) => {
-      const dot = cell.querySelector(".commit");
-      if (!dot) return;
-      const r = dot.getBoundingClientRect();
-      dots[cell.dataset.id] = {
-        x: r.left + r.width / 2 - box.left,
-        y: r.top + r.height / 2 - box.top,
-      };
-    });
-    svg.setAttribute("width", String(Math.max(box.width, wrap.scrollWidth)));
-    svg.setAttribute("height", String(wrap.scrollHeight));
-    svg.innerHTML = "";
-    const ns = "http://www.w3.org/2000/svg";
-    const add = (d, color, width) => {
-      const path = document.createElementNS(ns, "path");
-      path.setAttribute("d", d);
-      path.setAttribute("fill", "none");
-      path.setAttribute("stroke", color);
-      path.setAttribute("stroke-width", String(width || 2.5));
-      path.setAttribute("stroke-linecap", "round");
-      svg.appendChild(path);
-    };
-    nodes.forEach((n) => {
-      (parentsOf[n.id] || []).forEach((pid) => {
-        const a = dots[n.id];
-        const b = dots[pid];
-        if (!a || !b) return;
-        const color = branchColor((plan.ownerOf || {})[n.id]);
-        const mid = (a.y + b.y) / 2;
-        add(
-          a.x === b.x
-            ? "M " + a.x + " " + a.y + " L " + b.x + " " + b.y
-            : "M " + a.x + " " + a.y + " C " + a.x + " " + mid + ", " + b.x + " " + mid + ", " + b.x + " " + b.y,
-          color,
-          a.x === b.x ? 2.5 : 3.5
-        );
-      });
-    });
-  }
-  function renderList(all) {
-    const list = document.getElementById("list");
-    const atRoot = !(state.trail || []).length;
-    const ctx = focusContext();
-    const nodes = atRoot ? graphNodes(all) : visibleNodes(all);
-    const parentsOf = parentMap(nodes.filter((n) => !n.stub), true);
-    nodes.forEach((n) => {
-      if (n.stub && n.attach) parentsOf[n.id] = [n.attach];
-    });
-    const plan = lanePlan(ctx, nodes);
-    const depths = {};
-    const depthOf = (id) => {
-      if (depths[id] != null) return depths[id];
-      depths[id] = 0;
-      const ps = ctx.parentsAll[id] || [];
-      depths[id] = ps.length ? 1 + Math.max.apply(null, ps.map(depthOf)) : 0;
-      return depths[id];
-    };
-    const atDepth = {};
-    let maxD = 0;
-    nodes.forEach((n) => {
-      const d = n.stub
-        ? (n.tip ? depthOf(n.tip) : n.attach ? depthOf(n.attach) + 1 : 0)
-        : depthOf(n.id);
-      const lane = plan.laneOf[n.id] == null ? 0 : plan.laneOf[n.id];
-      maxD = Math.max(maxD, d);
-      (atDepth[d] = atDepth[d] || {})[lane] = n;
-    });
-    const wrap = document.createElement("div");
-    wrap.className = "graph";
-    wrap.style.setProperty("--lanes", String(Math.max(1, plan.laneCount)));
-    wrap.style.setProperty("--lane-w", Math.max(280, list.clientWidth) + "px");
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("class", "rails");
-    wrap.appendChild(svg);
-    const fillCell = (cell, meta) => {
-      const owner = (plan.ownerOf || {})[meta.id] || currentBranchName();
-      const color = branchColor(owner);
-      cell.dataset.id = meta.id;
-      const rail = document.createElement("div");
-      rail.className = "gutter";
-      const commit = document.createElement("i");
-      commit.className = "commit kind-" + (meta.kind || "step");
-      if (meta.current) commit.classList.add("current");
-      if (meta.stub) commit.classList.add("stub");
-      if (owner !== currentBranchName()) commit.classList.add("other");
-      commit.style.setProperty("--b", color);
-      const expandable = !!(meta.children && meta.children.length);
-      if (expandable || meta.stub) commit.style.cursor = "pointer";
-      rail.appendChild(commit);
-      const card = document.createElement("div");
-      card.className = "card kind-" + (meta.kind || "step") + (meta.stub ? " stub" : "");
-      card.style.setProperty("--b", color);
-      if (meta.current) card.classList.add("current");
-      if (state.selected === meta.id || state.selected === meta.tip) card.classList.add("selected");
-      const title = document.createElement("div");
-      title.className = "title";
-      const label = document.createElement("span");
-      label.textContent = meta.stub
-        ? "BRANCH " + meta.branch
-        : truncate(meta.title || meta.kind || "entry", 42);
-      title.appendChild(label);
-      card.appendChild(title);
-      const openNode = (toggle) => {
-        if (meta.stub) {
-          toggleBranch(meta.branch, meta.tip);
-          return;
-        }
-        state.selected = meta.id;
-        if (toggle && expandable) toggleExpand(meta.id);
-        saveState();
-        render();
-        document.getElementById("detail").scrollIntoView({ block: "start" });
-      };
-      commit.addEventListener("click", (e) => {
-        e.stopPropagation();
-        openNode(true);
-      });
-      card.addEventListener("click", () => openNode(false));
-      cell.appendChild(rail);
-      cell.appendChild(card);
-    };
-    for (let d = maxD; d >= 0; d--) {
-      const at = atDepth[d];
-      if (!at) continue;
-      const trow = document.createElement("div");
-      trow.className = "trow";
-      for (let lane = 0; lane < plan.laneCount; lane++) {
-        const cell = document.createElement("div");
-        cell.className = "cell" + (at[lane] ? "" : " empty");
-        if (at[lane]) fillCell(cell, at[lane]);
-        trow.appendChild(cell);
-      }
-      wrap.appendChild(trow);
-    }
-    list.innerHTML = "";
-    list.appendChild(wrap);
-    bindPan(list);
-    lastRails = () => {
-      wrap.style.setProperty("--lane-w", Math.max(280, list.clientWidth) + "px");
-      renderRails(wrap, svg, nodes, parentsOf, plan);
-    };
-    lastRails();
-    if (state.reveal) {
-      const hit = wrap.querySelector('.cell[data-id="' + state.reveal + '"]');
-      if (hit) hit.scrollIntoView({ block: "center", inline: "nearest" });
-      stickRight = list.scrollLeft + list.clientWidth >= list.scrollWidth - 8;
-      stickBottom = list.scrollTop + list.clientHeight >= list.scrollHeight - 8;
-      state.reveal = null;
-    } else {
-      if (stickRight) list.scrollLeft = list.scrollWidth;
-      if (stickBottom) list.scrollTop = list.scrollHeight;
-    }
-  }
-  function bindPan(list) {
-    if (list.dataset.pan) return;
-    list.dataset.pan = "1";
-    list.addEventListener("scroll", () => {
-      stickRight = list.scrollLeft + list.clientWidth >= list.scrollWidth - 8;
-      stickBottom = list.scrollTop + list.clientHeight >= list.scrollHeight - 8;
-    }, { passive: true });
-    new ResizeObserver(() => {
-      if (lastRails) lastRails();
-      if (stickRight) list.scrollLeft = list.scrollWidth;
-      if (stickBottom) list.scrollTop = list.scrollHeight;
-    }).observe(list);
-  }
-  function depButton(id) {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.textContent = "[" + String(id).slice(0, 8) + "]";
-    const target = byId()[String(id)] || null;
-    btn.title = target ? "Show entry " + target.id.slice(0, 8)
-      : "Entry not on this view";
-    btn.addEventListener("click", () => {
-      if (!target) return;
-      state.selected = target.id;
-      saveState();
-      render();
-      document.getElementById("detail").scrollIntoView({behavior: "smooth"});
-    });
-    return btn;
-  }
-  function renderQuestions() {
-    const el = document.getElementById("questions");
-    const list = document.getElementById("questions-list");
-    const promptQs = ((graph.prompt || {}).questions || []);
-    if (promptQs.length) {
-      el.style.display = "none";
-      return;
-    }
-    const qs = (graph.nodes || []).filter((n) => n.kind === "open_question");
-    if (!qs.length) {
-      el.style.display = "none";
-      return;
-    }
-    el.style.display = "block";
-    list.innerHTML = "";
-    qs.forEach((q) => {
-      const item = document.createElement("div");
-      item.className = "q-item";
-      const text = document.createElement("div");
-      text.className = "q-text";
-      text.textContent = "[" + String(q.id).slice(0, 8) + "] "
-        + (q.title || "").trim();
-      item.appendChild(text);
-      const deps = document.createElement("div");
-      deps.className = "q-deps";
-      (q.depends_on || []).forEach((id) => deps.appendChild(depButton(id)));
-      if (deps.childNodes.length) item.appendChild(deps);
-      list.appendChild(item);
-    });
-  }
-  function promptHasContent(p) {
-    if (!p) return false;
-    return !!(p.goal || p.steering
-      || (p.questions || []).length
-      || (p.findings || []).length
-      || (p.injected || "").trim());
-  }
-  function promptBlock(title, entry, { extra } = {}) {
-    if (!entry || !(entry.text || "").trim()) return null;
-    const block = document.createElement("div");
-    block.className = "prompt-block";
-    const h3 = document.createElement("h3");
-    h3.textContent = title;
-    block.appendChild(h3);
-    const who = document.createElement("div");
-    who.className = "who";
-    const btn = depButton(entry.id);
-    who.appendChild(btn);
-    if (entry.agent) {
-      const agent = document.createElement("span");
-      agent.textContent = " @" + entry.agent;
-      who.appendChild(agent);
-    }
-    if (entry.stale) {
-      const stale = document.createElement("span");
-      stale.className = "stale";
-      stale.textContent = " [stale]";
-      who.appendChild(stale);
-    }
-    block.appendChild(who);
-    const body = document.createElement("div");
-    body.className = "body";
-    body.textContent = entry.text;
-    block.appendChild(body);
-    const deps = (entry.depends_on || []);
-    if (deps.length) {
-      const row = document.createElement("div");
-      row.className = "q-deps";
-      deps.forEach((id) => row.appendChild(depButton(id)));
-      block.appendChild(row);
-    }
-    if (extra) block.appendChild(extra);
-    return block;
-  }
-  function renderPrompt() {
-    const el = document.getElementById("prompt");
-    const pinned = document.getElementById("prompt-pinned");
-    const findings = document.getElementById("prompt-findings");
-    const meta = document.getElementById("prompt-meta");
-    const copy = document.getElementById("prompt-copy");
-    const p = graph.prompt || {};
-    if (!promptHasContent(p)) {
-      el.style.display = "none";
-      return;
-    }
-    el.style.display = "block";
-    pinned.innerHTML = "";
-    findings.innerHTML = "";
-    const add = (parent, title, entry) => {
-      const block = promptBlock(title, entry);
-      if (block) parent.appendChild(block);
-    };
-    add(pinned, "Goal", p.goal);
-    add(pinned, "Steering", p.steering);
-    (p.questions || []).forEach((q) => add(pinned, "Open question", q));
-    const found = p.findings || [];
-    const findingsHead = document.createElement("div");
-    findingsHead.className = "prompt-block";
-    const findingsTitle = document.createElement("h3");
-    findingsTitle.textContent = "Findings so far";
-    findingsHead.appendChild(findingsTitle);
-    findings.appendChild(findingsHead);
-    if (!found.length) {
-      const body = document.createElement("div");
-      body.className = "body";
-      body.textContent = "No findings yet.";
-      findingsHead.appendChild(body);
-    } else {
-      found.forEach((item) => {
-        const block = promptBlock("Finding", item);
-        if (block) {
-          block.querySelector("h3").remove();
-          findings.appendChild(block);
-        }
-      });
-    }
-    const n = found.length;
-    meta.textContent = n ? (n + (n === 1 ? " finding" : " findings")) : "";
-    copy.onclick = async () => {
-      const text = p.injected || "";
-      try {
-        await navigator.clipboard.writeText(text);
-        copy.textContent = "Copied";
-        setTimeout(() => { copy.textContent = "Copy injected"; }, 1200);
-      } catch (_) {
-        copy.textContent = "Failed";
-        setTimeout(() => { copy.textContent = "Copy injected"; }, 1200);
-      }
-    };
+    const hit = document.querySelector('.entry[data-id="' + String(id).replace(/"/g, "") + '"]');
+    if (hit) hit.scrollIntoView({ block: "nearest" });
   }
   function renderBranches() {
-    const el = document.getElementById("branch");
-    el.innerHTML = "";
-    const mark = document.createElement("span");
-    mark.className = "branch-label";
-    mark.textContent = "BRANCH";
-    el.appendChild(mark);
-    const ctx = focusContext();
+    const el = document.getElementById("branches");
     const rows = graph.branches || [];
-    if (rows.length <= 1) {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "focus here";
-      btn.textContent = ctx.focus;
-      btn.title = "BRANCH " + ctx.focus + " · you are here";
-      el.appendChild(btn);
-      return;
-    }
+    el.innerHTML = "";
+    if (rows.length <= 1) { el.hidden = true; return; }
+    el.hidden = false;
+    const focus = focusedBranch();
     rows.forEach((b) => {
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "branch-tab";
-      btn.style.setProperty("--b", branchColor(b.name));
-      if (b.current) btn.classList.add("here");
-      if (b.name === (state.branch || ctx.focus) || isBranchOpen(b.name)) {
-        btn.classList.add("focus");
-      }
-      btn.textContent = b.name;
-      btn.title = b.current
-        ? "BRANCH " + b.name + " · you are here"
-        : (isBranchOpen(b.name) ? "Collapse" : "Expand") + " BRANCH " + b.name;
-      btn.addEventListener("click", () => toggleBranch(b.name));
+      btn.className = "branch-tab" + (b.name === focus ? " here" : "");
+      btn.textContent = b.name + (b.current ? " · you" : "");
+      btn.addEventListener("click", () => {
+        state.branch = b.name;
+        saveState();
+        render();
+      });
       el.appendChild(btn);
     });
   }
+  function renderCommits() {
+    const box = document.getElementById("commits");
+    const atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 28;
+    const first = !box.childElementCount;
+    box.innerHTML = "";
+    const rows = rowsFor(focusedBranch());
+    if (!rows.length) {
+      const empty = document.createElement("p");
+      empty.className = "empty";
+      empty.textContent = "Commits show up here after the first save.";
+      box.appendChild(empty);
+      return;
+    }
+    const spine = document.createElement("div");
+    spine.className = "spine";
+    box.appendChild(spine);
+    rows.forEach((n) => {
+      const entry = document.createElement("div");
+      entry.className = "entry";
+      entry.dataset.id = n.id;
+      const role = roleOf(n);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "commit" + (state.selected === n.id ? " on" : "");
+      const dot = document.createElement("i");
+      dot.className = "dot " + role + (n.current ? " current" : "");
+      const sha = document.createElement("span");
+      sha.className = "sha";
+      sha.textContent = shortId(n.id);
+      const pill = document.createElement("span");
+      pill.className = "pill " + role;
+      pill.textContent = role;
+      const title = document.createElement("span");
+      title.className = "title";
+      title.textContent = firstLine(n.title || n.kind || "entry");
+      btn.appendChild(dot);
+      btn.appendChild(sha);
+      btn.appendChild(pill);
+      btn.appendChild(title);
+      btn.addEventListener("click", () => {
+        if ((n.children || []).length) toggleExpand(n.id);
+        state.selected = state.selected === n.id ? null : n.id;
+        saveState();
+        render();
+      });
+      entry.appendChild(btn);
+      if (state.selected === n.id) {
+        const msg = document.createElement("div");
+        msg.className = "msg";
+        msg.textContent = (n.body || n.title || "").trim() || "(empty)";
+        entry.appendChild(msg);
+        if (n.mcp_tools) {
+          const cat = document.createElement("details");
+          cat.className = "catalog";
+          const sum = document.createElement("summary");
+          sum.textContent = "MCP tool catalog";
+          const pre = document.createElement("div");
+          pre.textContent = n.mcp_tools;
+          cat.appendChild(sum);
+          cat.appendChild(pre);
+          entry.appendChild(cat);
+        }
+      }
+      box.appendChild(entry);
+    });
+    if (first || atBottom) box.scrollTop = box.scrollHeight;
+  }
+  function idButton(id) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "id";
+    btn.textContent = "[" + shortId(id) + "]";
+    btn.addEventListener("click", () => selectId(id));
+    return btn;
+  }
+  function addBlock(parent, tone, title, entry, withBudget) {
+    if (!entry || !(entry.text || "").trim()) return;
+    const sec = document.createElement("div");
+    sec.className = "sec " + tone;
+    const bar = document.createElement("i");
+    bar.className = "bar " + tone;
+    const body = document.createElement("div");
+    const h = document.createElement("h3");
+    h.textContent = "## " + title;
+    if (withBudget) {
+      const bud = document.createElement("span");
+      bud.className = "bud";
+      bud.textContent = String(entry.text || "").length + "c";
+      h.appendChild(bud);
+    }
+    const line = document.createElement("p");
+    line.className = "line";
+    line.appendChild(idButton(entry.id));
+    line.appendChild(document.createTextNode(" " + firstLine(entry.text)));
+    if (entry.stale) {
+      const mark = document.createElement("span");
+      mark.className = "mark";
+      mark.textContent = " [stale]";
+      line.appendChild(mark);
+    }
+    body.appendChild(h);
+    body.appendChild(line);
+    restLines(entry.text).forEach((t) => {
+      const more = document.createElement("p");
+      more.className = "more";
+      more.textContent = t;
+      body.appendChild(more);
+    });
+    sec.appendChild(bar);
+    sec.appendChild(body);
+    parent.appendChild(sec);
+  }
+  function addMany(parent, tone, title, entries) {
+    const rows = (entries || []).filter((e) => e && (e.text || "").trim());
+    if (!rows.length) return;
+    const sec = document.createElement("div");
+    sec.className = "sec " + tone;
+    const bar = document.createElement("i");
+    bar.className = "bar " + tone;
+    const body = document.createElement("div");
+    const h = document.createElement("h3");
+    h.textContent = "## " + title;
+    body.appendChild(h);
+    rows.forEach((entry) => {
+      const line = document.createElement("p");
+      line.className = "line";
+      line.appendChild(idButton(entry.id));
+      line.appendChild(document.createTextNode(" " + firstLine(entry.text)));
+      if (entry.stale) {
+        const mark = document.createElement("span");
+        mark.className = "mark";
+        mark.textContent = " [stale]";
+        line.appendChild(mark);
+      }
+      body.appendChild(line);
+    });
+    sec.appendChild(bar);
+    sec.appendChild(body);
+    parent.appendChild(sec);
+  }
+  function renderState() {
+    const body = document.getElementById("state-body");
+    const budget = document.getElementById("state-budget");
+    const p = graph.prompt || {};
+    const injected = String(p.injected || "");
+    budget.textContent = injected ? (injected.length + " / 1,200") : "≤ 1,200 chars";
+    body.innerHTML = "";
+    const found = p.findings || [];
+    if (!p.goal && !p.steering && !(p.questions || []).length && !found.length && !injected) {
+      const empty = document.createElement("p");
+      empty.className = "empty light";
+      empty.textContent = "The first request becomes the goal.";
+      body.appendChild(empty);
+      return;
+    }
+    addBlock(body, "goal", "Goal", p.goal, true);
+    addBlock(body, "steer", "Steering", p.steering, false);
+    if (found.length) addBlock(body, "handoff", "Handoff", found[found.length - 1], true);
+    addMany(body, "open", "Open", p.questions || []);
+    if (found.length > 1) addMany(body, "related", "Related", found.slice(0, -1).slice(-3));
+  }
+  function toolLabel(action) {
+    return TOOLS[action] || action || "memory";
+  }
+  function renderActions() {
+    const box = document.getElementById("action-list");
+    const rows = (graph.actions || []).slice().reverse();
+    box.innerHTML = "";
+    if (!rows.length) {
+      const empty = document.createElement("p");
+      empty.className = "empty";
+      empty.textContent = "Retrievals show up here when the agent calls memory_find.";
+      box.appendChild(empty);
+      return;
+    }
+    rows.forEach((row) => {
+      const item = document.createElement("div");
+      item.className = "act";
+      const top = document.createElement("div");
+      top.className = "act-top";
+      const name = document.createElement("span");
+      name.className = "tool " + (row.action || "");
+      name.textContent = toolLabel(row.action);
+      const when = document.createElement("time");
+      when.className = "when";
+      when.textContent = formatWhen(row.at);
+      top.appendChild(name);
+      top.appendChild(when);
+      item.appendChild(top);
+      if (row.detail) {
+        const detail = document.createElement("div");
+        detail.className = "detail";
+        detail.textContent = row.detail;
+        item.appendChild(detail);
+      }
+      box.appendChild(item);
+    });
+  }
+  function toFileUrl(absPath) {
+    return "file://" + String(absPath).split("/").map((p, i) => (i === 0 ? p : encodeURIComponent(p))).join("/");
+  }
+  function openInFinder(absPath, event) {
+    if (event) { event.preventDefault(); event.stopPropagation(); }
+    const reveal = graph && graph.reveal;
+    if (reveal) {
+      fetch(reveal + "?path=" + encodeURIComponent(absPath)).catch(() => {
+        window.open(toFileUrl(absPath), "_blank");
+      });
+      return;
+    }
+    window.open(toFileUrl(absPath), "_blank");
+  }
+  function fileRow(label, badge, stale, abs) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "file";
+    const path = document.createElement("span");
+    path.className = "path";
+    path.textContent = label;
+    const mark = document.createElement("span");
+    mark.className = stale ? "stale" : "ok";
+    mark.textContent = badge;
+    btn.appendChild(path);
+    btn.appendChild(mark);
+    if (abs) btn.addEventListener("click", (e) => openInFinder(abs, e));
+    return btn;
+  }
+  function renderRunning(data) {
+    const box = document.getElementById("running");
+    box.innerHTML = "";
+    const inspecting = data && data.inspecting;
+    if (inspecting && inspecting.id) {
+      const line = document.createElement("p");
+      line.className = "run";
+      line.textContent = "inspecting " + shortId(inspecting.id);
+      box.appendChild(line);
+    }
+    ((data && data.processes) || []).forEach((proc) => {
+      const line = document.createElement("p");
+      line.className = "run";
+      line.textContent = proc.command || "running";
+      box.appendChild(line);
+    });
+    box.hidden = !box.childElementCount;
+  }
+  function renderFiles(data) {
+    lastNow = data || null;
+    const box = document.getElementById("files");
+    box.innerHTML = "";
+    if (!data) {
+      const wait = document.createElement("p");
+      wait.className = "empty";
+      wait.textContent = "checking files…";
+      box.appendChild(wait);
+      return;
+    }
+    renderRunning(data);
+    const files = data.files || [];
+    if (!files.length) {
+      box.appendChild(fileRow("working tree", "sha256 ✓", false, null));
+      return;
+    }
+    const root = projectRoot();
+    files.slice(0, 8).forEach((f) => {
+      const rel = String(f.path || "");
+      const abs = rel.startsWith("/") ? rel : (root ? root + "/" + rel : rel);
+      box.appendChild(fileRow(rel, "[stale]", true, abs));
+    });
+    if (files.length > 8) {
+      const more = document.createElement("p");
+      more.className = "empty";
+      more.textContent = "+" + (files.length - 8) + " more changed";
+      box.appendChild(more);
+    }
+  }
+  function workingEndpoint() {
+    if (graph && graph.working) return graph.working;
+    const reveal = graph && graph.reveal;
+    if (!reveal) return null;
+    return String(reveal).replace(/\/reveal\/?$/, "/working");
+  }
   function render() {
-    const all = byId();
-    renderBranches();
-    renderQuestions();
-    renderPrompt();
-    state.trail = (state.trail || []).filter((id) => all[id] && (all[id].children || []).length);
-    if (state.selected && !all[state.selected]) state.selected = null;
     const names = new Set((graph.branches || []).map((b) => b.name));
     if (state.branch && !names.has(state.branch)) state.branch = null;
-    saveState();
-    renderCrumbs(all);
-    renderList(all);
-    renderDetail(all);
-    if (lastNow) renderNow(lastNow);
+    renderBranches();
+    renderCommits();
+    renderState();
+    renderActions();
+    if (lastNow || (graph && graph.now)) renderFiles(lastNow || graph.now);
   }
   function applyData(next) {
     const encoded = JSON.stringify(next || {});
@@ -1733,30 +796,59 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     render();
     return true;
   }
+  function loadActions() {
+    if (isDemo()) return;
+    const s = document.createElement("script");
+    s.src = "actions.js?t=" + Date.now();
+    s.onload = () => {
+      const rows = window.__AGENT_MEMORY_ACTIONS__;
+      if (!Array.isArray(rows)) return;
+      graph.actions = rows;
+      renderActions();
+    };
+    document.head.appendChild(s);
+    setTimeout(() => s.remove(), 4000);
+  }
+  function pollWorking() {
+    if (isDemo()) {
+      renderFiles(graph.now || { files: [], processes: [], inspecting: null });
+      return;
+    }
+    const url = workingEndpoint();
+    if (!url) {
+      renderFiles(null);
+      return;
+    }
+    fetch(url).then((r) => {
+      if (!r.ok) throw new Error("working");
+      return r.json();
+    }).then(renderFiles).catch(() => {
+      if (!document.getElementById("files").childElementCount) {
+        renderFiles(null);
+      }
+    });
+  }
   function poll() {
     if (isDemo()) return;
     const s = document.createElement("script");
     s.src = "data.js?t=" + Date.now();
     s.onload = () => {
       applyData(window.__AGENT_MEMORY_LIVE__);
-      setStatus("live · " + new Date().toLocaleTimeString(), true);
+      loadActions();
+      const inspecting = lastNow && lastNow.inspecting;
+      setStatus(inspecting && inspecting.id ? "inspecting" : "live", true);
       pollWorking();
       schedule();
     };
-    s.onerror = () => {
-      setStatus("waiting for data…", false);
-      schedule();
-    };
+    s.onerror = () => { setStatus("waiting for data…", false); schedule(); };
     document.head.appendChild(s);
     setTimeout(() => s.remove(), 5000);
   }
-  function schedule() {
-    setTimeout(poll, POLL_MS);
-  }
+  function schedule() { setTimeout(poll, POLL_MS); }
   applyData(graph);
   setStatus(isDemo() ? "demo" : "live", true);
   pollWorking();
-  if (!isDemo()) schedule();
+  if (!isDemo()) { loadActions(); schedule(); }
 })();
 </script>
 </body>
@@ -1764,9 +856,61 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
 """
 
 
+# ponytail: last 40 tool calls; raise the cap if one session outgrows the card
+ACTIONS_CAP = 40
+
+
 def default_live_dir(memory) -> Path:
     """Directory for the browser live monitor (inside the memory git dir)."""
     return Path(memory._git_dir) / "live"
+
+
+def _actions_path(live_dir: Path) -> Path:
+    return Path(live_dir) / "actions.json"
+
+
+def load_actions(live_dir: Path) -> list:
+    path = _actions_path(live_dir)
+    if not path.exists():
+        return []
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    if not isinstance(raw, list):
+        return []
+    return [row for row in raw if isinstance(row, dict)][-ACTIONS_CAP:]
+
+
+def _write_actions_js(live_dir: Path, rows: list) -> None:
+    encoded = json.dumps(rows).replace("</", "<\\/")
+    (Path(live_dir) / "actions.js").write_text(
+        f"window.__AGENT_MEMORY_ACTIONS__ = {encoded};\n",
+        encoding="utf-8",
+    )
+
+
+def record_action(memory, action: str, detail: str = "") -> None:
+    """Append one tool call for the live page. Failures are ignored."""
+    try:
+        live = default_live_dir(memory)
+        live.mkdir(parents=True, exist_ok=True)
+        rows = load_actions(live)
+        rows.append(
+            {
+                "at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "action": str(action or "")[:40],
+                "detail": str(detail or "").replace("\n", " ")[:140],
+            }
+        )
+        rows = rows[-ACTIONS_CAP:]
+        _actions_path(live).write_text(
+            json.dumps(rows, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        _write_actions_js(live, rows)
+    except Exception:
+        return
 
 
 def _shell_version(path: Path) -> str | None:
@@ -1810,6 +954,8 @@ def write_live_html(
         payload["reveal"] = None
     if payload.get("reveal"):
         payload["working"] = str(payload["reveal"]).rsplit("/", 1)[0] + "/working"
+    payload["actions"] = load_actions(out_dir)
+    _write_actions_js(out_dir, payload["actions"])
     encoded = json.dumps(payload, indent=2).replace("</", "<\\/")
     (out_dir / "data.js").write_text(
         f"window.__AGENT_MEMORY_LIVE__ = {encoded};\n",
@@ -2057,6 +1203,23 @@ def demo_payload() -> dict:
             ],
             "inspecting": None,
         },
+        "actions": [
+            {
+                "at": "2026-08-17T11:12:04+00:00",
+                "action": "find",
+                "detail": "query=login p95",
+            },
+            {
+                "at": "2026-08-17T11:12:20+00:00",
+                "action": "find",
+                "detail": "ids=a7b8c9d0",
+            },
+            {
+                "at": "2026-08-17T11:13:01+00:00",
+                "action": "save",
+                "detail": "Most of the time: retrieve, don't converse.",
+            },
+        ],
     }
 
 
@@ -2064,7 +1227,7 @@ def write_live_demo(path: str | Path) -> Path:
     """Write a self-contained demo page (no memory store, no polling)."""
     encoded = json.dumps(demo_payload(), indent=2).replace("</", "<\\/")
     html = SHELL_TEMPLATE.replace("__SHELL_VERSION__", SHELL_VERSION)
-    html = html.replace("<title>Memory · live</title>", "<title>Memory · demo</title>")
+    html = html.replace("<title>agent-memory</title>", "<title>agent-memory · demo</title>")
     html = html.replace(
         '<script src="data.js"></script>',
         f"<script>window.__AGENT_MEMORY_LIVE__ = {encoded};</script>",

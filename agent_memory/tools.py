@@ -179,6 +179,79 @@ MEMORY_TOOLS = [MEMORY_TOOL]
 MEMORY_TOOL_NAME = "memory"
 
 
+# Shown on the live page. Reads that fire constantly (history, model_get) stay off it.
+_LOGGED_ACTIONS = {
+    "find",
+    "save",
+    "summarize",
+    "delete",
+    "branch",
+    "inspect",
+    "inspect_done",
+    "open_questions",
+    "goal_create",
+    "goal_use",
+    "model_propose",
+    "model_accept",
+    "model_handoff",
+    "model_reduce",
+    "model_predict",
+}
+
+
+def _clip(value, limit: int = 120) -> str:
+    return str(value or "").split("\n", 1)[0].strip()[:limit]
+
+
+def _id_list(raw) -> str:
+    if not raw:
+        return ""
+    ids = [raw] if isinstance(raw, str) else list(raw)
+    return ", ".join(str(item)[:8] for item in ids[:6])
+
+
+def _action_detail(arguments: dict) -> str:
+    action = arguments.get("action") or ""
+    if action == "find":
+        shown = _id_list(arguments.get("ids"))
+        if shown:
+            return "ids=" + shown
+        if arguments.get("query"):
+            return "query=" + _clip(arguments.get("query"), 100)
+        if arguments.get("text"):
+            return "text=" + _clip(arguments.get("text"), 100)
+        return "headlines"
+    if action == "save":
+        return _clip(arguments.get("text"))
+    if action == "delete":
+        return "ids=" + _id_list(arguments.get("ids") or arguments.get("id"))
+    if action == "branch":
+        return _clip(arguments.get("label") or arguments.get("name"))
+    if action == "open_questions":
+        text = _clip(arguments.get("text"))
+        return text or "close"
+    if action in ("inspect", "goal_use"):
+        return _clip(arguments.get("id"), 12)
+    if action == "goal_create":
+        return _clip(arguments.get("text"))
+    return ""
+
+
+def _note_action(memory: Memory, arguments: dict) -> None:
+    """Record a tool call for the live page. Never fails the tool."""
+    action = arguments.get("action") or ""
+    if action == "save" and arguments.get("summary"):
+        action = "summarize"
+    if action not in _LOGGED_ACTIONS:
+        return
+    try:
+        from agent_memory.live_html import record_action
+
+        record_action(memory, action, _action_detail(arguments))
+    except Exception:
+        return
+
+
 def call_tool(memory: Memory, name: str, arguments: dict) -> str:
     """Run the memory tool and return the text result for the model.
 
@@ -194,6 +267,8 @@ def call_tool(memory: Memory, name: str, arguments: dict) -> str:
         result = _run_action(memory, arguments)
     except (ValueError, RuntimeError, KeyError, TypeError, OSError) as error:
         result = f"Error: {error}"
+    else:
+        _note_action(memory, arguments)
     memory._last_tool_result = result
     return result
 

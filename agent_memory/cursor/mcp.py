@@ -109,6 +109,12 @@ def _build_server():
         """Save a finding. After a completed milestone, call memory_summarize to fold its commits."""
         memory = get_memory(goal)
         item_id = memory.save(text, agent=agent)
+        try:
+            from agent_memory.live_html import record_action
+
+            record_action(memory, "save", text.split("\n", 1)[0][:120])
+        except Exception:
+            pass
         memory.write_state_file()
         try:
             memory.write_live_html()
@@ -127,6 +133,12 @@ def _build_server():
         """Fold finished work into one line. Pass agent."""
         memory = get_memory(goal)
         item_id = memory.summarize(text, agent=agent)
+        try:
+            from agent_memory.live_html import record_action
+
+            record_action(memory, "summarize", text.split("\n", 1)[0][:120])
+        except Exception:
+            pass
         memory.write_state_file()
         try:
             memory.write_live_html()
