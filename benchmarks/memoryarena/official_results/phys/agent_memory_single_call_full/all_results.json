@@ -1,0 +1,47 @@
+{
+    "overall_average_passrate": 1.0,
+    "avg_progress_score": 1.0,
+    "average_session_time": 19.13,
+    "average_memory_length": 968.0,
+    "average_task_time": 77.08,
+    "memory_length": 3499.0,
+    "min_k": 2,
+    "num_papers_evaluated": 20,
+    "total_subtasks_evaluated": 86,
+    "passrate_at_k": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+    ],
+    "cummulative_passrate_at_k": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+    ],
+    "passrate_at_min_k": [
+        1.0,
+        1.0
+    ],
+    "cummulative_passrate_at_min_k": [
+        1.0,
+        1.0
+    ]
+}
