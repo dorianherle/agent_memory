@@ -561,7 +561,8 @@ class Memory:
         )
         if not hits:
             return []
-        ordered = [memory_id for memory_id, _score in hits]
+        scores = dict(hits)
+        ordered = list(scores)
         if ids is not None:
             wanted = set(ids)
             ordered = [memory_id for memory_id in ordered if memory_id in wanted]
@@ -579,7 +580,7 @@ class Memory:
         )
         by_id = {row["id"]: row for row in rows}
         return [
-            self._row_item(by_id[memory_id])
+            self._row_item(by_id[memory_id], scores[memory_id])
             for memory_id in ordered
             if memory_id in by_id
         ][:k]
