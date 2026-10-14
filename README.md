@@ -2,7 +2,7 @@
 
 **Deterministic Bounded State Packets, Git-Snapshot Lineage, and Consecutive Compression for Long-Horizon AI Agents**
 
-**Author:** **Dorian Herle**  
+**Author:** **Dorian Herle** (`herle.dorian@gmail.com`)  
 **Paper:** [📄 Read the Paper (PDF)](paper/agent_memory_paper.pdf) · [📖 Read Online (Markdown)](paper/PAPER.md) · [🧾 LaTeX Source](paper/agent_memory_paper.tex)  
 **Benchmark Artifacts:** [`benchmarks/memoryarena/`](benchmarks/memoryarena/) · [`examples/memoryarena_online_benchmark.py`](examples/memoryarena_online_benchmark.py)
 

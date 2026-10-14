@@ -1,6 +1,6 @@
 # Agent Memory: Deterministic Bounded State Packets, Git-Snapshot Lineage, and Consecutive Compression for Long-Horizon AI Agents
 
-**Author:** **Dorian Herle** (`dorian.herle@gmail.com`)  
+**Author:** **Dorian Herle** (`herle.dorian@gmail.com`)  
 **Date:** October 14, 2026  
 **Repository:** [github.com/dorianherle/agent_memory](https://github.com/dorianherle/agent_memory)  
 **Paper Formats:** [PDF (`paper/agent_memory_paper.pdf`)](agent_memory_paper.pdf) · [LaTeX Source (`paper/agent_memory_paper.tex`)](agent_memory_paper.tex) · [Markdown (`paper/PAPER.md`)](PAPER.md)
