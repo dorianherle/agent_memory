@@ -9,7 +9,7 @@ import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
-from agent_memory.core import HIDDEN_DIR, Memory
+from agent_memory.core import HIDDEN_DIR, Memory, split_goals
 
 GOALS_DIR = "goals"
 REGISTRY = "goals.json"
@@ -182,7 +182,14 @@ def memory_for(path: str | Path, goal_id: str | None = None) -> Memory:
     path = Path(path).resolve()
     if not goal_id:
         return Memory(path)
-    return Memory(resolve_goal(path, goal_id)["workspace"])
+    try:
+        return Memory(resolve_goal(path, goal_id)["workspace"])
+    except ValueError:
+        local = Memory(path)
+        prefix = goal_id.strip().lower()
+        if prefix and any(item.id.startswith(prefix) for item in split_goals(local.state())):
+            return local
+        raise
 
 
 def bind_packet(project: str | Path, goal_id: str, question: str | None = None) -> str:

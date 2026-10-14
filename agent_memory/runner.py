@@ -388,6 +388,13 @@ def codex_command(prompt: str, cwd: Path, model: str | None = None) -> list[str]
         "--skip-git-repo-check",
         "--sandbox",
         "workspace-write",
+        "--ephemeral",
+        "-c",
+        f"mcp_servers.agent_memory.command={json.dumps(sys.executable)}",
+        "-c",
+        f'mcp_servers.agent_memory.args={json.dumps(["-m", "agent_memory.cursor.mcp", "--root", str(cwd)])}',
+        "-c",
+        'mcp_servers.agent_memory.default_tools_approval_mode="approve"',
     ]
     if model:
         command += ["--model", model]

@@ -264,6 +264,8 @@ class WorkerDetectTests(MemoryTestCase):
         prompt = "write failing tests"
         command = codex_command(prompt, cwd, model="gpt-5.6-luna")
         self.assertEqual(command[:5], ["codex", "exec", "--skip-git-repo-check", "--sandbox", "workspace-write"])
+        self.assertIn("--ephemeral", command)
+        self.assertIn('mcp_servers.agent_memory.default_tools_approval_mode="approve"', command)
         self.assertIn("--model", command)
         self.assertIn("gpt-5.6-luna", command)
         self.assertIn(str(cwd), command)

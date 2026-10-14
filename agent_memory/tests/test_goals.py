@@ -121,6 +121,8 @@ class GoalSpaceTests(MemoryTestCase):
     def test_resolve_unknown_goal(self) -> None:
         with self.assertRaises(ValueError):
             resolve_goal(self.path, "deadbeef")
+        goal_commit = self.memory.save_user("Build tx_engine")
+        self.assertEqual(memory_for(self.path, goal_commit[:8])._path, self.path.resolve())
 
 
 class GoalMcpTests(MemoryTestCase):
