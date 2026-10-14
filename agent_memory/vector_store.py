@@ -5,16 +5,28 @@ from __future__ import annotations
 import sqlite3
 import time
 from functools import wraps
+from typing import Iterable, TypeVar
 
 import numpy
 
+T = TypeVar("T")
 
-def _locked(method):
+
+def locked(method):
     @wraps(method)
     def call(self, *args, **kwargs):
         with self.lock:
             return method(self, *args, **kwargs)
     return call
+
+
+def _chunks(items: list[T], size: int = 400) -> Iterable[list[T]]:
+    for start in range(0, len(items), size):
+        yield items[start : start + size]
+
+
+def _decode_vector(blob: bytes) -> numpy.ndarray:
+    return numpy.frombuffer(blob, dtype=numpy.float32).copy()
 
 
 def vector_bytes(vector: list[float]) -> tuple[int, bytes]:
@@ -32,7 +44,7 @@ def vector_bytes(vector: list[float]) -> tuple[int, bytes]:
 
 
 class VectorStoreMixin:
-    @_locked
+    @locked
     def missing_documents(self, provider: str) -> list[sqlite3.Row]:
         return self.connection.execute(
             """
@@ -51,7 +63,7 @@ class VectorStoreMixin:
             (provider,),
         ).fetchall()
 
-    @_locked
+    @locked
     def embedding(
         self, provider: str, purpose: str, digest: str
     ) -> numpy.ndarray | None:
@@ -62,11 +74,9 @@ class VectorStoreMixin:
             """,
             (provider, purpose, digest),
         ).fetchone()
-        if row is None:
-            return None
-        return numpy.frombuffer(row["vector"], dtype=numpy.float32).copy()
+        return _decode_vector(row["vector"]) if row is not None else None
 
-    @_locked
+    @locked
     def save_embeddings(
         self,
         provider: str,
@@ -93,7 +103,7 @@ class VectorStoreMixin:
                     (provider, purpose, digest, self.owner),
                 )
 
-    @_locked
+    @locked
     def queue_embeddings(
         self, provider: str, purpose: str, inputs: list[tuple[str, str]]
     ) -> None:
@@ -107,18 +117,16 @@ class VectorStoreMixin:
                 [(provider, purpose, digest, text) for digest, text in inputs],
             )
 
-    @_locked
+    @locked
     def claim_embeddings(
         self,
         provider: str,
         purpose: str,
         inputs: list[tuple[str, str]],
     ) -> list[tuple[str, str]]:
-        claimed = []
-        for start in range(0, len(inputs), 400):
-            claimed.extend(
-                self._claim_chunk(provider, purpose, inputs[start : start + 400])
-            )
+        claimed: list[tuple[str, str]] = []
+        for chunk in _chunks(inputs):
+            claimed.extend(self._claim_chunk(provider, purpose, chunk))
         return claimed
 
     def _claim_chunk(
@@ -151,12 +159,13 @@ class VectorStoreMixin:
                 (provider, purpose, stale),
             )
             digests = [digest for digest, _ in inputs]
+            placeholders = ",".join("?" for _ in digests)
             rows = self.connection.execute(
                 f"""
                 SELECT jobs.input_hash, jobs.text FROM embedding_jobs jobs
                 WHERE jobs.provider = ? AND jobs.purpose = ?
                   AND jobs.state = 'pending'
-                  AND jobs.input_hash IN ({','.join('?' for _ in digests)})
+                  AND jobs.input_hash IN ({placeholders})
                   AND NOT EXISTS (
                       SELECT 1 FROM embeddings
                       WHERE embeddings.provider = jobs.provider
@@ -183,7 +192,7 @@ class VectorStoreMixin:
             raise
         return [(row["input_hash"], row["text"]) for row in rows]
 
-    @_locked
+    @locked
     def renew_embeddings(
         self,
         provider: str,
@@ -193,25 +202,19 @@ class VectorStoreMixin:
         if not inputs:
             return
         digests = [digest for digest, _ in inputs]
+        now = time.time_ns() // 1000
         with self.connection:
-            for start in range(0, len(digests), 400):
-                chunk = digests[start : start + 400]
+            for chunk in _chunks(digests):
                 self.connection.execute(
                     f"""
                     UPDATE embedding_jobs SET claimed_us = ?
                     WHERE provider = ? AND purpose = ? AND owner = ?
                       AND input_hash IN ({','.join('?' for _ in chunk)})
                     """,
-                    [
-                        time.time_ns() // 1000,
-                        provider,
-                        purpose,
-                        self.owner,
-                        *chunk,
-                    ],
+                    [now, provider, purpose, self.owner, *chunk],
                 )
 
-    @_locked
+    @locked
     def fail_embeddings(
         self,
         provider: str,
@@ -223,8 +226,7 @@ class VectorStoreMixin:
             return
         digests = [digest for digest, _ in inputs]
         with self.connection:
-            for start in range(0, len(digests), 400):
-                chunk = digests[start : start + 400]
+            for chunk in _chunks(digests):
                 self.connection.execute(
                     f"""
                     UPDATE embedding_jobs
@@ -237,7 +239,7 @@ class VectorStoreMixin:
                     [error, provider, purpose, self.owner, *chunk],
                 )
 
-    @_locked
+    @locked
     def vectors(self, provider: str) -> list[tuple[int, str, numpy.ndarray]]:
         rows = self.connection.execute(
             """
@@ -251,15 +253,11 @@ class VectorStoreMixin:
             (provider,),
         ).fetchall()
         return [
-            (
-                row["id"],
-                row["hash"],
-                numpy.frombuffer(row["vector"], dtype=numpy.float32).copy(),
-            )
+            (row["id"], row["hash"], _decode_vector(row["vector"]))
             for row in rows
         ]
 
-    @_locked
+    @locked
     def vector_count(self, provider: str) -> int:
         return self.connection.execute(
             """
@@ -269,7 +267,7 @@ class VectorStoreMixin:
             (provider,),
         ).fetchone()[0]
 
-    @_locked
+    @locked
     def vector_metadata(self, provider: str) -> dict[int, str]:
         rows = self.connection.execute(
             """
@@ -283,7 +281,7 @@ class VectorStoreMixin:
         ).fetchall()
         return {row["id"]: row["hash"] for row in rows}
 
-    @_locked
+    @locked
     def vector_dimensions(self, provider: str) -> int:
         row = self.connection.execute(
             """
@@ -294,15 +292,14 @@ class VectorStoreMixin:
         ).fetchone()
         return row["dimensions"] if row else 0
 
-    @_locked
+    @locked
     def vectors_for_ids(
         self, provider: str, labels: list[int]
     ) -> dict[int, numpy.ndarray]:
         if not labels:
             return {}
         rows = []
-        for start in range(0, len(labels), 400):
-            chunk = labels[start : start + 400]
+        for chunk in _chunks(labels):
             rows.extend(
                 self.connection.execute(
                     f"""
@@ -316,18 +313,14 @@ class VectorStoreMixin:
                     [provider, *chunk],
                 ).fetchall()
             )
-        return {
-            row["id"]: numpy.frombuffer(row["vector"], dtype=numpy.float32).copy()
-            for row in rows
-        }
+        return {row["id"]: _decode_vector(row["vector"]) for row in rows}
 
-    @_locked
+    @locked
     def memory_ids_for_content(self, hashes: list[str]) -> dict[str, list[str]]:
         if not hashes:
             return {}
         rows = []
-        for start in range(0, len(hashes), 400):
-            chunk = hashes[start : start + 400]
+        for chunk in _chunks(hashes):
             rows.extend(
                 self.connection.execute(
                     f"""
@@ -343,15 +336,14 @@ class VectorStoreMixin:
             result.setdefault(row["hash"], []).append(row["id"])
         return result
 
-    @_locked
+    @locked
     def document_vectors(
         self, provider: str, hashes: list[str]
     ) -> dict[str, numpy.ndarray]:
         if not hashes:
             return {}
         rows = []
-        for start in range(0, len(hashes), 400):
-            chunk = hashes[start : start + 400]
+        for chunk in _chunks(hashes):
             rows.extend(
                 self.connection.execute(
                     f"""
@@ -362,9 +354,4 @@ class VectorStoreMixin:
                     [provider, *chunk],
                 ).fetchall()
             )
-        return {
-            row["input_hash"]: numpy.frombuffer(
-                row["vector"], dtype=numpy.float32
-            ).copy()
-            for row in rows
-        }
+        return {row["input_hash"]: _decode_vector(row["vector"]) for row in rows}

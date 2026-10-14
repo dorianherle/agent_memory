@@ -118,11 +118,20 @@ def handle(event: str, data: dict) -> dict:
         memory.close()
 
 
+def _agent_instructions(agent: str) -> str:
+    return (
+        f"{CURSOR_INSTRUCTIONS}\n\n"
+        f"Your memory agent name: @{agent}\n"
+        f"Pass agent={agent!r} on memory_save / memory_summarize when possible."
+    )
+
+
 def _handle_with_memory(event: str, data: dict, memory) -> dict:
     if event == "sessionStart":
         sid = _session_id(data) or data.get("session_id")
-        agent = lookup_session_agent(memory._git_dir, sid) or DEFAULT_AGENT
-        if sid and not lookup_session_agent(memory._git_dir, sid):
+        existing = lookup_session_agent(memory._git_dir, sid)
+        agent = existing or DEFAULT_AGENT
+        if sid and not existing:
             register_session(
                 memory._git_dir,
                 sid,
@@ -153,13 +162,7 @@ def _handle_with_memory(event: str, data: dict, memory) -> dict:
                     state_block = f"\n\n# MEMORY STATE\n{packet}"
         except Exception:
             pass
-        context = (
-            f"{CURSOR_INSTRUCTIONS}\n\n"
-            f"Your memory agent name: @{agent}\n"
-            f"Pass agent={agent!r} on memory_save / memory_summarize when possible."
-            f"{html_note}"
-            f"{state_block}"
-        )
+        context = f"{_agent_instructions(agent)}{html_note}{state_block}"
         return {
             "additional_context": context,
             "env": {ENV_AGENT: agent},
@@ -168,19 +171,12 @@ def _handle_with_memory(event: str, data: dict, memory) -> dict:
     if event == "beforeSubmitPrompt":
         from agent_memory.core import _SMALL_TALK_RE
 
-        prompt = data.get("prompt") or ""
+        raw_prompt = data.get("prompt")
+        cleaned = raw_prompt.strip() if isinstance(raw_prompt, str) else ""
         entry_id = None
-        if (
-            isinstance(prompt, str)
-            and prompt.strip()
-            and not _SMALL_TALK_RE.match(prompt.strip())
-        ):
-            entry_id = memory.ensure_goal(prompt.strip(), agent=USER_AGENT)
-            try:
-                memory.write_live_html()
-            except Exception:
-                pass
-        if entry_id and isinstance(prompt, str) and prompt.strip():
+        if cleaned and not _SMALL_TALK_RE.match(cleaned):
+            entry_id = memory.ensure_goal(cleaned, agent=USER_AGENT)
+        if entry_id:
             try:
                 from agent_memory.live_html import default_live_dir
                 from agent_memory.turn_prompts import (
@@ -189,24 +185,19 @@ def _handle_with_memory(event: str, data: dict, memory) -> dict:
                 )
 
                 agent = _agent_for_event(memory, data)
-                instructions = (
-                    f"{CURSOR_INSTRUCTIONS}\n\n"
-                    f"Your memory agent name: @{agent}\n"
-                    f"Pass agent={agent!r} on memory_save / "
-                    f"memory_summarize when possible."
-                )
                 record_turn_prompt(
                     default_live_dir(memory),
                     entry_id,
-                    goal=prompt.strip(),
-                    memory_state=memory.render_packet(prompt.strip()),
-                    instructions=instructions,
+                    goal=cleaned,
+                    memory_state=memory.render_packet(cleaned),
+                    instructions=_agent_instructions(agent),
                     rule=_memory_rule_text(memory),
                     mcp_tools=mcp_tools_catalog(),
                 )
-                memory.write_live_html()
             except (Exception, SystemExit):
                 pass
+        if cleaned and not _SMALL_TALK_RE.match(cleaned):
+            _refresh_dashboard(memory)
         return {
             "continue": True,
         }
@@ -291,8 +282,7 @@ def _handle_with_memory(event: str, data: dict, memory) -> dict:
 
 
 def main() -> None:
-    from agent_memory.cursor.common import remember_root
-    from agent_memory.cursor.mcp import _strip_root_argv
+    from agent_memory.cursor.common import _strip_root_argv, remember_root
 
     remember_root()
     _strip_root_argv()

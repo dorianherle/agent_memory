@@ -40,21 +40,9 @@ EXCLUDE_ENTRIES = (
 )
 
 _SKIP_SCAN_DIRS = frozenset(
-    {
-        HIDDEN_DIR,
-        ".git",
-        ".svn",
-        ".hg",
-        "__pycache__",
-        ".pytest_cache",
-        "node_modules",
-        ".venv",
-        "venv",
-        ".tox",
-        ".mypy_cache",
-        ".ruff_cache",
-        ".next",
-    }
+    entry.rstrip("/")
+    for entry in EXCLUDE_ENTRIES
+    if entry.endswith("/") and "*" not in entry
 )
 
 _FILE_TOKEN_RE = re.compile(
@@ -263,8 +251,8 @@ def stale_files(memory, items: list) -> dict[str, list[str]]:
             for name in (item.payload.get("files") or [])
             if str(name).strip()
         }
-        mentioned = memory._mentioned_files(
-            item.message, known_files, unique_basenames
+        mentioned = mentioned_files(
+            memory._path, item.message, known_files, unique_basenames
         )
         explicit = declared | mentioned
         all_explicit.update(explicit)
@@ -290,21 +278,17 @@ def stale_files(memory, items: list) -> dict[str, list[str]]:
         ).splitlines()
         if name.strip()
     }
-    diff_cache: dict[str, set[str]] = {}
     for item_id, files in item_files.items():
         if item_id in changed_commits:
             later = changed_commits[item_id] | wt_diff
         else:
-            later = diff_cache.get(item_id)
-            if later is None:
-                later = {
-                    name.strip()
-                    for name in memory._run(
-                        "diff", "--name-only", item_id, "--", *sorted(files), check=False
-                    ).splitlines()
-                    if name.strip()
-                }
-                diff_cache[item_id] = later
+            later = {
+                name.strip()
+                for name in memory._run(
+                    "diff", "--name-only", item_id, "--", *sorted(files), check=False
+                ).splitlines()
+                if name.strip()
+            }
         changed = sorted(files & (later | untracked))
         if changed:
             drifted[item_id] = changed

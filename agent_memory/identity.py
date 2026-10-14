@@ -55,8 +55,10 @@ def normalize_agent(name: str | None) -> str:
 def resolve_agent(
     explicit: str | None = None,
     payload: dict | None = None,
+    *,
+    default: str = DEFAULT_AGENT,
 ) -> str:
-    """Pick agent name: explicit → payload → env → agent."""
+    """Pick agent name: explicit → payload → env → default."""
     if explicit and str(explicit).strip():
         return normalize_agent(str(explicit))
     if payload:
@@ -66,7 +68,7 @@ def resolve_agent(
     env = os.environ.get(ENV_AGENT)
     if env and env.strip():
         return normalize_agent(env)
-    return DEFAULT_AGENT
+    return normalize_agent(default)
 
 
 def agent_color_key(name: str) -> str:
@@ -86,12 +88,8 @@ def agent_color_hex(name: str) -> str:
     return AGENT_COLOR_HEX[agent_color_key(name)]
 
 
-def sessions_path(git_dir: Path) -> Path:
-    return Path(git_dir) / SESSIONS_FILE
-
-
 def load_sessions(git_dir: Path) -> dict:
-    path = sessions_path(git_dir)
+    path = Path(git_dir) / SESSIONS_FILE
     if not path.exists():
         return {}
     try:
@@ -102,7 +100,7 @@ def load_sessions(git_dir: Path) -> dict:
 
 
 def save_sessions(git_dir: Path, data: dict) -> None:
-    path = sessions_path(git_dir)
+    path = Path(git_dir) / SESSIONS_FILE
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2) + "\n")
 
@@ -154,16 +152,7 @@ def ensure_agent_payload(
     default: str = DEFAULT_AGENT,
 ) -> dict:
     """Return a copy of payload with ``agent`` set."""
-    out = dict(payload or {})
-    if agent and str(agent).strip():
-        out["agent"] = normalize_agent(str(agent))
-        return out
-    if out.get("agent"):
-        out["agent"] = normalize_agent(str(out["agent"]))
-        return out
-    env = os.environ.get(ENV_AGENT)
-    if env and env.strip():
-        out["agent"] = normalize_agent(env)
-        return out
-    out["agent"] = normalize_agent(default)
-    return out
+    return {
+        **(payload or {}),
+        "agent": resolve_agent(agent, payload, default=default),
+    }

@@ -25,14 +25,14 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from socketserver import ThreadingMixIn
 
+from agent_memory.core import HIDDEN_DIR, INSPECT_FILE
+
 PORT_FILE = ".reveal_port"
 PID_FILE = ".reveal_pid"
 DEFAULT_HOST = "127.0.0.1"
 # Prefer a stable high port; fall back if busy.
 PORT_CANDIDATES = (18765, 18766, 18767, 27654)
 WORKING_LIMIT = 50
-HIDDEN_DIR = ".agent_memory"
-INSPECT_FILE = "INSPECTING"
 # Cursor rewrites running_for_ms about every 5s; older files are leftovers.
 LIVE_TERMINAL_S = 20
 
@@ -54,11 +54,13 @@ def ensure_reveal_server(live_dir: Path, root: Path | None = None) -> str | None
         return None
     live_dir = Path(live_dir)
     live_dir.mkdir(parents=True, exist_ok=True)
-    existing = reveal_url(live_dir)
-    if existing and _working_ok(existing):
-        return existing
-    if existing:
-        _stop_reveal(live_dir)
+    port = _read_port(live_dir)
+    if port is not None:
+        base = f"http://{DEFAULT_HOST}:{port}"
+        if _healthy(base, require_working=True):
+            return f"{base}/reveal"
+        if _healthy(base):
+            _stop_reveal(live_dir)
 
     python = sys.executable
     log = live_dir / ".reveal.log"
@@ -116,29 +118,16 @@ def _read_port(live_dir: Path) -> int | None:
         return None
 
 
-def _healthy(base: str) -> bool:
+def _healthy(base: str, *, require_working: bool = False) -> bool:
     try:
         with urllib.request.urlopen(f"{base}/health", timeout=0.3) as resp:
-            return resp.status == 200
-    except (urllib.error.URLError, TimeoutError, OSError):
-        return False
-
-
-def _working_ok(reveal: str) -> bool:
-    base = str(reveal).rsplit("/", 1)[0]
-    try:
-        with urllib.request.urlopen(f"{base}/working", timeout=0.3) as resp:
             if resp.status != 200:
                 return False
+            if not require_working:
+                return True
             data = json.loads(resp.read().decode())
-        return isinstance(data, dict) and "processes" in data
-    except (
-        urllib.error.HTTPError,
-        urllib.error.URLError,
-        TimeoutError,
-        OSError,
-        json.JSONDecodeError,
-    ):
+            return isinstance(data, dict) and bool(data.get("working"))
+    except (urllib.error.URLError, TimeoutError, OSError, json.JSONDecodeError):
         return False
 
 
@@ -394,7 +383,7 @@ class _Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:  # noqa: N802
         parsed = urllib.parse.urlparse(self.path)
         if parsed.path == "/health":
-            self._json(200, {"ok": True})
+            self._json(200, {"ok": True, "working": True})
             return
         if parsed.path == "/reveal":
             qs = urllib.parse.parse_qs(parsed.query)

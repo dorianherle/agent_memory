@@ -214,9 +214,7 @@ def write_credentials(path: Path, values: dict[str, str]) -> None:
         pass
 
 
-def load_credentials(root: Path) -> dict[str, str]:
-    """Load ``.agent_memory/credentials.env`` into a dict (does not mutate os.environ)."""
-    path = credentials_path(root)
+def _parse_env_file(path: Path) -> dict[str, str]:
     if not path.exists():
         return {}
     out: dict[str, str] = {}
@@ -227,6 +225,11 @@ def load_credentials(root: Path) -> dict[str, str]:
         key, value = text.split("=", 1)
         out[key.strip()] = value.strip()
     return out
+
+
+def load_credentials(root: Path) -> dict[str, str]:
+    """Load ``.agent_memory/credentials.env`` into a dict (does not mutate os.environ)."""
+    return _parse_env_file(credentials_path(root))
 
 
 def apply_credentials_env(root: Path) -> dict[str, str]:
@@ -249,18 +252,8 @@ def apply_credentials_env(root: Path) -> dict[str, str]:
 
 def load_dotenv_key(root: Path, name: str = "GEMINI_API_KEY") -> str | None:
     """Read a single key from project ``.env`` if present (no overwrite of os.environ)."""
-    path = Path(root).resolve() / ".env"
-    if not path.exists():
-        return None
-    for line in path.read_text().splitlines():
-        text = line.strip()
-        if not text or text.startswith("#") or "=" not in text:
-            continue
-        key, value = text.split("=", 1)
-        if key.strip() == name:
-            value = value.strip().strip("'").strip('"')
-            return value or None
-    return None
+    raw = _parse_env_file(Path(root).resolve() / ".env").get(name, "")
+    return raw.strip("'").strip('"') or None
 
 
 def gemini_env(api_key: str) -> dict[str, str]:

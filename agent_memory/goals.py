@@ -78,15 +78,6 @@ def _title(text: str) -> str:
     return head or "untitled"
 
 
-def _is_git(project: Path) -> bool:
-    result = subprocess.run(
-        ["git", "-C", str(project), "rev-parse", "--is-inside-work-tree"],
-        capture_output=True,
-        text=True,
-    )
-    return result.returncode == 0 and result.stdout.strip() == "true"
-
-
 def _has_head(project: Path) -> bool:
     result = subprocess.run(
         ["git", "-C", str(project), "rev-parse", "--verify", "HEAD"],
@@ -98,7 +89,7 @@ def _has_head(project: Path) -> bool:
 def _checkout(project: Path, goal_id: str, workspace: Path) -> str:
     workspace.parent.mkdir(parents=True, exist_ok=True)
     branch = f"goal/{goal_id}"
-    if _is_git(project) and _has_head(project):
+    if _has_head(project):
         subprocess.run(
             [
                 "git",
@@ -118,6 +109,11 @@ def _checkout(project: Path, goal_id: str, workspace: Path) -> str:
         return branch
     shutil.copytree(project, workspace, ignore=COPY_IGNORE, symlinks=True)
     return ""
+
+
+def _resolve_record(project: Path, record: dict) -> dict:
+    workspace = (project / record["workspace"]).resolve()
+    return {**record, "project": str(project), "workspace": str(workspace)}
 
 
 def create_goal(project: str | Path, text: str) -> dict:
@@ -143,7 +139,7 @@ def create_goal(project: str | Path, text: str) -> dict:
     }
     goals.append(record)
     _dump(project, goals)
-    return resolve_goal(project, goal_id)
+    return _resolve_record(project, record)
 
 
 def resolve_goal(project: str | Path, goal_id: str) -> dict:
@@ -161,13 +157,12 @@ def resolve_goal(project: str | Path, goal_id: str) -> dict:
     if len(matches) > 1 and not any(item["id"] == prefix for item in matches):
         raise ValueError(f"ambiguous goal id {goal_id!r}")
     record = next((item for item in matches if item["id"] == prefix), matches[0])
-    workspace = (project / record["workspace"]).resolve()
-    return {**record, "project": str(project), "workspace": str(workspace)}
+    return _resolve_record(project, record)
 
 
 def list_goals(project: str | Path) -> list[dict]:
     project = host_project(project)
-    return [resolve_goal(project, item["id"]) for item in _load(project)]
+    return [_resolve_record(project, item) for item in _load(project)]
 
 
 def memory_for(path: str | Path, goal_id: str | None = None) -> Memory:
@@ -178,17 +173,21 @@ def memory_for(path: str | Path, goal_id: str | None = None) -> Memory:
     return Memory(resolve_goal(path, goal_id)["workspace"])
 
 
-def bind_packet(project: str | Path, goal_id: str, question: str | None = None) -> str:
-    record = resolve_goal(project, goal_id)
-    with Memory(record["workspace"]) as memory:
-        packet = memory.render_packet(question)
+def _format_goal_packet(prefix: str, record: dict, packet: str) -> str:
     branch = record.get("branch") or "(copy)"
     return (
-        f"Goal [{record['id']}] {record['title']}\n"
+        f"{prefix} [{record['id']}] {record['title']}\n"
         f"Workspace: {record['workspace']}\n"
         f"Branch: {branch}\n\n"
         f"{packet}"
     )
+
+
+def bind_packet(project: str | Path, goal_id: str, question: str | None = None) -> str:
+    record = resolve_goal(project, goal_id)
+    with Memory(record["workspace"]) as memory:
+        packet = memory.render_packet(question)
+    return _format_goal_packet("Goal", record, packet)
 
 
 def format_goal_list(project: str | Path) -> str:
@@ -205,10 +204,4 @@ def format_goal_list(project: str | Path) -> str:
 
 
 def format_created(record: dict, packet: str) -> str:
-    branch = record.get("branch") or "(copy)"
-    return (
-        f"Created goal [{record['id']}] {record['title']}\n"
-        f"Workspace: {record['workspace']}\n"
-        f"Branch: {branch}\n\n"
-        f"{packet}"
-    )
+    return _format_goal_packet("Created goal", record, packet)

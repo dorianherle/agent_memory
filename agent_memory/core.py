@@ -15,7 +15,6 @@ from typing import Iterator
 from agent_memory.catalog import Catalog
 from agent_memory.git_ops import (
     ARCHIVE_PREFIX,
-    EXCLUDE_ENTRIES,
     FIELD_SEPARATOR,
     GENERATED_STATE_FILES,
     HIDDEN_DIR,
@@ -24,8 +23,6 @@ from agent_memory.git_ops import (
     RECORD_SEPARATOR,
     ensure_exclude,
     head_file_history,
-    mentioned_files,
-    nested_repo_excludes,
     parse_record,
     read_records,
     stale_files,
@@ -120,7 +117,6 @@ class Memory:
         self._search = None
         self._catalog = None
         self._last_tool_result = "Nothing yet."
-        self._find_used_substring = False
         self._commit_files_cache: dict[str, set[str]] = {}
         self._head_history_cache: tuple[str, dict[str, set[str]], set[str], dict[str, str]] | None = None
         self._init()
@@ -165,15 +161,9 @@ class Memory:
         exclude = self._git_dir / "info" / "exclude"
         first_exclude = not exclude.exists()
         exclude.parent.mkdir(parents=True, exist_ok=True)
-        self._ensure_exclude(exclude, scan_nested=first_exclude)
+        ensure_exclude(exclude, self._path, scan_nested=first_exclude)
         self._catalog = Catalog(self._git_dir)
         self._sync_catalog()
-
-    def _ensure_exclude(self, path: Path, *, scan_nested: bool = True) -> None:
-        ensure_exclude(path, self._path, scan_nested=scan_nested)
-
-    def _nested_repo_excludes(self) -> list[str]:
-        return nested_repo_excludes(self._path)
 
     @contextmanager
     def _lock(self) -> Iterator[None]:
@@ -218,13 +208,6 @@ class Memory:
     def _parse_record(self, raw: str) -> dict:
         return parse_record(raw)
 
-    def _read_records(
-        self,
-        new_tips: list[str],
-        old_tips: list[str],
-    ) -> list[dict]:
-        return read_records(self._run, new_tips, old_tips)
-
     def _sync_catalog(self) -> None:
         refs = self._refs()
         known = self._catalog.known_refs()
@@ -234,7 +217,7 @@ class Memory:
             tip for name, tip in refs.items()
             if known.get(name) != tip
         ]
-        records = self._read_records(changed_tips, list(known.values()))
+        records = read_records(self._run, changed_tips, list(known.values()))
         self._catalog.add_memories(records)
         self._catalog.update_refs(refs)
 
@@ -251,9 +234,6 @@ class Memory:
         self._sync_catalog()
         full_id = self._resolve(item_id)
         row = self._catalog.get(full_id)
-        if row is None:
-            self._sync_catalog()
-            row = self._catalog.get(full_id)
         if row is None:
             raise ValueError(f"unknown memory id {item_id!r}")
         return self._row_item(row)
@@ -288,11 +268,8 @@ class Memory:
         agent: str | None = None,
         _snapshot: bool = True,
     ) -> str:
-        if self.inspecting() is not None:
-            raise RuntimeError(
-                "cannot save while inspecting; call inspect_done first"
-            )
         from agent_memory.identity import DEFAULT_AGENT, ensure_agent_payload
+        from agent_memory.prompt import _goal, _steering
 
         payload = payload or {}
         if OPERATION_KEY in payload:
@@ -303,21 +280,15 @@ class Memory:
         if summary:
             allow_empty = True
             state = self.state()
-            recent = [item for item in state if "covers" not in item.payload]
-            goal = split_goals(state)
-            goal_id = goal[0].id if goal else None
-            users = [
-                item
-                for item in recent
-                if item.payload.get("user") and item.id != goal_id
-            ]
-            steer_id = users[-1].id if users else None
+            goal = _goal(state)
+            steer = _steering(state, goal)
+            pinned = {entry.id for entry in (goal, steer) if entry}
             recent = [
                 item
-                for item in recent
-                if item.payload.get(OPEN_QUESTION_KEY) is not True
-                and item.id != goal_id
-                and item.id != steer_id
+                for item in state
+                if "covers" not in item.payload
+                and item.payload.get(OPEN_QUESTION_KEY) is not True
+                and item.id not in pinned
             ]
             if recent:
                 stored_payload["covers"] = [item.id for item in recent]
@@ -330,7 +301,7 @@ class Memory:
             if self.inspecting() is not None:
                 raise RuntimeError("cannot save while inspecting; call inspect_done first")
             if _snapshot:
-                self._ensure_exclude(self._git_dir / "info" / "exclude", scan_nested=True)
+                ensure_exclude(self._git_dir / "info" / "exclude", self._path, scan_nested=True)
                 if any((self._path / name).exists() for name in GENERATED_STATE_FILES):
                     self._run("rm", "--cached", "--ignore-unmatch", "--", *GENERATED_STATE_FILES)
                 self._run("add", "-A")
@@ -382,7 +353,6 @@ class Memory:
                 if len(reachable) < len(set(wanted)):
                     branch_name = None
 
-        self._find_used_substring = False
         use_semantic = query is not None and (
             self._provider is not None
             or bool(os.getenv("AGENT_MEMORY_PROVIDER"))
@@ -406,7 +376,6 @@ class Memory:
                 items = [self._row_item(row, score) for row, score in ranked]
             except Exception:
                 use_semantic = False
-                self._find_used_substring = False
         if not use_semantic:
             if query is not None:
                 items = self._fts_items(
@@ -464,36 +433,21 @@ class Memory:
         include_historical: bool,
         k: int,
     ) -> list[MemoryItem]:
-        hits = self._catalog.fts(
-            query, max(k * 4, 16), branch=branch, ids=ids, text=text,
-            payload=payload, since=since, until=until,
-            include_historical=include_historical,
-        )
-        if not hits:
-            return []
-        scores = dict(hits)
-        ordered = list(scores)
-        if ids is not None:
-            wanted = set(ids)
-            ordered = [memory_id for memory_id in ordered if memory_id in wanted]
-        if not ordered:
-            return []
         rows = self._catalog.select(
             branch=branch,
-            ids=ordered,
+            ids=ids,
             text=text,
             payload=payload,
             since=since,
             until=until,
             include_historical=include_historical,
-            limit=None,
+            fts_query=query,
+            limit=max(k * 4, 16),
         )
-        by_id = {row["id"]: row for row in rows}
         return [
-            self._row_item(by_id[memory_id], scores[memory_id])
-            for memory_id in ordered
-            if memory_id in by_id
-        ][:k]
+            self._row_item(row, -float(row["fts_rank"]))
+            for row in rows[:k]
+        ]
 
     def state(self) -> list[MemoryItem]:
         self._sync_catalog()
@@ -567,7 +521,13 @@ class Memory:
             )
         return result
 
-    def save_user(self, text: str, *, agent: str | None = None) -> str | None:
+    def save_user(
+        self,
+        text: str,
+        *,
+        agent: str | None = None,
+        _has_goal: bool | None = None,
+    ) -> str | None:
         """Record the user's own words as an entry."""
         from agent_memory.identity import USER_AGENT
 
@@ -580,8 +540,9 @@ class Memory:
         latest = self.find(payload={"user": True}, k=1)
         if latest and latest[0].message == text:
             return None
+        has_goal = bool(split_goals(self.state())) if _has_goal is None else _has_goal
         payload = {"user": True}
-        if not split_goals(self.state()):
+        if not has_goal:
             payload[GOAL_KEY] = True
         return self.save(
             text,
@@ -615,12 +576,11 @@ class Memory:
         cleaned = (text or "").strip()
         if not cleaned:
             return None
-        self._remember_query(cleaned)
-        if split_goals(self.state()):
-            if _STEERING_PROMPT_RE.search(cleaned):
-                return self.save_user(cleaned, agent=agent)
+        has_goal = bool(split_goals(self.state()))
+        if has_goal and not _STEERING_PROMPT_RE.search(cleaned):
+            self._remember_query(cleaned)
             return None
-        return self.save_user(cleaned, agent=agent)
+        return self.save_user(cleaned, agent=agent, _has_goal=has_goal)
 
     def auto_save(
         self,
@@ -734,29 +694,36 @@ class Memory:
         )
         return changed_commits, known_files, unique_basenames
 
-    def _mentioned_files(
-        self,
-        message: str,
-        known_files: set[str] | None = None,
-        unique_basenames: dict[str, str] | None = None,
-    ) -> set[str]:
-        return mentioned_files(
-            self._path, message, known_files, unique_basenames
-        )
-
     def _stale_files(self, items: list[MemoryItem]) -> dict[str, list[str]]:
         return stale_files(self, items)
 
     def _stale_ids(self, items: list[MemoryItem]) -> set[str]:
         return set(self._stale_files(items))
 
+    def _packet_context(
+        self,
+        items: list[MemoryItem],
+        question: str | None = None,
+    ) -> tuple[str, list[MemoryItem], list[MemoryItem]]:
+        from agent_memory.prompt import _goal, _handoff, _steering
+
+        active_q = self._active_query(items)
+        query = (question or "").strip() or active_q
+        related = self.related_notes(query, _state=items) if query else []
+        if not related and active_q and active_q != query:
+            related = self.related_notes(active_q, _state=items)
+        goal = _goal(items)
+        handoff = _handoff(items)
+        candidates = [
+            entry for entry in (goal, _steering(items, goal), handoff) if entry
+        ]
+        candidates += split_open_questions(items)[:8] + related
+        return query, related, candidates
+
     def prompt_payload(self) -> dict:
         """Current prompt: compact injected text plus full-body sections."""
         from agent_memory.prompt import (
             RECENT_CAP,
-            _goal,
-            _handoff,
-            _steering,
             current_prompt,
             render,
             render_packet,
@@ -767,33 +734,17 @@ class Memory:
         inspecting = self.inspecting()
         _, recent = split_state(items)
         hide = {item.id for item in all_open_questions(items)}
-        recent = [item for item in recent if item.id not in hide]
-        sample = list(recent[-RECENT_CAP:])
-        goal = _goal(items)
-        if goal:
-            sample.append(goal)
-        steer = _steering(items, goal)
-        if steer:
-            sample.append(steer)
-        questions = split_open_questions(items)
-        sample.extend(questions)
-        query = self._active_query(items)
-        related = self.related_notes(query, _state=items) if query else []
-        handoff = _handoff(items)
-        all_candidates = list(sample)
-        if handoff:
-            all_candidates.append(handoff)
-        all_candidates.extend(related)
-        stale_ids = self._stale_ids(all_candidates)
+        recent_slice = [item for item in recent if item.id not in hide][-RECENT_CAP:]
+        query, related, packet_candidates = self._packet_context(items)
+        stale_ids = self._stale_ids(recent_slice + packet_candidates)
         payload = current_prompt(items, stale_ids=stale_ids)
-        text = render(
+        payload["injected"] = render(
             items,
             branches,
             inspecting,
             compact=True,
             stale_ids=stale_ids,
         )
-        payload["injected"] = text
         payload["packet"] = render_packet(
             items,
             related,
@@ -842,23 +793,10 @@ class Memory:
 
     def render_packet(self, question: str | None = None, *, max_chars: int = 1200) -> str:
         """Goal / Handoff / questions / Related for this question."""
-        from agent_memory.prompt import (
-            _goal,
-            _handoff,
-            _steering,
-            render_packet,
-        )
+        from agent_memory.prompt import render_packet
 
         items = self.state()
-        active_q = self._active_query(items)
-        query = (question or "").strip() or active_q
-        related = self.related_notes(query, _state=items) if query else []
-        if not related and active_q and active_q != query:
-            related = self.related_notes(active_q, _state=items)
-        goal = _goal(items)
-        handoff = _handoff(items)
-        candidates = [entry for entry in (goal, _steering(items, goal), handoff) if entry]
-        candidates += split_open_questions(items)[:8] + related
+        query, related, candidates = self._packet_context(items, question)
         return render_packet(
             items,
             related,

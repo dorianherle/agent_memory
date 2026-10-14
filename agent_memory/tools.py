@@ -1,7 +1,6 @@
 from agent_memory.core import Memory
 from agent_memory.prompt import (
     FIND_DEFAULT_K,
-    SUBSTRING_FALLBACK,
     _transcript,
     render_find,
     render_timeline,
@@ -220,12 +219,9 @@ def _note_action(memory: Memory, arguments: dict) -> None:
         action = "summarize"
     if action not in _LOGGED_ACTIONS:
         return
-    try:
-        from agent_memory.live_html import record_action
+    from agent_memory.live_html import record_action
 
-        record_action(memory, action, _action_detail(arguments))
-    except Exception:
-        return
+    record_action(memory, action, _action_detail(arguments))
 
 
 def call_tool(memory: Memory, name: str, arguments: dict) -> str:
@@ -303,7 +299,6 @@ def _run_action(memory: Memory, arguments: dict) -> str:
         return f"Saved [{item_id[:8]}]."
     if action == "find":
         branch = None if arguments.get("all_branches") else "current"
-        queried = bool(arguments.get("query"))
         explicit = bool(arguments.get("ids"))
         raw_k = arguments.get("limit") or arguments.get("k")
         k = int(raw_k) if raw_k is not None else (50 if explicit else FIND_DEFAULT_K)
@@ -316,7 +311,6 @@ def _run_action(memory: Memory, arguments: dict) -> str:
             k=pool_k,
             branch=branch,
         )
-        used_substring = memory._find_used_substring
         full = bool(arguments.get("full"))
         if not explicit:
             items = [
@@ -363,16 +357,13 @@ def _run_action(memory: Memory, arguments: dict) -> str:
             if item.payload.get("covers")
         }
         stale_ids = memory._stale_ids(items) if branch == "current" else set()
-        result = render_find(
+        return render_find(
             items,
             full_ids={item.id for item in items} if explicit else set(),
             children=children,
-            full=bool(arguments.get("full")),
+            full=full,
             stale_ids=stale_ids,
         )
-        if queried and used_substring:
-            result = f"{result}\n\n{SUBSTRING_FALLBACK}"
-        return result
     if action == "delete":
         raw = arguments.get("ids") or arguments.get("id")
         if not raw:

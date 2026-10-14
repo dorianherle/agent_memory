@@ -61,6 +61,24 @@ def remember_root(argv: list[str] | None = None) -> Path:
     return _resolved_root
 
 
+def _strip_root_argv() -> None:
+    """Remove our ``--root`` flag so CLI/MCP entrypoints do not see unknown args."""
+    args = sys.argv[1:]
+    cleaned = []
+    skip = False
+    for arg in args:
+        if skip:
+            skip = False
+            continue
+        if arg == "--root":
+            skip = True
+            continue
+        if arg.startswith("--root="):
+            continue
+        cleaned.append(arg)
+    sys.argv = [sys.argv[0], *cleaned]
+
+
 def memory_root(
     argv: list[str] | None = None,
     *,

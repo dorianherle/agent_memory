@@ -16,16 +16,8 @@ FIND_BODY_MAX = 800
 FIND_CHILD_CAP = 6
 HISTORY_CAP = 16
 RELATED_CAP = 3
-RELATED_FTS = 8
 SUBSTRING_FALLBACK = "(substring fallback — set GEMINI_API_KEY)"
-_NARRATION = re.compile(
-    r"^(i\s+)?("
-    r"investigated|looked(\s+into|\s+at)|"
-    r"opened|opening|"
-    r"now i|i will|let me|going to"
-    r")\b",
-    re.IGNORECASE,
-)
+_ACTIONABLE_RE = re.compile(r"(?im)^(next|blocked|remaining):")
 
 # System message for OpenAI-style tool calling. Pair with
 # agent_memory.tools.MEMORY_TOOL: the schema says what each action does
@@ -132,10 +124,10 @@ def _id8(item_id: str) -> str:
     return f"[{item_id[:8]}]"
 
 
-def _headline(item: MemoryItem) -> str:
+def _headline(item: MemoryItem, max_len: int = SUBJECT_MAX) -> str:
     head = (item.message or "").strip().split("\n", 1)[0].strip()
-    if len(head) > SUBJECT_MAX:
-        head = head[: SUBJECT_MAX - 1].rstrip() + "…"
+    if len(head) > max_len:
+        head = head[: max_len - 1].rstrip() + "…"
     return head
 
 
@@ -155,44 +147,33 @@ def _checkpoint_age(recent: list[MemoryItem]) -> int | None:
     return age
 
 
+def _format_entry(item: MemoryItem, body: str, stale: bool = False) -> str:
+    from agent_memory.identity import DEFAULT_AGENT, USER_AGENT
+
+    agent = item.payload.get("agent") or DEFAULT_AGENT
+    prefix = ""
+    if item.payload.get("covers"):
+        prefix = "Summary: "
+    elif item.payload.get("user"):
+        prefix = "user: "
+        agent = USER_AGENT
+    who = "" if agent in (USER_AGENT, "") else f"@{agent} "
+    mark = "[stale] " if stale else ""
+    return f"[{item.id[:8]}] {mark}{who}{prefix}{body}"
+
+
 def _subject(
     item: MemoryItem,
     max_len: int = SUBJECT_MAX,
     stale: bool = False,
 ) -> str:
     """One-line commit subject for prompt injection (not the full body)."""
-    from agent_memory.identity import DEFAULT_AGENT, USER_AGENT
-
-    agent = item.payload.get("agent") or DEFAULT_AGENT
-    prefix = ""
-    if item.payload.get("covers"):
-        prefix = "Summary: "
-    elif item.payload.get("user"):
-        prefix = "user: "
-        agent = USER_AGENT
-    who = "" if agent in (USER_AGENT, "") else f"@{agent} "
-    mark = "[stale] " if stale else ""
-    # First line only — treat multi-paragraph agent dumps as commit bodies.
-    head = (item.message or "").strip().split("\n", 1)[0].strip()
-    if len(head) > max_len:
-        head = head[: max_len - 1].rstrip() + "…"
-    return f"[{item.id[:8]}] {mark}{who}{prefix}{head}"
+    return _format_entry(item, _headline(item, max_len), stale=stale)
 
 
 def _line(item: MemoryItem, stale: bool = False) -> str:
     """Full message line (for timelines / expanded views)."""
-    from agent_memory.identity import DEFAULT_AGENT, USER_AGENT
-
-    agent = item.payload.get("agent") or DEFAULT_AGENT
-    prefix = ""
-    if item.payload.get("covers"):
-        prefix = "Summary: "
-    elif item.payload.get("user"):
-        prefix = "user: "
-        agent = USER_AGENT
-    who = "" if agent in (USER_AGENT, "") else f"@{agent} "
-    mark = "[stale] " if stale else ""
-    return f"[{item.id[:8]}] {mark}{who}{prefix}{item.message}"
+    return _format_entry(item, item.message, stale=stale)
 
 
 def _transcript(item: MemoryItem) -> bool:
@@ -278,9 +259,9 @@ def _handoff(items: list[MemoryItem], *, covered=()) -> MemoryItem | None:
     if checkpoints:
         return checkpoints[-1]
     actionable = [item for item in items if item.payload.get("auto")
-                  and re.search(r"(?im)^(next|blocked|remaining):", item.message)]
+                  and _ACTIONABLE_RE.search(item.message)]
     findings = [item for item in _recent_findings(items) if item.id not in covered
-                or re.search(r"(?im)^(next|blocked|remaining):", item.message)]
+                or _ACTIONABLE_RE.search(item.message)]
     candidates = {item.id for item in actionable + findings}
     for item in reversed(items):
         if item.id in candidates:

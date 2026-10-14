@@ -5,12 +5,11 @@ import sqlite3
 import threading
 import uuid
 from datetime import datetime
-from functools import wraps
 from pathlib import Path
 
-from agent_memory.vector_store import VectorStoreMixin, vector_bytes
+from agent_memory.vector_store import VectorStoreMixin, locked, vector_bytes
 
-__all__ = ["CATALOG_FILE", "Catalog", "canonical_document", "content_hash", "vector_bytes"]
+__all__ = ["CATALOG_FILE", "Catalog", "canonical_document", "content_hash", "locked", "vector_bytes"]
 
 CATALOG_FILE = "catalog.sqlite3"
 SCHEMA_VERSION = 5
@@ -19,14 +18,6 @@ _FTS_STOP = frozenset(
     "may of on or our should so such than that the their them then there these "
     "they this to was we were what when where which who will with would".split()
 )
-
-
-def locked(method):
-    @wraps(method)
-    def call(self, *args, **kwargs):
-        with self.lock:
-            return method(self, *args, **kwargs)
-    return call
 
 
 def content_hash(text: str) -> str:
@@ -59,6 +50,12 @@ class Catalog(VectorStoreMixin):
 
     def _create_schema(self) -> None:
         version = self.connection.execute("PRAGMA user_version").fetchone()[0]
+        if version == SCHEMA_VERSION:
+            existing = self.connection.execute(
+                "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'memories'"
+            ).fetchone()
+            if existing is not None:
+                return
         if version != SCHEMA_VERSION:
             self.connection.execute("PRAGMA foreign_keys=OFF")
             self.connection.execute("DROP TABLE IF EXISTS memory_fts")

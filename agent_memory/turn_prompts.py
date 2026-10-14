@@ -9,6 +9,7 @@ still present in the graph.
 
 from __future__ import annotations
 
+import functools
 import json
 from pathlib import Path
 
@@ -26,6 +27,7 @@ PACKET_NOTE = (
 )
 
 
+@functools.lru_cache(maxsize=1)
 def mcp_tools_catalog() -> str:
     """Plain-text catalog of agent-memory MCP tools (name + docstring)."""
     try:
@@ -96,8 +98,6 @@ def record_turn_prompt(
     instructions: str = "",
     rule: str = "",
     mcp_tools: str = "",
-    # Back-compat with older callers that only passed injected=
-    injected: str | None = None,
 ) -> Path:
     """Remember the memory prompt packet for this user entry."""
     live_dir = Path(live_dir)
@@ -112,7 +112,7 @@ def record_turn_prompt(
         except json.JSONDecodeError:
             data = {}
 
-    state_text = (injected if injected is not None else memory_state) or ""
+    state_text = memory_state or ""
     tools_text = mcp_tools or mcp_tools_catalog()
     packet = build_packet(
         instructions=instructions,
@@ -127,7 +127,6 @@ def record_turn_prompt(
         "rule": rule,
         "mcp_tools": tools_text,
         "memory_state": state_text,
-        # Keep "injected" alias for older HTML shells / tests.
         "injected": state_text,
         "packet": packet,
     }
