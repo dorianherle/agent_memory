@@ -98,3 +98,31 @@ class HandoffTests(MemoryTestCase):
         packet = self.memory.render_packet()
         self.assertIn('[more]', packet)
         self.assertLessEqual(len(packet), 1200)
+
+    def test_mentioned_file_detects_staleness_without_explicit_payload(self):
+        auth = self.path / "auth.py"
+        auth.write_text("import hmac\n")
+        self.memory.save("Initial setup")
+        # Agent inspects auth.py without editing it and saves a finding mentioning auth.py
+        note = self.memory.save("Verified: auth.py uses constant-time hmac.compare_digest")
+        self.assertNotIn(f"[{note[:8]}] [stale]", self.memory.render_packet("auth.py"))
+        auth.write_text("def check(a, b): return a == b\n")
+        self.assertIn(f"[{note[:8]}] [stale]", self.memory.render_packet("auth.py"))
+
+    def test_global_decision_is_not_falsely_stale_from_unrelated_dirty_file(self):
+        readme = self.path / "README.md"
+        readme.write_text("v1\n")
+        note = self.memory.save("Decision: all tokens expire after 3600 seconds")
+        readme.write_text("v2\n")
+        self.memory.save("Updated README docs")
+        self.assertNotIn(f"[{note[:8]}] [stale]", self.memory.render_packet("tokens expire"))
+
+    def test_summarized_dead_ends_do_not_leak_into_related_or_duplicate_find(self):
+        dead = self.memory.save("Dead end: charge_customer retry backoff did not fix 502")
+        summary = self.memory.summarize("Verified: charge_customer needs X-Idempotency-Key")
+        self.memory.save("Next: update API docs")
+        related_ids = [item.id for item in self.memory.related_notes("charge_customer retry")]
+        self.assertNotIn(dead, related_ids)
+        self.assertIn(summary, related_ids)
+        found = self.memory.call("memory", {"action": "find", "query": "charge_customer"})
+        self.assertEqual(found.count(dead[:8]), 1)

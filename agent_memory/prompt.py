@@ -298,6 +298,8 @@ def _excerpt(item: MemoryItem, query: str, limit: int) -> str:
     for index, line in ranked:
         if line in seen:
             continue
+        if len(line) < 3 and not _PRIORITY_LINE.match(line) and not _EQUATION_LINE.search(line):
+            continue
         if used + len(line) + 1 <= content_limit:
             chosen.append((index, line)); seen.add(line); used += len(line) + 1
     text = "\n".join(line for _, line in sorted(chosen))

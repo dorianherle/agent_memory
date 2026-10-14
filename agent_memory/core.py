@@ -3,6 +3,7 @@ from __future__ import annotations
 import fcntl
 import json
 import os
+import re
 import shutil
 import subprocess
 from contextlib import contextmanager
@@ -25,6 +26,26 @@ FIELD_SEPARATOR = "\x00"
 RECORD_SEPARATOR = "\x02"
 GENERATED_STATE_FILES = (".cursor/MEMORY_STATE.md", ".cursor/rules/agent-memory-state.mdc")
 
+_SMALL_TALK_RE = re.compile(
+    r"^(hi|hello|hey|yo|sup|howdy|good\s+(morning|afternoon|evening)|"
+    r"what'?s\s+up|how\s+are\s+you|how'?s\s+it\s+going|thanks|thank\s+you|thx|ok|okay|cool|great|nice)"
+    r"([!.,?\s]+(there|man|bro|team|agent|cursor|buddy|pal|folks|all|everyone|how\s+are\s+you|what'?s\s+up))*[!.,?\s]*$",
+    re.IGNORECASE,
+)
+_STEERING_PROMPT_RE = re.compile(
+    r"^(constraint\s*:|requirement\s*:|rule\s*:|important\s*:|"
+    r"always\s+|never\s+|do\s+not\s+|don'?t\s+|must\s+not\s+|"
+    r"keep\s+the\s+[^\n]*\b(unchanged|compatible|intact|same)\b)",
+    re.IGNORECASE,
+)
+_FILE_TOKEN_RE = re.compile(
+    r"(?:[\w.-]+/)+[\w.-]+\.[A-Za-z0-9]+|\b[\w.-]+\.(?:py|ts|tsx|js|jsx|rs|go|java|cpp|c|h|hpp|json|yaml|yml|toml|sql|sh|md|txt|cfg|ini)\b"
+)
+_GLOBAL_DECISION_RE = re.compile(
+    r"^(decision|constraint|policy|convention|architecture)\s*:",
+    re.IGNORECASE,
+)
+
 
 def _first_line(text: str, max_len: int) -> str:
     head = (text or "").strip().split("\n", 1)[0].strip()
@@ -44,6 +65,13 @@ EXCLUDE_ENTRIES = (
     ".env",
     "__pycache__/",
     ".pytest_cache/",
+    "node_modules/",
+    ".venv/",
+    "venv/",
+    ".tox/",
+    ".mypy_cache/",
+    ".ruff_cache/",
+    ".next/",
     *GENERATED_STATE_FILES,
 )
 
@@ -118,6 +146,7 @@ class Memory:
         self._catalog = None
         self._last_tool_result = "Nothing yet."
         self._find_used_substring = False
+        self._commit_files_cache: dict[str, set[str]] = {}
         self._init()
 
     def _run(self, *args: str, check: bool = True) -> str:
@@ -695,12 +724,17 @@ class Memory:
     def ensure_goal(self, text: str, *, agent: str | None = None) -> str | None:
         """Create the initial goal from the first request, but no chat log.
 
-        Turn text remains transient after a goal exists. Durable constraints,
-        decisions, findings, and checkpoints belong in explicit memory notes.
+        Turn text remains transient after a goal exists, except explicit
+        durable user constraints/directives which update Steering.
         """
-        if split_goals(self.state()):
+        cleaned = (text or "").strip()
+        if not cleaned:
             return None
-        return self.save_user(text, agent=agent)
+        if split_goals(self.state()):
+            if _STEERING_PROMPT_RE.search(cleaned):
+                return self.save_user(cleaned, agent=agent)
+            return None
+        return self.save_user(cleaned, agent=agent)
 
     def auto_save(
         self,
@@ -790,41 +824,92 @@ class Memory:
             closed.append(target)
         return closed
 
+    def _committed_files(self, item_id: str) -> set[str]:
+        cached = self._commit_files_cache.get(item_id)
+        if cached is not None:
+            return cached
+        names = self._run(
+            "show", "--pretty=format:", "--name-only", item_id, check=False
+        )
+        files = {name.strip() for name in names.splitlines() if name.strip()}
+        self._commit_files_cache[item_id] = files
+        return files
+
+    def _mentioned_files(self, message: str) -> set[str]:
+        found: set[str] = set()
+        for raw in _FILE_TOKEN_RE.findall(message or ""):
+            candidate = raw.strip().lstrip("./")
+            if not candidate or candidate in GENERATED_STATE_FILES:
+                continue
+            target = (self._path / candidate).resolve()
+            try:
+                rel = target.relative_to(self._path).as_posix()
+            except ValueError:
+                continue
+            if target.is_file():
+                found.add(rel)
+        return found
+
     def _stale_files(self, items: list[MemoryItem]) -> dict[str, list[str]]:
-        """Map item id -> snapshot or declared files that changed since item."""
+        """Map item id -> snapshot or declared/mentioned files that changed since item."""
         drifted: dict[str, list[str]] = {}
         if not items or self.inspecting() is not None:
             return drifted
         head = self._run("rev-parse", "HEAD", check=False)
         if not head:
             return drifted
-        declared = sorted({name for item in items for name in item.payload.get("files", [])})
+        unique_items = [
+            item
+            for item in {entry.id: entry for entry in items}.values()
+            if not item.payload.get("user") and not item.payload.get("open_question")
+        ]
+        if not unique_items:
+            return drifted
+        item_files: dict[str, set[str]] = {}
+        all_explicit: set[str] = set()
+        for item in unique_items:
+            declared = {
+                str(name).strip()
+                for name in (item.payload.get("files") or [])
+                if str(name).strip()
+            }
+            mentioned = self._mentioned_files(item.message)
+            explicit = declared | mentioned
+            all_explicit.update(explicit)
+            if declared:
+                files = explicit
+            elif _GLOBAL_DECISION_RE.match((item.message or "").strip()):
+                files = explicit
+            else:
+                files = self._committed_files(item.id) | explicit
+            if files:
+                item_files[item.id] = files
+        if not item_files:
+            return drifted
         untracked = set()
-        if declared:
+        if all_explicit:
             # Include ignored paths when the caller explicitly declares them.
             # Git diff alone does not report newly created untracked evidence.
-            untracked = set(self._run("ls-files", "--others", "-z", "--", *declared,
-                                      check=False).split("\0"))
-        for item in {entry.id: entry for entry in items}.values():
-            if item.payload.get("user") or item.payload.get("open_question"):
-                continue
-            names = self._run(
-                "show", "--pretty=format:", "--name-only", item.id, check=False
+            untracked = set(
+                self._run(
+                    "ls-files", "--others", "-z", "--", *sorted(all_explicit), check=False
+                ).split("\0")
             )
-            files = {name for name in names.splitlines() if name.strip()}
-            files.update(item.payload.get("files") or [])
-            if not files:
-                continue
-            later = {
-                name
-                for name in self._run(
-                    "diff", "--name-only", item.id, "--", check=False
-                ).splitlines()
-                if name.strip()
-            }
+        diff_cache: dict[str, set[str]] = {}
+        for item_id, files in item_files.items():
+            later = diff_cache.get(item_id)
+            if later is None:
+                later = {
+                    name.strip()
+                    for name in self._run(
+                        "diff", "--name-only", item_id, "--", check=False
+                    ).splitlines()
+                    if name.strip()
+                }
+                diff_cache[item_id] = later
             changed = sorted(files & (later | untracked))
             if changed:
-                drifted[item.id] = changed
+                drifted[item_id] = changed
         return drifted
 
     def _stale_ids(self, items: list[MemoryItem]) -> set[str]:
@@ -844,12 +929,17 @@ class Memory:
         from agent_memory.prompt import (
             RECENT_CAP,
             _goal,
+            _handoff,
+            _latest_user_text,
             _steering,
             current_prompt,
             render,
+            render_packet,
         )
 
         items = self.state()
+        branches = self.branches()
+        inspecting = self.inspecting()
         _, recent = split_state(items)
         hide = {item.id for item in all_open_questions(items)}
         recent = [item for item in recent if item.id not in hide]
@@ -860,20 +950,35 @@ class Memory:
         steer = _steering(items, goal)
         if steer:
             sample.append(steer)
-        sample.extend(split_open_questions(items))
-        stale_ids = self._stale_ids(sample)
+        questions = split_open_questions(items)
+        sample.extend(questions)
+        query = _latest_user_text(items)
+        related = self.related_notes(query, _state=items) if query else []
+        handoff = _handoff(items)
+        all_candidates = list(sample)
+        if handoff:
+            all_candidates.append(handoff)
+        all_candidates.extend(related)
+        stale_ids = self._stale_ids(all_candidates)
         payload = current_prompt(
             items, stale_ids=stale_ids
         )
         text = render(
             items,
-            self.branches(),
-            self.inspecting(),
+            branches,
+            inspecting,
             compact=True,
             stale_ids=stale_ids,
         )
         payload["injected"] = text
-        payload["packet"] = self.render_packet()
+        payload["packet"] = render_packet(
+            items,
+            related,
+            branches,
+            inspecting,
+            query=query,
+            stale_ids=stale_ids,
+        )
         return payload
 
     def render_state(self) -> str:
@@ -881,7 +986,7 @@ class Memory:
         return self.prompt_payload()["injected"]
 
     def related_notes(self, question: str, *, k: int | None = None, _state=None) -> list:
-        """Work notes matching the question via FTS. Skips transcript and Goal."""
+        """Work notes matching the question via FTS. Skips transcript, folded items, and Goal."""
         from agent_memory.prompt import (
             RELATED_CAP,
             _goal,
@@ -894,14 +999,21 @@ class Memory:
             return []
         cap = RELATED_CAP if k is None else k
         state = self.state() if _state is None else _state
+        active_ids = {item.id for item in state}
         skip = {item.id for item in (_goal(state), _handoff(state)) if item}
         limit = max(cap * 3, 8)
         while True:
             items = self.find(query=question, k=limit, branch="current")
-            related = [item for item in items if item.id not in skip and not _transcript(item)]
+            related = [
+                item
+                for item in items
+                if item.id in active_ids
+                and item.id not in skip
+                and not _transcript(item)
+            ]
             if len(related) >= cap or len(items) < limit:
                 return related[:cap]
-            # Transcript hits must not crowd useful work out of the result set.
+            # Transcript/folded hits must not crowd useful work out of the result set.
             # This grows local retrieval only, never the model-visible packet.
             limit *= 2
 

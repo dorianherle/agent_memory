@@ -171,6 +171,30 @@ class TestWrapper(MemoryTestCase):
         names = [tool["function"]["name"] for tool in fake.requests[0]["tools"]]
         self.assertEqual(names, ["memory", "weather"])
 
+    def test_parallel_memory_and_user_tool_calls_executes_memory(self):
+        weather = {
+            "type": "function",
+            "function": {"name": "weather", "parameters": {}},
+        }
+        fake = FakeClient([
+            reply(
+                tool_calls=[
+                    tool_call("memory", {"action": "save", "text": "Saved in parallel"}),
+                    tool_call("weather", {"city": "Zurich"}),
+                ]
+            ),
+        ])
+        client = wrap(fake, self.memory)
+        response = client.chat.completions.create(
+            model="gpt-5",
+            messages=[{"role": "user", "content": "Check weather and save note"}],
+            tools=[weather],
+        )
+        self.assertEqual(len(response.choices[0].message.tool_calls), 2)
+        self.assertTrue(
+            any(item.message == "Saved in parallel" for item in self.memory.state())
+        )
+
     def test_streaming_memory_tool_loop(self):
         fake = FakeClient([
             [

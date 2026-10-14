@@ -143,9 +143,18 @@ class MemoryEnhancedOpenAI:
             )
             message = response.choices[0].message
             calls = message.tool_calls or []
-            if not calls or any(
+            if not calls:
+                return response
+            if any(
                 call.function.name != MEMORY_TOOL_NAME for call in calls
             ):
+                for call in calls:
+                    if call.function.name == MEMORY_TOOL_NAME:
+                        call_tool(
+                            self.memory,
+                            call.function.name,
+                            json.loads(call.function.arguments),
+                        )
                 return response
             messages.append(message)
             for call in calls:
@@ -191,9 +200,18 @@ class MemoryEnhancedOpenAI:
 
             # After state: the stream is done. Only a pure memory call
             # keeps the loop going; anything else was the final answer.
-            if not calls or any(
+            if not calls:
+                return
+            if any(
                 call["name"] != MEMORY_TOOL_NAME for call in calls
             ):
+                for call in calls:
+                    if call["name"] == MEMORY_TOOL_NAME:
+                        call_tool(
+                            self.memory,
+                            call["name"],
+                            json.loads(call["arguments"]),
+                        )
                 return
             messages.append(
                 {

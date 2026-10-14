@@ -58,6 +58,28 @@ class McpServerTests(MemoryTestCase):
         self.assertFalse(last.payload.get("auto"))
         self.assertEqual(last.payload.get("agent"), "agent")
 
+    def test_memory_save_tool_accepts_payload_files_and_handoff(self) -> None:
+        try:
+            from agent_memory.cursor.mcp import _build_server
+        except SystemExit as error:
+            self.skipTest(str(error))
+
+        with patch.dict(os.environ, {"AGENT_MEMORY_ROOT": str(self.path)}):
+            server = _build_server()
+            tool = server._tool_manager._tools["memory_save"]
+            result = tool.fn(
+                text="Handoff checkpoint\nNext: pytest -k auth",
+                agent="agent",
+                files=["work.txt"],
+                handoff=True,
+                payload={"tag": "cp"},
+            )
+        self.assertIn("Saved [", result)
+        last = Memory(self.path).state()[-1]
+        self.assertTrue(last.payload.get("handoff"))
+        self.assertEqual(last.payload.get("files"), ["work.txt"])
+        self.assertEqual(last.payload.get("tag"), "cp")
+
     def test_memory_delete_tool_hides_from_state(self) -> None:
         try:
             from agent_memory.cursor.mcp import _build_server
@@ -393,11 +415,22 @@ class HookTests(MemoryTestCase):
         self.assertEqual(Memory(self.path).state(), [])
 
     def test_only_first_prompt_establishes_goal(self) -> None:
+        handle("beforeSubmitPrompt", {"prompt": "hey what's up?"})
         handle("beforeSubmitPrompt", {"prompt": "fix checkout"})
         handle("beforeSubmitPrompt", {"prompt": "so what were we discussing?"})
         items = Memory(self.path).state()
         self.assertEqual([item.message for item in items], ["fix checkout"])
         self.assertTrue(items[0].payload.get("goal"))
+
+    def test_before_submit_captures_explicit_steering_constraint(self) -> None:
+        handle("beforeSubmitPrompt", {"prompt": "fix checkout"})
+        handle("beforeSubmitPrompt", {"prompt": "Constraint: keep the public REST API compatible"})
+        mem = Memory(self.path)
+        pkt = mem.render_packet("checkout")
+        self.assertIn("## Goal", pkt)
+        self.assertIn("fix checkout", pkt)
+        self.assertIn("## Steering", pkt)
+        self.assertIn("keep the public REST API compatible", pkt)
 
     def test_session_start_injects_context(self) -> None:
         self.memory.save("prior work")

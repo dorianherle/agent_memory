@@ -35,8 +35,8 @@ current user.
 
 | Tool | Use |
 |---|---|
-| `memory_save(text, agent=None, payload=None)` | Save a dead end, decision, constraint, or pre-edit checkpoint. |
-| `memory_find(ids=…, text=…, query=…, all_branches=False, full=False)` | Retrieve specific notes; use a narrow search. |
+| `memory_save(text, agent=None, payload=None, files=None, handoff=False)` | Save a dead end, decision, constraint, or pre-edit checkpoint. |
+| `memory_find(ids=…, text=…, query=…, all_branches=False, full=False, limit=None)` | Retrieve specific notes; use a narrow search. |
 | `memory_history(full=False)` | Timeline headlines with folded steps; `full=True` for bodies. |
 | `memory_summarize(text, agent=None)` | Fold finished work while preserving the original notes. |
 | `memory_open_questions(text="", depends_on=None, ids=None)` | Add an unresolved question; empty text closes questions. |

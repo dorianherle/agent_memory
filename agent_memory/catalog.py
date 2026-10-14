@@ -365,12 +365,18 @@ class Catalog:
             raw_words = re.findall(r"\w+", fts_query)
             words = [w for w in raw_words if w.lower() not in _FTS_STOP] or raw_words
             if not words:
-                return []
-            where.append("memory_fts MATCH ?")
-            values.append(" OR ".join(f'"{word}"' for word in dict.fromkeys(words)))
-            search_join = "JOIN memory_fts ON memory_fts.memory_id = memories.id "
-            search_rank = ", bm25(memory_fts) AS fts_rank "
-            ordering = "fts_rank ASC, " + ordering
+                token = fts_query.strip()
+                if not token:
+                    return []
+                where.append("instr(lower(memories.message), lower(?)) > 0")
+                values.append(token)
+                search_rank = ", 0.0 AS fts_rank "
+            else:
+                where.append("memory_fts MATCH ?")
+                values.append(" OR ".join(f'"{word}"' for word in dict.fromkeys(words)))
+                search_join = "JOIN memory_fts ON memory_fts.memory_id = memories.id "
+                search_rank = ", bm25(memory_fts) AS fts_rank "
+                ordering = "fts_rank ASC, " + ordering
         sql = (
             "SELECT memories.*, contents.hash AS content_hash, contents.text AS document "
             f"{search_rank}"

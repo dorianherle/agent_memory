@@ -130,9 +130,15 @@ def handle(event: str, data: dict) -> dict:
         }
 
     if event == "beforeSubmitPrompt":
+        from agent_memory.core import _SMALL_TALK_RE
+
         prompt = data.get("prompt") or ""
         entry_id = None
-        if isinstance(prompt, str) and prompt.strip():
+        if (
+            isinstance(prompt, str)
+            and prompt.strip()
+            and not _SMALL_TALK_RE.match(prompt.strip())
+        ):
             entry_id = memory.ensure_goal(prompt.strip(), agent=USER_AGENT)
             try:
                 memory.write_live_html()
@@ -204,6 +210,7 @@ def handle(event: str, data: dict) -> dict:
                 "subagent_id": sub_id,
                 "subagent_type": sub_type,
                 "event": "start",
+                "auto": True,
             },
             agent=parent_agent,
         )

@@ -250,3 +250,19 @@ class TestFind(MemoryTestCase):
         )
         self.assertIn("Fixed matrix", result)
         self.assertNotIn(SUBSTRING_FALLBACK, result)
+
+    def test_find_tool_respects_limit_and_symbolic_operator_query(self):
+        from agent_memory import call_tool
+
+        self.save("Operator === prevents type coercion in parser")
+        hits_sym = self.memory.find(query="===")
+        self.assertEqual(len(hits_sym), 1)
+        self.assertIn("===", hits_sym[0].message)
+
+        out = call_tool(
+            self.memory,
+            "memory",
+            {"action": "find", "query": "matrix", "limit": 1},
+        )
+        lines = [line for line in out.splitlines() if line.startswith("[")]
+        self.assertEqual(len(lines), 1)

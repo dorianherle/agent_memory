@@ -305,12 +305,14 @@ def _run_action(memory: Memory, arguments: dict) -> str:
         branch = None if arguments.get("all_branches") else "current"
         queried = bool(arguments.get("query"))
         explicit = bool(arguments.get("ids"))
+        raw_k = arguments.get("limit") or arguments.get("k")
+        k = int(raw_k) if raw_k is not None else (50 if explicit else FIND_DEFAULT_K)
         items = memory.find(
             arguments.get("query"),
             ids=arguments.get("ids"),
             text=arguments.get("text"),
             payload=arguments.get("payload"),
-            k=50 if explicit else FIND_DEFAULT_K,
+            k=k,
             branch=branch,
         )
         used_substring = memory._find_used_substring
@@ -321,6 +323,9 @@ def _run_action(memory: Memory, arguments: dict) -> str:
             for item in items
             for child_id in item.payload.get("covers", [])
         ]
+        if not explicit and cover_ids:
+            covered_set = set(cover_ids)
+            items = [item for item in items if item.id not in covered_set]
         kids = (
             memory.find(ids=cover_ids, k=len(cover_ids), branch=branch)
             if cover_ids

@@ -14,22 +14,26 @@ from agent_memory.tools import call_tool
 
 def _mcp_server(name: str):
     """Return a high-level MCP server instance for the installed SDK."""
-    try:
-        from mcp.server import MCPServer
+    import warnings
 
-        return MCPServer(name)
-    except ImportError:
-        pass
-    try:
-        from mcp.server.fastmcp import FastMCP
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        try:
+            from mcp.server.fastmcp import FastMCP
 
-        return FastMCP(name)
-    except ImportError as error:
-        raise SystemExit(
-            "Cursor MCP needs the `mcp` package. Install with:\n"
-            '  pip install "agent-memory[cursor]"\n'
-            f"Import error: {error}"
-        ) from error
+            return FastMCP(name)
+        except ImportError:
+            pass
+        try:
+            from mcp.server import MCPServer
+
+            return MCPServer(name)
+        except ImportError as error:
+            raise SystemExit(
+                "Cursor MCP needs the `mcp` package. Install with:\n"
+                '  pip install "agent-memory[cursor]"\n'
+                f"Import error: {error}"
+            ) from error
 
 
 def _build_server():
@@ -61,6 +65,7 @@ def _build_server():
         ids: list[str] | None = None,
         all_branches: bool = False,
         full: bool = False,
+        limit: int | None = None,
         goal: str | None = None,
     ) -> str:
         """Search. query=/text= work headlines (or full bodies with full=True); ids= bodies (capped unless full=True). Transcript omitted unless ids=."""
@@ -74,14 +79,27 @@ def _build_server():
                 "ids": ids,
                 "all_branches": all_branches,
                 "full": full,
+                "limit": limit,
             },
         )
 
     @mcp.tool()
-    def memory_save(text: str, agent: str | None = None, goal: str | None = None) -> str:
-        """Save a finding, dead end, decision, or checkpoint."""
+    def memory_save(
+        text: str,
+        agent: str | None = None,
+        goal: str | None = None,
+        payload: dict | None = None,
+        files: list[str] | None = None,
+        handoff: bool = False,
+    ) -> str:
+        """Save a finding, dead end, decision, or checkpoint. Pass files=[...] or handoff=True when applicable."""
         memory = get_memory(goal)
-        item_id = memory.save(text, agent=agent)
+        merged = dict(payload or {})
+        if files:
+            merged["files"] = [str(f) for f in files if str(f).strip()]
+        if handoff:
+            merged["handoff"] = True
+        item_id = memory.save(text, merged or None, agent=agent)
         try:
             from agent_memory.live_html import record_action
 

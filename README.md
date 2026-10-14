@@ -15,9 +15,9 @@
 Long-context chat buffers rot and explode in token cost. External fact extractors (`Mem0`) paraphrase away exact equations and code constants. Fixed-window RAG (`BM25` / vector chunks) slices multi-line definitions in half.
 
 **`agent-memory` fixes this with three mechanisms:**
-1. **Bounded State Packet (`<= 1,200 chars`):** Every turn injects a deterministic `# MEMORY STATE` view (`Goal`, `Steering`, `Task model`, `Handoff`, `Open questions`, `Related`) in **~200 tokens with 0 LLM calls**.
+1. **Bounded State Packet (`<= 1,200 chars`):** Every turn injects a deterministic `# MEMORY STATE` view (`Goal`, `Steering`, `Handoff`, `Open questions`, `Related`) in **~200 tokens with 0 LLM calls**.
 2. **Git Snapshot Lineage:** Every saved note is a commit in an isolated Git DAG with SHA-256 file hashes—giving agents automatic `[stale]` warnings when files change and time-travel (`memory_inspect` / `memory_branch`).
-3. **Consecutive Compression & 1-Call Full Retrieval:** Completed steps fold into rolling summaries (`memory_summarize`) or safe AST rules (`memory_model`), while `memory_find(query=..., full=True)` retrieves uncut note bodies with **100% equation & symbol recall**.
+3. **Consecutive Compression & 1-Call Full Retrieval:** Completed steps fold into rolling summaries (`memory_summarize`), while `memory_find(query=..., full=True)` retrieves uncut note bodies with **100% equation & symbol recall**.
 
 ---
 
@@ -87,12 +87,12 @@ Next: pytest tests/test_checkout.py -k retry
 
 | MCP Tool | What it does |
 | :--- | :--- |
-| `memory_save` | Save a finding, decision, or handoff (`payload={"handoff": True, "files": [...]}`) |
-| `memory_find` | Search notes by query or ID (`memory_find(query="...", full=True)` for uncut bodies) |
+| `memory_save` | Save a finding, decision, or handoff (`files=[...]`, `handoff=True`, or `payload={...}`) |
+| `memory_find` | Search notes by query or ID (`memory_find(query="...", full=True, limit=5)` for uncut bodies) |
 | `memory_summarize` | Compress completed notes into a single rolling summary commit |
-| `memory_model` | Propose, check, accept, and algebraically `reduce` executable AST task rules |
 | `memory_open_questions` | Track or close unresolved blockers |
 | `memory_inspect` / `memory_branch` | Rewind working files to an earlier memory snapshot or branch from it |
+| `memory_goal_create` / `memory_goal_list` / `memory_goal_use` | Create and bind isolated goal workspaces |
 
 - **Live Browser View:** Open `.agent_memory/live/index.html` to watch the memory timeline update in real time.
 

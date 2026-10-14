@@ -203,7 +203,15 @@ class Search:
         query_vector = self._query_vector(query)
         total = max(1, self._vector_count)
         pool = min(total, max(50, k * 10))
-        lexical = dict(self.catalog.fts(query, max(50, k * 10))) if hybrid else {}
+        fts_hits = (
+            self.catalog.fts(query, max(50, k * 10), branch=branch)
+            if hybrid
+            else []
+        )
+        lexical_rank = {
+            doc_id: rank for rank, (doc_id, _) in enumerate(fts_hits, 1)
+        }
+        lexical = dict(fts_hits)
 
         filtered = any([
             ids is not None,
@@ -278,7 +286,8 @@ class Search:
         for row in eligible:
             vector = vectors.get(row["content_hash"])
             semantic = float(vector @ query_vector) if vector is not None else 0.0
-            lexical_score = 1.0 if row["id"] in lexical else 0.0
+            rank = lexical_rank.get(row["id"])
+            lexical_score = (61.0 / (60.0 + rank)) if rank is not None else 0.0
             recency = (row["committed_us"] - oldest) / span
             score = semantic + (0.1 * lexical_score if hybrid else 0.0)
             score += recency_weight * recency
