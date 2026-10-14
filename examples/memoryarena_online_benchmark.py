@@ -788,6 +788,235 @@ def export_official_memoryarena_format(
     return all_results
 
 
+def _load_openrouter_key() -> str:
+    env_file = ROOT / ".env"
+    if env_file.exists():
+        for line in env_file.read_text(encoding="utf-8").splitlines():
+            if "=" in line and not line.strip().startswith("#"):
+                k, v = line.split("=", 1)
+                if k.strip() == "OPENROUTER_API_KEY":
+                    return v.strip().strip('"').strip("'")
+    return ""
+
+
+def openrouter_chat(
+    messages: list[dict],
+    model: str = "openai/gpt-5-mini",
+    max_tokens: int = 4096,
+) -> tuple[str, float]:
+    """Call OpenRouter chat completions with `openai/gpt-5-mini` (matching official MemoryArena config)."""
+    api_key = _load_openrouter_key()
+    if not api_key:
+        raise RuntimeError("OPENROUTER_API_KEY not found in .env")
+    payload = json.dumps(
+        {
+            "model": model,
+            "messages": messages,
+            "temperature": 0.0,
+            "max_tokens": max_tokens,
+            "reasoning": {"effort": "low"},
+        }
+    ).encode("utf-8")
+    t0 = time.monotonic()
+    last_err = None
+    for attempt in range(4):
+        try:
+            req = urllib.request.Request(
+                "https://openrouter.ai/api/v1/chat/completions",
+                data=payload,
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                },
+            )
+            with urllib.request.urlopen(req, timeout=90) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            text = (data["choices"][0]["message"].get("content") or "").strip()
+            return text, round(time.monotonic() - t0, 2)
+        except Exception as e:
+            last_err = e
+            time.sleep(1.5 * (attempt + 1))
+    raise RuntimeError(f"OpenRouter call failed after retries: {last_err}")
+
+
+def official_math_env_judge(
+    question: str,
+    action: str,
+    ground_truth: str,
+    judge_model: str = "openai/gpt-5-mini",
+) -> tuple[bool, str]:
+    """Exact `MathEnvironment.judge()` implementation from
+    `ZexueHe/MemoryArena/env/env_systems/math_env.py` (lines 53-77).
+    """
+    judge_prompt = f"""
+            You are a math expert. 
+            Determine if these two expressions are mathematically equivalent answer for the given question:
+            Question: {question}
+            Expression 1: {action}
+            Expression 2: {ground_truth}
+
+            Respond only with "yes" or "no". """
+    messages = [
+        {
+            "role": "system",
+            "content": "You are a helpful assistant that judges the equivalence of two mathematical expressions.",
+        },
+        {"role": "user", "content": judge_prompt},
+    ]
+    out, _ = openrouter_chat(messages, model=judge_model, max_tokens=2000)
+    out_lower = out.lower()
+    return ("yes" in out_lower), out_lower
+
+
+def run_single_task_chain_gpt5mini(
+    task: dict,
+    arm: str,
+    work_root: Path,
+    seed_step0: dict | None = None,
+    solver_model: str = "openai/gpt-5-mini",
+) -> dict:
+    """Execute one full multi-session task chain using official `gpt-5-mini` solver
+    and official `MathEnvironment.judge()` (`gpt-5-mini`).
+    """
+    task_id = task["id"]
+    bgs = task["backgrounds"]
+    qs = task["questions"]
+    ans = task["answers"]
+    n_steps = len(qs)
+
+    tmpdir = work_root / f"gpt5mini_task_{task_id}_{arm}"
+    tmpdir.mkdir(parents=True, exist_ok=True)
+    mem = Memory(tmpdir)
+    mem0_facts: list[str] = []
+    bm25_chunks: list[str] = []
+    prev_summary_id: str | None = None
+
+    step_results = []
+    for step_idx in range(n_steps):
+        q = qs[step_idx]
+        bg = bgs[step_idx]
+
+        if step_idx == 0 and seed_step0 is not None:
+            response_text = seed_step0["response_excerpt"]
+            step_results.append(dict(seed_step0))
+        else:
+            if step_idx == 0 or arm == "no_memory":
+                mem_ctx = ""
+            elif arm == "mem0_style_extracted_facts":
+                mem_ctx = retrieve_mem0_facts(mem0_facts, q)
+            elif arm == "bm25_chunk_rag":
+                mem_ctx = retrieve_bm25_chunks(bm25_chunks, q)
+            elif arm == "agent_memory_passive_state":
+                mem_ctx = build_state_packet(mem, q)
+            elif arm == "agent_memory_single_call_full":
+                found = call_tool(
+                    mem,
+                    "memory",
+                    {"action": "find", "query": q, "full": True},
+                )
+                state_items = mem.state()
+                goal_items = [it for it in state_items if it.payload.get("goal") is True]
+                extra_goal = ""
+                if goal_items and f"[{goal_items[0].id}]" not in found:
+                    extra_goal = f"\n[{goal_items[0].id}] {goal_items[0].message}"
+                pkt = build_state_packet(mem, q)
+                mem_ctx = f"{pkt}\n\n## Retrieved Memory Notes (memory_find query full=True)\n{found}{extra_goal}"
+            else:
+                raise ValueError(f"Unknown arm: {arm}")
+
+            prompt = build_subtask_prompt(
+                task["paper_name"], step_idx, n_steps, bg, q, mem_ctx
+            )
+            response_text, latency = openrouter_chat(
+                [
+                    {
+                        "role": "system",
+                        "content": "You are a careful theoretical physics and mathematical reasoning solver.",
+                    },
+                    {"role": "user", "content": prompt},
+                ],
+                model=solver_model,
+                max_tokens=4096,
+            )
+            rubric_grade = grade_subtask_response(task_id, step_idx, response_text, ans[step_idx])
+            judge_ok, judge_raw = official_math_env_judge(q, response_text, ans[step_idx])
+            # Official `MathEnvironment.judge()` determines `passed`, while refusing due to missing context is always False
+            passed = bool(judge_ok and not rubric_grade["admitted_missing_context"])
+            step_results.append(
+                {
+                    "step": step_idx + 1,
+                    "passed": passed,
+                    "judge_is_correct": bool(judge_ok),
+                    "judge_feedback": judge_raw,
+                    "rubric_passed": rubric_grade["passed"],
+                    "rubric_score": rubric_grade["rubric_score"],
+                    "expr_recall": rubric_grade["expr_recall"],
+                    "admitted_missing_context": rubric_grade["admitted_missing_context"],
+                    "prompt_chars": len(prompt),
+                    "memory_chars": len(mem_ctx),
+                    "latency_s": latency,
+                    "response_excerpt": response_text[-600:],
+                }
+            )
+
+        # Update persistent memory after session completes
+        if arm == "mem0_style_extracted_facts":
+            mem0_facts.extend(extract_mem0_facts(step_idx, bg, response_text))
+        elif arm == "bm25_chunk_rag":
+            if bg.strip():
+                bm25_chunks.extend(chunk_text(bg))
+            bm25_chunks.extend(chunk_text(f"Q: {q}\nA: {response_text[-800:]}"))
+        elif arm.startswith("agent_memory_"):
+            if bg.strip():
+                mem.save(
+                    f"Paper Setup ({task['paper_name']}):\n{bg}",
+                    {"goal": True, "step": step_idx + 1},
+                    agent="phys_agent",
+                )
+            final_match = re.search(
+                r"FINAL RESULT:(.*)", response_text, flags=re.DOTALL | re.IGNORECASE
+            )
+            distilled = (
+                final_match.group(1).strip()
+                if final_match
+                else response_text[-800:].strip()
+            )
+            mem.save(
+                f"Subtask {step_idx + 1} Solved Result:\nQuestion: {q[:220]}\n{distilled}",
+                {"step": step_idx + 1},
+                agent="phys_agent",
+            )
+            if step_idx >= 1:
+                if prev_summary_id:
+                    mem.delete(prev_summary_id)
+                prior_summaries = []
+                for prev_idx, sr in enumerate(step_results):
+                    prior_summaries.append(
+                        f"Step {prev_idx + 1}: {sr['response_excerpt'][-350:]}"
+                    )
+                prev_summary_id = mem.save(
+                    f"Consecutive Derivation Law (Steps 1..{step_idx + 1} for {task['paper_name']}):\n"
+                    + "\n".join(prior_summaries),
+                    summary=True,
+                    agent="phys_agent",
+                )
+
+    passed_count = sum(1 for s in step_results if s["passed"])
+    ps = passed_count / n_steps
+    sr = 1.0 if step_results[-1]["passed"] else 0.0
+    return {
+        "task_id": task_id,
+        "paper_name": task["paper_name"],
+        "arm": arm,
+        "model": solver_model,
+        "judge": "MathEnvironment.judge (gpt-5-mini)",
+        "num_steps": n_steps,
+        "sr": sr,
+        "ps": round(ps, 4),
+        "steps": step_results,
+    }
+
+
 def summarize_runs(arm_runs: list[dict]) -> dict:
     arm_runs = sorted(arm_runs, key=lambda x: x["task_id"])
     avg_sr = sum(r["sr"] for r in arm_runs) / len(arm_runs)
@@ -972,12 +1201,135 @@ def main() -> None:
             arm, runs_20, tasks_by_id
         )
 
+    # Official `gpt-5-mini` + `MathEnvironment.judge()` 20-paper evaluation
+    gpt5mini_arms = [
+        "no_memory",
+        "mem0_style_extracted_facts",
+        "bm25_chunk_rag",
+        "agent_memory_passive_state",
+        "agent_memory_single_call_full",
+    ]
+    cached_gpt5mini: dict[tuple[str, int], dict] = {}
+    for arm_name, arm_obj in cached_data.get("official_gpt5mini_20_tasks_benchmark", {}).items():
+        for tr in arm_obj.get("tasks", []):
+            cached_gpt5mini[(arm_name, tr["task_id"])] = tr
+
+    missing_gpt5mini: list[tuple[dict, str]] = []
+    if "--official-gpt5mini" in sys.argv:
+        for tid in ALL_20_TASK_IDS:
+            for arm in gpt5mini_arms:
+                if (arm, tid) not in cached_gpt5mini:
+                    missing_gpt5mini.append((tasks_by_id[tid], arm))
+
+    if missing_gpt5mini:
+        work_root_5m = Path(tempfile.mkdtemp(prefix="memoryarena_gpt5mini_"))
+        try:
+            step0_5m: dict[int, dict] = {}
+            for tid in ALL_20_TASK_IDS:
+                for arm in gpt5mini_arms:
+                    if (arm, tid) in cached_gpt5mini:
+                        step0_5m[tid] = cached_gpt5mini[(arm, tid)]["steps"][0]
+                        break
+            need_s0 = [tid for tid in ALL_20_TASK_IDS if tid not in step0_5m]
+            if need_s0:
+                print(
+                    f"\n3a. Running Official `gpt-5-mini` + `MathEnvironment.judge()` Session 1 (Step 0) seeds for {len(need_s0)} papers..."
+                )
+
+                def _run_seed_5m(tid_val: int) -> tuple[int, dict]:
+                    t_obj = tasks_by_id[tid_val]
+                    q0 = t_obj["questions"][0]
+                    bg0 = t_obj["backgrounds"][0]
+                    gt0 = t_obj["answers"][0]
+                    p0 = build_subtask_prompt(
+                        t_obj["paper_name"], 0, len(t_obj["questions"]), bg0, q0, ""
+                    )
+                    rtext, lat = openrouter_chat(
+                        [
+                            {
+                                "role": "system",
+                                "content": "You are a careful theoretical physics and mathematical reasoning solver.",
+                            },
+                            {"role": "user", "content": p0},
+                        ],
+                        model="openai/gpt-5-mini",
+                        max_tokens=4096,
+                    )
+                    rub0 = grade_subtask_response(tid_val, 0, rtext, gt0)
+                    j_ok, j_raw = official_math_env_judge(q0, rtext, gt0)
+                    passed0 = bool(j_ok and not rub0["admitted_missing_context"])
+                    return tid_val, {
+                        "step": 1,
+                        "passed": passed0,
+                        "judge_is_correct": bool(j_ok),
+                        "judge_feedback": j_raw,
+                        "rubric_passed": rub0["passed"],
+                        "rubric_score": rub0["rubric_score"],
+                        "expr_recall": rub0["expr_recall"],
+                        "admitted_missing_context": rub0["admitted_missing_context"],
+                        "prompt_chars": len(p0),
+                        "memory_chars": 0,
+                        "latency_s": lat,
+                        "response_excerpt": rtext[-600:],
+                    }
+
+                with ThreadPoolExecutor(max_workers=20) as pool:
+                    for fut in as_completed([pool.submit(_run_seed_5m, tid) for tid in need_s0]):
+                        tid_done, s0_obj = fut.result()
+                        step0_5m[tid_done] = s0_obj
+                        print(
+                            f"  [gpt-5-mini Seed S1] Task {tid_done:2d} -> "
+                            f"judge={s0_obj['judge_is_correct']}, passed={s0_obj['passed']}"
+                        )
+
+            print(
+                f"\n3b. Running {len(missing_gpt5mini)} official `gpt-5-mini` + `MathEnvironment.judge()` chains across all 20 papers..."
+            )
+            with ThreadPoolExecutor(max_workers=25) as pool:
+                fut_5m = {
+                    pool.submit(
+                        run_single_task_chain_gpt5mini,
+                        task,
+                        arm,
+                        work_root_5m,
+                        step0_5m.get(task["id"]),
+                    ): (task["id"], arm)
+                    for task, arm in missing_gpt5mini
+                }
+                for fut in as_completed(fut_5m):
+                    tid_done, arm_done = fut_5m[fut]
+                    res_5m = fut.result()
+                    cached_gpt5mini[(arm_done, tid_done)] = res_5m
+                    print(
+                        f"  [Done gpt-5-mini] Task {tid_done:2d} ({arm_done:30s}) -> "
+                        f"SR={res_5m['sr']:.0f}, PS={res_5m['ps']*100:5.1f}% "
+                        f"({sum(1 for s in res_5m['steps'] if s['passed'])}/{res_5m['num_steps']} steps)"
+                    )
+        finally:
+            shutil.rmtree(work_root_5m, ignore_errors=True)
+
+    gpt5mini_20_summary = {}
+    gpt5mini_eval_outputs = {}
+    for arm in gpt5mini_arms:
+        runs_5m = [
+            cached_gpt5mini[(arm, tid)]
+            for tid in ALL_20_TASK_IDS
+            if (arm, tid) in cached_gpt5mini
+        ]
+        if len(runs_5m) == len(ALL_20_TASK_IDS):
+            gpt5mini_20_summary[arm] = summarize_runs(runs_5m)
+            gpt5mini_eval_outputs[arm] = export_official_memoryarena_format(
+                f"{arm}_gpt5mini", runs_5m, tasks_by_id
+            )
+
     output = {
         "benchmark": "MemoryArena (ICML 2026, arXiv:2602.16313) — Formal Reasoning (Physics)",
         "dataset_url": HF_URL,
         "total_dataset_tasks": len(tasks),
         "total_dataset_subtasks": sum(len(t["questions"]) for t in tasks),
         "retention_diagnostic_all_20_tasks": retention_summary,
+        "official_gpt5mini_20_tasks_benchmark": gpt5mini_20_summary,
+        "official_gpt5mini_eval_py_all_results": gpt5mini_eval_outputs,
         "full_20_tasks_benchmark": full_20_summary,
         "official_eval_py_all_results_20_tasks": official_eval_outputs,
         "live_llm_benchmark_8_tasks": live_8_summary,
@@ -985,13 +1337,21 @@ def main() -> None:
     }
     RESULTS_PATH.write_text(json.dumps(output, indent=2), encoding="utf-8")
     print(f"\nSaved full benchmark results to {RESULTS_PATH}")
-    print("\n=== FULL 20/20 TASKS (86 SUBTASKS) OFFICIAL MEMORYARENA SUMMARY ===")
+    print("\n=== FULL 20/20 TASKS (86 SUBTASKS) SUMMARY (gpt-5.6-sol) ===")
     for arm, m in official_eval_outputs.items():
         print(
             f"  {arm:32s}: SR (overall_average_passrate) = {m['overall_average_passrate']*100:5.1f}% | "
             f"PS (avg_progress_score) = {m['avg_progress_score']*100:5.1f}% | "
             f"avg_mem_tokens = {m['average_memory_length']}"
         )
+    if gpt5mini_eval_outputs:
+        print("\n=== OFFICIAL `gpt-5-mini` + `MathEnvironment.judge()` 20/20 TASKS SUMMARY ===")
+        for arm, m in gpt5mini_eval_outputs.items():
+            print(
+                f"  {arm:32s}: SR (overall_average_passrate) = {m['overall_average_passrate']*100:5.1f}% | "
+                f"PS (avg_progress_score) = {m['avg_progress_score']*100:5.1f}% | "
+                f"avg_mem_tokens = {m['average_memory_length']}"
+            )
 
 
 if __name__ == "__main__":
