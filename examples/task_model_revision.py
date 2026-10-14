@@ -46,9 +46,10 @@ def run(root):
     for case in observations:
         model["cases"].append({**case, "evidence": [evidence]})
     for artifact in ("app.py", "config.json", "calibration.json"):
-        model["rules"].append({"id": artifact, "target": "needs_review", "claim": f"Review {artifact} after a source change.",
-                               "when": expr("eq", {"var": "artifact"}, {"value": artifact}),
-                               "then": expr("ne", {"var": "before"}, {"var": "after"}),
+        model["rules"].append({"id": artifact, "target": "needs_review",
+                               "claim": f"Review {artifact} after a source change.",
+                               "when": f"artifact == {artifact!r}",
+                               "then": "before != after",
                                "dependencies": ["review-policy.txt"], "evidence": [evidence]})
     before_packet = memory.render_packet("Source review observations")
     proposal = memory.model_propose(model)
@@ -62,7 +63,7 @@ def run(root):
     # A generalized rule is a separate, tested proposal; the reducer does not
     # silently remove the conditions that limited the earlier model.
     generalized = copy.deepcopy(second_model["model"])
-    generalized["rules"][0]["when"] = {"value": True}
+    generalized["rules"][0]["when"] = True
     generalized["rules"][0]["claim"] = "Review when a declared source fingerprint changes."
     before = fingerprint(root, "new-settings.json")
     (root / "new-settings.json").write_text('{"workers":8}')

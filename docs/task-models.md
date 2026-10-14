@@ -42,8 +42,8 @@ with a real observation note ID on the current branch.
       "id": "source-change",
       "target": "needs_review",
       "claim": "Review a claim when its declared source state differs.",
-      "when": {"value": true},
-      "then": {"op": "ne", "args": [{"var": "before"}, {"var": "after"}]},
+      "when": true,
+      "then": "before != after",
       "evidence": ["EVIDENCE_NOTE_ID"],
       "dependencies": ["review-policy.txt"]
     }
@@ -77,8 +77,22 @@ object. Extra observed fields can remain in archived cases when a revision
 removes an unnecessary input. Every variable used by a rule must be declared.
 Nested variables use names such as `request.tenant`.
 
-Expressions use a fixed interpreter. There is no generated Python or shell
-execution. Supported operators are `eq`, `ne`, `lt`, `le`, `gt`, `ge`, `in`,
+Expressions use a fixed, safe interpreter. There is no `eval`, generated Python,
+or shell execution. Rules can be written either as sleek 1-line formulas (parsed
+by `ast.parse(..., mode="eval")` against a strict operator whitelist) or as
+explicit JSON AST objects:
+
+- Comparisons and logic: `"before != after"`, `"18.0 <= temp <= 28.0"`,
+  `"artifact in ['app.py', 'config.json']"`, `"path not in policy.get('ignored', [])"`
+- Conditionals: `"2.75 if serial == 'M17' and temp > 26.0 else 4.0"`
+- Dictionary lookups: `"saved.get(path, {'kind': 'missing'})"`
+- Collection comprehensions: `"all(dep.saved == dep.current for dep in dependencies)"`,
+  `"any(path not in policy.get('ignored', []) and saved.get(path) != current.get(path) for path in declared)"`
+
+When `claim` is omitted on a rule, it is generated automatically from the
+rule's formula (`target = then when cond`).
+
+Supported AST operators are `eq`, `ne`, `lt`, `le`, `gt`, `ge`, `in`,
 `not`, `and`, `or`, `len`, `add`, `sub`, `if`, and `get`. `get` takes an object,
 a string key, and a default expression. It evaluates the default only if the
 key is absent. It preserves explicit false, zero, empty strings, and null.
@@ -88,7 +102,7 @@ This permits lookup by a path supplied by a collection predicate. For example:
 {"op":"get","args":[{"var":"saved"},{"var":"path"},{"value":{"kind":"missing"}}]}
 ```
 
-Collection predicates use:
+Collection predicates use `"all(dep.saved == dep.current for dep in dependencies)"` or:
 
 ```json
 {
@@ -100,9 +114,13 @@ Collection predicates use:
 ```
 
 `any` has the same format. Numeric operators require finite numbers. Boolean
-operators require Boolean values. Equality compares canonical JSON values. Missing
-fields, missing conditions, unsupported input types, and evaluation limits
-return an unknown result. Conditions define where a rule applies.
+operators require Boolean values. Equality and list membership (`in`) compare
+canonical JSON values (so `True` and `1` never collide). Missing fields,
+missing conditions, unsupported input types, and evaluation limits return an
+unknown result. Conditions define where a rule applies. When multiple rules
+match a target, a rule with a strictly more specific condition (a strict
+superset of conjuncts, or a conditional exception over an unconditional default
+law) overrides the broader law; unrelated conflicting rules return `ambiguous`.
 
 ## Acceptance and uncertainty
 
@@ -140,8 +158,10 @@ truth of the observation and resolution.
 ## Reduction
 
 `memory_model(operation="reduce")` creates a proposal. It flattens repeated
-Boolean expressions and merges rules with the same target and effect. Merged
-conditions form a disjunction. Dependencies and evidence are retained.
+Boolean expressions, merges rules with the same target and effect, factors
+common conjuncts across disjunctions (`(A and B) or (A and C) -> A and (B or C)`),
+and collapses repeated equality checks into set membership
+(`(x == a) or (x == b) -> x in [a, b]`). Dependencies and evidence are retained.
 
 This transformation factors an existing program. It does not remove its domain
 conditions or discover a new physical law. Broader generalizations need an
@@ -198,8 +218,11 @@ The separate `model_reduce` operation still creates a proposal without accepting
 it. The combined handoff explicitly includes acceptance after a passing check.
 
 Use `payload={"observations":[new_cases]}` with the active model ID when the rules
-still explain new observations. The backend retains the old rules and cases.
-It adds the new cases, checks them, and blocks acceptance after a mismatch.
+still explain new observations, or `payload={"observations":[new_cases], "residuals":[exception_rules]}`
+when a surprise observation requires a residual exception rule. The backend
+retains the old rules and cases, merges any residual rules, checks all historical
+and new cases, accepts the revision, and runs algebraic reduction (`reduce`) to
+factor shared laws when that reduces working size.
 Changed sources still require a new challenge with fresh saved evidence.
 
 The tool returns working check summaries by default. `full=true` returns the

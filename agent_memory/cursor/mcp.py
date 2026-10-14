@@ -66,7 +66,7 @@ def _build_server():
         goal: str | None = None,
         full: bool = False,
     ) -> str:
-        """Task model: get (full=True adds fixtures), propose(data=model, base=active id), check(id), accept(id), reduce, predict(data=inputs, target), handoff(data=model or {observations:[cases]} or null to reuse, base=active id). Handoff checks, accepts, reduces, and records a challenge prediction. Git retains evidence."""
+        """Task model: get (full=True adds fixtures), propose(data=model, base=active id), check(id), accept(id), reduce, predict(data=inputs, target), handoff(data=model or {observations:[cases], residuals:[rules]} or null to reuse, base=active id). Rules accept 1-line formulas (when="x in ['a','b']", then="before != after"); specific rules override broader defaults. Handoff checks, accepts, reduces, and records a challenge prediction."""
         memory = get_memory(goal)
         result = call_tool(memory, "memory", {
             "action": "model_" + operation, "payload": data,

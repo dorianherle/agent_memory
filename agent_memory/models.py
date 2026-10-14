@@ -7,6 +7,7 @@ No shell commands or generated Python run when a model is read or evaluated.
 """
 from __future__ import annotations
 
+import ast
 import copy
 import hashlib
 import json
@@ -19,6 +20,15 @@ SCHEMA = 1
 MAX_BYTES = 65536
 MAX_NODES = 256
 MAX_DEPTH = 16
+_BOOL_OPS = ("eq", "ne", "lt", "le", "gt", "ge", "in", "not", "and", "or", "all", "any")
+_CMP_OPS = {
+    ast.Eq: "eq", ast.NotEq: "ne", ast.Lt: "lt", ast.LtE: "le",
+    ast.Gt: "gt", ast.GtE: "ge", ast.In: "in",
+}
+_BINARY_SYMBOLS = {
+    "eq": "==", "ne": "!=", "lt": "<", "le": "<=",
+    "gt": ">", "ge": ">=", "in": "in", "add": "+", "sub": "-",
+}
 
 
 def canonical(value):
@@ -32,6 +42,218 @@ def union(*groups):
 
 class Unknown(ValueError):
     """An input or applicability condition is unavailable."""
+
+
+def _dotted_name(node) -> str | None:
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Attribute) and node.attr.isidentifier():
+        prefix = _dotted_name(node.value)
+        if prefix:
+            return f"{prefix}.{node.attr}"
+    return None
+
+
+def _from_ast(node, *, depth=0):
+    if depth > MAX_DEPTH:
+        raise ValueError("Expression exceeds the interpreter limit")
+    if isinstance(node, ast.Constant):
+        if type(node.value) not in (bool, int, float, str, type(None)):
+            raise ValueError("Unsupported constant in formula")
+        canonical(node.value)
+        return {"value": node.value}
+    if isinstance(node, (ast.List, ast.Tuple)):
+        items = [_from_ast(el, depth=depth + 1) for el in node.elts]
+        if any(set(item) != {"value"} for item in items):
+            raise ValueError("List literals in formulas must contain constants")
+        return {"value": [item["value"] for item in items]}
+    if isinstance(node, ast.Dict):
+        if any(k is None for k in node.keys):
+            raise ValueError("Dict unpacking is not supported")
+        keys = [_from_ast(k, depth=depth + 1) for k in node.keys]
+        vals = [_from_ast(v, depth=depth + 1) for v in node.values]
+        if any(set(k) != {"value"} or not isinstance(k["value"], str) for k in keys) or any(
+            set(v) != {"value"} for v in vals
+        ):
+            raise ValueError("Dict literals must use constant string keys and constant values")
+        return {"value": {k["value"]: v["value"] for k, v in zip(keys, vals)}}
+    if isinstance(node, ast.Name):
+        if node.id in ("true", "false", "null"):
+            return {"value": {"true": True, "false": False, "null": None}[node.id]}
+        return {"var": node.id}
+    if isinstance(node, ast.Attribute):
+        dotted = _dotted_name(node)
+        if dotted:
+            return {"var": dotted}
+        raise ValueError("Attribute access is only supported on variable names")
+    if isinstance(node, ast.BoolOp):
+        op = "and" if isinstance(node.op, ast.And) else "or"
+        return {"op": op, "args": [_from_ast(v, depth=depth + 1) for v in node.values]}
+    if isinstance(node, ast.UnaryOp):
+        if isinstance(node.op, ast.Not):
+            return {"op": "not", "args": [_from_ast(node.operand, depth=depth + 1)]}
+        if isinstance(node.op, ast.USub):
+            inner = _from_ast(node.operand, depth=depth + 1)
+            if set(inner) == {"value"} and type(inner["value"]) in (int, float):
+                canonical(-inner["value"])
+                return {"value": -inner["value"]}
+            return {"op": "sub", "args": [{"value": 0}, inner]}
+        raise ValueError("Unsupported unary operator")
+    if isinstance(node, ast.BinOp):
+        if isinstance(node.op, ast.Add):
+            return {"op": "add", "args": [_from_ast(node.left, depth=depth + 1), _from_ast(node.right, depth=depth + 1)]}
+        if isinstance(node.op, ast.Sub):
+            return {"op": "sub", "args": [_from_ast(node.left, depth=depth + 1), _from_ast(node.right, depth=depth + 1)]}
+        raise ValueError("Unsupported binary operator")
+    if isinstance(node, ast.Compare):
+        parts = []
+        left = _from_ast(node.left, depth=depth + 1)
+        for op_node, right_node in zip(node.ops, node.comparators):
+            right = _from_ast(right_node, depth=depth + 1)
+            if isinstance(op_node, ast.NotIn):
+                parts.append({"op": "not", "args": [{"op": "in", "args": [left, right]}]})
+            elif type(op_node) in _CMP_OPS:
+                parts.append({"op": _CMP_OPS[type(op_node)], "args": [left, right]})
+            else:
+                raise ValueError(f"Unsupported comparison operator: {type(op_node).__name__}")
+            left = right
+        return parts[0] if len(parts) == 1 else {"op": "and", "args": parts}
+    if isinstance(node, ast.IfExp):
+        return {"op": "if", "args": [
+            _from_ast(node.test, depth=depth + 1),
+            _from_ast(node.body, depth=depth + 1),
+            _from_ast(node.orelse, depth=depth + 1),
+        ]}
+    if isinstance(node, ast.Call):
+        if node.keywords:
+            raise ValueError("Keyword arguments are not supported in formulas")
+        if isinstance(node.func, ast.Name) and node.func.id == "len" and len(node.args) == 1:
+            return {"op": "len", "args": [_from_ast(node.args[0], depth=depth + 1)]}
+        if isinstance(node.func, ast.Name) and node.func.id == "get" and len(node.args) in (2, 3):
+            default = _from_ast(node.args[2], depth=depth + 1) if len(node.args) == 3 else {"value": None}
+            return {"op": "get", "args": [
+                _from_ast(node.args[0], depth=depth + 1),
+                _from_ast(node.args[1], depth=depth + 1),
+                default,
+            ]}
+        if isinstance(node.func, ast.Attribute) and node.func.attr == "get" and len(node.args) in (1, 2):
+            default = _from_ast(node.args[1], depth=depth + 1) if len(node.args) == 2 else {"value": None}
+            return {"op": "get", "args": [
+                _from_ast(node.func.value, depth=depth + 1),
+                _from_ast(node.args[0], depth=depth + 1),
+                default,
+            ]}
+        if (
+            isinstance(node.func, ast.Name)
+            and node.func.id in ("all", "any")
+            and len(node.args) == 1
+            and isinstance(node.args[0], (ast.GeneratorExp, ast.ListComp))
+        ):
+            comp = node.args[0]
+            if len(comp.generators) != 1:
+                raise ValueError("Collection rule supports a single comprehension clause")
+            gen = comp.generators[0]
+            if not isinstance(gen.target, ast.Name) or gen.is_async:
+                raise ValueError("Invalid collection variable")
+            test_expr = _from_ast(comp.elt, depth=depth + 1)
+            if gen.ifs:
+                conds = [_from_ast(if_node, depth=depth + 1) for if_node in gen.ifs]
+                guard = conds[0] if len(conds) == 1 else {"op": "and", "args": conds}
+                if node.func.id == "any":
+                    test_expr = {"op": "and", "args": [guard, test_expr]}
+                else:
+                    test_expr = {"op": "or", "args": [{"op": "not", "args": [guard]}, test_expr]}
+            return {
+                "op": node.func.id,
+                "items": _from_ast(gen.iter, depth=depth + 1),
+                "as": gen.target.id,
+                "test": test_expr,
+            }
+    raise ValueError(f"Unsupported formula syntax: {ast.dump(node)}")
+
+
+def compile_expr(expr):
+    """Compile a 1-line Python formula, scalar literal, or AST dict into canonical AST."""
+    if type(expr) in (bool, int, float) or expr is None:
+        canonical(expr)
+        return {"value": expr}
+    if isinstance(expr, str):
+        text = expr.strip()
+        if not text or len(text) > 4096:
+            raise ValueError("Invalid formula expression")
+        try:
+            parsed = ast.parse(text, mode="eval")
+        except SyntaxError as error:
+            raise ValueError(f"Invalid formula syntax: {text!r}") from error
+        compiled = _from_ast(parsed.body)
+        validate_expression(compiled)
+        return compiled
+    if isinstance(expr, dict):
+        if set(expr) in ({"value"}, {"var"}):
+            return copy.deepcopy(expr)
+        if expr.get("op") in ("all", "any") and set(expr) == {"op", "items", "as", "test"}:
+            return {
+                "op": expr["op"],
+                "items": compile_expr(expr["items"]),
+                "as": expr["as"],
+                "test": compile_expr(expr["test"]),
+            }
+        if "op" in expr and set(expr) == {"op", "args"} and isinstance(expr["args"], list):
+            return {"op": expr["op"], "args": [compile_expr(arg) for arg in expr["args"]]}
+        return copy.deepcopy(expr)
+    raise ValueError("An expression must be a formula string, literal, or expression object")
+
+
+def format_expr(expr) -> str:
+    """Render an expression tree as a sleek 1-line formula."""
+    expr = compile_expr(expr)
+    if "value" in expr:
+        val = expr["value"]
+        if isinstance(val, (dict, list)):
+            return json.dumps(val, ensure_ascii=True, sort_keys=True)
+        return repr(val)
+    if "var" in expr:
+        return expr["var"]
+    op = expr["op"]
+    if op in ("all", "any"):
+        return f"{op}({format_expr(expr['test'])} for {expr['as']} in {format_expr(expr['items'])})"
+    args = expr["args"]
+    if op == "not":
+        inner = args[0]
+        if isinstance(inner, dict) and inner.get("op") == "in":
+            return f"{format_expr(inner['args'][0])} not in {format_expr(inner['args'][1])}"
+        rendered = format_expr(inner)
+        return f"not ({rendered})" if isinstance(inner, dict) and inner.get("op") in ("and", "or", "if", "eq", "ne", "lt", "le", "gt", "ge", "in", "add", "sub") else f"not {rendered}"
+    if op in ("and", "or"):
+        joiner = f" {op} "
+        parts = []
+        for arg in args:
+            text = format_expr(arg)
+            if isinstance(arg, dict) and arg.get("op") in ("or", "if") and op == "and":
+                text = f"({text})"
+            parts.append(text)
+        return joiner.join(parts)
+    if op == "if":
+        return f"({format_expr(args[1])} if {format_expr(args[0])} else {format_expr(args[2])})"
+    if op == "len":
+        return f"len({format_expr(args[0])})"
+    if op == "get":
+        target = format_expr(args[0])
+        if isinstance(args[0], dict) and args[0].get("op") in ("and", "or", "if", "eq", "ne", "lt", "le", "gt", "ge", "in", "add", "sub"):
+            target = f"({target})"
+        return f"{target}.get({format_expr(args[1])}, {format_expr(args[2])})"
+    if op in _BINARY_SYMBOLS:
+        return f"{format_expr(args[0])} {_BINARY_SYMBOLS[op]} {format_expr(args[1])}"
+    return canonical(expr)
+
+
+def format_rule(rule: dict) -> str:
+    """Render a rule as a compact law: `target = then` or `target = then when cond`."""
+    when_expr = compile_expr(rule.get("when", {"value": True}))
+    then_text = format_expr(rule["then"])
+    if when_expr == {"value": True}:
+        return f"{rule['target']} = {then_text}"
+    return f"{rule['target']} = {then_text} when {format_expr(when_expr)}"
 
 
 def validate_expression(expr, *, depth=0, counter=None):
@@ -70,7 +292,16 @@ def validate_expression(expr, *, depth=0, counter=None):
         validate_expression(child, depth=depth + 1, counter=counter)
 
 
+def _is_bool_expr(expr) -> bool:
+    if not isinstance(expr, dict):
+        return False
+    if "value" in expr:
+        return type(expr["value"]) is bool
+    return expr.get("op") in _BOOL_OPS
+
+
 def evaluate(expr, context, *, budget=None):
+    expr = compile_expr(expr)
     budget = [8192] if budget is None else budget
     budget[0] -= 1
     if budget[0] < 0:
@@ -118,6 +349,13 @@ def evaluate(expr, context, *, budget=None):
     if op == "in":
         if not isinstance(values[1], (list, str, dict)):
             raise Unknown("in needs a collection")
+        if isinstance(values[1], list):
+            left_key = canonical(values[0])
+            return any(canonical(item) == left_key for item in values[1])
+        if isinstance(values[1], str) and not isinstance(values[0], str):
+            raise Unknown("in on a string needs a string left operand")
+        if isinstance(values[1], dict) and not isinstance(values[0], str):
+            return False
         return values[0] in values[1]
     if op == "len":
         if not isinstance(values[0], (list, str, dict)):
@@ -133,25 +371,114 @@ def evaluate(expr, context, *, budget=None):
             "gt": lambda: values[0] > values[1], "ge": lambda: values[0] >= values[1]}[op]()
 
 
+def _eq_or_in_pair(arg):
+    if not isinstance(arg, dict):
+        return None
+    if arg.get("op") == "eq":
+        left, right = arg["args"]
+        if set(right) == {"value"} and set(left) != {"value"}:
+            return left, [right["value"]]
+        if set(left) == {"value"} and set(right) != {"value"}:
+            return right, [left["value"]]
+    if arg.get("op") == "in":
+        left, right = arg["args"]
+        if set(right) == {"value"} and isinstance(right["value"], list) and set(left) != {"value"}:
+            return left, right["value"]
+    return None
+
+
+def _factor_or(args):
+    # 1. Distributive law: (A and B) or (A and C) -> A and (B or C)
+    while len(args) > 1:
+        counts = {}
+        by_key = {}
+        for idx, arg in enumerate(args):
+            if isinstance(arg, dict) and arg.get("op") == "and":
+                for item in arg["args"]:
+                    key = canonical(item)
+                    by_key[key] = item
+                    counts.setdefault(key, []).append(idx)
+        best = max(
+            ((len(idxs), key, idxs) for key, idxs in counts.items() if len(idxs) >= 2),
+            default=None,
+        )
+        if best is None:
+            break
+        _, common_key, matched_idxs = best
+        matched_set = set(matched_idxs)
+        remainders, others = [], []
+        for idx, arg in enumerate(args):
+            if idx not in matched_set:
+                others.append(arg)
+                continue
+            rest = [item for item in arg["args"] if canonical(item) != common_key]
+            remainders.append(rest[0] if len(rest) == 1 else {"op": "and", "args": rest})
+        factored = normalize({
+            "op": "and",
+            "args": [by_key[common_key], normalize({"op": "or", "args": remainders})],
+        })
+        args = others + [factored]
+    # 2. Set membership factoring: (x == a) or (x == b) -> x in [a, b]
+    groups = {}
+    for idx, arg in enumerate(args):
+        pair = _eq_or_in_pair(arg)
+        if pair is not None:
+            lhs, vals = pair
+            entry = groups.setdefault(canonical(lhs), {"lhs": lhs, "idxs": [], "vals": {}})
+            entry["idxs"].append(idx)
+            for val in vals:
+                entry["vals"][canonical(val)] = val
+    folded_idxs = set()
+    folded_args = []
+    for entry in groups.values():
+        if len(entry["idxs"]) >= 2 and len(entry["vals"]) >= 2:
+            folded_idxs.update(entry["idxs"])
+            merged_vals = [entry["vals"][k] for k in sorted(entry["vals"])]
+            folded_args.append({"op": "in", "args": [entry["lhs"], {"value": merged_vals}]})
+    if folded_idxs:
+        args = [arg for idx, arg in enumerate(args) if idx not in folded_idxs] + folded_args
+    unique = {canonical(arg): arg for arg in args}
+    return [unique[key] for key in sorted(unique)]
+
+
 def normalize(expr):
-    """Pure factoring: flatten and deduplicate Boolean operands, not facts."""
+    """Algebraic factoring: flatten, deduplicate, factor common conjuncts and sets."""
+    expr = compile_expr(expr)
     if "op" not in expr:
         return copy.deepcopy(expr)
     if expr["op"] in ("all", "any"):
         return {**expr, "items": normalize(expr["items"]), "test": normalize(expr["test"])}
     args = [normalize(arg) for arg in expr["args"]]
+    if expr["op"] == "not":
+        inner = args[0]
+        if set(inner) == {"value"} and type(inner["value"]) is bool:
+            return {"value": not inner["value"]}
+        if isinstance(inner, dict) and inner.get("op") == "not" and _is_bool_expr(inner["args"][0]):
+            return inner["args"][0]
+    if expr["op"] == "if" and _is_bool_expr(args[0]):
+        if args[1] == {"value": True} and args[2] == {"value": False}:
+            return args[0]
+        if args[1] == {"value": False} and args[2] == {"value": True}:
+            return normalize({"op": "not", "args": [args[0]]})
     if expr["op"] in ("and", "or"):
         flat = []
         for arg in args:
             flat.extend(arg["args"] if arg.get("op") == expr["op"] else [arg])
         unique = {canonical(arg): arg for arg in flat}
         args = [unique[key] for key in sorted(unique)]
+        identity = {"value": True} if expr["op"] == "and" else {"value": False}
+        if len(args) > 1 and identity in args:
+            filtered = [arg for arg in args if arg != identity]
+            args = filtered or [identity]
+        if expr["op"] == "or" and len(args) > 1:
+            args = _factor_or(args)
         if len(args) == 1:
             return args[0]
     return {"op": expr["op"], "args": args}
 
 
 def variables(expr, bound=()):
+    expr = compile_expr(expr)
     if "var" in expr:
         root = expr["var"].split(".")[0]
         return set() if root in bound else {root}
@@ -173,8 +500,8 @@ def reduce_structure(model):
             groups[key] = rule
             continue
         first = groups[key]
-        first["claim"] = f"Shared rule for {first['target']}; read retained conditions."
         first["when"] = normalize({"op": "or", "args": [first["when"], rule["when"]]})
+        first["claim"] = format_rule(first)[:240]
         first["evidence"] = union(first["evidence"], rule["evidence"])
         first["dependencies"] = union(first["dependencies"], rule["dependencies"])
     rules = list(groups.values())
@@ -188,21 +515,23 @@ def reduce_structure(model):
                 continue
             if type(second["then"]["value"]) is not bool or second["then"]["value"] == first["then"]["value"]:
                 continue
-            negated = lambda condition: {"op": "not", "args": [condition]}
+            if first["when"] == {"value": True} or second["when"] == {"value": True}:
+                continue
+            negated = lambda condition: normalize({"op": "not", "args": [condition]})
             if canonical(second["when"]) == canonical(negated(first["when"])):
                 predicate, yes, no = first["when"], first["then"], second["then"]
             elif canonical(first["when"]) == canonical(negated(second["when"])):
                 predicate, yes, no = second["when"], second["then"], first["then"]
             else:
                 continue
-            effect = {"op": "if", "args": [predicate, yes, no]}
+            effect = normalize({"op": "if", "args": [predicate, yes, no]})
             try:
                 validate_expression(effect)
             except ValueError:
                 continue
             # if preserves the Boolean type check of both original conditions.
             first["when"], first["then"] = {"value": True}, effect
-            first["claim"] = f"Boolean decision for {first['target']}; read the retained predicate."
+            first["claim"] = format_rule(first)[:240]
             first["evidence"] = union(first["evidence"], second["evidence"])
             first["dependencies"] = union(first["dependencies"], second["dependencies"])
             removed.add(j)
@@ -276,10 +605,16 @@ def validate_model(raw):
                 raise ValueError("Duplicate rule id")
             ids.add(rule["id"])
             _string(rule.get("target"), "target", 80)
-            _string(rule.get("claim"), "claim", 240)
             rule.setdefault("when", {"value": True})
+            rule["when"] = compile_expr(rule["when"])
             validate_expression(rule["when"])
-            validate_expression(rule.get("then"))
+            if "then" not in rule:
+                raise ValueError("An expression must be an object")
+            rule["then"] = compile_expr(rule["then"])
+            validate_expression(rule["then"])
+            if "claim" not in rule:
+                rule["claim"] = format_rule(rule)[:240]
+            _string(rule.get("claim"), "claim", 240)
             if (variables(rule["when"]) | variables(rule["then"])) - inputs.keys():
                 raise ValueError("A rule references an undeclared input")
             rule["evidence"] = _strings(rule.get("evidence", []), "evidence id")
@@ -338,27 +673,46 @@ def check_inputs(model, inputs):
         raise Unknown("Inputs must contain finite JSON values") from error
 
 
+def _conjuncts(expr) -> frozenset[str]:
+    expr = normalize(expr)
+    if expr == {"value": True}:
+        return frozenset()
+    if isinstance(expr, dict) and expr.get("op") == "and":
+        return frozenset(canonical(arg) for arg in expr["args"])
+    return frozenset({canonical(expr)})
+
+
 def prediction(rules, inputs, target):
-    values, used = {}, []
+    matched, used = [], []
     budget = [8192]
     try:
         for rule in rules:
             if rule["target"] != target:
                 continue
-            applies = evaluate(rule["when"], inputs, budget=budget)
+            when_expr = compile_expr(rule.get("when", {"value": True}))
+            then_expr = compile_expr(rule["then"])
+            applies = evaluate(when_expr, inputs, budget=budget)
             if type(applies) is not bool:
                 raise Unknown("Rule condition must return a Boolean")
             if applies:
-                value = evaluate(rule["then"], inputs, budget=budget)
-                values[canonical(value)] = value
+                value = evaluate(then_expr, inputs, budget=budget)
                 used.append(rule["id"])
+                matched.append((rule["id"], _conjuncts(when_expr), canonical(value), value))
     except (Unknown, TypeError, OverflowError, ValueError) as error:
         return {"status": "unknown", "reason": str(error), "rules": used}
-    if not values:
+    if not matched:
         return {"status": "unknown", "reason": "No applicable rule", "rules": []}
+    # A strictly more specific condition (strict superset of conjuncts) overrides
+    # a broader or unconditional default law without ambiguity.
+    active = [
+        item for item in matched
+        if not any(item[1] < other[1] for other in matched)
+    ]
+    values = {item[2]: item[3] for item in active}
+    active_ids = [item[0] for item in active]
     if len(values) > 1:
-        return {"status": "ambiguous", "values": list(values.values()), "rules": used}
-    return {"status": "predicted", "value": next(iter(values.values())), "rules": used}
+        return {"status": "ambiguous", "values": list(values.values()), "rules": active_ids}
+    return {"status": "predicted", "value": next(iter(values.values())), "rules": active_ids}
 
 
 def latest(items):
@@ -422,6 +776,74 @@ def dependencies(model):
                  *(rule["dependencies"] for alt in model["alternatives"] for rule in alt["rules"]))
 
 
+_TYPE_NAMES = {
+    bool: "boolean",
+    int: "integer",
+    float: "number",
+    str: "string",
+    list: "array",
+    dict: "object",
+}
+
+
+def _expand_delta(raw, active):
+    """Expand consecutive compression deltas (`observations` + `residuals`) against the active model."""
+    if not isinstance(raw, dict) or not ({"observations", "residuals"} & set(raw)):
+        return raw
+    if active is None:
+        raise ValueError("Observations and residuals require an active model")
+    extra = set(raw) - {
+        "observations", "residuals", "rules", "inputs",
+        "alternatives", "unresolved", "resolutions", "title",
+    }
+    if extra:
+        raise ValueError("Unknown delta model field")
+    updated = copy.deepcopy(active["model"])
+    if "title" in raw:
+        updated["title"] = raw["title"]
+    if "inputs" in raw and isinstance(raw["inputs"], dict):
+        updated["inputs"].update(raw["inputs"])
+    observations = raw.get("observations")
+    if observations is not None:
+        if not isinstance(observations, list) or not observations:
+            raise ValueError("Observations must be a nonempty list of recorded cases")
+        for obs in observations:
+            if isinstance(obs, dict) and isinstance(obs.get("inputs"), dict):
+                for key, val in obs["inputs"].items():
+                    if key not in updated["inputs"] and type(val) in _TYPE_NAMES:
+                        updated["inputs"][key] = _TYPE_NAMES[type(val)]
+                        for prior in updated["cases"]:
+                            prior["inputs"].setdefault(key, val)
+        updated["cases"] = copy.deepcopy(observations)
+    if "rules" in raw:
+        updated["rules"] = copy.deepcopy(raw["rules"])
+    residuals = raw.get("residuals")
+    if residuals is not None:
+        if not isinstance(residuals, list) or not residuals:
+            raise ValueError("Residuals must be a nonempty list of rules")
+        obs_list = observations or []
+        by_id = {rule["id"]: idx for idx, rule in enumerate(updated["rules"])}
+        for res in copy.deepcopy(residuals):
+            if not isinstance(res, dict):
+                raise ValueError("Invalid rule fields")
+            if "evidence" not in res and obs_list:
+                matching = union(*(
+                    c.get("evidence", []) for c in obs_list
+                    if isinstance(c, dict) and c.get("target") == res.get("target")
+                )) or union(*(c.get("evidence", []) for c in obs_list if isinstance(c, dict)))
+                if matching:
+                    res["evidence"] = matching
+            if res.get("id") in by_id:
+                updated["rules"][by_id[res["id"]]] = res
+            else:
+                by_id[res.get("id")] = len(updated["rules"])
+                updated["rules"].append(res)
+    for key in ("alternatives", "unresolved", "resolutions"):
+        if key in raw:
+            updated[key] = copy.deepcopy(raw[key])
+    return updated
+
+
 class TaskModels:
     def __init__(self, memory):
         self.memory = memory
@@ -480,7 +902,7 @@ class TaskModels:
             raise ValueError("base is required when revising an active model; use model_get")
         if base is not None and self.memory._resolve(base) != actual_base:
             raise ValueError("Model base changed; read the current model before revising it")
-        raw = copy.deepcopy(model)
+        raw = _expand_delta(copy.deepcopy(model), active)
         if active:
             previous = active["model"]
             raw.setdefault("alternatives", copy.deepcopy(previous["alternatives"]))
@@ -652,16 +1074,13 @@ class TaskModels:
             return result
 
         try:
-            if isinstance(model, dict) and set(model) == {"observations"}:
+            if isinstance(model, dict) and ({"observations", "residuals"} & set(model)):
                 active = self.get()
                 if active is None:
-                    raise ValueError("Observations require an active model")
-                observations = model["observations"]
-                if not isinstance(observations, list) or not observations:
-                    raise ValueError("Observations must be a nonempty list of recorded cases")
-                updated = copy.deepcopy(active["model"])
-                updated["cases"] = copy.deepcopy(observations)
-                model = updated
+                    raise ValueError("Observations and residuals require an active model")
+                if base is None:
+                    base = active["id"]
+                model = _expand_delta(model, active)
             if model is not None:
                 proposal = step("model_propose", {"base": base, "model": model},
                                 lambda: self.propose(model, base=base, agent=agent))
@@ -728,7 +1147,8 @@ class TaskModels:
         report = self.check(id=record["id"], items=items)
         covered = sources(record["model"]) if report["status"] == "tested" else []
         return {"id": record["id"], "revision": record["revision"], "status": report["status"],
-                "rules": [{"id": rule["id"], "claim": rule["claim"]} for rule in record["model"]["rules"]],
+                "rules": [{"id": rule["id"], "claim": rule["claim"], "formula": format_rule(rule)}
+                          for rule in record["model"]["rules"]],
                 "covered": covered, "alternatives": sum(alt["status"] == "unseparated" for alt in report["alternatives"]),
                 "unresolved": len(report["unresolved"]), "issues": report["issues"],
                 "complexity": report["complexity"]}

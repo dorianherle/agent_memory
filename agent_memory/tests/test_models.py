@@ -5,7 +5,9 @@ import json
 from unittest.mock import patch
 
 from agent_memory import Memory
-from agent_memory.models import TaskModels, Unknown, evaluate, fingerprint, prediction, reduce_structure, validate_expression
+from agent_memory.models import (TaskModels, Unknown, canonical, compile_expr, evaluate, fingerprint,
+                                 format_expr, format_rule, normalize, prediction, reduce_structure,
+                                 validate_expression)
 from agent_memory.tests.helpers import MemoryTestCase
 
 
@@ -492,3 +494,114 @@ class TaskModelTests(MemoryTestCase):
             second = self.accept(model, base=first)
         self.assertEqual(self.memory.model_get()["id"], second)
         self.assertEqual(self.memory.model_get()["parent"], first)
+
+    def test_formula_compilation_roundtrip_and_comprehension_rules(self):
+        from pathlib import Path
+        example = Path(__file__).resolve().parents[2] / "examples/source_dependency_model.json"
+        raw_model = json.loads(example.read_text())
+        rule = raw_model["rules"][0]
+        when_formula = format_expr(rule["when"])
+        then_formula = format_expr(rule["then"])
+        self.assertEqual(canonical(compile_expr(when_formula)), canonical(rule["when"]))
+        self.assertEqual(canonical(compile_expr(then_formula)), canonical(rule["then"]))
+        formula_model = copy.deepcopy(raw_model)
+        formula_model["rules"] = [{
+            "id": "changed-declared-dependency",
+            "target": "needs_review",
+            "when": when_formula,
+            "then": then_formula,
+            "evidence": [self.evidence],
+        }]
+        for case in formula_model["cases"]:
+            case["evidence"] = [self.evidence]
+        accepted = self.accept(formula_model)
+        stored_rule = self.memory.model_get(accepted)["model"]["rules"][0]
+        self.assertIn("needs_review =", stored_rule["claim"])
+        for case in raw_model["cases"]:
+            res = self.memory.model_predict(case["inputs"], "needs_review")
+            self.assertEqual(res["status"], "predicted")
+            self.assertIs(res["value"], case["expected"])
+
+    def test_consecutive_compression_law_residuals_and_distributive_set_factoring(self):
+        n1 = self.memory.save("Baseline thermal window: 4.0 inside [18.0, 28.0] C, else 0.0.")
+        base_model = {
+            "title": "Thermal load law",
+            "inputs": {"serial": "string", "temp": "number"},
+            "rules": [{
+                "id": "thermal-window",
+                "target": "max_load",
+                "then": "4.0 if 18.0 <= temp <= 28.0 else 0.0",
+                "evidence": [n1],
+            }],
+            "cases": [
+                {"id": "nominal-22", "target": "max_load", "inputs": {"serial": "M12", "temp": 22.0},
+                 "expected": 4.0, "evidence": [n1], "challenge": True},
+                {"id": "cold-12", "target": "max_load", "inputs": {"serial": "M12", "temp": 12.0},
+                 "expected": 0.0, "evidence": [n1], "challenge": False},
+            ],
+        }
+        h1 = self.memory.model_handoff(base_model)
+        self.assertEqual(h1["status"], "tested")
+
+        # Turn 2: Zero-surprise observation folds evidence without rule growth.
+        n2 = self.memory.save("Verified nominal load 4.0 at 25.0 C.")
+        h2 = self.memory.model_handoff({
+            "observations": [{
+                "id": "nominal-25", "target": "max_load", "inputs": {"serial": "M15", "temp": 25.0},
+                "expected": 4.0, "evidence": [n2], "challenge": False,
+            }],
+        })
+        self.assertEqual(h2["status"], "tested")
+        self.assertEqual(len(self.memory.model_get()["model"]["rules"]), 1)
+        self.assertNotIn("Verified nominal load 4.0 at 25.0 C.", self.memory.render_packet())
+
+        # Turn 3: First anomaly (M17 derates above 26 C) assimilated as a residual exception.
+        n3 = self.memory.save("Unit M17 derates to 2.75 above 26.0 C.")
+        h3 = self.memory.model_handoff({
+            "observations": [{
+                "id": "m17-hot-case", "target": "max_load",
+                "inputs": {"serial": "M17", "temp": 27.0},
+                "expected": 2.75, "evidence": [n3], "challenge": True,
+            }],
+            "residuals": [{
+                "id": "m17-hot", "target": "max_load",
+                "when": "serial == 'M17' and temp > 26.0",
+                "then": 2.75,
+            }],
+        })
+        self.assertEqual(h3["status"], "tested")
+        self.assertEqual(self.memory.model_predict({"serial": "M17", "temp": 27.0}, "max_load")["value"], 2.75)
+        self.assertEqual(self.memory.model_predict({"serial": "M12", "temp": 27.0}, "max_load")["value"], 4.0)
+        self.assertEqual(self.memory.model_predict({"serial": "M17", "temp": 22.0}, "max_load")["value"], 4.0)
+
+        # Turn 4: Second anomaly (M18 derates above 26 C) factors with M17 via distributive + `in` compression.
+        n4 = self.memory.save("Unit M18 also derates to 2.75 above 26.0 C.")
+        h4 = self.memory.model_handoff({
+            "observations": [{
+                "id": "m18-hot-case", "target": "max_load",
+                "inputs": {"serial": "M18", "temp": 26.5},
+                "expected": 2.75, "evidence": [n4], "challenge": True,
+            }],
+            "residuals": [{
+                "id": "m18-hot", "target": "max_load",
+                "when": "serial == 'M18' and temp > 26.0",
+                "then": 2.75,
+            }],
+        })
+        self.assertEqual(h4["status"], "tested")
+        active_rules = self.memory.model_get()["model"]["rules"]
+        self.assertEqual(len(active_rules), 2)
+        exception_rule = next(r for r in active_rules if r["id"] == "m17-hot")
+        self.assertEqual(
+            format_rule(exception_rule),
+            'max_load = 2.75 when serial in ["M17", "M18"] and temp > 26.0',
+        )
+        self.assertEqual(self.memory.model_predict({"serial": "M18", "temp": 26.5}, "max_load")["value"], 2.75)
+
+        # Unrelated overlapping rules still report ambiguous.
+        conflict = prediction([
+            {"id": "r1", "target": "y", "when": "a == 1", "then": 10},
+            {"id": "r2", "target": "y", "when": "b == 1", "then": 20},
+        ], {"a": 1, "b": 1}, "y")
+        self.assertEqual(conflict["status"], "ambiguous")
+

@@ -127,6 +127,7 @@ class TestWrapper(MemoryTestCase):
                 "model_accept",
                 "model_reduce",
                 "model_predict",
+                "model_handoff",
             ],
         )
 

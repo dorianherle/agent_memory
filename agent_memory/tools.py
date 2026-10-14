@@ -48,8 +48,10 @@ MEMORY_TOOL = {
             "model_check / model_accept (id=proposal); model_reduce; "
             "model_predict (payload=inputs, name=target); model_handoff "
             "(payload=model or null to reuse, id=base) checks, accepts, reduces, "
-            "and records a challenge prediction. payload={observations:[cases]} "
-            "adds observations to the active rules without copying them. Models keep Git evidence."
+            "and records a challenge prediction. Rules accept 1-line formulas "
+            "(e.g. when=\"x in ['a','b']\", then=\"before != after\"). "
+            "payload={observations:[cases], residuals:[rules]} assimilates new "
+            "observations and exception rules into the active model without copying it."
         ),
         "parameters": {
             "type": "object",

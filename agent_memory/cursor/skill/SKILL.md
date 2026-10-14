@@ -42,8 +42,16 @@ A blocked model needs review. A tested model passed its recorded cases; it is
 not proof of a physical law or a guarantee outside its declared conditions.
 
 After actual work provides new evidence, save the observation with `memory_save`.
-Propose a revision with `memory_model(operation="propose", data=model,
-base=active_id)`. Keep prior cases, alternatives, and unresolved results.
+Write rules as sleek 1-line formulas (for example, `"when": "artifact in ['app.py', 'config.json']"`,
+`"then": "before != after"`, or `"then": "all(d.saved == d.current for d in deps)"`) or AST objects;
+`claim` is auto-generated from the formula when omitted. Specific conditional rules automatically
+override broader or unconditional default laws.
+
+For consecutive compression on an active model, call `memory_model(operation="handoff",
+data={"observations": [cases], "residuals": [rules]}, base=active_id)` (or `operation="propose"`):
+- Zero-surprise observations (`{"observations": [cases]}`) verify against the active law and fold their source notes out of the active prompt.
+- Surprise observations (`{"observations": [cases], "residuals": [rules]}`) assimilate residual exception rules, check all historical + new cases, accept, and run `reduce` to algebraically factor shared laws (`(A and B) or (A and C) -> A and (B or C)` and `(x == a) or (x == b) -> x in [a, b]`).
+
 Add a challenge case that could expose an incorrect generalization. Declare
 the source files on which each rule depends. Missing files also have a state.
 The model cannot detect an undeclared dependency.

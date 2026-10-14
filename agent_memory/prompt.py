@@ -39,11 +39,13 @@ State contains Goal, Steering, Handoff, questions and relevant excerpts.
 Use visible ids to find details; full=true retrieves an uncut body.
 Save decisions, evidence, failed approaches and Next: before handoff.
 The active Task model holds executable rules, conditions, and evidence cases.
+Rules accept 1-line formulas (e.g. "when": "x in ['a', 'b']", "then": "before != after")
+or expression objects; specific conditional rules override broader default laws.
 Use model_get to read it. Use model_predict for a checked prediction.
 Model tools return working rules first; full=true also retrieves stored cases.
-After new evidence, propose a model revision with model_propose, check it with
-model_check, then accept a passing proposal with model_accept. model_reduce
-factors shared rules without dropping recorded cases. It creates a proposal.
+Use model_handoff with a model or consecutive delta {"observations": [...], "residuals": [...]}
+to propose, check, accept, and algebraically factor rules in one call, or step through
+model_propose, model_check, model_accept, and model_reduce.
 Keep alternatives and unresolved results. A tested model is conditional evidence,
 not a physical law. Cases must come from actual observations or tests.
 Distill durable user constraints; never copy raw prompts or answers into memory.
@@ -393,7 +395,11 @@ def render_packet(
             lines.append("Needs review: " + "; ".join(model["issues"]))
         else:
             for rule in model["rules"][:2]:
-                lines.append(f"{rule['id']}: {rule['claim']}")
+                formula = rule.get("formula")
+                if formula and formula != rule["claim"] and len(formula) <= 96:
+                    lines.append(f"{rule['id']}: {rule['claim']} [{formula}]")
+                else:
+                    lines.append(f"{rule['id']}: {rule['claim']}")
             if len(model["rules"]) > 2:
                 lines.append(f"{len(model['rules']) - 2} more rules; use model_get.")
         if model["alternatives"] or model["unresolved"]:
