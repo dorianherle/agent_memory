@@ -95,7 +95,10 @@ def split_open_questions(items: list[MemoryItem]) -> list[MemoryItem]:
 
 def split_goals(items: list[MemoryItem]) -> list[MemoryItem]:
     """The original job. Marked goal=True, else the oldest user entry."""
-    marked = [item for item in items if item.payload.get(GOAL_KEY) is True]
+    marked = [
+        item for item in items
+        if item.payload.get(GOAL_KEY) is True or item.payload.get("role") == "goal"
+    ]
     if marked:
         return marked[:1]
     users = [item for item in items if item.payload.get("user")]

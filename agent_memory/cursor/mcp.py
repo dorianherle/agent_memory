@@ -90,7 +90,7 @@ def _build_server():
         full: bool = False,
         goal: str | None = None,
     ) -> str:
-        """Search. query=/text= work headlines; ids= bodies (capped). Transcript omitted unless ids=."""
+        """Search. query=/text= work headlines (or full bodies with full=True); ids= bodies (capped unless full=True). Transcript omitted unless ids=."""
         return call_tool(
             get_memory(goal),
             "memory",

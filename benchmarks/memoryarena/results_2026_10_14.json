@@ -10,20 +10,38 @@
       "avg_prompt_tokens_est": 66,
       "evaluated_dependent_subtasks": 66
     },
+    "mem0_style_extracted_facts": {
+      "avg_equation_recall": 0.3696,
+      "avg_prompt_chars": 749,
+      "avg_prompt_tokens_est": 187,
+      "evaluated_dependent_subtasks": 66
+    },
+    "bm25_chunk_rag": {
+      "avg_equation_recall": 0.5391,
+      "avg_prompt_chars": 1497,
+      "avg_prompt_tokens_est": 374,
+      "evaluated_dependent_subtasks": 66
+    },
     "agent_memory_passive_state": {
-      "avg_equation_recall": 0.3941,
-      "avg_prompt_chars": 1188,
-      "avg_prompt_tokens_est": 297,
+      "avg_equation_recall": 0.5252,
+      "avg_prompt_chars": 1353,
+      "avg_prompt_tokens_est": 338,
       "evaluated_dependent_subtasks": 66
     },
     "agent_memory_headlines_only": {
-      "avg_equation_recall": 0.3941,
-      "avg_prompt_chars": 1510,
-      "avg_prompt_tokens_est": 377,
+      "avg_equation_recall": 0.5252,
+      "avg_prompt_chars": 1619,
+      "avg_prompt_tokens_est": 405,
+      "evaluated_dependent_subtasks": 66
+    },
+    "agent_memory_single_call_full": {
+      "avg_equation_recall": 1.0,
+      "avg_prompt_chars": 6260,
+      "avg_prompt_tokens_est": 1565,
       "evaluated_dependent_subtasks": 66
     },
     "agent_memory_active_consecutive": {
-      "avg_equation_recall": 0.9677,
+      "avg_equation_recall": 1.0,
       "avg_prompt_chars": 5924,
       "avg_prompt_tokens_est": 1481,
       "evaluated_dependent_subtasks": 66
@@ -140,7 +158,7 @@
               "step": 5,
               "passed": true,
               "rubric_score": 1.0,
-              "expr_recall": 0.0,
+              "expr_recall": 0.2,
               "admitted_missing_context": false,
               "prompt_chars": 862,
               "memory_chars": 0,
@@ -173,7 +191,7 @@
               "step": 8,
               "passed": true,
               "rubric_score": 1.0,
-              "expr_recall": 0.571,
+              "expr_recall": 0.714,
               "admitted_missing_context": false,
               "prompt_chars": 922,
               "memory_chars": 0,
@@ -530,24 +548,24 @@
         }
       ]
     },
-    "agent_memory_passive_state": {
-      "sr": 0.625,
-      "ps": 0.7208,
+    "mem0_style_extracted_facts": {
+      "sr": 0.375,
+      "ps": 0.5979,
       "sr_at_k": {
         "step_1": 1.0,
-        "step_2": 0.625,
-        "step_3": 0.5,
-        "step_4": 1.0
+        "step_2": 0.5,
+        "step_3": 0.375,
+        "step_4": 0.5
       },
-      "avg_memory_chars_injected": 868,
+      "avg_memory_chars_injected": 611,
       "tasks": [
         {
           "task_id": 0,
           "paper_name": "0000.0001",
-          "arm": "agent_memory_passive_state",
+          "arm": "mem0_style_extracted_facts",
           "num_steps": 3,
           "sr": 0.0,
-          "ps": 0.3333,
+          "ps": 0.6667,
           "steps": [
             {
               "step": 1,
@@ -557,40 +575,40 @@
               "admitted_missing_context": false,
               "prompt_chars": 2960,
               "memory_chars": 0,
-              "latency_s": 30.6,
-              "response_excerpt": "e,\n\\[\nM(0,0)=c_0+\\frac{16}{3}.\n\\]\nThus, if \\(\\eqref{eq:norm}\\) is \\(M(0,0)=\\mathcal N\\), then\n\\[\nc_0=\\mathcal N-\\frac{16}{3}.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{(c_2,c_3,c_0)=\\left(-1,-1,\\mathcal N-\\frac{16}{3}\\right)}\n\\quad\\text{if }M(0,0)=\\mathcal N.\n\\]\nLocality gives \\(3(4-t)(1+c_3)+2(1+c_2)=0\\), which fixes \\(c_2=c_3=-1\\). The missing normalization equation must specify \\(\\mathcal N\\) to fix \\(c_0\\)."
+              "latency_s": 23.1,
+              "response_excerpt": "lied information. Thus, if \\(M(0,0)=m\\), then\n\\[\nc_0=m-\\frac{16}{3}.\n\\]\nIn particular, \\(M(0,0)=0\\) gives \\(c_0=-16/3\\), while \\(M(0,0)=1\\) gives \\(c_0=-13/3\\).\n\nFINAL RESULT:\n\\[\n\\boxed{(c_2,c_3,c_0)=\\left(-1,-1,\\,m-\\frac{16}{3}\\right)},\\qquad m\\equiv M(0,0).\n\\]\nLocality uses \\(c_2=-A_1\\) and \\(c_3=-N\\). The missing normalization equation must specify \\(m\\) to give one numerical value for \\(c_0\\)."
             },
             {
               "step": 2,
-              "passed": false,
-              "rubric_score": 0.0,
-              "expr_recall": 0.429,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.571,
               "admitted_missing_context": false,
-              "prompt_chars": 1479,
-              "memory_chars": 651,
-              "latency_s": 36.18,
-              "response_excerpt": "al N+\\frac{6592}{81}.\n\\]\nFor unit normalization, \\(\\mathcal N=1\\), this is \\(c_0=\\frac{6673}{81}\\).\n\nFINAL RESULT:\n\\[\n\\boxed{(c_2,c_3,c_0)=\\left(-\\frac{28}{27},-\\frac{82}{81},\\mathcal N+\\frac{6592}{81}\\right)}.\n\\]\nLocality uses the sums \\(\\sum_{a\\in\\{1,3\\}}a^{-3}\\) and \\(\\sum_{a\\in\\{1,3\\}}a^{-4}\\). The normalization equation is \\(c_0+16c_2+64c_3=\\mathcal N\\); for \\(\\mathcal N=1\\), \\(c_0=6673/81\\)."
+              "prompt_chars": 1326,
+              "memory_chars": 498,
+              "latency_s": 19.21,
+              "response_excerpt": "ves\n\\[\nc_2=-A_1=-4,\\qquad c_3=-N=-2.\n\\]\nThe data do not include the normalization condition that fixes \\(c_0\\). Therefore, \\(c_0\\) is undetermined, even when \\(\\sigma=4\\).\n\nFINAL RESULT:\n\\[\n\\boxed{(c_2,c_3,c_0)=(-4,-2,\\text{undetermined})}.\n\\]\nThe locality equations are \\(c_2=-A_1\\) and \\(c_3=-N\\). A separate normalization equation, including its parameter \\(m\\), is necessary to calculate \\(c_0\\)."
             },
             {
               "step": 3,
               "passed": false,
               "rubric_score": 0.0,
               "expr_recall": 0.375,
-              "admitted_missing_context": true,
-              "prompt_chars": 1848,
-              "memory_chars": 881,
-              "latency_s": 14.55,
-              "response_excerpt": "mplitude.\n\nFINAL RESULT:\n\\[\n\\boxed{\\text{Insufficient information to determine }(c_2,c_3,c_0)\\text{ uniquely.}}\n\\]\nThe required equations are the two large-\\(s\\) locality conditions and the normalization equation \\(M(0,0)=\\mathcal N\\). The supplied context gives only partial results for smaller sets, not the general dependence on \\(\\sum_{a\\in\\mathcal A}a^{-3}\\) and \\(\\sum_{a\\in\\mathcal A}a^{-4}\\)."
+              "admitted_missing_context": false,
+              "prompt_chars": 1492,
+              "memory_chars": 525,
+              "latency_s": 9.16,
+              "response_excerpt": "erived from the supplied context without adding unsupported assumptions.\n\nFINAL RESULT:\n\\[\n(c_2,c_3,c_0)=(-A_1,-N,c_0),\n\\qquad c_0\\text{ fixed by the missing normalization equation for }m.\n\\]\nThe locality constraints are \\(c_2=-A_1\\) and \\(c_3=-N\\). The normalization constraint, the value of \\(m\\), and the definition of the ansatz for \\(M(s,t)\\) are necessary to give the requested explicit answer."
             }
           ]
         },
         {
           "task_id": 1,
           "paper_name": "2507.7811",
-          "arm": "agent_memory_passive_state",
+          "arm": "mem0_style_extracted_facts",
           "num_steps": 12,
           "sr": 0.0,
-          "ps": 0.5,
+          "ps": 0.25,
           "steps": [
             {
               "step": 1,
@@ -600,19 +618,19 @@
               "admitted_missing_context": false,
               "prompt_chars": 6772,
               "memory_chars": 0,
-              "latency_s": 16.89,
-              "response_excerpt": "]\nbecause \\(i\\ne j\\) and the \\(k=N\\) term is zero. Therefore, each vector \\(\\mathbf b^a\\) has unit length.\n\nFINAL RESULT:\n\\[\n\\boxed{\\lVert\\mathbf b^a\\rVert=1\\quad\\text{for every double-index }a.}\n\\]\nThe matrix \\(A\\) is orthogonal, and its last column has equal entries \\(A_{iN}=1/\\sqrt N\\). Hence, the normalized difference of any two distinct rows has squared length \\(\\lVert\\mathbf b^a\\rVert^2=1\\)."
+              "latency_s": 15.39,
+              "response_excerpt": "jk})^2\n=\\frac12(1+1-2\\delta_{ij})=1,\n\\]\nsince \\(i\\ne j\\). Hence, all vectors \\(\\mathbf b^a\\) have unit length.\n\nFINAL RESULT:\n\\[\n\\boxed{\\left\\lVert\\mathbf b^a\\right\\rVert=1\\quad\\text{for every double-index }a.}\n\\]\nThe orthogonality relation gives the squared distance between two different rows of \\(A\\) as \\(2\\). The factor \\(1/\\sqrt{2}\\) in \\(b_k^{[i,j]}\\) makes each \\(\\mathbf b^a\\) a unit vector."
             },
             {
               "step": 2,
-              "passed": true,
-              "rubric_score": 1.0,
+              "passed": false,
+              "rubric_score": 0.0,
               "expr_recall": 0.333,
               "admitted_missing_context": false,
-              "prompt_chars": 1306,
-              "memory_chars": 490,
-              "latency_s": 14.47,
-              "response_excerpt": "t2}=\\mathbf b^a\\!\\cdot\\mathbf y,\n\\]\nwe get\n\\[\nx_i-x_j=\\sqrt2\\,r\\cos\\Theta^a.\n\\]\nThus, \\((x_i-x_j)^2=2r^2\\cos^2\\Theta^a\\).\n\nFINAL RESULT:\n\\[\n\\boxed{x_i-x_j=\\sqrt2\\,r\\cos\\Theta^a},\\qquad\n\\boxed{(x_i-x_j)^2=2r^2\\cos^2\\Theta^a}.\n\\]\nThe key equations are \\(\\mathbf y=r\\hat{\\mathbf y}\\) and \\(\\cos\\Theta^a=\\mathbf b^a\\cdot\\hat{\\mathbf y}\\). They combine with \\((x_i-x_j)/\\sqrt2=\\mathbf b^a\\cdot\\mathbf y\\)."
+              "prompt_chars": 1313,
+              "memory_chars": 498,
+              "latency_s": 12.76,
+              "response_excerpt": "_{ia}-A_{ja}\\), then\n\\[\nx_i-x_j=r\\,\\boldsymbol\\alpha_{ij}\\cdot\\boldsymbol\\Theta,\n\\qquad \\lVert\\boldsymbol\\alpha_{ij}\\rVert^2=2.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{x_i-x_j=r\\sum_{a=1}^{N-1}(A_{ia}-A_{ja})\\Theta^a\n      =r\\,\\boldsymbol\\alpha_{ij}\\cdot\\boldsymbol\\Theta}\n\\]\nThe center-of-mass coordinate does not occur in the difference. The relative vector has squared length \\(\\boldsymbol\\alpha_{ij}^{2}=2\\)."
             },
             {
               "step": 3,
@@ -620,43 +638,43 @@
               "rubric_score": 0.0,
               "expr_recall": 0.0,
               "admitted_missing_context": false,
-              "prompt_chars": 1532,
-              "memory_chars": 686,
-              "latency_s": 10.67,
-              "response_excerpt": "1)\\) commutation relations:\n\\[\n[D,H]=-iH,\\qquad [D,K]=iK,\\qquad [K,H]=-2iD.\n\\]\nEquivalently, \\([H,D]=iH\\), \\([K,D]=-iK\\), and \\([H,K]=2iD\\).\n\nFINAL RESULT:\n\\[\n\\boxed{[D,H]=-iH},\\qquad\n\\boxed{[D,K]=iK},\\qquad\n\\boxed{[K,H]=-2iD}.\n\\]\nThe dilation generator \\(D\\) gives opposite scaling weights to \\(H\\) and \\(K\\). The commutator of \\(K\\) and \\(H\\) closes on \\(D\\), which completes the conformal algebra."
+              "prompt_chars": 1371,
+              "memory_chars": 525,
+              "latency_s": 16.22,
+              "response_excerpt": "]\nthe Hamiltonian is homogeneous of degree \\(-2\\). Therefore, the conformal commutators are\n\\[\n[D,H]=-iH,\\qquad [D,K]=iK,\\qquad [K,H]=-2iD.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{[D,H]=-iH,\\quad [D,K]=iK,\\quad [K,H]=-2iD.}\n\\]\nThe degree \\(-2\\) homogeneity of the kinetic and inverse-square terms gives \\([D,H]=-iH\\). The quadratic operator \\(K\\) gives \\([D,K]=iK\\) and closes the algebra through \\([K,H]=-2iD\\)."
             },
             {
               "step": 4,
-              "passed": true,
-              "rubric_score": 1.0,
+              "passed": false,
+              "rubric_score": 0.0,
               "expr_recall": 0.143,
               "admitted_missing_context": false,
-              "prompt_chars": 1779,
-              "memory_chars": 910,
-              "latency_s": 20.09,
-              "response_excerpt": "bda(\\lambda-1)}{\\cos^2\\Theta^a}\\right)\\right]},\n\\]\n\\[\n\\boxed{K_{\\rm rel}=\\frac{r^2}{2}},\\qquad\n\\boxed{D_{\\rm rel}=\\frac{i}{2}\\left(r\\partial_r+\\frac{N-1}{2}\\right)}.\n\\]\nThe relation \\((x_i-x_j)^2=2r^2\\cos^2\\Theta^a\\) puts the interaction in the angular operator. The relative space has dimension \\(N-1\\), which gives the radial coefficient \\((N-2)/r\\) and the constant \\((N-1)/2\\) in \\(D_{\\rm rel}\\)."
+              "prompt_chars": 1522,
+              "memory_chars": 653,
+              "latency_s": 18.36,
+              "response_excerpt": "ymbol\\alpha_{ij}\\cdot\\boldsymbol\\Theta)^2},\\\\\nK_{\\rm rel}&=\\frac12r^2,\\\\\nD_{\\rm rel}&=\\frac{i}{2}\\left(r\\partial_r+\\frac{N-1}{2}\\right).\n\\end{aligned}}\n\\]\nThe relative Laplacian is the radial Laplacian in \\(N-1\\) dimensions plus \\(r^{-2}\\nabla^2_{S^{N-2}}\\). The Calogero interaction is also proportional to \\(r^{-2}\\), while \\(K_{\\rm rel}\\) is quadratic and \\(D_{\\rm rel}\\) generates radial scaling."
             },
             {
               "step": 5,
               "passed": true,
               "rubric_score": 1.0,
-              "expr_recall": 0.0,
+              "expr_recall": 0.4,
               "admitted_missing_context": false,
-              "prompt_chars": 1887,
-              "memory_chars": 1058,
-              "latency_s": 8.61,
-              "response_excerpt": "(-\\partial_r^2-\\frac{N-2}{r}\\partial_r+\\frac{\\hat L^2_{S^{N-2}}}{r^2}\\right)}.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{H_{\\rm rel}=\\frac12\\left[-\\partial_r^2-\\frac{N-2}{r}\\partial_r+\\frac{1}{r^2}\\hat L^2_{S^{N-2}}\\right]}.\n\\]\nThe first two terms are the radial kinetic operator in \\(N-1\\) relative dimensions. The operator \\(\\hat L^2_{S^{N-2}}\\) contains the angular Laplacian and the inverse-square interaction."
+              "prompt_chars": 1610,
+              "memory_chars": 781,
+              "latency_s": 14.7,
+              "response_excerpt": "FINAL RESULT:\n\\[\n\\boxed{H_{\\rm rel}=-\\frac12\\left(\\partial_r^2+\\frac{N-2}{r}\\partial_r\\right)+\\frac{1}{2r^2}\\left[\\hat L^2_{S^{N-2}}+\\lambda(\\lambda-1)\\sum_{i<j}(\\boldsymbol\\alpha_{ij}\\cdot\\boldsymbol\\Omega)^{-2}\\right]}\n\\]\nThe radial kinetic term is the radial Laplacian in \\(N-1\\) dimensions. The angular kinetic term and the Calogero potential combine into one operator multiplied by \\(1/(2r^2)\\)."
             },
             {
               "step": 6,
-              "passed": true,
-              "rubric_score": 1.0,
-              "expr_recall": 0.5,
+              "passed": false,
+              "rubric_score": 0.5,
+              "expr_recall": 0.0,
               "admitted_missing_context": false,
-              "prompt_chars": 1870,
-              "memory_chars": 1041,
-              "latency_s": 13.26,
-              "response_excerpt": "sing the total generators,\n\\[\n\\mathcal{D}=D,\n\\qquad\n\\mathcal{K}=K.\n\\]\nThus, the calligraphic operators are the same full dilatation and special conformal generators as the non-calligraphic operators.\n\nFINAL RESULT:\n\\[\n\\boxed{\\mathcal{D}=D},\\qquad \\boxed{\\mathcal{K}=K}.\n\\]\nThe total generators are sums of their center-of-mass and relative parts. These sums define the full operators \\(D\\) and \\(K\\)."
+              "prompt_chars": 1361,
+              "memory_chars": 532,
+              "latency_s": 10.13,
+              "response_excerpt": "Using the conformal-generator normalization,\n\\[\n\\boxed{\\mathcal D=2D},\\qquad \\boxed{\\mathcal K=K}.\n\\]\nThus, \\(D=\\mathcal D/2\\), while the special conformal generator does not require rescaling.\n\nFINAL RESULT:\n\\[\n\\boxed{\\mathcal D=2D,\\qquad \\mathcal K=K.}\n\\]\nThe dilation operator differs by a factor of \\(2\\). The quadratic conformal operator is unchanged."
             },
             {
               "step": 7,
@@ -664,21 +682,21 @@
               "rubric_score": 0.5,
               "expr_recall": 0.083,
               "admitted_missing_context": false,
-              "prompt_chars": 1971,
-              "memory_chars": 1066,
-              "latency_s": 18.05,
-              "response_excerpt": "=\\sum_c\\frac{b_i^c}{\\mathbf b^c\\cdot\\mathbf y}=\\frac1r\\sum_c\\frac{b_i^c}{\\cos\\Theta^c}},\n\\qquad\n\\boxed{\\partial_{y_i}^2\\log\\operatorname{vdm}=-\\sum_c\\frac{(b_i^c)^2}{(\\mathbf b^c\\cdot\\mathbf y)^2}=-\\frac1{r^2}\\sum_c\\frac{(b_i^c)^2}{\\cos^2\\Theta^c}}.\n\\]\nThe first derivative is a sum of inverse linear root coordinates. The second derivative is the negative sum of their squared inverse contributions."
+              "prompt_chars": 1686,
+              "memory_chars": 781,
+              "latency_s": 18.85,
+              "response_excerpt": "sum_c\\frac{b_i^c}{\\mathbf b^c\\cdot\\mathbf y}},\\qquad\n\\boxed{\\partial_{y_i}^2\\log\\operatorname{vdm}=-\\sum_c\\frac{(b_i^c)^2}{(\\mathbf b^c\\cdot\\mathbf y)^2}}.\n\\]\nEach Vandermonde factor is linear in \\(\\mathbf y\\), so its logarithmic derivative gives one reciprocal linear factor. With \\(\\mathbf y=r\\widehat{\\mathbf y}\\), the first and second derivatives scale as \\(r^{-1}\\) and \\(r^{-2}\\), respectively."
             },
             {
               "step": 8,
               "passed": true,
               "rubric_score": 1.0,
-              "expr_recall": 0.0,
+              "expr_recall": 0.714,
               "admitted_missing_context": false,
-              "prompt_chars": 1976,
-              "memory_chars": 1087,
-              "latency_s": 15.35,
-              "response_excerpt": "al K_{\\rm rel}\\mathcal H_{\\rm rel}\\right)-\\left(\\mathcal D_{\\rm rel}\\right)^2.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\mathcal C_{2}^{\\rm rel}=\\frac12\\{\\mathcal H_{\\rm rel},\\mathcal K_{\\rm rel}\\}-\\left(\\mathcal D_{\\rm rel}\\right)^2}\n\\]\nThe anticommutator gives the required symmetric operator ordering. This Casimir commutes with \\(\\mathcal H_{\\rm rel}\\), \\(\\mathcal K_{\\rm rel}\\), and \\(\\mathcal D_{\\rm rel}\\)."
+              "prompt_chars": 1542,
+              "memory_chars": 653,
+              "latency_s": 13.92,
+              "response_excerpt": "mathcal{D}_{\\rm rel}-i)\n=\\mathcal{H}_{\\rm rel}\\mathcal{K}_{\\rm rel}-\\mathcal{D}_{\\rm rel}(\\mathcal{D}_{\\rm rel}+i).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\mathcal{C}_2^{\\rm rel}=\\frac12\\{\\mathcal{H}_{\\rm rel},\\mathcal{K}_{\\rm rel}\\}-(\\mathcal{D}_{\\rm rel})^2}\n\\]\nThe key commutator is \\([\\mathcal{H}_{\\rm rel},\\mathcal{K}_{\\rm rel}]=2i\\mathcal{D}_{\\rm rel}\\). It gives the equivalent ordered forms shown above."
             },
             {
               "step": 9,
@@ -686,10 +704,10 @@
               "rubric_score": 0.0,
               "expr_recall": 0.0,
               "admitted_missing_context": false,
-              "prompt_chars": 1858,
-              "memory_chars": 1023,
-              "latency_s": 15.61,
-              "response_excerpt": ",r\\sin\\vartheta)\\), the Vandermonde determinant is\n\\[\n\\vdm(\\mathbf y)=\\frac{1}{\\sqrt2}y_1\\left(3y_2^2-y_1^2\\right)=-\\frac{r^3}{\\sqrt2}\\cos(3\\vartheta).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\vdm(\\mathbf y)=-\\frac{r^3}{\\sqrt2}\\cos(3\\vartheta)}.\n\\]\nThe Cartesian form is \\(\\vdm(\\mathbf y)=2^{-1/2}y_1(3y_2^2-y_1^2)\\). Substitution of \\(y_1=r\\cos\\vartheta\\) and \\(y_2=r\\sin\\vartheta\\) gives the triple-angle form."
+              "prompt_chars": 1616,
+              "memory_chars": 781,
+              "latency_s": 15.15,
+              "response_excerpt": "me{vdm}(\\mathbf y)=\\pm r^3\\sin(3\\vartheta)/\\sqrt2\\), where the sign depends on the coordinate and product conventions.\n\nFINAL RESULT:\n\\[\n\\boxed{\\operatorname{vdm}(\\mathbf y)=-\\frac{r^3}{\\sqrt2}\\cos(3\\vartheta)}.\n\\]\nThe cubic radial factor follows from the degree-three homogeneity of the \\(N=3\\) Vandermonde factor. Its angular zeros, \\(\\cos(3\\vartheta)=0\\), are the three particle-coincidence lines."
             },
             {
               "step": 10,
@@ -697,10 +715,10 @@
               "rubric_score": 0.0,
               "expr_recall": 0.0,
               "admitted_missing_context": false,
-              "prompt_chars": 1996,
-              "memory_chars": 1126,
-              "latency_s": 17.2,
-              "response_excerpt": "vdm(\\mathbf y)^2}.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\hat{\\mathcal L}_{S^1}^{2}=-\\partial_\\vartheta^2+\\frac{9\\lambda(\\lambda-1)}{\\cos^2(3\\vartheta)}=-\\partial_\\vartheta^2+\\frac{9\\lambda(\\lambda-1)r^6}{2\\,\\vdm(\\mathbf y)^2}}\n\\]\nThe three inverse-square angular terms combine into \\(9/\\cos^2(3\\vartheta)\\). The relation \\(\\vdm(\\mathbf y)=-(r^3/\\sqrt2)\\cos(3\\vartheta)\\) gives the equivalent Vandermonde form."
+              "prompt_chars": 1651,
+              "memory_chars": 781,
+              "latency_s": 21.64,
+              "response_excerpt": "da-1)r^6}{2\\operatorname{vdm}^2}.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\hat{\\mathcal L}_{S^1}^{\\,2}=-\\partial_\\vartheta^2+\\frac{9\\lambda(\\lambda-1)}{\\cos^2(3\\vartheta)}}.\n\\]\nThe relation \\(\\operatorname{vdm}=-(r^3/\\sqrt2)\\cos(3\\vartheta)\\) converts the three pairwise singularities into one angular potential. Therefore, the interaction term is equivalently \\(9\\lambda(\\lambda-1)r^6/(2\\operatorname{vdm}^2)\\)."
             },
             {
               "step": 11,
@@ -708,10 +726,10 @@
               "rubric_score": 0.0,
               "expr_recall": 0.0,
               "admitted_missing_context": false,
-              "prompt_chars": 2030,
-              "memory_chars": 1111,
-              "latency_s": 16.57,
-              "response_excerpt": "\\\\\n&+C_2\\,(\\sinh u)^{1-2\\lambda}{}_2F_1\\!\\left(\\frac12+i\\sigma,\\frac12-i\\sigma;\\frac32-\\lambda;-\\sinh^2u\\right).\n\\end{aligned}}\n\\]\nThe substitution \\(z=-\\sinh^2u\\) changes the differential equation into the Gauss hypergeometric equation. The two displayed terms give independent solutions for generic \\(\\lambda\\); exceptional parameter values follow by the usual limiting or logarithmic construction."
+              "prompt_chars": 1668,
+              "memory_chars": 749,
+              "latency_s": 18.01,
+              "response_excerpt": "oxed{P(u)=C_1{}_2F_1\\!\\left(\\lambda+i\\sigma,\\lambda-i\\sigma;\\lambda+\\frac12;-\\sinh^2u\\right)+C_2(\\sinh u)^{1-2\\lambda}{}_2F_1\\!\\left(\\frac12+i\\sigma,\\frac12-i\\sigma;\\frac32-\\lambda;-\\sinh^2u\\right)}.\n\\]\nThe substitution \\(z=-\\sinh^2u\\) changes the differential equation into Gauss's hypergeometric equation. Its parameters are \\(a=\\lambda+i\\sigma\\), \\(b=\\lambda-i\\sigma\\), and \\(c=\\lambda+\\tfrac12\\)."
             },
             {
               "step": 12,
@@ -719,17 +737,17 @@
               "rubric_score": 0.0,
               "expr_recall": 0.0,
               "admitted_missing_context": false,
-              "prompt_chars": 2008,
-              "memory_chars": 1032,
-              "latency_s": 24.14,
-              "response_excerpt": "solution has argument \\(-\\sinh^2(3\\chi)\\), set\n\\[\n\\frac{1-f(\\chi)}{2}=-\\sinh^2(3\\chi).\n\\]\nThus,\n\\[\nf(\\chi)=1+2\\sinh^2(3\\chi)=\\cosh(6\\chi).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{f(\\chi)=\\cosh(6\\chi)},\\qquad\nY_\\sigma(\\chi)\\propto C_{i\\sigma-\\lambda}^{\\lambda}\\!\\left(\\cosh(6\\chi)\\right).\n\\]\nThe Gegenbauer hypergeometric argument is \\((1-f)/2\\). Matching it to \\(-\\sinh^2(3\\chi)\\) gives \\(f(\\chi)=\\cosh(6\\chi)\\)."
+              "prompt_chars": 1758,
+              "memory_chars": 782,
+              "latency_s": 23.04,
+              "response_excerpt": "The function is\n\\[\nf(\\chi)=i\\sinh\\chi.\n\\]\nThus,\n\\[\nY_\\sigma(\\chi)\\propto C^\\lambda_{i\\sigma-\\lambda}\\!\\left(i\\sinh\\chi\\right).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{f(\\chi)=i\\sinh\\chi}\n\\]\nThe substitution \\(z=-\\sinh^2\\chi\\) gives the hypergeometric equation. The Gegenbauer degree is \\(i\\sigma-\\lambda\\), and its argument is \\(i\\sinh\\chi\\)."
             }
           ]
         },
         {
           "task_id": 3,
           "paper_name": "2309.15922",
-          "arm": "agent_memory_passive_state",
+          "arm": "mem0_style_extracted_facts",
           "num_steps": 3,
           "sr": 0.0,
           "ps": 0.3333,
@@ -742,8 +760,8 @@
               "admitted_missing_context": false,
               "prompt_chars": 2365,
               "memory_chars": 0,
-              "latency_s": 40.43,
-              "response_excerpt": ")\\right\\rangle=0.\n\\]\nThe odd-\\(m\\) term \\(c_{1111}^{3,1}\\) vanishes identically in its sum rule. Thus, it does not give an additional constraint on \\(\\rho_\\ell^{1111}\\).\n\nFINAL RESULT:\n\\[\n\\boxed{N_{m+n=4}=1}\n\\]\nThere is one independent null constraint: \\(c_{1111}^{2,2}=\\tfrac32 c_{1111}^{4,0}\\). Its spectral form is \\(\\left\\langle \\rho_\\ell^{1111}(L_\\ell^2-\\tfrac32L_\\ell^1)/\\mu^5\\right\\rangle=0\\)."
+              "latency_s": 47.55,
+              "response_excerpt": "s not give an independent null constraint. The non-trivial constraint is\n\\[\n\\left\\langle \\frac{2\\rho_\\ell^{1111}(\\mu)}{\\mu^5}\n\\left(L_\\ell^2-\\frac{3}{2}L_\\ell^1\\right)\\right\\rangle=0.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{N_{\\mathrm{null}}(m+n=4)=1}\n\\]\nCrossing requires \\(c^{2,2}_{1111}=\\tfrac32c^{4,0}_{1111}\\). After use of the sum rules, this relation gives the single spectral null constraint shown above."
             },
             {
               "step": 2,
@@ -751,10 +769,10 @@
               "rubric_score": 0.0,
               "expr_recall": 1.0,
               "admitted_missing_context": false,
-              "prompt_chars": 1783,
-              "memory_chars": 596,
-              "latency_s": 47.25,
-              "response_excerpt": "mathcal N^{1122}_{4},\\mathcal N^{1212}_{4},\\mathcal N^{1221}_{4}\\right)=3.\n\\]\nThus, the number of independent null constraints is \\(3\\).\n\nFINAL RESULT:\n\\[\n\\boxed{N^{\\{1122,1212,1221\\}}_{m+n=4}=3}\n\\]\nCrossing symmetry links the three spectral densities \\(\\rho^{1122}_{\\ell,n}\\), \\(\\rho^{1212}_{\\ell,n}\\), and \\(\\rho^{1221}_{\\ell,n}\\). At \\(m+n=4\\), the resulting null-constraint system has rank \\(3\\)."
+              "prompt_chars": 1685,
+              "memory_chars": 498,
+              "latency_s": 52.11,
+              "response_excerpt": "raints among \\(\\rho^{1122}_{\\ell,n}\\), \\(\\rho^{1212}_{\\ell,n}\\), and \\(\\rho^{1221}_{\\ell,n}\\) is\n\\[\nN_{\\mathrm{null}}=6.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{N_{\\mathrm{null}}(m+n=4)=6}\n\\]\nThe sum rules map the three spectral-density sectors to the fourth-order amplitude coefficients. Crossing symmetry reduces these coefficients to three independent combinations, which gives six independent null relations."
             },
             {
               "step": 3,
@@ -762,10 +780,1010 @@
               "rubric_score": 0.0,
               "expr_recall": 1.0,
               "admitted_missing_context": false,
-              "prompt_chars": 2141,
-              "memory_chars": 878,
-              "latency_s": 37.73,
-              "response_excerpt": "l order \\(m+n=4\\), each ordering gives one independent null constraint. Thus,\n\\[\nN^{\\{1234,1243,1324,1342,1423,1432\\}}_{m+n=4}=6.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{N^{\\{1234,1243,1324,1342,1423,1432\\}}_{m+n=4}=6}\n\\]\nThe relevant coefficient pairs are \\((m,n)=(4,0),(3,1),(2,2)\\). The sum rules and crossing symmetry give one independent spectral null relation for each of the six distinct flavor orderings."
+              "prompt_chars": 1909,
+              "memory_chars": 646,
+              "latency_s": 45.42,
+              "response_excerpt": "aves 5 independent combinations, so the number of independent null constraints is\n\\[\n18-5=13.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{N_{\\mathrm{null}}=13}\n\\]\nThe sum rules use the three coefficients \\(c^{4,0}_{ijkl}\\), \\(c^{3,1}_{ijkl}\\), and \\(c^{2,2}_{ijkl}\\) for each of the six orderings. Crossing reduces these 18 quantities to 5 independent combinations and gives 13 independent spectral null constraints."
+            }
+          ]
+        },
+        {
+          "task_id": 4,
+          "paper_name": "2111.01267",
+          "arm": "mem0_style_extracted_facts",
+          "num_steps": 4,
+          "sr": 1.0,
+          "ps": 1.0,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 3264,
+              "memory_chars": 0,
+              "latency_s": 18.36,
+              "response_excerpt": "ghtarrow\\ \\partial_x f=0\\ \\Longrightarrow\\ f(q,x)=f(q,0),\n\\]\n\\[\nY_n(x)=Y_n(0)\\quad(n=2,3,4),\\qquad \\partial_x\\bar q=\\partial_x\\mathrm{Var}_q=0\n\\]\nwhen \\(Y_2\\ne0\\). Production or collisions are therefore necessary for nontrivial \\(x\\)-dependence of the distribution moments. With the specified empty initial state, \\(f=0\\) and all moments vanish, while \\(\\bar q\\) and \\(\\mathrm{Var}_q\\) are undefined."
+            },
+            {
+              "step": 2,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.75,
+              "admitted_missing_context": false,
+              "prompt_chars": 1342,
+              "memory_chars": 392,
+              "latency_s": 28.72,
+              "response_excerpt": "\\(\\bar q\\) is not defined. After the source acts, it stays equal to \\(q_0\\).\n\nFINAL RESULT:\n\\[\n\\boxed{f(q,x)=\\Theta(x-x_0)\\delta(q-q_0)},\\qquad\n\\boxed{Y_2=q_0^2\\Theta(x-x_0)},\\qquad\n\\boxed{Y_3=q_0^3\\Theta(x-x_0)},\n\\]\n\\[\n\\boxed{\\bar q=Y_3/Y_2=q_0\\quad(x>x_0)}.\n\\]\nThe source puts all particles at the fixed comoving momentum \\(q_0\\). Because \\(\\gamma=0\\), free streaming does not change this momentum."
+            },
+            {
+              "step": 3,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.25,
+              "admitted_missing_context": false,
+              "prompt_chars": 1820,
+              "memory_chars": 540,
+              "latency_s": 20.98,
+              "response_excerpt": "ESULT:\n\\[\n\\boxed{\\mathcal N(x)=\\frac{Y_2(x)}{2}}\n\\]\n\\[\n\\boxed{\\partial_xY_2=0,\\qquad\n\\partial_xY_3=\\gamma(x)(3Y_2-Y_3),\\qquad\n\\partial_xY_4=\\gamma(x)(12Y_2-Y_4)}.\n\\]\nNumber conservation fixes the collision normalization because \\(\\int_0^\\infty q^2e^{-q}dq=2\\). After production stops, \\(Y_2\\) is constant, and the collision term drives \\(Y_3\\) and \\(Y_4\\) toward \\(3Y_2\\) and \\(12Y_2\\), respectively."
+            },
+            {
+              "step": 4,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.9,
+              "admitted_missing_context": false,
+              "prompt_chars": 2367,
+              "memory_chars": 668,
+              "latency_s": 22.34,
+              "response_excerpt": "mathcal I,\\quad Y_4(x_s)=q_0^2\\mathcal I}\n\\]\nwith\n\\[\n\\boxed{\\mathcal I=A[6-e^{-x_s}P(x_s)]+\\frac{B}{r^4}[e^{-rx_1}P(rx_1)-e^{-rx_s}P(rx_s)]},\n\\quad P(z)=z^3+3z^2+6z+6.\n\\]\nFor \\(x\\ge x_s\\), \\(Y_2\\) is constant, while \\(Y_3/Y_2\\) and \\(Y_4/Y_2\\) relax exponentially to \\(3\\) and \\(12\\). Hence \\(\\bar q=3+(q_0-3)E\\) and \\(\\mathrm{Var}_q=12+(q_0^2-12)E-[3+(q_0-3)E]^2\\), where \\(E=e^{-\\gamma_0(x-x_s)}\\)."
+            }
+          ]
+        },
+        {
+          "task_id": 6,
+          "paper_name": "1105.6063",
+          "arm": "mem0_style_extracted_facts",
+          "num_steps": 3,
+          "sr": 0.0,
+          "ps": 0.3333,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2163,
+              "memory_chars": 0,
+              "latency_s": 7.62,
+              "response_excerpt": "oduct region. They count the diagonal twice, so subtract the diagonal sum once:\n\\[\n\\sum_{k=1}^{N}\\frac{(-1)^k}{2k+1}\\frac{(-1)^k}{(2k+1)^2}\n=\\sum_{k=1}^{N}\\frac{1}{(2k+1)^3}=C(N).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{A(N)B(N)=S_{1,2}(N)+S_{2,1}(N)-C(N)}.\n\\]\nInclusive nesting makes each nested sum contain the diagonal. Thus, their sum counts the diagonal twice, and subtraction of \\(C(N)\\) gives the product."
+            },
+            {
+              "step": 2,
+              "passed": false,
+              "rubric_score": 0.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 1398,
+              "memory_chars": 469,
+              "latency_s": 13.58,
+              "response_excerpt": " identity are not sufficient to calculate their limits. Please supply the definitions from Subtask 1.\n\nFINAL RESULT:\n\\[\nA(\\infty),\\;B(\\infty),\\;C(\\infty)\\quad\\text{cannot be determined from the supplied information.}\n\\]\nInclusive nested sums contain the diagonal term. Thus, a product relation can require subtraction of \\(C(N)\\), but the explicit summands are necessary to evaluate the three limits."
+            },
+            {
+              "step": 3,
+              "passed": false,
+              "rubric_score": 0.0,
+              "expr_recall": 0.4,
+              "admitted_missing_context": false,
+              "prompt_chars": 1570,
+              "memory_chars": 617,
+              "latency_s": 27.98,
+              "response_excerpt": "_{N\\to\\infty}C(N)=\\sum_{k=1}^{\\infty}\\frac{1}{(2k-1)^3}\n=\\left(1-2^{-3}\\right)\\zeta(3)=\\frac{7}{8}\\zeta(3).\n\\]\nTherefore,\n\\[\n\\mathcal K=\\frac{\\pi G}{4}+\\frac{7}{8}\\zeta(3).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\mathcal K=\\frac{\\pi G}{4}+\\frac{7}{8}\\zeta(3)}.\n\\]\nThe inclusive product identity is \\(S_{1,2}+S_{2,1}=S_1S_2+C\\). The limits \\(S_1\\to\\pi/4\\), \\(S_2\\to G\\), and \\(C\\to 7\\zeta(3)/8\\) give the result."
+            }
+          ]
+        },
+        {
+          "task_id": 8,
+          "paper_name": "2307.08563",
+          "arm": "mem0_style_extracted_facts",
+          "num_steps": 5,
+          "sr": 0.0,
+          "ps": 0.2,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.667,
+              "admitted_missing_context": false,
+              "prompt_chars": 2618,
+              "memory_chars": 0,
+              "latency_s": 16.83,
+              "response_excerpt": "\n\\[\n\\boxed{\nc_N(D_{\\rm tot},K)=\\#\\left\\{(a_0,a_1,b_0,b_1,c_1,\\ldots,c_N)\\in\\mathbb Z_{\\ge0}^{N+4}:\n\\begin{aligned}\na_0+b_0+2(a_1+b_1)+\\sum_{n=1}^N c_n&=D_{\\rm tot},\\\\\n\\sum_{n=1}^N c_n&=K,\\\\\n(a_0+a_1)+\\sum_{n=1}^N n c_n&=b_0+b_1\n\\end{aligned}\n\\right\\}.\n}\n\\]\nThe powers of \\(t\\) and \\(u\\) give the dimension and spurion-number equations. The constant term in \\(z\\) gives the charge-neutrality equation."
+            },
+            {
+              "step": 2,
+              "passed": false,
+              "rubric_score": 0.0,
+              "expr_recall": 0.5,
+              "admitted_missing_context": false,
+              "prompt_chars": 1297,
+              "memory_chars": 498,
+              "latency_s": 16.82,
+              "response_excerpt": ") and \\(Y\\) contribute. Write the monomial as \\(X^aY^b\\). Charge neutrality gives \\(a-b=0\\), and mass dimension six gives \\(a+b=6\\). Thus, \\(a=b=3\\), so the only monomial is \\(X^3Y^3\\).\n\n\\[\nc_0(6,0)=[t^6]H_0(t,0)=1.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{c_0(6,0)=1}\n\\]\nThe key equations are \\(a+b=6\\) and \\(a-b=0\\). Their unique nonnegative solution is \\((a,b)=(3,3)\\), which gives one charge-neutral monomial."
+            },
+            {
+              "step": 3,
+              "passed": false,
+              "rubric_score": 0.0,
+              "expr_recall": 0.5,
+              "admitted_missing_context": false,
+              "prompt_chars": 1459,
+              "memory_chars": 646,
+              "latency_s": 17.81,
+              "response_excerpt": "he monomial be \\(X^aY^b\\) with one spurion insertion. The coefficient conditions are\n\\[\na+b=6,\\qquad a-b=0.\n\\]\nThus, \\(a=b=3\\). There is one allowed charge-neutral monomial, so\n\\[\nc_1(6,1)=[t^6u]H_1(t,u)=1.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{c_1(6,1)=1}\n\\]\nThe dimension equation is \\(a+b=6\\), and charge neutrality gives \\(a-b=0\\). Their unique nonnegative solution is \\((a,b)=(3,3)\\), so the count is one."
+            },
+            {
+              "step": 4,
+              "passed": false,
+              "rubric_score": 0.0,
+              "expr_recall": 0.5,
+              "admitted_missing_context": false,
+              "prompt_chars": 1459,
+              "memory_chars": 646,
+              "latency_s": 34.88,
+              "response_excerpt": "\\cdot4\\cdot3=48.\n\\]\nThe transposition term contributes \\(0\\), because after one \\(D\\) factor it requires an odd total number of \\(X\\) and \\(Y\\) factors, which cannot be charge-neutral. Thus\n\\[\nc_2(8,2)=\\frac12(48+0)=24.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{c_2(8,2)=24}\n\\]\nThe dimension and charge equations give \\(a+b=6\\) and \\(a=b\\), hence \\((a,b)=(3,3)\\). The two-cycle average gives \\(\\tfrac12(48+0)=24\\)."
+            },
+            {
+              "step": 5,
+              "passed": false,
+              "rubric_score": 0.0,
+              "expr_recall": 1.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 1830,
+              "memory_chars": 774,
+              "latency_s": 66.42,
+              "response_excerpt": "_2,n_3) & \\text{number of }(a,b,c,d)\\\\ \\hline\n4 &(2,1,0)&16\\\\\n6 &(0,3,0),(1,1,1)&9\\text{ each}\\\\\n8 &(0,1,2)&4\n\\end{array}\n\\]\nTherefore,\n\\[\nc_3(10,3)=16+2(9)+4=38.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{c_3(10,3)=[t^{10}u^3]H_3(t,u)=38}\n\\]\nThe key equations are \\(a+b+c+d=10\\) and \\(n_1+n_2+n_3=3\\). Charge neutrality requires \\(a-b+n_1+2n_2+3n_3=0\\), which gives the four applicable spurion distributions above."
+            }
+          ]
+        },
+        {
+          "task_id": 9,
+          "paper_name": "2505.18074",
+          "arm": "mem0_style_extracted_facts",
+          "num_steps": 4,
+          "sr": 1.0,
+          "ps": 1.0,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.667,
+              "admitted_missing_context": false,
+              "prompt_chars": 2081,
+              "memory_chars": 0,
+              "latency_s": 12.57,
+              "response_excerpt": "chi_{K_0}(\\nu).\n\\]\nTherefore, each plane wave is an eigenfunction.\n\nFINAL RESULT:\n\\[\n\\boxed{(\\mathcal K_0\\phi_\\nu)(\\rho)=\\chi_0(\\nu)\\phi_\\nu(\\rho)},\n\\qquad\n\\boxed{\\chi_0(\\nu)=\\chi_{K_0}(\\nu)\n=\\int_0^\\infty dt\\,\\frac{\\cos(\\nu t)-1}{\\sinh(t/2)}}.\n\\]\nThe variable change \\(t=\\rho-\\rho'\\) factors out \\(e^{i\\nu\\rho}\\). The even kernel removes the odd sine term and leaves the cosine-transform eigenvalue."
+            },
+            {
+              "step": 2,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 1417,
+              "memory_chars": 451,
+              "latency_s": 16.1,
+              "response_excerpt": "r sum gives\n\\[\n\\chi_0(\\nu)=2\\psi(1)-\\psi\\!\\left(\\frac12+i\\nu\\right)-\\psi\\!\\left(\\frac12-i\\nu\\right).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\chi_0(\\nu)=2\\psi(1)-\\psi\\!\\left(\\frac12+i\\nu\\right)-\\psi\\!\\left(\\frac12-i\\nu\\right)}.\n\\]\nThe kernel transform reduces to an integral over \\(x\\in(0,1)\\) with powers \\(x^{-1/2\\pm i\\nu}\\). The standard integral representation of \\(\\psi(1)-\\psi(z)\\) evaluates the two terms."
+            },
+            {
+              "step": 3,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 1812,
+              "memory_chars": 599,
+              "latency_s": 20.8,
+              "response_excerpt": "boxed{\\mathcal K_1\\phi_\\nu=\\chi_1(\\nu)\\phi_\\nu},\\qquad\n\\boxed{\\chi_1(\\nu)=\\int_{-\\infty}^{\\infty}dt\\,|t|K_0(t)(e^{-i\\nu t}-1)\n=\\int_0^\\infty dt\\,\\frac{t}{\\sinh(t/2)}(\\cos\\nu t-1)}.\n\\]\nThe plane waves remain eigenfunctions because the operator is translation invariant. With the definitions in the question, \\(\\boxed{\\chi_1(\\nu)\\ne-\\chi_0''(\\nu)}\\); the second derivative inserts \\(t^2\\), not \\(|t|\\)."
+            },
+            {
+              "step": 4,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 1.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2201,
+              "memory_chars": 727,
+              "latency_s": 78.3,
+              "response_excerpt": "[\n\\boxed{\\chi_{\\epsilon,\\eta}(\\nu)=\\chi_0(\\nu)+\\epsilon\\pi^2\\operatorname{sech}^2(\\pi\\nu)-\\eta\\chi_0''(\\nu)}.\n\\]\nThe identity \\(2\\operatorname{Re}\\psi^{(1)}(\\tfrac12+i\\nu)=\\pi^2\\operatorname{sech}^2(\\pi\\nu)\\) gives the \\(|t|\\) correction. The Fourier differentiation identity \\(t^2e^{-i\\nu t}=-\\partial_\\nu^2e^{-i\\nu t}\\) gives the \\(t^2\\) correction, and no third- or fourth-order derivative occurs."
+            }
+          ]
+        },
+        {
+          "task_id": 15,
+          "paper_name": "2401.09908",
+          "arm": "mem0_style_extracted_facts",
+          "num_steps": 3,
+          "sr": 1.0,
+          "ps": 1.0,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 1674,
+              "memory_chars": 0,
+              "latency_s": 19.66,
+              "response_excerpt": "rac14I_1\\right)=0.\n\\]\nDivide by \\(z\\) and simplify:\n\\[\nz(1-z)I_1''(z)+(1-2z)I_1'(z)-\\frac14I_1(z)=0.\n\\]\n\nFINAL RESULT:\n\\[\nI_1(z)=\\pi\\sum_{n=0}^{\\infty}\\frac{(\\tfrac12)_n^2}{(n!)^2}z^n,\n\\qquad\n\\left[\\theta^2-z\\left(\\theta+\\tfrac12\\right)^2\\right]I_1(z)=0.\n\\]\nThe coefficient recurrence is \\(n^2c_n=(n-\\tfrac12)^2c_{n-1}\\). Using \\(\\theta^2I=z^2I''+zI'\\) gives \\(z(1-z)I_1''+(1-2z)I_1'-\\tfrac14I_1=0\\)."
+            },
+            {
+              "step": 2,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 1448,
+              "memory_chars": 431,
+              "latency_s": 16.49,
+              "response_excerpt": "AL RESULT:\n\\[\nI_2(z)=\\pi^2\\sum_{n=0}^{\\infty}\\left(\\frac{(\\tfrac12)_n}{n!}\\right)^3z^n,\n\\qquad\nn^3c_n=\\left(n-\\tfrac12\\right)^3c_{n-1},\n\\]\n\\[\n\\boxed{\\left[\\theta^3-z\\left(\\theta+\\tfrac12\\right)^3\\right]I_2(z)=0.}\n\\]\nThe two beta integrals and the binomial factor produce the third power of \\((\\tfrac12)_n/n!\\). The coefficient recurrence is equivalent to the stated third-order differential equation."
+            },
+            {
+              "step": 3,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 1.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 1582,
+              "memory_chars": 579,
+              "latency_s": 12.93,
+              "response_excerpt": "=z\\frac{d}{dz}\\), this recurrence gives the minimal fourth-order operator\n\\[\nL_3=\\theta^4-z\\left(\\theta+\\tfrac12\\right)^4.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{L_3 I_3(z)=0,\\qquad L_3=\\theta^4-z\\left(\\theta+\\tfrac12\\right)^4,\\qquad \\theta=z\\frac{d}{dz}.}\n\\]\nThe series is \\(I_3(z)=\\pi^3\\sum_{n\\geq0}[(\\tfrac12)_n/n!]^4z^n\\). Its recurrence \\(n^4c_n=(n-\\tfrac12)^4c_{n-1}\\) gives the minimal operator directly."
+            }
+          ]
+        }
+      ]
+    },
+    "bm25_chunk_rag": {
+      "sr": 0.375,
+      "ps": 0.7292,
+      "sr_at_k": {
+        "step_1": 1.0,
+        "step_2": 0.875,
+        "step_3": 0.5,
+        "step_4": 0.25
+      },
+      "avg_memory_chars_injected": 1373,
+      "tasks": [
+        {
+          "task_id": 0,
+          "paper_name": "0000.0001",
+          "arm": "bm25_chunk_rag",
+          "num_steps": 3,
+          "sr": 0.0,
+          "ps": 0.6667,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.5,
+              "admitted_missing_context": false,
+              "prompt_chars": 2960,
+              "memory_chars": 0,
+              "latency_s": 23.1,
+              "response_excerpt": "lied information. Thus, if \\(M(0,0)=m\\), then\n\\[\nc_0=m-\\frac{16}{3}.\n\\]\nIn particular, \\(M(0,0)=0\\) gives \\(c_0=-16/3\\), while \\(M(0,0)=1\\) gives \\(c_0=-13/3\\).\n\nFINAL RESULT:\n\\[\n\\boxed{(c_2,c_3,c_0)=\\left(-1,-1,\\,m-\\frac{16}{3}\\right)},\\qquad m\\equiv M(0,0).\n\\]\nLocality uses \\(c_2=-A_1\\) and \\(c_3=-N\\). The missing normalization equation must specify \\(m\\) to give one numerical value for \\(c_0\\)."
+            },
+            {
+              "step": 2,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.429,
+              "admitted_missing_context": false,
+              "prompt_chars": 2117,
+              "memory_chars": 1289,
+              "latency_s": 38.36,
+              "response_excerpt": "}{3}.\n\\]\nThus, if the normalization is \\(M(0,0)=m\\), then\n\\[\nc_0=m-\\frac{64}{3}.\n\\]\nFor \\(M(0,0)=0\\), \\(c_0=-64/3\\). For \\(M(0,0)=1\\), \\(c_0=-61/3\\).\n\nFINAL RESULT:\n\\[\n\\boxed{(c_2,c_3,c_0)=\\left(-4,-2,\\,m-\\frac{64}{3}\\right)},\\qquad m=M(0,0).\n\\]\nLocality uses \\(c_2=-\\sum_{a\\in\\mathcal A}a\\) and \\(c_3=-|\\mathcal A|\\). Normalization uses \\(c_0=M(0,0)-\\mathcal D(0,0)\\), with \\(\\mathcal D(0,0)=64/3\\)."
+            },
+            {
+              "step": 3,
+              "passed": false,
+              "rubric_score": 0.5,
+              "expr_recall": 0.375,
+              "admitted_missing_context": false,
+              "prompt_chars": 2256,
+              "memory_chars": 1289,
+              "latency_s": 41.16,
+              "response_excerpt": "s,t)-3\\,\\mathcal C_3(s,t)-\\frac{13}{3},\n\\qquad u=4-s-t,\n\\]\nwhere \\(\\mathcal D(s,t)\\) is the pole sum over \\(a\\in\\{1,3,5\\}\\).\n\nFINAL RESULT:\n\\[\n\\boxed{(c_2,c_3,c_0)=\\left(-9,-3,-\\frac{13}{3}\\right)},\n\\qquad\n\\boxed{M(s,t)=\\mathcal D(s,t)-9\\mathcal C_2(s,t)-3\\mathcal C_3(s,t)-\\frac{13}{3}}.\n\\]\nLocality uses \\(c_2=-\\sum_a a\\) and \\(c_3=-|\\mathcal A|\\). The normalization uses \\(c_0=1-\\sum_a 16/(4-a)\\)."
+            }
+          ]
+        },
+        {
+          "task_id": 1,
+          "paper_name": "2507.7811",
+          "arm": "bm25_chunk_rag",
+          "num_steps": 12,
+          "sr": 0.0,
+          "ps": 0.5833,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 1.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 6772,
+              "memory_chars": 0,
+              "latency_s": 15.39,
+              "response_excerpt": "jk})^2\n=\\frac12(1+1-2\\delta_{ij})=1,\n\\]\nsince \\(i\\ne j\\). Hence, all vectors \\(\\mathbf b^a\\) have unit length.\n\nFINAL RESULT:\n\\[\n\\boxed{\\left\\lVert\\mathbf b^a\\right\\rVert=1\\quad\\text{for every double-index }a.}\n\\]\nThe orthogonality relation gives the squared distance between two different rows of \\(A\\) as \\(2\\). The factor \\(1/\\sqrt{2}\\) in \\(b_k^{[i,j]}\\) makes each \\(\\mathbf b^a\\) a unit vector."
+            },
+            {
+              "step": 2,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.5,
+              "admitted_missing_context": false,
+              "prompt_chars": 2221,
+              "memory_chars": 1405,
+              "latency_s": 11.75,
+              "response_excerpt": " definition\n\\[\nr\\cos\\Theta^{[i,j]}=\\mathbf b^{[i,j]}\\!\\cdot\\mathbf y,\n\\]\nit follows that\n\\[\nx_i-x_j=\\sqrt{2}\\,r\\cos\\Theta^{[i,j]}.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{x_i-x_j=\\sqrt{2}\\,r\\cos\\Theta^{a}},\\qquad a=[i,j].\n\\]\nThe Jacobi-coordinate projection is \\(\\mathbf b^{[i,j]}\\cdot\\mathbf y=(x_i-x_j)/\\sqrt{2}\\). The angular definition then gives the particle separation as \\(\\sqrt{2}\\,r\\cos\\Theta^{[i,j]}\\)."
+            },
+            {
+              "step": 3,
+              "passed": false,
+              "rubric_score": 0.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2251,
+              "memory_chars": 1405,
+              "latency_s": 13.6,
+              "response_excerpt": "Using the stated convention for \\(D\\), the conformal algebra is\n\\[\n[D,H]=-iH,\\qquad [D,K]=iK,\\qquad [K,H]=-2iD.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{[D,H]=-iH,\\quad [D,K]=iK,\\quad [K,H]=-2iD}\n\\]\nThe dilation operator gives \\(H\\) and \\(K\\) scaling weights \\(-1\\) and \\(+1\\), respectively. The commutator of \\(K\\) with \\(H\\) closes the algebra on \\(D\\)."
+            },
+            {
+              "step": 4,
+              "passed": false,
+              "rubric_score": 0.5,
+              "expr_recall": 0.143,
+              "admitted_missing_context": false,
+              "prompt_chars": 2274,
+              "memory_chars": 1405,
+              "latency_s": 19.12,
+              "response_excerpt": "{\\lambda(\\lambda-1)}{\\cos^2\\Theta^a}\\right)\\right],\\\\\nK_{\\rm rel}&=\\frac12r^2,\\\\\nD_{\\rm rel}&=\\frac{i}{2}\\left(r\\partial_r+\\frac{N-1}{2}\\right).\n\\end{aligned}}\n\\]\nAll angular dependence is in \\(\\hat L^2_{S^{N-2}}\\), while the radial kinetic term contains the measure coefficient \\(N-2\\). The operators \\(K_{\\rm rel}\\) and \\(D_{\\rm rel}\\) depend only on \\(r\\) and the relative-space dimension \\(N-1\\)."
+            },
+            {
+              "step": 5,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.2,
+              "admitted_missing_context": false,
+              "prompt_chars": 2234,
+              "memory_chars": 1405,
+              "latency_s": 7.77,
+              "response_excerpt": "_{S^{N-2}}\\right],\n\\]\nwhere\n\\[\n\\hat L^2_{S^{N-2}}=-\\nabla^2_{S^{N-2}}+\\sum_a\\frac{\\lambda(\\lambda-1)}{\\cos^2\\Theta^a}.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{H_{\\rm rel}=\\frac12\\left[-\\partial_r^2-\\frac{N-2}{r}\\partial_r+\\frac{\\hat L^2_{S^{N-2}}}{r^2}\\right]}.\n\\]\nThe radial kinetic term has the coefficient \\(N-2\\). The operator \\(\\hat L^2_{S^{N-2}}\\) contains all angular and inverse-square interaction terms."
+            },
+            {
+              "step": 6,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2219,
+              "memory_chars": 1390,
+              "latency_s": 13.74,
+              "response_excerpt": "and}\\) are both multiplication operators, they commute. Therefore,\n\\[\n\\mathcal K=\\mathrm{Vand}^{-\\lambda}K\\,\\mathrm{Vand}^{\\lambda}=K.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\mathcal D=D+\\frac{i\\lambda N(N-1)}{4},\\qquad \\mathcal K=K.}\n\\]\nThe shift in \\(\\mathcal D\\) follows from the degree \\(N(N-1)/2\\) of the Vandermonde factor. The operator \\(\\mathcal K\\) does not change because it commutes with that factor."
+            },
+            {
+              "step": 7,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.333,
+              "admitted_missing_context": false,
+              "prompt_chars": 2310,
+              "memory_chars": 1405,
+              "latency_s": 11.06,
+              "response_excerpt": "^c}{\\mathbf b^c\\cdot\\mathbf y}\n-\\frac{N(N-1)}{2}\\frac{y_i}{r^2}}\n\\]\n\\[\n\\boxed{\\partial_{y_i}^2\\log\\boldsymbol{\\Delta}\n=-\\sum_c\\frac{(b_i^c)^2}{(\\mathbf b^c\\cdot\\mathbf y)^2}\n-\\frac{N(N-1)}{2r^2}\n+N(N-1)\\frac{y_i^2}{r^4}}\n\\]\nThe product contains \\(N(N-1)/2\\) linear factors, each divided by \\(r\\). Differentiation uses \\(\\partial_{y_i}\\log r=y_i/r^2\\) and \\(\\partial_{y_i}(y_i/r^2)=1/r^2-2y_i^2/r^4\\)."
+            },
+            {
+              "step": 8,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.714,
+              "admitted_missing_context": false,
+              "prompt_chars": 2294,
+              "memory_chars": 1405,
+              "latency_s": 10.73,
+              "response_excerpt": " rel}\\right)\n-\\mathcal{D}_{\\rm rel}^{\\,2}.\n\\]\nThe symmetric product is necessary because \\(\\mathcal{H}_{\\rm rel}\\) and \\(\\mathcal{K}_{\\rm rel}\\) do not commute.\n\nFINAL RESULT:\n\\[\n\\boxed{\\mathcal{C}_2^{\\rm rel}=\\tfrac12\\{\\mathcal{H}_{\\rm rel},\\mathcal{K}_{\\rm rel}\\}-\\mathcal{D}_{\\rm rel}^{\\,2}}\n\\]\nHere, \\(\\{A,B\\}=AB+BA\\). This operator is the relative-sector part of the quadratic conformal Casimir."
+            },
+            {
+              "step": 9,
+              "passed": false,
+              "rubric_score": 0.0,
+              "expr_recall": 0.25,
+              "admitted_missing_context": false,
+              "prompt_chars": 2240,
+              "memory_chars": 1405,
+              "latency_s": 14.77,
+              "response_excerpt": "\n\\]\nThus,\n\\[\n\\vdm(\\mathbf y)=\\frac14\\cos\\vartheta\\left(\\cos^2\\vartheta-3\\sin^2\\vartheta\\right)=\\frac14\\cos(3\\vartheta).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\vdm(\\mathbf y)=\\frac14\\cos(3\\vartheta)}.\n\\]\nThe Vandermonde factor is the product of the three normalized pair-difference factors. The triple-angle identity \\(\\cos(3\\vartheta)=\\cos\\vartheta(\\cos^2\\vartheta-3\\sin^2\\vartheta)\\) gives the compact result."
+            },
+            {
+              "step": 10,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2274,
+              "memory_chars": 1405,
+              "latency_s": 17.65,
+              "response_excerpt": "_\\vartheta+9\\lambda^2.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\hat{\\mathcal L}^{2}_{S^1}=-\\partial_\\vartheta^2+6\\lambda\\tan(3\\vartheta)\\partial_\\vartheta+9\\lambda^2}\n\\]\nThe Vandermonde factor is \\(\\vdm=\\tfrac14\\cos(3\\vartheta)\\), so \\(\\partial_\\vartheta\\ln\\vdm=-3\\tan(3\\vartheta)\\). The similarity transformation changes the inverse-square potential into a first-derivative term and the constant \\(9\\lambda^2\\)."
+            },
+            {
+              "step": 11,
+              "passed": false,
+              "rubric_score": 0.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2324,
+              "memory_chars": 1405,
+              "latency_s": 18.67,
+              "response_excerpt": "2-\\lambda;-\\sinh^2u\\right).\n\\end{aligned}\n\\]\nThe first term is the solution that is regular at \\(u=0\\).\n\nFINAL RESULT:\n\\[\n\\boxed{P_{\\mathrm{reg}}(u)={}_2F_1\\!\\left(\\lambda+i\\sigma,\\lambda-i\\sigma;\\lambda+\\frac12;-\\sinh^2u\\right)}.\n\\]\nThe substitution \\(z=-\\sinh^2u\\) gives the Gauss hypergeometric equation. Its parameters are \\(a=\\lambda+i\\sigma\\), \\(b=\\lambda-i\\sigma\\), and \\(c=\\lambda+\\tfrac12\\)."
+            },
+            {
+              "step": 12,
+              "passed": false,
+              "rubric_score": 0.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2381,
+              "memory_chars": 1405,
+              "latency_s": 9.72,
+              "response_excerpt": "The analytic continuation gives\n\\[\n\\cos\\vartheta=\\cos\\left(i\\chi-\\frac{\\pi}{2}\\right)=i\\sinh\\chi.\n\\]\nThus,\n\\[\nY_\\sigma(\\chi)\\propto C^\\lambda_{i\\sigma-\\lambda}\\!\\left(i\\sinh\\chi\\right).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{f(\\chi)=i\\sinh\\chi}\n\\]\nThe angular solution before continuation has the argument \\(\\cos\\vartheta\\). The substitution \\(\\vartheta=i\\chi-\\pi/2\\) gives \\(\\cos\\vartheta=i\\sinh\\chi\\)."
+            }
+          ]
+        },
+        {
+          "task_id": 3,
+          "paper_name": "2309.15922",
+          "arm": "bm25_chunk_rag",
+          "num_steps": 3,
+          "sr": 0.0,
+          "ps": 0.3333,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 1.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2365,
+              "memory_chars": 0,
+              "latency_s": 47.55,
+              "response_excerpt": "s not give an independent null constraint. The non-trivial constraint is\n\\[\n\\left\\langle \\frac{2\\rho_\\ell^{1111}(\\mu)}{\\mu^5}\n\\left(L_\\ell^2-\\frac{3}{2}L_\\ell^1\\right)\\right\\rangle=0.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{N_{\\mathrm{null}}(m+n=4)=1}\n\\]\nCrossing requires \\(c^{2,2}_{1111}=\\tfrac32c^{4,0}_{1111}\\). After use of the sum rules, this relation gives the single spectral null constraint shown above."
+            },
+            {
+              "step": 2,
+              "passed": false,
+              "rubric_score": 0.0,
+              "expr_recall": 1.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2592,
+              "memory_chars": 1405,
+              "latency_s": 12.5,
+              "response_excerpt": "l,n}\\) at total order \\(m+n=4\\).\n\n\\[\nN_{\\mathrm{null}}^{(1122,1212,1221)}\\big|_{m+n=4}=11.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{N_{\\mathrm{null}}=11}\n\\]\nThe sum rules express the fourth-order coefficients \\(c_{ijkl}^{m,n}\\), with \\(m+n=4\\), as linear moments of the three spectral densities. Crossing symmetry gives a linear system for these moments, and its independent null-space relations have rank \\(11\\)."
+            },
+            {
+              "step": 3,
+              "passed": false,
+              "rubric_score": 0.0,
+              "expr_recall": 1.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2667,
+              "memory_chars": 1405,
+              "latency_s": 21.77,
+              "response_excerpt": "al-density orderings give \\(6\\times 5=30\\) structures. Crossing symmetry leaves \\(5\\) independent combinations, so the number of null constraints is\n\\[\nN_{\\mathrm{null}}=30-5=25.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{N_{\\mathrm{null}}=25}\n\\]\nThe six orderings contain \\(30\\) degree-four structures. Crossing symmetry reduces them to \\(5\\) independent combinations and gives \\(25\\) independent null constraints."
+            }
+          ]
+        },
+        {
+          "task_id": 4,
+          "paper_name": "2111.01267",
+          "arm": "bm25_chunk_rag",
+          "num_steps": 4,
+          "sr": 0.0,
+          "ps": 0.75,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 3264,
+              "memory_chars": 0,
+              "latency_s": 18.36,
+              "response_excerpt": "ghtarrow\\ \\partial_x f=0\\ \\Longrightarrow\\ f(q,x)=f(q,0),\n\\]\n\\[\nY_n(x)=Y_n(0)\\quad(n=2,3,4),\\qquad \\partial_x\\bar q=\\partial_x\\mathrm{Var}_q=0\n\\]\nwhen \\(Y_2\\ne0\\). Production or collisions are therefore necessary for nontrivial \\(x\\)-dependence of the distribution moments. With the specified empty initial state, \\(f=0\\) and all moments vanish, while \\(\\bar q\\) and \\(\\mathrm{Var}_q\\) are undefined."
+            },
+            {
+              "step": 2,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.75,
+              "admitted_missing_context": false,
+              "prompt_chars": 2355,
+              "memory_chars": 1405,
+              "latency_s": 25.81,
+              "response_excerpt": "is \\(q_0\\).\n\nFINAL RESULT:\n\\[\n\\boxed{f(q,x)=A\\left[6-e^{-x}(x^3+3x^2+6x+6)\\right]\\delta(q-q_0)}\n\\]\n\\[\n\\boxed{Y_2=Aq_0^2F(x),\\qquad Y_3=Aq_0^3F(x),\\qquad \\bar q=q_0,}\n\\quad F(x)=6-e^{-x}(x^3+3x^2+6x+6).\n\\]\nThe source changes only the total particle yield because it injects every particle at \\(q=q_0\\). The common factor \\(F(x)\\) cancels in \\(Y_3/Y_2\\), so the mean comoving momentum stays at \\(q_0\\)."
+            },
+            {
+              "step": 3,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.25,
+              "admitted_missing_context": false,
+              "prompt_chars": 2685,
+              "memory_chars": 1405,
+              "latency_s": 12.03,
+              "response_excerpt": "2=3\\), and \\(4!/2=12\\).\n\nFINAL RESULT:\n\\[\n\\boxed{\\mathcal N(x)=\\frac{Y_2(x)}{2}},\n\\qquad\n\\boxed{\\partial_xY_2=0,\\quad \\partial_xY_3=\\gamma(3Y_2-Y_3),\\quad \\partial_xY_4=\\gamma(12Y_2-Y_4)}.\n\\]\nNumber conservation fixes the equilibrium normalization through \\(\\int_0^\\infty q^2e^{-q}dq=2\\). After production stops, the general moment equation is \\(\\partial_xY_n=\\gamma[(n!/2)Y_2-Y_n]\\) for \\(n=2,3,4\\)."
+            },
+            {
+              "step": 4,
+              "passed": false,
+              "rubric_score": 0.5,
+              "expr_recall": 0.4,
+              "admitted_missing_context": false,
+              "prompt_chars": 3104,
+              "memory_chars": 1405,
+              "latency_s": 30.58,
+              "response_excerpt": "0^3,q_0^4)},\n\\]\n\\[\n\\boxed{\\bar q=3+(q_0-3)e^{-\\gamma_0(x-x_s)}},\n\\]\n\\[\n\\boxed{\\mathrm{Var}_q=3+2(q_0-3)e^{-\\gamma_0(x-x_s)}+(3-2q_0)e^{-2\\gamma_0(x-x_s)}}.\n\\]\nThe total injection \\(\\mathcal I_s\\) sets the conserved post-production value of \\(Y_2\\). The kineticization equations make the mean and variance approach \\(3\\) with exponential factors \\(e^{-\\gamma_0(x-x_s)}\\) and \\(e^{-2\\gamma_0(x-x_s)}\\)."
+            }
+          ]
+        },
+        {
+          "task_id": 6,
+          "paper_name": "1105.6063",
+          "arm": "bm25_chunk_rag",
+          "num_steps": 3,
+          "sr": 1.0,
+          "ps": 1.0,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2163,
+              "memory_chars": 0,
+              "latency_s": 7.62,
+              "response_excerpt": "oduct region. They count the diagonal twice, so subtract the diagonal sum once:\n\\[\n\\sum_{k=1}^{N}\\frac{(-1)^k}{2k+1}\\frac{(-1)^k}{(2k+1)^2}\n=\\sum_{k=1}^{N}\\frac{1}{(2k+1)^3}=C(N).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{A(N)B(N)=S_{1,2}(N)+S_{2,1}(N)-C(N)}.\n\\]\nInclusive nesting makes each nested sum contain the diagonal. Thus, their sum counts the diagonal twice, and subtraction of \\(C(N)\\) gives the product."
+            },
+            {
+              "step": 2,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.5,
+              "admitted_missing_context": false,
+              "prompt_chars": 2333,
+              "memory_chars": 1405,
+              "latency_s": 10.31,
+              "response_excerpt": "ight)\\zeta(3)-1\n=\\frac{7}{8}\\zeta(3)-1.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{A(\\infty)=\\frac{\\pi}{4}-1,\\qquad B(\\infty)=G-1,\\qquad C(\\infty)=\\frac{7}{8}\\zeta(3)-1.}\n\\]\nThe first two equations follow from \\(\\beta(1)=\\pi/4\\) and \\(\\beta(2)=G\\), after removal of the \\(k=0\\) term. The third equation follows because the sum over positive odd integers is \\((1-2^{-3})\\zeta(3)\\), again with the first term removed."
+            },
+            {
+              "step": 3,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.6,
+              "admitted_missing_context": false,
+              "prompt_chars": 2325,
+              "memory_chars": 1372,
+              "latency_s": 11.61,
+              "response_excerpt": "ior results,\n\\[\n\\mathcal K=\\left(\\frac{\\pi}{4}-1\\right)(G-1)+\\frac{7}{8}\\zeta(3)-1\n=\\frac{\\pi G}{4}-\\frac{\\pi}{4}-G+\\frac{7}{8}\\zeta(3).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\mathcal K=\\frac{\\pi G}{4}-\\frac{\\pi}{4}-G+\\frac{7}{8}\\zeta(3)}.\n\\]\nThe inclusive product identity is \\(S_{1,2}+S_{2,1}=AB+C\\). Substitution of \\(A(\\infty)=\\pi/4-1\\), \\(B(\\infty)=G-1\\), and \\(C(\\infty)=7\\zeta(3)/8-1\\) gives the result."
+            }
+          ]
+        },
+        {
+          "task_id": 8,
+          "paper_name": "2307.08563",
+          "arm": "bm25_chunk_rag",
+          "num_steps": 5,
+          "sr": 1.0,
+          "ps": 1.0,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.667,
+              "admitted_missing_context": false,
+              "prompt_chars": 2618,
+              "memory_chars": 0,
+              "latency_s": 16.83,
+              "response_excerpt": "\n\\[\n\\boxed{\nc_N(D_{\\rm tot},K)=\\#\\left\\{(a_0,a_1,b_0,b_1,c_1,\\ldots,c_N)\\in\\mathbb Z_{\\ge0}^{N+4}:\n\\begin{aligned}\na_0+b_0+2(a_1+b_1)+\\sum_{n=1}^N c_n&=D_{\\rm tot},\\\\\n\\sum_{n=1}^N c_n&=K,\\\\\n(a_0+a_1)+\\sum_{n=1}^N n c_n&=b_0+b_1\n\\end{aligned}\n\\right\\}.\n}\n\\]\nThe powers of \\(t\\) and \\(u\\) give the dimension and spurion-number equations. The constant term in \\(z\\) gives the charge-neutrality equation."
+            },
+            {
+              "step": 2,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.5,
+              "admitted_missing_context": false,
+              "prompt_chars": 2199,
+              "memory_chars": 1400,
+              "latency_s": 14.15,
+              "response_excerpt": "b_0+b_1.\n\\]\nSet \\(q=a_0+a_1=b_0+b_1\\) and \\(p=a_1+b_1\\). Then\n\\[\n2q+p=6.\n\\]\nThe valid cases are \\((q,p)=(3,0)\\), with \\(1\\) solution, and \\((q,p)=(2,2)\\), with \\(3\\) solutions. Thus,\n\\[\nc_0(6,0)=1+3=4.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{c_0(6,0)=[t^6]H_0(t,0)=4}\n\\]\nCharge neutrality gives \\(a_0+a_1=b_0+b_1=q\\). The dimension equation becomes \\(2q+a_1+b_1=6\\), and its valid solutions give the count \\(4\\)."
+            },
+            {
+              "step": 3,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.5,
+              "admitted_missing_context": false,
+              "prompt_chars": 2218,
+              "memory_chars": 1405,
+              "latency_s": 11.02,
+              "response_excerpt": "). Then \\(b_0+b_1=A+1\\), and\n\\[\na_1+b_1=4-2A.\n\\]\nFor \\(A=1\\), there are two solutions: \\((a_1,b_1)=(0,2),(1,1)\\). For \\(A=2\\), there is one solution: \\((a_1,b_1)=(0,0)\\). Thus, the total is \\(2+1=3\\).\n\nFINAL RESULT:\n\\[\n\\boxed{c_1(6,1)=[t^6u]H_1(t,u)=3.}\n\\]\nThe key equations are \\(c_1=1\\), \\(a_0+b_0+2(a_1+b_1)=5\\), and \\(a_0+a_1+1=b_0+b_1\\). Their nonnegative integer solutions give the count \\(3\\)."
+            },
+            {
+              "step": 4,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.5,
+              "admitted_missing_context": false,
+              "prompt_chars": 2213,
+              "memory_chars": 1400,
+              "latency_s": 16.92,
+              "response_excerpt": "]\nThe numbers of nonnegative solutions for \\(q=2,3,4\\) are, respectively,\n\\[\n3,\\quad 3,\\quad 2.\n\\]\nTherefore,\n\\[\nc_2(8,2)=3+3+2=8.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{c_2(8,2)=[t^8u^2]H_2(t,u)=8}.\n\\]\nThe equations \\(c_1+c_2=2\\) and \\(q=c_1+2c_2\\) give the three charge sectors \\(q=2,3,4\\). In each sector, the remaining equations reduce to \\(b_0+b_1=A+q\\) and \\(a_1+b_1=6-q-2A\\), which give counts \\(3,3,2\\)."
+            },
+            {
+              "step": 5,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 1.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2457,
+              "memory_chars": 1400,
+              "latency_s": 20.59,
+              "response_excerpt": "ding counts for \\((X,Y,D,\\bar D)\\) are\n\\[\n(F_3,F_4,F_5,F_6,F_7)=(3,3,2,1,1).\n\\]\nTherefore,\n\\[\nc_3(10,3)=\\sum_{q=3}^{7}m_qF_q\n=3+3+2(2)+2(1)+2(1)=14.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{c_3(10,3)=[t^{10}u^3]H_3(t,u)=14}\n\\]\nThe equations \\(c_1+c_2+c_3=3\\) and \\(q=c_1+2c_2+3c_3\\) classify the spurion factors. The remaining exponents satisfy \\(b_0+b_1=p+q\\) and \\(2p+r=7-q\\), which give the total count \\(14\\)."
+            }
+          ]
+        },
+        {
+          "task_id": 9,
+          "paper_name": "2505.18074",
+          "arm": "bm25_chunk_rag",
+          "num_steps": 4,
+          "sr": 0.0,
+          "ps": 0.5,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.667,
+              "admitted_missing_context": false,
+              "prompt_chars": 2081,
+              "memory_chars": 0,
+              "latency_s": 12.57,
+              "response_excerpt": "chi_{K_0}(\\nu).\n\\]\nTherefore, each plane wave is an eigenfunction.\n\nFINAL RESULT:\n\\[\n\\boxed{(\\mathcal K_0\\phi_\\nu)(\\rho)=\\chi_0(\\nu)\\phi_\\nu(\\rho)},\n\\qquad\n\\boxed{\\chi_0(\\nu)=\\chi_{K_0}(\\nu)\n=\\int_0^\\infty dt\\,\\frac{\\cos(\\nu t)-1}{\\sinh(t/2)}}.\n\\]\nThe variable change \\(t=\\rho-\\rho'\\) factors out \\(e^{i\\nu\\rho}\\). The even kernel removes the odd sine term and leaves the cosine-transform eigenvalue."
+            },
+            {
+              "step": 2,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2371,
+              "memory_chars": 1405,
+              "latency_s": 27.73,
+              "response_excerpt": "y}\\left(\\frac{1}{n+1}-\\frac{1}{n+z}\\right)\n\\]\ngives the required expression.\n\nFINAL RESULT:\n\\[\n\\boxed{\\chi_0(\\nu)=2\\psi(1)-\\psi\\!\\left(\\frac12+i\\nu\\right)-\\psi\\!\\left(\\frac12-i\\nu\\right)}.\n\\]\nThe kernel expansion converts the transform into a convergent sum over \\(n+\\tfrac12\\). The digamma series evaluates this sum and also shows that \\(\\chi_0(\\nu)=2\\psi(1)-2\\operatorname{Re}\\psi(\\tfrac12+i\\nu)\\)."
+            },
+            {
+              "step": 3,
+              "passed": false,
+              "rubric_score": 0.5,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2618,
+              "memory_chars": 1405,
+              "latency_s": 26.71,
+              "response_excerpt": "SULT:\n\\[\n\\boxed{(\\mathcal K_1\\phi_\\nu)(\\rho)=\\chi_1(\\nu)\\phi_\\nu(\\rho)},\n\\qquad\n\\boxed{\\chi_1(\\nu)=\\int_{-\\infty}^{\\infty}dt\\,|t|K_0(t)\\bigl(\\cos(\\nu t)-1\\bigr)}.\n\\]\nThe plane wave remains an eigenfunction because the operator is translation invariant. With the definitions in the question, \\(\\boxed{\\chi_1(\\nu)\\ne-\\chi_0''(\\nu)}\\); that claimed equality contains a kernel-power or subtraction error."
+            },
+            {
+              "step": 4,
+              "passed": false,
+              "rubric_score": 0.5,
+              "expr_recall": 1.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2879,
+              "memory_chars": 1405,
+              "latency_s": 15.31,
+              "response_excerpt": ")\n=\\left[\\chi_0(\\nu)-\\epsilon\\chi_0''(\\nu)+\\eta\\chi_0^{(4)}(\\nu)\\right]\\phi_\\nu(\\rho).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\chi_{\\epsilon,\\eta}(\\nu)=\\chi_0(\\nu)-\\epsilon\\frac{d^2\\chi_0}{d\\nu^2}+\\eta\\frac{d^4\\chi_0}{d\\nu^4}}\n\\]\nThe kernel decomposition makes the eigenvalue linear in \\(1\\), \\(\\epsilon\\), and \\(\\eta\\). The required relations are \\(\\chi_{|t|K_0}=-\\chi_0''\\) and \\(\\chi_{t^2K_0}=\\chi_0^{(4)}\\)."
+            }
+          ]
+        },
+        {
+          "task_id": 15,
+          "paper_name": "2401.09908",
+          "arm": "bm25_chunk_rag",
+          "num_steps": 3,
+          "sr": 1.0,
+          "ps": 1.0,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 1674,
+              "memory_chars": 0,
+              "latency_s": 19.66,
+              "response_excerpt": "rac14I_1\\right)=0.\n\\]\nDivide by \\(z\\) and simplify:\n\\[\nz(1-z)I_1''(z)+(1-2z)I_1'(z)-\\frac14I_1(z)=0.\n\\]\n\nFINAL RESULT:\n\\[\nI_1(z)=\\pi\\sum_{n=0}^{\\infty}\\frac{(\\tfrac12)_n^2}{(n!)^2}z^n,\n\\qquad\n\\left[\\theta^2-z\\left(\\theta+\\tfrac12\\right)^2\\right]I_1(z)=0.\n\\]\nThe coefficient recurrence is \\(n^2c_n=(n-\\tfrac12)^2c_{n-1}\\). Using \\(\\theta^2I=z^2I''+zI'\\) gives \\(z(1-z)I_1''+(1-2z)I_1'-\\tfrac14I_1=0\\)."
+            },
+            {
+              "step": 2,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2102,
+              "memory_chars": 1085,
+              "latency_s": 14.33,
+              "response_excerpt": "recurrence therefore proves the equation.\n\nFINAL RESULT:\n\\[\n\\boxed{I_2(z)=\\pi^2\\sum_{n=0}^{\\infty}\n\\left(\\frac{(\\tfrac12)_n}{n!}\\right)^3z^n}\n\\]\n\\[\n\\boxed{\\left[\\theta^3-z\\left(\\theta+\\tfrac12\\right)^3\\right]I_2(z)=0.}\n\\]\nThe beta integrals give the coefficient \\(a_n=\\pi^2[(\\tfrac12)_n/n!]^3\\). The coefficient recurrence \\(n^3a_n=(n-\\tfrac12)^3a_{n-1}\\) is exactly the stated differential equation."
+            },
+            {
+              "step": 3,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 1.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2088,
+              "memory_chars": 1085,
+              "latency_s": 9.24,
+              "response_excerpt": "\\theta+\\frac12\\right)^4.\n\\]\nThus, \\(L_3I_3(z)=0\\).\n\nFINAL RESULT:\n\\[\n\\boxed{L_3=\\theta^4-z\\left(\\theta+\\frac12\\right)^4},\n\\qquad\n\\boxed{\\left[\\theta^4-z\\left(\\theta+\\frac12\\right)^4\\right]I_3(z)=0}.\n\\]\nThe integral is \\(I_3(z)=\\pi^3{}_4F_3(\\tfrac12,\\tfrac12,\\tfrac12,\\tfrac12;1,1,1;z)\\). Its coefficient recurrence is \\(n^4a_n=(n-\\tfrac12)^4a_{n-1}\\), which gives the minimal operator of order \\(4\\)."
+            }
+          ]
+        }
+      ]
+    },
+    "agent_memory_passive_state": {
+      "sr": 0.75,
+      "ps": 0.8854,
+      "sr_at_k": {
+        "step_1": 1.0,
+        "step_2": 1.0,
+        "step_3": 0.75,
+        "step_4": 0.75
+      },
+      "avg_memory_chars_injected": 1104,
+      "tasks": [
+        {
+          "task_id": 0,
+          "paper_name": "0000.0001",
+          "arm": "agent_memory_passive_state",
+          "num_steps": 3,
+          "sr": 1.0,
+          "ps": 1.0,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.5,
+              "admitted_missing_context": false,
+              "prompt_chars": 2960,
+              "memory_chars": 0,
+              "latency_s": 23.1,
+              "response_excerpt": "lied information. Thus, if \\(M(0,0)=m\\), then\n\\[\nc_0=m-\\frac{16}{3}.\n\\]\nIn particular, \\(M(0,0)=0\\) gives \\(c_0=-16/3\\), while \\(M(0,0)=1\\) gives \\(c_0=-13/3\\).\n\nFINAL RESULT:\n\\[\n\\boxed{(c_2,c_3,c_0)=\\left(-1,-1,\\,m-\\frac{16}{3}\\right)},\\qquad m\\equiv M(0,0).\n\\]\nLocality uses \\(c_2=-A_1\\) and \\(c_3=-N\\). The missing normalization equation must specify \\(m\\) to give one numerical value for \\(c_0\\)."
+            },
+            {
+              "step": 2,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.429,
+              "admitted_missing_context": false,
+              "prompt_chars": 1772,
+              "memory_chars": 944,
+              "latency_s": 15.26,
+              "response_excerpt": "}{4-1}+\\frac{4^4}{4-3}=\\frac{1024}{3},\n\\]\nand\n\\[\nc_2S_2+c_3S_3=(-4)(16)+(-2)(64)=-192.\n\\]\nThus\n\\[\nm=\\frac{1024}{3}-192+c_0=\\frac{448}{3}+c_0,\n\\qquad c_0=m-\\frac{448}{3}.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{(c_2,c_3,c_0)=\\left(-4,-2,\\,m-\\frac{448}{3}\\right)},\n\\qquad m\\equiv M(0,0).\n\\]\nLocality gives \\(c_2=-\\sum_a a\\) and \\(c_3=-|\\mathcal A|\\). The normalization at \\((s,t,u)=(0,0,4)\\) gives \\(c_0=m-448/3\\)."
+            },
+            {
+              "step": 3,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.625,
+              "admitted_missing_context": false,
+              "prompt_chars": 2001,
+              "memory_chars": 1034,
+              "latency_s": 19.38,
+              "response_excerpt": "s^4}{s-a}+\\frac{t^4}{t-a}+\\frac{u^4}{u-a}\n\\right)\n+m+\\frac{752}{3}-9S_2-3S_3.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{(c_2,c_3,c_0)=\\left(-9,-3,m+\\frac{752}{3}\\right)}\n\\]\n\\[\n\\boxed{M(s,t)=\\sum_{a\\in\\{1,3,5\\}}\\bigl(K_a(s)+K_a(t)+K_a(4-s-t)\\bigr)+m+\\frac{752}{3}-9S_2-3S_3.}\n\\]\nThe locality equations are \\(c_2=-\\sum_a a\\) and \\(c_3=-|\\mathcal A|\\). The normalization equation at \\((0,0,4)\\) gives \\(c_0=m+752/3\\)."
+            }
+          ]
+        },
+        {
+          "task_id": 1,
+          "paper_name": "2507.7811",
+          "arm": "agent_memory_passive_state",
+          "num_steps": 12,
+          "sr": 0.0,
+          "ps": 0.6667,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 1.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 6772,
+              "memory_chars": 0,
+              "latency_s": 15.39,
+              "response_excerpt": "jk})^2\n=\\frac12(1+1-2\\delta_{ij})=1,\n\\]\nsince \\(i\\ne j\\). Hence, all vectors \\(\\mathbf b^a\\) have unit length.\n\nFINAL RESULT:\n\\[\n\\boxed{\\left\\lVert\\mathbf b^a\\right\\rVert=1\\quad\\text{for every double-index }a.}\n\\]\nThe orthogonality relation gives the squared distance between two different rows of \\(A\\) as \\(2\\). The factor \\(1/\\sqrt{2}\\) in \\(b_k^{[i,j]}\\) makes each \\(\\mathbf b^a\\) a unit vector."
+            },
+            {
+              "step": 2,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.667,
+              "admitted_missing_context": false,
+              "prompt_chars": 1761,
+              "memory_chars": 945,
+              "latency_s": 11.03,
+              "response_excerpt": "ik}-A_{jk})y_k\n=\\sqrt{2}\\,\\mathbf b^{[i,j]}\\cdot\\mathbf y.\n\\]\nBecause\n\\[\n\\mathbf b^a\\cdot\\mathbf y=r\\cos\\Theta^a,\n\\]\nwe get\n\\[\nx_i-x_j=\\sqrt{2}\\,r\\cos\\Theta^{[i,j]}.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{x_i-x_j=\\sqrt{2}\\,r\\cos\\Theta^{[i,j]}}\n\\]\nThe coefficient vector satisfies \\(A_{ik}-A_{jk}=\\sqrt{2}\\,b_k^{[i,j]}\\). The angular definition then gives \\(\\mathbf b^{[i,j]}\\cdot\\mathbf y=r\\cos\\Theta^{[i,j]}\\)."
+            },
+            {
+              "step": 3,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 1947,
+              "memory_chars": 1101,
+              "latency_s": 17.4,
+              "response_excerpt": "Using the conformal algebra, the commutators are\n\\[\n[D,H]=iH,\\qquad [D,K]=-iK,\\qquad [K,H]=2iD.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{[D,H]=iH,\\quad [D,K]=-iK,\\quad [K,H]=2iD}\n\\]\nThe dilation operator gives opposite scaling weights to \\(H\\) and \\(K\\). The commutator of \\(K\\) and \\(H\\) gives \\(2iD\\)."
+            },
+            {
+              "step": 4,
+              "passed": false,
+              "rubric_score": 0.5,
+              "expr_recall": 0.143,
+              "admitted_missing_context": false,
+              "prompt_chars": 1967,
+              "memory_chars": 1098,
+              "latency_s": 22.16,
+              "response_excerpt": "s\\Theta^a)^2}\\right]}\n\\]\n\\[\n\\boxed{K_{\\rm rel}=\\frac{r^2}{2},\\qquad D_{\\rm rel}=-\\frac{i}{2}\\left(r\\partial_r+\\frac{N-1}{2}\\right)}.\n\\]\nThe relative Hamiltonian separates into a radial kinetic term and the angular operator \\(\\hat L^2_{S^{N-2}}/(2r^2)\\). The operators \\(K_{\\rm rel}\\) and \\(D_{\\rm rel}\\) depend only on \\(r\\) and generate special conformal transformations and dilations, respectively."
+            },
+            {
+              "step": 5,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.6,
+              "admitted_missing_context": false,
+              "prompt_chars": 1986,
+              "memory_chars": 1157,
+              "latency_s": 9.34,
+              "response_excerpt": "(\\partial_r^2+\\frac{N-2}{r}\\partial_r\\right)+\\frac{1}{2r^2}\\hat{L}^2_{S^{N-2}}.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{H_{\\rm rel}=-\\frac{1}{2}\\left(\\partial_r^2+\\frac{N-2}{r}\\partial_r\\right)+\\frac{\\hat{L}^2_{S^{N-2}}}{2r^2}}\n\\]\nThe first term is the radial kinetic operator in \\(N-1\\) relative dimensions. The operator \\(\\hat{L}^2_{S^{N-2}}\\) contains the angular Laplacian and the inverse-square interaction."
+            },
+            {
+              "step": 6,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.5,
+              "admitted_missing_context": false,
+              "prompt_chars": 1959,
+              "memory_chars": 1130,
+              "latency_s": 7.97,
+              "response_excerpt": "factor:\n\\[\n\\mathcal{K}=\\operatorname{vdm}^{-\\lambda}K\\operatorname{vdm}^{\\lambda}=K.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\mathcal{D}=D+\\frac{i\\lambda N(N-1)}{4},\\qquad \\mathcal{K}=K.}\n\\]\nThe similarity transformation shifts \\(D\\) by a constant that comes from the Vandermonde degree \\(N(N-1)/2\\). It does not change \\(K\\), because \\(K\\) and \\(\\operatorname{vdm}^{\\lambda}\\) are both multiplication operators."
+            },
+            {
+              "step": 7,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.167,
+              "admitted_missing_context": false,
+              "prompt_chars": 2060,
+              "memory_chars": 1155,
+              "latency_s": 12.54,
+              "response_excerpt": "e{vdm}\n=\\sum_c\\frac{b_i^c}{\\mathbf b^c\\cdot\\mathbf y}\n-\\frac{N(N-1)y_i}{2r^2}}\n\\]\n\\[\n\\boxed{\\partial_{y_i}^2\\log\\operatorname{vdm}\n=-\\sum_c\\frac{(b_i^c)^2}{(\\mathbf b^c\\cdot\\mathbf y)^2}\n-\\frac{N(N-1)}{2r^2}\n+\\frac{N(N-1)y_i^2}{r^4}}\n\\]\nThe first equation follows by differentiating each linear factor and the radial denominator. The second equation uses \\(\\partial_{y_i}(y_i/r^2)=1/r^2-2y_i^2/r^4\\)."
+            },
+            {
+              "step": 8,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.143,
+              "admitted_missing_context": false,
+              "prompt_chars": 2021,
+              "memory_chars": 1132,
+              "latency_s": 15.5,
+              "response_excerpt": "athcal C_{2}^{\\rm rel}\\Psi_{n\\sigma}\n=\\Delta_\\sigma(\\Delta_\\sigma-1)\\Psi_{n\\sigma}.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\mathcal C_{2}^{\\rm rel}=\\tfrac12\\{\\mathcal H_{\\rm rel},\\mathcal K_{\\rm rel}\\}-\\mathcal D_{\\rm rel}^{2}}\n\\]\nThe anticommutator gives the symmetric product of \\(\\mathcal H_{\\rm rel}\\) and \\(\\mathcal K_{\\rm rel}\\). Its eigenvalue on \\(\\Psi_{n\\sigma}\\) is \\(\\Delta_\\sigma(\\Delta_\\sigma-1)\\)."
+            },
+            {
+              "step": 9,
+              "passed": false,
+              "rubric_score": 0.0,
+              "expr_recall": 0.25,
+              "admitted_missing_context": false,
+              "prompt_chars": 2011,
+              "memory_chars": 1176,
+              "latency_s": 22.21,
+              "response_excerpt": "(\\mathbf y)\n=\\frac14\\cos\\vartheta\\left(\\cos\\vartheta+\\sqrt3\\sin\\vartheta\\right)\n\\left(\\cos\\vartheta-\\sqrt3\\sin\\vartheta\\right)\n=\\frac14\\cos(3\\vartheta).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\operatorname{vdm}(\\mathbf y)=\\frac14\\cos(3\\vartheta)}.\n\\]\nThe normalized pairwise-root projections form a product of three angular factors. The triple-angle identity reduces this product to \\(\\frac14\\cos(3\\vartheta)\\)."
+            },
+            {
+              "step": 10,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2038,
+              "memory_chars": 1168,
+              "latency_s": 21.14,
+              "response_excerpt": "lambda}\n\\left[-\\partial_\\vartheta^2+\frac{9\\lambda(\\lambda-1)}{\\cos^2(3\\vartheta)}\\right]\n\\operatorname{vdm}^{\\lambda}\n=-\\partial_\\vartheta^2+6\\lambda\\tan(3\\vartheta)\\partial_\\vartheta+9\\lambda^2\n}\n\\]\nThe needed Vandermonde factor is \\(\\operatorname{vdm}=\\frac14\\cos(3\\vartheta)\\). Its logarithmic derivative is \\(-3\\tan(3\\vartheta)\\), which gives the first-order term and the constant \\(9\\lambda^2\\)."
+            },
+            {
+              "step": 11,
+              "passed": false,
+              "rubric_score": 0.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2055,
+              "memory_chars": 1136,
+              "latency_s": 24.06,
+              "response_excerpt": "1\\!\\left(\\lambda+i\\sigma,\\lambda-i\\sigma;\\lambda+\\frac12;-\\sinh^2u\\right)+C_2(\\sinh u)^{1-2\\lambda}{}_2F_1\\!\\left(\\frac12+i\\sigma,\\frac12-i\\sigma;\\frac32-\\lambda;-\\sinh^2u\\right)}.\n\\]\nThe substitution \\(z=-\\sinh^2u\\) gives the Gauss hypergeometric equation with \\(a=\\lambda+i\\sigma\\), \\(b=\\lambda-i\\sigma\\), and \\(c=\\lambda+\\tfrac12\\). The two local exponents at \\(u=0\\) are \\(0\\) and \\(1-2\\lambda\\)."
+            },
+            {
+              "step": 12,
+              "passed": false,
+              "rubric_score": 0.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2127,
+              "memory_chars": 1151,
+              "latency_s": 20.17,
+              "response_excerpt": "=\\tanh^2 u\\), we get\n\\[\n\\cosh(2u)=\\frac{1+\\tanh^2u}{1-\\tanh^2u}=\\frac{1+\\chi}{1-\\chi}.\n\\]\nThus,\n\\[\nY_\\sigma(\\chi)\\propto C^\\lambda_{i\\sigma-\\lambda}\\!\\left(\\frac{1+\\chi}{1-\\chi}\\right).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{f(\\chi)=\\frac{1+\\chi}{1-\\chi}}.\n\\]\nThe radial equation becomes the Gegenbauer equation when its argument is \\(x=\\cosh(2u)\\). The relation \\(\\chi=\\tanh^2u\\) gives \\(x=(1+\\chi)/(1-\\chi)\\)."
+            }
+          ]
+        },
+        {
+          "task_id": 3,
+          "paper_name": "2309.15922",
+          "arm": "agent_memory_passive_state",
+          "num_steps": 3,
+          "sr": 0.0,
+          "ps": 0.6667,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 1.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2365,
+              "memory_chars": 0,
+              "latency_s": 47.55,
+              "response_excerpt": "s not give an independent null constraint. The non-trivial constraint is\n\\[\n\\left\\langle \\frac{2\\rho_\\ell^{1111}(\\mu)}{\\mu^5}\n\\left(L_\\ell^2-\\frac{3}{2}L_\\ell^1\\right)\\right\\rangle=0.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{N_{\\mathrm{null}}(m+n=4)=1}\n\\]\nCrossing requires \\(c^{2,2}_{1111}=\\tfrac32c^{4,0}_{1111}\\). After use of the sum rules, this relation gives the single spectral null constraint shown above."
+            },
+            {
+              "step": 2,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 1.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2211,
+              "memory_chars": 1024,
+              "latency_s": 65.91,
+              "response_excerpt": "\\), the resulting spectral equations have two independent null directions.\n\n\\[\n\\boxed{N_{\\mathrm{null}}^{\\{1122,1212,1221\\}}(m+n=4)=2}\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{N_{\\mathrm{null}}=2}\n\\]\nThe sum rule uses the combinations \\(\\rho^{ijkl}_{\\ell}+(-1)^m\\rho^{ilkj}_{\\ell}\\). Crossing among the \\(1122\\), \\(1212\\), and \\(1221\\) channels gives two independent homogeneous spectral constraints at \\(m+n=4\\)."
+            },
+            {
+              "step": 3,
+              "passed": false,
+              "rubric_score": 0.0,
+              "expr_recall": 1.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2399,
+              "memory_chars": 1136,
+              "latency_s": 29.6,
+              "response_excerpt": "as rank one, and its null space has dimension\n\\[\nN_{\\mathrm{null}}=6-1=\\boxed{5}.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{N_{\\mathrm{null}}=5}\n\\]\nAt \\(m+n=4\\), crossing relates the six densities \\(\\rho^{1234}_{\\ell,n},\\rho^{1243}_{\\ell,n},\\rho^{1324}_{\\ell,n},\\rho^{1342}_{\\ell,n},\\rho^{1423}_{\\ell,n},\\rho^{1432}_{\\ell,n}\\). One combination is independent, so five homogeneous combinations are null constraints."
             }
           ]
         },
@@ -785,8 +1803,8 @@
               "admitted_missing_context": false,
               "prompt_chars": 3264,
               "memory_chars": 0,
-              "latency_s": 19.22,
-              "response_excerpt": "rm{Var}_q\\) are undefined until particles are produced.\n\nFINAL RESULT:\n\\[\nS=0,\\ \\gamma=0\n\\quad\\Longrightarrow\\quad\n\\partial_x f=0\n\\quad\\Longrightarrow\\quad\nf(q,x)=f(q,0).\n\\]\nFree streaming conserves \\(q\\), the distribution, and the moments \\(Y_2,Y_3,Y_4\\). Therefore, any defined evolution of \\(\\bar q=Y_3/Y_2\\) or \\(\\mathrm{Var}_q=Y_4/Y_2-(Y_3/Y_2)^2\\) must result from production and/or collisions."
+              "latency_s": 18.36,
+              "response_excerpt": "ghtarrow\\ \\partial_x f=0\\ \\Longrightarrow\\ f(q,x)=f(q,0),\n\\]\n\\[\nY_n(x)=Y_n(0)\\quad(n=2,3,4),\\qquad \\partial_x\\bar q=\\partial_x\\mathrm{Var}_q=0\n\\]\nwhen \\(Y_2\\ne0\\). Production or collisions are therefore necessary for nontrivial \\(x\\)-dependence of the distribution moments. With the specified empty initial state, \\(f=0\\) and all moments vanish, while \\(\\bar q\\) and \\(\\mathrm{Var}_q\\) are undefined."
             },
             {
               "step": 2,
@@ -794,10 +1812,10 @@
               "rubric_score": 1.0,
               "expr_recall": 0.75,
               "admitted_missing_context": false,
-              "prompt_chars": 1585,
-              "memory_chars": 635,
-              "latency_s": 23.91,
-              "response_excerpt": " so the ratio is not defined. Its continuous post-production value is \\(q_0\\).\n\nFINAL RESULT:\n\\[\n\\boxed{f(q,x)=I_1(x)\\delta(q-q_0)},\\qquad\n\\boxed{Y_2=q_0^2I_1(x)},\\qquad\n\\boxed{Y_3=q_0^3I_1(x)},\\qquad\n\\boxed{\\bar q=q_0}.\n\\]\nThe collisionless equation integrates the source directly, so all produced particles stay at momentum \\(q_0\\). The common production factor \\(I_1(x)\\) cancels from \\(Y_3/Y_2\\)."
+              "prompt_chars": 2043,
+              "memory_chars": 1093,
+              "latency_s": 10.52,
+              "response_excerpt": "tion assignment, is \\(q_0\\).\n\nFINAL RESULT:\n\\[\n\\boxed{f(q,x)=(x-1)\\Theta(x-1)\\delta(q-q_0)},\\qquad\n\\boxed{Y_2=q_0^2(x-1)\\Theta(x-1)},\n\\]\n\\[\n\\boxed{Y_3=q_0^3(x-1)\\Theta(x-1)},\\qquad\n\\boxed{\\bar q=q_0\\quad (Y_2>0)}.\n\\]\nThe collisionless solution is the fixed-momentum delta distribution multiplied by the integrated source. Because \\(Y_3=q_0Y_2\\), every nonempty distribution has mean momentum \\(q_0\\)."
             },
             {
               "step": 3,
@@ -805,21 +1823,21 @@
               "rubric_score": 1.0,
               "expr_recall": 0.25,
               "admitted_missing_context": false,
-              "prompt_chars": 2143,
-              "memory_chars": 863,
-              "latency_s": 23.27,
-              "response_excerpt": "rtial_xY_4=\\gamma(x)(12Y_2-Y_4)\n}.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\mathcal N(x)=\\frac{Y_2(x)}{2}},\n\\qquad\n\\boxed{\\partial_xY_2=0,\\quad\n\\partial_xY_3=\\gamma(3Y_2-Y_3),\\quad\n\\partial_xY_4=\\gamma(12Y_2-Y_4)}.\n\\]\nNumber conservation follows from \\(\\int_0^\\infty q^2e^{-q}dq=2\\). After production stops, the general equation \\(\\partial_xY_n=\\gamma[\\mathcal N\\Gamma(n+1)-Y_n]\\) gives the closed moment system."
+              "prompt_chars": 2410,
+              "memory_chars": 1130,
+              "latency_s": 11.53,
+              "response_excerpt": "2-Y_4\\bigr)}.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\mathcal N(x)=\\frac{Y_2(x)}{2}},\\qquad\n\\boxed{\\partial_xY_2=0,\\quad\n\\partial_xY_3=\\gamma(3Y_2-Y_3),\\quad\n\\partial_xY_4=\\gamma(12Y_2-Y_4)}.\n\\]\nNumber conservation fixes the equilibrium normalization because \\(\\int_0^\\infty q^2e^{-q}dq=2\\). After production stops, the general equation \\(\\partial_xY_n=\\gamma[(n!/2)Y_2-Y_n]\\) closes the three required moments."
             },
             {
               "step": 4,
               "passed": true,
               "rubric_score": 1.0,
-              "expr_recall": 0.6,
+              "expr_recall": 0.9,
               "admitted_missing_context": false,
-              "prompt_chars": 2838,
-              "memory_chars": 1139,
-              "latency_s": 28.18,
-              "response_excerpt": "+6,\n\\]\n\\[\n\\boxed{(Y_2,Y_3,Y_4)_{x_s}=\\mathcal I(1,q_0,q_0^2)},\n\\]\n\\[\n\\boxed{\\bar q=3+(q_0-3)z,\\qquad\n\\mathrm{Var}_q=12+(q_0^2-12)z-[3+(q_0-3)z]^2},\n\\quad z=e^{-\\gamma_0(x-x_s)}.\n\\]\nThe integrated two-step source fixes the conserved abundance \\(Y_2=\\mathcal I\\) and the initial monoenergetic moments. After production stops, each higher moment relaxes exponentially to \\(Y_n=\\mathcal I\\Gamma(n+1)/2\\)."
+              "prompt_chars": 2843,
+              "memory_chars": 1144,
+              "latency_s": 20.13,
+              "response_excerpt": "}\\left(1+x_s+\\frac{x_s^2}{2}+\\frac{x_s^3}{6}\\right)\\right]+\\frac{B}{r^4}\\left[e^{-rx_1}P(rx_1)-e^{-rx_s}P(rx_s)\\right]},\n\\quad P(z)=z^3+3z^2+6z+6.\n\\]\nFor \\(x\\ge x_s\\), \\(Y_2\\) is constant, while \\(Y_3\\) and \\(Y_4\\) relax exponentially to \\(3Y_2\\) and \\(12Y_2\\). Hence \\(\\bar q=3+(q_0-3)e^{-\\gamma_0(x-x_s)}\\) and \\(\\mathrm{Var}_q=12+(q_0^2-12)e^{-\\gamma_0(x-x_s)}-[3+(q_0-3)e^{-\\gamma_0(x-x_s)}]^2\\)."
             }
           ]
         },
@@ -839,8 +1857,8 @@
               "admitted_missing_context": false,
               "prompt_chars": 2163,
               "memory_chars": 0,
-              "latency_s": 10.36,
-              "response_excerpt": "iagonal, so subtract one diagonal copy:\n\\[\nA(N)B(N)=S_{1,2}(N)+S_{2,1}(N)-\\sum_{k=1}^{N}\\frac{(-1)^k(-1)^k}{(2k+1)^3}.\n\\]\nSince \\((-1)^k(-1)^k=1\\), the diagonal sum is \\(C(N)\\).\n\nFINAL RESULT:\n\\[\n\\boxed{A(N)B(N)=S_{1,2}(N)+S_{2,1}(N)-C(N)}.\n\\]\nThe two inclusive nested sums cover the full product region and count the diagonal twice. The equation subtracts \\(C(N)\\), which is the extra diagonal copy."
+              "latency_s": 7.62,
+              "response_excerpt": "oduct region. They count the diagonal twice, so subtract the diagonal sum once:\n\\[\n\\sum_{k=1}^{N}\\frac{(-1)^k}{2k+1}\\frac{(-1)^k}{(2k+1)^2}\n=\\sum_{k=1}^{N}\\frac{1}{(2k+1)^3}=C(N).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{A(N)B(N)=S_{1,2}(N)+S_{2,1}(N)-C(N)}.\n\\]\nInclusive nesting makes each nested sum contain the diagonal. Thus, their sum counts the diagonal twice, and subtraction of \\(C(N)\\) gives the product."
             },
             {
               "step": 2,
@@ -848,10 +1866,10 @@
               "rubric_score": 1.0,
               "expr_recall": 0.5,
               "admitted_missing_context": false,
-              "prompt_chars": 1531,
-              "memory_chars": 602,
-              "latency_s": 18.17,
-              "response_excerpt": "a(3)-1\n=\\frac{7}{8}\\zeta(3)-1.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{A(\\infty)=\\frac{\\pi}{4}-1,\\qquad B(\\infty)=G-1,\\qquad C(\\infty)=\\frac{7}{8}\\zeta(3)-1.}\n\\]\nThe first two equations follow from the Dirichlet beta values \\(\\beta(1)=\\pi/4\\) and \\(\\beta(2)=G\\), after removal of the \\(k=0\\) term. The last equation uses \\(\\sum_{k=0}^{\\infty}(2k+1)^{-3}=(1-2^{-3})\\zeta(3)\\), again with the \\(k=0\\) term removed."
+              "prompt_chars": 1794,
+              "memory_chars": 865,
+              "latency_s": 13.38,
+              "response_excerpt": "[\nC(\\infty)=\\frac{7}{8}\\zeta(3)-1.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\nA(\\infty)=\\frac{\\pi}{4}-1,\n\\qquad\nB(\\infty)=G-1,\n\\qquad\nC(\\infty)=\\frac{7}{8}\\zeta(3)-1\n}\n\\]\nThe first two equations follow from the arctangent series and the definition of Catalan\u2019s constant after removal of the \\(k=0\\) term. The third equation follows from the odd-integer part of \\(\\zeta(3)\\), also after removal of the \\(k=0\\) term."
             },
             {
               "step": 3,
@@ -859,10 +1877,10 @@
               "rubric_score": 1.0,
               "expr_recall": 0.6,
               "admitted_missing_context": false,
-              "prompt_chars": 1784,
-              "memory_chars": 831,
-              "latency_s": 11.08,
-              "response_excerpt": "eft(\\frac{\\pi}{4}-1\\right)(G-1)+\\frac{7}{8}\\zeta(3)-1\n=\\frac{\\pi G}{4}-\\frac{\\pi}{4}-G+\\frac{7}{8}\\zeta(3).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\mathcal K=\\frac{\\pi G}{4}-\\frac{\\pi}{4}-G+\\frac{7}{8}\\zeta(3)}.\n\\]\nThe product identity gives \\(\\mathcal K=A(\\infty)B(\\infty)+C(\\infty)\\). The required limits follow from \\(\\beta(1)=\\pi/4\\), \\(\\beta(2)=G\\), and \\(\\sum_{k=0}^{\\infty}(2k+1)^{-3}=\\tfrac78\\zeta(3)\\)."
+              "prompt_chars": 2099,
+              "memory_chars": 1146,
+              "latency_s": 8.34,
+              "response_excerpt": "^k}{(2k+1)^2}=\\frac{1}{(2k+1)^3}.\n\\]\nTherefore,\n\\[\n\\mathcal K=\\left(\\frac{\\pi}{4}-1\\right)(G-1)+\\frac78\\zeta(3)-1\n=\\frac{\\pi G}{4}-\\frac{\\pi}{4}-G+\\frac78\\zeta(3).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\mathcal K=\\frac{\\pi G}{4}-\\frac{\\pi}{4}-G+\\frac78\\zeta(3)}.\n\\]\nThe finite quasi-shuffle equation is \\(S_{1,2}+S_{2,1}=AB+C\\). Insert \\(A(\\infty)=\\pi/4-1\\), \\(B(\\infty)=G-1\\), and \\(C(\\infty)=7\\zeta(3)/8-1\\)."
             }
           ]
         },
@@ -872,40 +1890,40 @@
           "arm": "agent_memory_passive_state",
           "num_steps": 5,
           "sr": 1.0,
-          "ps": 0.6,
+          "ps": 1.0,
           "steps": [
             {
               "step": 1,
               "passed": true,
               "rubric_score": 1.0,
-              "expr_recall": 0.333,
+              "expr_recall": 0.667,
               "admitted_missing_context": false,
               "prompt_chars": 2618,
               "memory_chars": 0,
-              "latency_s": 18.72,
-              "response_excerpt": "t\\{\n (a_0,a_1,b_0,b_1,c_1,\\ldots,c_N)\\in\\mathbb Z_{\\ge0}^{N+4}:\n \\begin{array}{l}\n a_0+b_0+2(a_1+b_1)+\\sum_{n=1}^N c_n=D_{\\rm tot},\\\\\n \\sum_{n=1}^N c_n=K,\\\\\n (a_0+a_1)+\\sum_{n=1}^N n c_n=b_0+b_1\n \\end{array}\n \\right\\}.\n}\n\\]\nThe powers of \\(t\\) and \\(u\\) give \\(D_{\\rm tot}\\) and \\(K\\), respectively. The condition \\(\\mathrm{CT}_z\\) sets the total \\(U(1)\\) charge to zero and gives the third equation."
+              "latency_s": 16.83,
+              "response_excerpt": "\n\\[\n\\boxed{\nc_N(D_{\\rm tot},K)=\\#\\left\\{(a_0,a_1,b_0,b_1,c_1,\\ldots,c_N)\\in\\mathbb Z_{\\ge0}^{N+4}:\n\\begin{aligned}\na_0+b_0+2(a_1+b_1)+\\sum_{n=1}^N c_n&=D_{\\rm tot},\\\\\n\\sum_{n=1}^N c_n&=K,\\\\\n(a_0+a_1)+\\sum_{n=1}^N n c_n&=b_0+b_1\n\\end{aligned}\n\\right\\}.\n}\n\\]\nThe powers of \\(t\\) and \\(u\\) give the dimension and spurion-number equations. The constant term in \\(z\\) gives the charge-neutrality equation."
             },
             {
               "step": 2,
-              "passed": false,
-              "rubric_score": 0.0,
+              "passed": true,
+              "rubric_score": 1.0,
               "expr_recall": 0.5,
               "admitted_missing_context": false,
-              "prompt_chars": 1180,
-              "memory_chars": 381,
-              "latency_s": 13.91,
-              "response_excerpt": " Subtask 1, the sector with \\(N=0\\) and \\(K=0\\) has one admissible monomial of total degree \\(D_{\\rm tot}=6\\). Therefore,\n\\[\nH_0(t,0)=1+t^6+O(t^8),\n\\qquad\nc_0(6,0)=[t^6]H_0(t,0)=1.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{c_0(6,0)=1}\n\\]\nThe powers of \\(t\\) and \\(u\\) impose \\(D_{\\rm tot}=6\\) and \\(K=0\\). The constant-term operation imposes zero total \\(U(1)\\) charge, and exactly one admissible solution remains."
+              "prompt_chars": 1906,
+              "memory_chars": 1107,
+              "latency_s": 13.33,
+              "response_excerpt": "2q+a_1+b_1=6,\\qquad 0\\leq a_1,b_1\\leq q.\n\\]\nThe solutions have either \\((q,a_1+b_1)=(3,0)\\), which gives \\(1\\) solution, or \\((q,a_1+b_1)=(2,2)\\), which gives \\(3\\) solutions. Thus,\n\\[\nc_0(6,0)=1+3=4.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{c_0(6,0)=[t^6]H_0(t,0)=4.}\n\\]\nCharge neutrality gives \\(a_0+a_1=b_0+b_1=q\\). The dimension equation becomes \\(2q+a_1+b_1=6\\), and its valid cases give \\(1+3=4\\) solutions."
             },
             {
               "step": 3,
-              "passed": false,
-              "rubric_score": 0.0,
+              "passed": true,
+              "rubric_score": 1.0,
               "expr_recall": 0.5,
               "admitted_missing_context": false,
-              "prompt_chars": 1651,
-              "memory_chars": 838,
-              "latency_s": 33.83,
-              "response_excerpt": "\\ge 0\\). They satisfy\n\\[\na+b+c_1=6,\\qquad c_1=1,\\qquad a-b+c_1=0.\n\\]\nThus,\n\\[\nc_1=1,\\qquad a+b=5,\\qquad a-b=-1,\n\\]\nwhich gives the unique solution\n\\[\n(a,b,c_1)=(2,3,1).\n\\]\nTherefore,\n\\[\n[t^6u]H_1(t,u)=1.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{c_1(6,1)=1}\n\\]\nThe powers of \\(t\\) and \\(u\\) impose \\(a+b+c_1=6\\) and \\(c_1=1\\). The constant-term condition imposes \\(a-b+c_1=0\\), which gives one admissible solution."
+              "prompt_chars": 1952,
+              "memory_chars": 1139,
+              "latency_s": 12.29,
+              "response_excerpt": "_1+b_1)=5.\n\\]\nLet \\(P=a_0+a_1\\). Then \\(b_0+b_1=P+1\\), so\n\\[\na_1+b_1=4-2P.\n\\]\nFor \\(P=1\\), there are two solutions. For \\(P=2\\), there is one solution. Thus, the total is \\(2+1=3\\).\n\nFINAL RESULT:\n\\[\n\\boxed{c_1(6,1)=[t^6u]H_1(t,u)=3.}\n\\]\nThe key equations are \\(a_0+a_1+1=b_0+b_1\\) and \\(a_0+b_0+2(a_1+b_1)=5\\). Their nonnegative integer solutions have counts \\(2\\) for \\(P=1\\) and \\(1\\) for \\(P=2\\)."
             },
             {
               "step": 4,
@@ -913,10 +1931,10 @@
               "rubric_score": 1.0,
               "expr_recall": 0.5,
               "admitted_missing_context": false,
-              "prompt_chars": 1652,
-              "memory_chars": 839,
-              "latency_s": 18.06,
-              "response_excerpt": "e remaining fields satisfy\n\\[\na+b+2(c+d)=6,\n\\qquad a-b+c-d=-s.\n\\]\nThe numbers of nonnegative solutions for \\(s=2,3,4\\) are \\(3,3,2\\), respectively. Thus,\n\\[\nc_2(8,2)=3+3+2=8.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{c_2(8,2)=[t^8u^2]H_2(t,u)=8}\n\\]\nThe spurion equations are \\(k_1+k_2=2\\) and \\(s=k_1+2k_2\\in\\{2,3,4\\}\\). The dimension and constant-term equations give solution counts \\(3,3,2\\), whose sum is \\(8\\)."
+              "prompt_chars": 1990,
+              "memory_chars": 1177,
+              "latency_s": 17.3,
+              "response_excerpt": "\n\\qquad\na_0+b_0+2(a_1+b_1)=6.\n\\]\nThe respective numbers of solutions are\n\\[\nM(6,2)=3,\\qquad M(6,3)=3,\\qquad M(6,4)=2.\n\\]\nTherefore,\n\\[\nc_2(8,2)=3+3+2=8.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{c_2(8,2)=[t^8u^2]H_2(t,u)=8.}\n\\]\nThe spurion constraint is \\(c_1+c_2=2\\), which gives charges \\(q=2,3,4\\). The remaining fields satisfy \\(b_0+b_1-a_0-a_1=q\\) and \\(a_0+b_0+2(a_1+b_1)=6\\), with solution counts \\(3,3,2\\)."
             },
             {
               "step": 5,
@@ -924,10 +1942,10 @@
               "rubric_score": 1.0,
               "expr_recall": 1.0,
               "admitted_missing_context": false,
-              "prompt_chars": 2194,
-              "memory_chars": 1137,
-              "latency_s": 43.75,
-              "response_excerpt": "\\]\nThe numbers of spurion choices with these charges are\n\\[\nm(s)=(1,1,2,2,2,1,1).\n\\]\nThus,\n\\[\nc_3(10,3)=\\sum_s m(s)f_7(s)\n=3+3+2(2)+2(1)+2(1)=14.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{c_3(10,3)=[t^{10}u^3]H_3(t,u)=14}\n\\]\nThe spurion equations are \\(k_1+k_2+k_3=3\\) and \\(s=k_1+2k_2+3k_3\\). The dimension and charge equations are \\(a+b+2p+2q=7\\) and \\(a+p-b-q+s=0\\), and their weighted solution count is \\(14\\)."
+              "prompt_chars": 2234,
+              "memory_chars": 1177,
+              "latency_s": 22.42,
+              "response_excerpt": "sponding solution counts are\n\\[\n(f_7(q))_{q=3}^{9}=(3,3,2,1,1,0,0).\n\\]\nThus,\n\\[\nc_3(10,3)=\\sum_{q=3}^{9}m_qf_7(q)\n=3+3+2(2)+2(1)+2(1)=14.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{c_3(10,3)=[t^{10}u^3]H_3(t,u)=14.}\n\\]\nThe three-spurion condition gives charge multiplicities \\((1,1,2,2,2,1,1)\\) for \\(q=3,\\ldots,9\\). The dimension-seven field equations give counts \\((3,3,2,1,1,0,0)\\), whose weighted sum is \\(14\\)."
             }
           ]
         },
@@ -937,7 +1955,7 @@
           "arm": "agent_memory_passive_state",
           "num_steps": 4,
           "sr": 1.0,
-          "ps": 1.0,
+          "ps": 0.75,
           "steps": [
             {
               "step": 1,
@@ -947,8 +1965,8 @@
               "admitted_missing_context": false,
               "prompt_chars": 2081,
               "memory_chars": 0,
-              "latency_s": 13.37,
-              "response_excerpt": "t)\\) is odd. Thus, \\(\\phi_\\nu\\) is an eigenfunction.\n\nFINAL RESULT:\n\\[\n\\boxed{(\\mathcal K_0\\phi_\\nu)(\\rho)=\\chi_0(\\nu)\\phi_\\nu(\\rho)}\n\\]\nwith\n\\[\n\\boxed{\\chi_0(\\nu)=\\chi_{K_0}(\\nu)=\\int_0^\\infty dt\\,\\frac{\\cos(\\nu t)-1}{\\sinh(t/2)}}.\n\\]\nTranslation invariance lets the factor \\(e^{i\\nu\\rho}\\) leave the integral. Evenness of \\(K_0\\) changes the Fourier transform into the stated real cosine transform."
+              "latency_s": 12.57,
+              "response_excerpt": "chi_{K_0}(\\nu).\n\\]\nTherefore, each plane wave is an eigenfunction.\n\nFINAL RESULT:\n\\[\n\\boxed{(\\mathcal K_0\\phi_\\nu)(\\rho)=\\chi_0(\\nu)\\phi_\\nu(\\rho)},\n\\qquad\n\\boxed{\\chi_0(\\nu)=\\chi_{K_0}(\\nu)\n=\\int_0^\\infty dt\\,\\frac{\\cos(\\nu t)-1}{\\sinh(t/2)}}.\n\\]\nThe variable change \\(t=\\rho-\\rho'\\) factors out \\(e^{i\\nu\\rho}\\). The even kernel removes the odd sine term and leaves the cosine-transform eigenvalue."
             },
             {
               "step": 2,
@@ -956,21 +1974,21 @@
               "rubric_score": 1.0,
               "expr_recall": 0.0,
               "admitted_missing_context": false,
-              "prompt_chars": 1629,
-              "memory_chars": 663,
-              "latency_s": 19.05,
-              "response_excerpt": "t\\,\\frac{\\cos(\\nu t)-1}{\\sinh(t/2)},\n\\]\nsince \\(2[\\psi(1)-\\psi(1/2)]=4\\ln 2\\).\n\nFINAL RESULT:\n\\[\n\\boxed{\\chi_0(\\nu)=2\\psi(1)-\\psi\\!\\left(\\frac12+i\\nu\\right)-\\psi\\!\\left(\\frac12-i\\nu\\right)}.\n\\]\nThe kernel transform becomes a sum of two exponential integrals with arguments \\(\\frac12\\pm i\\nu\\). The digamma integral representation evaluates these integrals and fixes the constant \\(\\chi_0(0)=4\\ln 2\\)."
+              "prompt_chars": 1969,
+              "memory_chars": 1003,
+              "latency_s": 22.58,
+              "response_excerpt": "tated expression gives \\(4\\ln 2\\).\n\nFINAL RESULT:\n\\[\n\\boxed{\\chi_0(\\nu)=2\\psi\\!\\left(\\frac12\\right)-\\psi\\!\\left(\\frac12+i\\nu\\right)-\\psi\\!\\left(\\frac12-i\\nu\\right)}.\n\\]\nThe geometric expansion of \\(1/\\sinh(t/2)\\) converts the integral into a digamma series. To obtain the requested formula, one must redefine the eigenvalue by adding \\(4\\ln 2\\): \\(\\chi_0^{\\mathrm{shifted}}(\\nu)=\\chi_0(\\nu)+4\\ln 2\\)."
             },
             {
               "step": 3,
-              "passed": true,
-              "rubric_score": 1.0,
+              "passed": false,
+              "rubric_score": 0.5,
               "expr_recall": 0.0,
               "admitted_missing_context": false,
-              "prompt_chars": 2137,
-              "memory_chars": 924,
-              "latency_s": 28.92,
-              "response_excerpt": ":\n\\[\n\\boxed{(\\mathcal K_1\\phi_\\nu)(\\rho)=\\chi_1(\\nu)\\phi_\\nu(\\rho)},\n\\qquad\n\\boxed{\\chi_1(\\nu)=\\int_0^\\infty dt\\,\\frac{t[\\cos(\\nu t)-1]}{\\sinh(t/2)}}.\n\\]\nThe plane wave remains an eigenfunction because the kernel depends only on \\(\\rho-\\rho'\\). For the stated \\(K_1(t)=|t|K_0(t)\\), the requested formula \\(\\chi_1=-\\chi_0''\\) is inconsistent: two derivatives generate \\(t^2K_0(t)\\), not \\(|t|K_0(t)\\)."
+              "prompt_chars": 2348,
+              "memory_chars": 1135,
+              "latency_s": 20.8,
+              "response_excerpt": "nu=\\chi_1(\\nu)\\phi_\\nu},\n\\qquad\n\\boxed{\\chi_1(\\nu)=2\\operatorname{Re}\\psi^{(1)}\\!\\left(\\frac12+i\\nu\\right)-2\\psi^{(1)}\\!\\left(\\frac12\\right)}.\n\\]\nThe Fourier modes remain eigenfunctions because \\(K_1\\) is translation invariant. With the stated definition \\(K_1=|t|K_0\\), the equation \\(\\chi_1=-\\chi_0''\\) is mathematically inconsistent because the second derivative produces the weight \\(t^2K_0(t)\\)."
             },
             {
               "step": 4,
@@ -978,10 +1996,10 @@
               "rubric_score": 1.0,
               "expr_recall": 1.0,
               "admitted_missing_context": false,
-              "prompt_chars": 2582,
-              "memory_chars": 1108,
-              "latency_s": 48.03,
-              "response_excerpt": "lso,\n\\[\n\\chi_0''(0)=-28\\zeta(3).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\chi_{\\epsilon,\\eta}(\\nu)=\\chi_0(\\nu)+\\epsilon\\pi^2\\left[\\operatorname{sech}^2(\\pi\\nu)-1\\right]+\\eta\\left[\\chi_0''(0)-\\chi_0''(\\nu)\\right]}\n\\]\nThe \\(|t|K_0\\) contribution is \\(\\pi^2[\\operatorname{sech}^2(\\pi\\nu)-1]\\). The \\(t^2K_0\\) contribution is \\(\\chi_0''(0)-\\chi_0''(\\nu)\\), and the third- and fourth-derivative coefficients are zero."
+              "prompt_chars": 2652,
+              "memory_chars": 1178,
+              "latency_s": 56.37,
+              "response_excerpt": "\\nu\n=\\chi_{\\epsilon,\\eta}(\\nu)\\phi_\\nu,\n\\qquad\n\\chi_{\\epsilon,\\eta}\n=\\chi_0+\\epsilon\\chi_1-\\eta\\chi_0''\n}\n\\]\n\\[\n\\boxed{\n\\chi_1(\\nu)=\\pi^2\\bigl[\\operatorname{sech}^2(\\pi\\nu)-1\\bigr]\n=2\\operatorname{Re}\\psi^{(1)}\\!\\left(\\tfrac12+i\\nu\\right)-2\\psi^{(1)}\\!\\left(\\tfrac12\\right)\n}.\n\\]\nMultiplication of the kernel by \\(t^2\\) gives \\(-\\chi_0''(\\nu)\\). No third-order or fourth-order derivative term occurs."
             }
           ]
         },
@@ -1001,8 +2019,8 @@
               "admitted_missing_context": false,
               "prompt_chars": 1674,
               "memory_chars": 0,
-              "latency_s": 14.44,
-              "response_excerpt": "Substitution and division by \\(z\\) give\n\\[\nz(1-z)I_1''(z)+(1-2z)I_1'(z)-\\frac14I_1(z)=0.\n\\]\n\nFINAL RESULT:\n\\[\nI_1(z)=\\pi\\sum_{n=0}^{\\infty}\\frac{(\\tfrac12)_n^2}{(n!)^2}z^n,\n\\qquad\n\\boxed{\\left[\\theta^2-z\\left(\\theta+\\tfrac12\\right)^2\\right]I_1=0}.\n\\]\nThe coefficient recurrence is \\(n^2a_n=(n-\\tfrac12)^2a_{n-1}\\). Expanding the Euler operators gives \\(\\boxed{z(1-z)I_1''+(1-2z)I_1'-\\tfrac14I_1=0}\\)."
+              "latency_s": 19.66,
+              "response_excerpt": "rac14I_1\\right)=0.\n\\]\nDivide by \\(z\\) and simplify:\n\\[\nz(1-z)I_1''(z)+(1-2z)I_1'(z)-\\frac14I_1(z)=0.\n\\]\n\nFINAL RESULT:\n\\[\nI_1(z)=\\pi\\sum_{n=0}^{\\infty}\\frac{(\\tfrac12)_n^2}{(n!)^2}z^n,\n\\qquad\n\\left[\\theta^2-z\\left(\\theta+\\tfrac12\\right)^2\\right]I_1(z)=0.\n\\]\nThe coefficient recurrence is \\(n^2c_n=(n-\\tfrac12)^2c_{n-1}\\). Using \\(\\theta^2I=z^2I''+zI'\\) gives \\(z(1-z)I_1''+(1-2z)I_1'-\\tfrac14I_1=0\\)."
             },
             {
               "step": 2,
@@ -1010,10 +2028,10 @@
               "rubric_score": 1.0,
               "expr_recall": 0.0,
               "admitted_missing_context": false,
-              "prompt_chars": 1682,
-              "memory_chars": 665,
-              "latency_s": 18.7,
-              "response_excerpt": "ytically continued.\n\nFINAL RESULT:\n\\[\nI_2(z)=\\pi^2\\sum_{n=0}^{\\infty}\\frac{(\\tfrac12)_n^3}{(n!)^3}z^n,\n\\qquad\nn^3a_n=(n-\\tfrac12)^3a_{n-1},\n\\]\n\\[\n\\boxed{\\left[\\theta^3-z\\left(\\theta+\\tfrac12\\right)^3\\right]I_2(z)=0}.\n\\]\nThe two beta integrals produce the coefficient \\(a_n=\\pi^2(\\tfrac12)_n^3/(n!)^3\\). Its recurrence is exactly the coefficient form of the stated third-order Euler-operator equation."
+              "prompt_chars": 2103,
+              "memory_chars": 1086,
+              "latency_s": 13.43,
+              "response_excerpt": ",\n\\[\n\\boxed{\\left[\\theta^3-z\\left(\\theta+\\tfrac12\\right)^3\\right]I_2(z)=0.}\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{I_2(z)=\\pi^2\\sum_{n=0}^{\\infty}\\frac{(\\tfrac12)_n^3}{(n!)^3}z^n},\n\\qquad\n\\boxed{\\left[\\theta^3-z\\left(\\theta+\\tfrac12\\right)^3\\right]I_2(z)=0}.\n\\]\nThe series coefficients satisfy \\(n^3c_n=(n-\\tfrac12)^3c_{n-1}\\). This recurrence is exactly the coefficient form of the stated third-order equation."
             },
             {
               "step": 3,
@@ -1021,10 +2039,510 @@
               "rubric_score": 1.0,
               "expr_recall": 1.0,
               "admitted_missing_context": false,
-              "prompt_chars": 1926,
-              "memory_chars": 923,
-              "latency_s": 12.55,
-              "response_excerpt": "imal-order operator has order four:\n\\[\nL_3=\\theta^4-z\\left(\\theta+\\tfrac12\\right)^4,\n\\qquad \\theta=z\\frac{d}{dz}.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{L_3=\\theta^4-z\\left(\\theta+\\tfrac12\\right)^4},\n\\qquad\n\\boxed{L_3I_3(z)=0}.\n\\]\nThe integral gives \\(I_3(z)=\\pi^3\\sum_{n\\geq0}(\\tfrac12)_n^4z^n/(n!)^4\\). The coefficient recurrence \\(n^4a_n=(n-\\tfrac12)^4a_{n-1}\\) gives the minimal fourth-order Euler operator."
+              "prompt_chars": 2153,
+              "memory_chars": 1150,
+              "latency_s": 16.47,
+              "response_excerpt": "d the lower parameters \\(1\\). Therefore, the generalized hypergeometric equation has minimal order \\(4\\).\n\nFINAL RESULT:\n\\[\n\\boxed{L_3=\\theta^4-z\\left(\\theta+\\tfrac12\\right)^4},\n\\qquad\n\\boxed{L_3I_3(z)=0}.\n\\]\nThe integral has the series \\(I_3(z)=\\pi^3\\sum_{n\\ge0}(\\tfrac12)_n^4z^n/(n!)^4\\). Its coefficient recurrence \\(n^4c_n=(n-\\tfrac12)^4c_{n-1}\\) produces the minimal fourth-order Euler operator."
+            }
+          ]
+        }
+      ]
+    },
+    "agent_memory_single_call_full": {
+      "sr": 1.0,
+      "ps": 1.0,
+      "sr_at_k": {
+        "step_1": 1.0,
+        "step_2": 1.0,
+        "step_3": 1.0,
+        "step_4": 1.0
+      },
+      "avg_memory_chars_injected": 6938,
+      "tasks": [
+        {
+          "task_id": 0,
+          "paper_name": "0000.0001",
+          "arm": "agent_memory_single_call_full",
+          "num_steps": 3,
+          "sr": 1.0,
+          "ps": 1.0,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.5,
+              "admitted_missing_context": false,
+              "prompt_chars": 2960,
+              "memory_chars": 0,
+              "latency_s": 23.1,
+              "response_excerpt": "lied information. Thus, if \\(M(0,0)=m\\), then\n\\[\nc_0=m-\\frac{16}{3}.\n\\]\nIn particular, \\(M(0,0)=0\\) gives \\(c_0=-16/3\\), while \\(M(0,0)=1\\) gives \\(c_0=-13/3\\).\n\nFINAL RESULT:\n\\[\n\\boxed{(c_2,c_3,c_0)=\\left(-1,-1,\\,m-\\frac{16}{3}\\right)},\\qquad m\\equiv M(0,0).\n\\]\nLocality uses \\(c_2=-A_1\\) and \\(c_3=-N\\). The missing normalization equation must specify \\(m\\) to give one numerical value for \\(c_0\\)."
+            },
+            {
+              "step": 2,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.429,
+              "admitted_missing_context": false,
+              "prompt_chars": 4408,
+              "memory_chars": 3581,
+              "latency_s": 13.26,
+              "response_excerpt": "ac{1024}{3},\n\\]\nand\n\\[\n\\mathcal P(0,0)=c_0-4(16)-2(64)=c_0-192.\n\\]\nThus, with \\(m\\equiv M(0,0)\\),\n\\[\nm=c_0+\\frac{448}{3},\\qquad c_0=m-\\frac{448}{3}.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{(c_2,c_3,c_0)=\\left(-4,-2,\\,m-\\frac{448}{3}\\right)},\n\\qquad m\\equiv M(0,0).\n\\]\nLocality gives \\(c_2=-\\sum_a a\\) and \\(c_3=-|\\mathcal A|\\). The normalization value \\(m=M(0,0)\\) fixes \\(c_0\\); if \\(m=0\\), then \\(c_0=-448/3\\)."
+            },
+            {
+              "step": 3,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.625,
+              "admitted_missing_context": false,
+              "prompt_chars": 5904,
+              "memory_chars": 4937,
+              "latency_s": 17.54,
+              "response_excerpt": "{u-a}\\right)\n+\\frac{752}{3}-9(s^2+t^2+u^2)-3(s^3+t^3+u^3).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{(c_2,c_3,c_0)=\\left(-9,-3,\\frac{752}{3}\\right)}\n\\]\n\\[\n\\boxed{M(s,t)=\\sum_{a\\in\\{1,3,5\\}}\\left(\\frac{s^4}{s-a}+\\frac{t^4}{t-a}+\\frac{(4-s-t)^4}{4-s-t-a}\\right)+\\frac{752}{3}-9S_2-3S_3.}\n\\]\nLocality gives \\(c_2=-\\sum_a a\\) and \\(c_3=-|\\mathcal A|\\). The normalization equation \\(M(0,0)=0\\) then gives \\(c_0=752/3\\)."
+            }
+          ]
+        },
+        {
+          "task_id": 1,
+          "paper_name": "2507.7811",
+          "arm": "agent_memory_single_call_full",
+          "num_steps": 12,
+          "sr": 1.0,
+          "ps": 1.0,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 1.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 6772,
+              "memory_chars": 0,
+              "latency_s": 15.39,
+              "response_excerpt": "jk})^2\n=\\frac12(1+1-2\\delta_{ij})=1,\n\\]\nsince \\(i\\ne j\\). Hence, all vectors \\(\\mathbf b^a\\) have unit length.\n\nFINAL RESULT:\n\\[\n\\boxed{\\left\\lVert\\mathbf b^a\\right\\rVert=1\\quad\\text{for every double-index }a.}\n\\]\nThe orthogonality relation gives the squared distance between two different rows of \\(A\\) as \\(2\\). The factor \\(1/\\sqrt{2}\\) in \\(b_k^{[i,j]}\\) makes each \\(\\mathbf b^a\\) a unit vector."
+            },
+            {
+              "step": 2,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.667,
+              "admitted_missing_context": false,
+              "prompt_chars": 7859,
+              "memory_chars": 7044,
+              "latency_s": 8.16,
+              "response_excerpt": "_{k=1}^{N-1}(A_{ik}-A_{jk})y_k\n=\\frac{x_i-x_j}{\\sqrt{2}}.\n\\]\nBecause \\(r\\cos\\Theta^a=\\mathbf b^a\\cdot\\mathbf y\\),\n\\[\nx_i-x_j=\\sqrt{2}\\,r\\cos\\Theta^{[i,j]}.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{x_i-x_j=\\sqrt{2}\\,r\\cos\\Theta^a,\\qquad a=[i,j].}\n\\]\nThe coordinate transformation gives \\(x_i-x_j=\\sqrt{2}\\,\\mathbf b^{[i,j]}\\cdot\\mathbf y\\). The angular definition gives \\(\\mathbf b^a\\cdot\\mathbf y=r\\cos\\Theta^a\\)."
+            },
+            {
+              "step": 3,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 9635,
+              "memory_chars": 8789,
+              "latency_s": 11.67,
+              "response_excerpt": "otential commutes with \\(K\\), so the kinetic term gives \\([K,H]=2iD\\).\n\nFINAL RESULT:\n\\[\n\\boxed{[D,H]=iH,\\qquad [D,K]=-iK,\\qquad [K,H]=2iD.}\n\\]\nThe homogeneity of the kinetic and inverse-square terms gives \\([D,H]=iH\\), while the quadratic form of \\(K\\) gives \\([D,K]=-iK\\). The canonical coordinate-momentum commutator gives \\([K,H]=2iD\\), which completes the \\(\\mathfrak{sl}(2,\\mathbb R)\\) algebra."
+            },
+            {
+              "step": 4,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.286,
+              "admitted_missing_context": false,
+              "prompt_chars": 10362,
+              "memory_chars": 9493,
+              "latency_s": 16.3,
+              "response_excerpt": "{1}{2r^2}\\sum_a\\frac{\\lambda(\\lambda-1)}{(\\cos\\Theta^a)^2},\\\\\nK_{\\rm rel}&=\\frac{r^2}{2},\\\\\nD_{\\rm rel}&=-\\frac{i}{2}\\left(r\\partial_r+\\frac{N-1}{2}\\right).\n\\end{aligned}}\n\\]\nThe identity \\(x_i-x_j=\\sqrt2\\,r\\cos\\Theta^{[i,j]}\\) gives the angular inverse-square potential. The radial decomposition of the Laplacian in \\(N-1\\) relative dimensions gives the kinetic term and the coefficient \\((N-2)/r\\)."
+            },
+            {
+              "step": 5,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.4,
+              "admitted_missing_context": false,
+              "prompt_chars": 11355,
+              "memory_chars": 10526,
+              "latency_s": 7.37,
+              "response_excerpt": "_a\\frac{\\lambda(\\lambda-1)}{(\\cos\\Theta^a)^2},\n\\]\ncombine the angular kinetic term and the inverse-square potential.\n\nFINAL RESULT:\n\\[\n\\boxed{H_{\\rm rel}=-\\frac12\\left(\\partial_r^2+\\frac{N-2}{r}\\partial_r\\right)+\\frac{1}{2r^2}\\hat L^2_{S^{N-2}}.}\n\\]\nThe radial Laplacian gives \\(\\partial_r^2+(N-2)\\partial_r/r\\). The angular kinetic term and the Calogero potential form \\(\\hat L^2_{S^{N-2}}/(2r^2)\\)."
+            },
+            {
+              "step": 6,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 12054,
+              "memory_chars": 11225,
+              "latency_s": 9.62,
+              "response_excerpt": "}D\\boldsymbol{\\Delta}^{\\lambda}=D,\n\\qquad\n\\mathcal K=\\boldsymbol{\\Delta}^{-\\lambda}K\\boldsymbol{\\Delta}^{\\lambda}=K.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\mathcal D=D,\\qquad \\mathcal K=K.}\n\\]\nThe Vandermonde angular factor is homogeneous of degree zero, so it commutes with \\(D\\). It also commutes with the multiplicative operator \\(K\\), and thus both operators are unchanged by the similarity transformation."
+            },
+            {
+              "step": 7,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.333,
+              "admitted_missing_context": false,
+              "prompt_chars": 12843,
+              "memory_chars": 11938,
+              "latency_s": 9.88,
+              "response_excerpt": "_{y_i}\\log\\vdm\n=\\sum_c\\frac{b_i^c}{\\mathbf b^c\\cdot\\mathbf y}\n-\\frac{N(N-1)}{2}\\frac{y_i}{r^2}}\n\\]\n\\[\n\\boxed{\\partial_{y_i}^2\\log\\vdm\n=-\\sum_c\\frac{(b_i^c)^2}{(\\mathbf b^c\\cdot\\mathbf y)^2}\n-\\frac{N(N-1)}{2r^2}\n+N(N-1)\\frac{y_i^2}{r^4}}\n\\]\nHere, the sum is over all \\(N(N-1)/2\\) double-indices \\(c\\). The equations use \\(\\partial_{y_i}\\log r=y_i/r^2\\) and \\(\\partial_{y_i}^2\\log r=1/r^2-2y_i^2/r^4\\)."
+            },
+            {
+              "step": 8,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.714,
+              "admitted_missing_context": false,
+              "prompt_chars": 13358,
+              "memory_chars": 12469,
+              "latency_s": 9.41,
+              "response_excerpt": "cal{K}_{\\rm rel}\n+\\mathcal{K}_{\\rm rel}\\mathcal{H}_{\\rm rel}\\right)\n-\\left(\\mathcal{D}_{\\rm rel}\\right)^2.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\mathcal{C}_2^{\\rm rel}\n=\\frac{1}{2}\\left\\{\\mathcal{H}_{\\rm rel},\\mathcal{K}_{\\rm rel}\\right\\}\n-\\left(\\mathcal{D}_{\\rm rel}\\right)^2}\n\\]\nThe braces denote the anticommutator \\(\\{A,B\\}=AB+BA\\). This formula is the quadratic Casimir restricted to the relative sector."
+            },
+            {
+              "step": 9,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.25,
+              "admitted_missing_context": false,
+              "prompt_chars": 13620,
+              "memory_chars": 12785,
+              "latency_s": 16.05,
+              "response_excerpt": "hbf y=r(\\cos\\vartheta,\\sin\\vartheta)\\),\n\\[\n\\vdm(\\mathbf y)=\\cos\\vartheta\\,\n\\cos\\left(\\vartheta-\\frac{\\pi}{3}\\right)\n\\cos\\left(\\vartheta-\\frac{2\\pi}{3}\\right)\n=-\\frac14\\cos(3\\vartheta).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\vdm(\\mathbf y)=-\\frac14\\cos(3\\vartheta)}.\n\\]\nThe three factors are \\(\\cos\\vartheta\\), \\(\\cos(\\vartheta-\\pi/3)\\), and \\(\\cos(\\vartheta-2\\pi/3)\\). Their product is \\(-\\cos(3\\vartheta)/4\\)."
+            },
+            {
+              "step": 10,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 13954,
+              "memory_chars": 13084,
+              "latency_s": 14.07,
+              "response_excerpt": "\\mathcal L}_{S^1}^{2}\n=\\vdm^{-\\lambda}\\left[-\\partial_\\vartheta^2\n+9\\lambda(\\lambda-1)\\sec^2(3\\vartheta)\\right]\\vdm^\\lambda\n=-\\partial_\\vartheta^2+6\\lambda\\tan(3\\vartheta)\\partial_\\vartheta+9\\lambda^2\n}\n\\]\nThe equations use \\(\\vdm=-\\cos(3\\vartheta)/4\\) and \\(\\partial_\\vartheta\\log\\vdm=-3\\tan(3\\vartheta)\\). The three inverse-square angular terms satisfy \\(\\sum_a\\sec^2\\Theta^a=9\\sec^2(3\\vartheta)\\)."
+            },
+            {
+              "step": 11,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 14505,
+              "memory_chars": 13586,
+              "latency_s": 25.02,
+              "response_excerpt": "2-\\lambda}\n{}_2F_1\\!\\left(\\frac12-i\\sigma,\\frac12+i\\sigma;\n\\frac32-\\lambda;-\\sinh^2u\\right).\n\\end{aligned}\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{P(u)=C_{-\\lambda+i\\sigma}^{\\lambda}\\!\\left(\\cosh 2u\\right)}\n\\]\nThe substitution \\(x=\\cosh(2u)\\) converts the equation into the Gegenbauer equation. Its parameters are \\(\\gamma=\\lambda\\) and \\(\\nu=-\\lambda+i\\sigma\\), with \\(\\nu(\\nu+2\\lambda)=-(\\lambda^2+\\sigma^2)\\)."
+            },
+            {
+              "step": 12,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 14972,
+              "memory_chars": 13996,
+              "latency_s": 15.67,
+              "response_excerpt": "duces to the equation from Subtask 11 after the substitution\n\\[\nu=\\frac{3\\chi}{2}.\n\\]\nTherefore,\n\\[\n\\cosh(2u)=\\cosh(3\\chi),\n\\]\nand\n\\[\nY_\\sigma(\\chi)\\propto C^\\lambda_{i\\sigma-\\lambda}\\!\\left(\\cosh 3\\chi\\right).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{f(\\chi)=\\cosh(3\\chi)}.\n\\]\nThe analytic continuation is \\(\\vartheta=i\\chi-\\pi/2\\). Setting \\(u=3\\chi/2\\) gives the Gegenbauer argument \\(\\cosh(2u)=\\cosh(3\\chi)\\)."
+            }
+          ]
+        },
+        {
+          "task_id": 3,
+          "paper_name": "2309.15922",
+          "arm": "agent_memory_single_call_full",
+          "num_steps": 3,
+          "sr": 1.0,
+          "ps": 1.0,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 1.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2365,
+              "memory_chars": 0,
+              "latency_s": 47.55,
+              "response_excerpt": "s not give an independent null constraint. The non-trivial constraint is\n\\[\n\\left\\langle \\frac{2\\rho_\\ell^{1111}(\\mu)}{\\mu^5}\n\\left(L_\\ell^2-\\frac{3}{2}L_\\ell^1\\right)\\right\\rangle=0.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{N_{\\mathrm{null}}(m+n=4)=1}\n\\]\nCrossing requires \\(c^{2,2}_{1111}=\\tfrac32c^{4,0}_{1111}\\). After use of the sum rules, this relation gives the single spectral null constraint shown above."
+            },
+            {
+              "step": 2,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 1.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 4119,
+              "memory_chars": 2933,
+              "latency_s": 50.14,
+              "response_excerpt": "traints among \\(\\rho^{1122}_{\\ell,n}\\), \\(\\rho^{1212}_{\\ell,n}\\), and \\(\\rho^{1221}_{\\ell,n}\\).\n\nFINAL RESULT:\n\\[\n\\boxed{N_{\\mathrm{null}}(m+n=4)=2}\n\\]\nThe first crossing equation relates the \\((3,1)\\), \\((4,0)\\), and \\((2,2)\\) coefficients. The second gives an independent relation among the \\((2,2)\\) and \\((4,0)\\) coefficients, and the sum rules turn both equations into spectral null constraints."
+            },
+            {
+              "step": 3,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 1.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 5674,
+              "memory_chars": 4411,
+              "latency_s": 30.97,
+              "response_excerpt": "-four amplitude coefficients. Therefore, the number of independent spectral null constraints is\n\\[\n9-5=4.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{N_{\\mathrm{null}}(m+n=4)=4}\n\\]\nThe even-\\(m\\) sum rules use the three crossed sums, while the odd-\\(m\\) sum rules use the three crossed differences. Crossing reduces these nine dispersive combinations to five independent coefficients and gives four null constraints."
+            }
+          ]
+        },
+        {
+          "task_id": 4,
+          "paper_name": "2111.01267",
+          "arm": "agent_memory_single_call_full",
+          "num_steps": 4,
+          "sr": 1.0,
+          "ps": 1.0,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 3264,
+              "memory_chars": 0,
+              "latency_s": 18.36,
+              "response_excerpt": "ghtarrow\\ \\partial_x f=0\\ \\Longrightarrow\\ f(q,x)=f(q,0),\n\\]\n\\[\nY_n(x)=Y_n(0)\\quad(n=2,3,4),\\qquad \\partial_x\\bar q=\\partial_x\\mathrm{Var}_q=0\n\\]\nwhen \\(Y_2\\ne0\\). Production or collisions are therefore necessary for nontrivial \\(x\\)-dependence of the distribution moments. With the specified empty initial state, \\(f=0\\) and all moments vanish, while \\(\\bar q\\) and \\(\\mathrm{Var}_q\\) are undefined."
+            },
+            {
+              "step": 2,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.75,
+              "admitted_missing_context": false,
+              "prompt_chars": 5160,
+              "memory_chars": 4210,
+              "latency_s": 13.57,
+              "response_excerpt": "\\).\n\nFINAL RESULT:\n\\[\n\\boxed{f(q,x)=6A\\left[1-e^{-x}\\left(1+x+\\frac{x^2}{2}+\\frac{x^3}{6}\\right)\\right]\\delta(q-q_0)}\n\\]\n\\[\n\\boxed{Y_2=q_0^2F(x),\\qquad Y_3=q_0^3F(x),\\qquad \\bar q=q_0\\quad(x>0)}.\n\\]\nThe source changes only the total amount \\(F(x)\\); it does not change the injection momentum. Therefore, the common factor cancels in \\(Y_3/Y_2\\), and the mean comoving momentum stays equal to \\(q_0\\)."
+            },
+            {
+              "step": 3,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.25,
+              "admitted_missing_context": false,
+              "prompt_chars": 6986,
+              "memory_chars": 5706,
+              "latency_s": 13.68,
+              "response_excerpt": "2-Y_4\\right)\n=\\gamma(12Y_2-Y_4).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\mathcal N(x)=\\frac{Y_2(x)}{2}}\n\\]\n\\[\n\\boxed{\n\\partial_xY_2=0,\\qquad\n\\partial_xY_3=\\gamma(x)(3Y_2-Y_3),\\qquad\n\\partial_xY_4=\\gamma(x)(12Y_2-Y_4)\n}\\qquad (x\\ge x_s).\n\\]\nNumber conservation fixes the equilibrium normalization through \\(2\\mathcal N=Y_2\\). The identities \\(\\int_0^\\infty q^ne^{-q}dq=n!\\) then close the three moment equations."
+            },
+            {
+              "step": 4,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.3,
+              "admitted_missing_context": false,
+              "prompt_chars": 8281,
+              "memory_chars": 6582,
+              "latency_s": 23.33,
+              "response_excerpt": "xed{Y_n(x_s)=q_0^nF_s\\quad(n=2,3,4)}\n\\]\n\\[\n\\boxed{\n\\bar q(x)=3+(q_0-3)E,\n\\qquad\n\\mathrm{Var}_q(x)=12+(q_0^2-12)E-[3+(q_0-3)E]^2,\n\\quad E=e^{-\\gamma_0(x-x_s)}.}\n\\]\nThe two injection steps change the common abundance \\(F_s\\), but all initial moment ratios depend only on \\(q_0\\). After \\(x_s\\), number is constant, while the third and fourth moments relax exponentially to the Maxwell\u2013Boltzmann values."
+            }
+          ]
+        },
+        {
+          "task_id": 6,
+          "paper_name": "1105.6063",
+          "arm": "agent_memory_single_call_full",
+          "num_steps": 3,
+          "sr": 1.0,
+          "ps": 1.0,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 2163,
+              "memory_chars": 0,
+              "latency_s": 7.62,
+              "response_excerpt": "oduct region. They count the diagonal twice, so subtract the diagonal sum once:\n\\[\n\\sum_{k=1}^{N}\\frac{(-1)^k}{2k+1}\\frac{(-1)^k}{(2k+1)^2}\n=\\sum_{k=1}^{N}\\frac{1}{(2k+1)^3}=C(N).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{A(N)B(N)=S_{1,2}(N)+S_{2,1}(N)-C(N)}.\n\\]\nInclusive nesting makes each nested sum contain the diagonal. Thus, their sum counts the diagonal twice, and subtraction of \\(C(N)\\) gives the product."
+            },
+            {
+              "step": 2,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.5,
+              "admitted_missing_context": false,
+              "prompt_chars": 3611,
+              "memory_chars": 2683,
+              "latency_s": 10.08,
+              "response_excerpt": "C(\\infty)=\\frac{7}{8}\\zeta(3)-1.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\nA(\\infty)=\\frac{\\pi}{4}-1,\n\\qquad\nB(\\infty)=G-1,\n\\qquad\nC(\\infty)=\\frac{7}{8}\\zeta(3)-1\n}\n\\]\nThe first two equations follow from the Gregory series and the definition of Catalan's constant after subtraction of the \\(k=0\\) term. The third equation uses \\(\\sum_{n\\ \\mathrm{odd}}n^{-3}=(1-2^{-3})\\zeta(3)\\), followed by the same subtraction."
+            },
+            {
+              "step": 3,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.6,
+              "admitted_missing_context": false,
+              "prompt_chars": 5287,
+              "memory_chars": 4334,
+              "latency_s": 10.1,
+              "response_excerpt": " \\(N\\to\\infty\\) gives\n\\[\n\\mathcal K=\\left(\\frac{\\pi}{4}-1\\right)(G-1)+\\frac78\\zeta(3)-1.\n\\]\nTherefore,\n\\[\n\\mathcal K=\\frac{\\pi G}{4}-\\frac{\\pi}{4}-G+\\frac78\\zeta(3).\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{\\mathcal K=\\frac{\\pi G}{4}-\\frac{\\pi}{4}-G+\\frac78\\zeta(3)}.\n\\]\nThe finite identity is \\(S_{1,2}(N)+S_{2,1}(N)=A(N)B(N)+C(N)\\). Use \\(A(\\infty)=\\pi/4-1\\), \\(B(\\infty)=G-1\\), and \\(C(\\infty)=7\\zeta(3)/8-1\\)."
+            }
+          ]
+        },
+        {
+          "task_id": 8,
+          "paper_name": "2307.08563",
+          "arm": "agent_memory_single_call_full",
+          "num_steps": 5,
+          "sr": 1.0,
+          "ps": 1.0,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.667,
+              "admitted_missing_context": false,
+              "prompt_chars": 2618,
+              "memory_chars": 0,
+              "latency_s": 16.83,
+              "response_excerpt": "\n\\[\n\\boxed{\nc_N(D_{\\rm tot},K)=\\#\\left\\{(a_0,a_1,b_0,b_1,c_1,\\ldots,c_N)\\in\\mathbb Z_{\\ge0}^{N+4}:\n\\begin{aligned}\na_0+b_0+2(a_1+b_1)+\\sum_{n=1}^N c_n&=D_{\\rm tot},\\\\\n\\sum_{n=1}^N c_n&=K,\\\\\n(a_0+a_1)+\\sum_{n=1}^N n c_n&=b_0+b_1\n\\end{aligned}\n\\right\\}.\n}\n\\]\nThe powers of \\(t\\) and \\(u\\) give the dimension and spurion-number equations. The constant term in \\(z\\) gives the charge-neutrality equation."
+            },
+            {
+              "step": 2,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.5,
+              "admitted_missing_context": false,
+              "prompt_chars": 4037,
+              "memory_chars": 3239,
+              "latency_s": 12.47,
+              "response_excerpt": "(q\\). Set \\(a_1=i\\) and \\(b_1=j\\). Then\n\\[\n2q+i+j=6,\\qquad 0\\le i,j\\le q.\n\\]\nFor \\(q=2\\), there are three solutions with \\(i+j=2\\). For \\(q=3\\), there is one solution with \\(i=j=0\\). Thus,\n\\[\nc_0(6,0)=3+1=4.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{c_0(6,0)=[t^6]H_0(t,0)=4.}\n\\]\nCharge neutrality gives \\(a_0+a_1=b_0+b_1=q\\). The dimension condition becomes \\(2q+a_1+b_1=6\\), which has four nonnegative solutions."
+            },
+            {
+              "step": 3,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.5,
+              "admitted_missing_context": false,
+              "prompt_chars": 5177,
+              "memory_chars": 4365,
+              "latency_s": 13.95,
+              "response_excerpt": "1.\n\\]\nFor \\(p=1\\), there are two solutions: \\((i,j)=(0,2),(1,1)\\). For \\(p=2\\), there is one solution: \\((i,j)=(0,0)\\). Thus, there are three invariant monomials.\n\nFINAL RESULT:\n\\[\n\\boxed{c_1(6,1)=[t^6u]H_1(t,u)=3.}\n\\]\nThe spurion equation fixes \\(c_1=1\\), and charge neutrality gives \\(b_0+b_1=a_0+a_1+1\\). The remaining dimension equation has two solutions for \\(p=1\\) and one solution for \\(p=2\\)."
+            },
+            {
+              "step": 4,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.5,
+              "admitted_missing_context": false,
+              "prompt_chars": 5765,
+              "memory_chars": 4952,
+              "latency_s": 15.31,
+              "response_excerpt": "on is\n\\[\n2A+s+i+j=6,\n\\qquad 0\\le i\\le A,\n\\qquad 0\\le j\\le A+s.\n\\]\nThe numbers of solutions are\n\\[\nN_{s=2}=3,\\qquad N_{s=3}=3,\\qquad N_{s=4}=2.\n\\]\nThus,\n\\[\nc_2(8,2)=3+3+2=8.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{c_2(8,2)=[t^8u^2]H_2(t,u)=8.}\n\\]\nThe equation \\(c_1+c_2=2\\) gives spurion charges \\(s=2,3,4\\). For each charge, the equations \\(b_0+b_1=A+s\\) and \\(2A+s+i+j=6\\) give respectively \\(3,3,2\\) solutions."
+            },
+            {
+              "step": 5,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 1.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 6644,
+              "memory_chars": 5587,
+              "latency_s": 19.8,
+              "response_excerpt": "1,2,2,2,1,1).\n\\]\nThe corresponding numbers of solutions for \\((A,i,j)\\) are\n\\[\nf_s=(3,3,2,1,1,0,0).\n\\]\nTherefore,\n\\[\nc_3(10,3)=\\sum_s m_sf_s\n=1(3)+1(3)+2(2)+2(1)+2(1)=14.\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{c_3(10,3)=[t^{10}u^3]H_3(t,u)=14.}\n\\]\nThe spurion equations are \\(c_1+c_2+c_3=3\\) and \\(s=c_1+2c_2+3c_3\\). For each spurion monomial, the remaining exponents satisfy \\(b_0+b_1=A+s\\) and \\(2A+s+i+j=7\\)."
+            }
+          ]
+        },
+        {
+          "task_id": 9,
+          "paper_name": "2505.18074",
+          "arm": "agent_memory_single_call_full",
+          "num_steps": 4,
+          "sr": 1.0,
+          "ps": 1.0,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.667,
+              "admitted_missing_context": false,
+              "prompt_chars": 2081,
+              "memory_chars": 0,
+              "latency_s": 12.57,
+              "response_excerpt": "chi_{K_0}(\\nu).\n\\]\nTherefore, each plane wave is an eigenfunction.\n\nFINAL RESULT:\n\\[\n\\boxed{(\\mathcal K_0\\phi_\\nu)(\\rho)=\\chi_0(\\nu)\\phi_\\nu(\\rho)},\n\\qquad\n\\boxed{\\chi_0(\\nu)=\\chi_{K_0}(\\nu)\n=\\int_0^\\infty dt\\,\\frac{\\cos(\\nu t)-1}{\\sinh(t/2)}}.\n\\]\nThe variable change \\(t=\\rho-\\rho'\\) factors out \\(e^{i\\nu\\rho}\\). The even kernel removes the odd sine term and leaves the cosine-transform eigenvalue."
+            },
+            {
+              "step": 2,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 3748,
+              "memory_chars": 2782,
+              "latency_s": 13.8,
+              "response_excerpt": ":\n\\[\n\\boxed{\\chi_0(\\nu)=2\\psi\\!\\left(\\frac12\\right)-\\psi\\!\\left(\\frac12+i\\nu\\right)-\\psi\\!\\left(\\frac12-i\\nu\\right)}\n\\]\n\\[\n\\boxed{\\chi_0(\\nu)=2\\psi(1)-\\psi\\!\\left(\\frac12+i\\nu\\right)-\\psi\\!\\left(\\frac12-i\\nu\\right)-4\\ln 2.}\n\\]\nThe geometric expansion of \\(1/\\sinh(t/2)\\) converts the integral into a digamma series. The requested formula needs an added constant \\(4\\ln 2\\) in the operator eigenvalue."
+            },
+            {
+              "step": 3,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 5641,
+              "memory_chars": 4428,
+              "latency_s": 20.07,
+              "response_excerpt": "\n\\[\n\\boxed{(\\mathcal K_1\\phi_\\nu)(\\rho)=\\chi_1(\\nu)\\phi_\\nu(\\rho)},\n\\qquad\n\\boxed{\\chi_1(\\nu)=\\int_0^\\infty\\frac{t\\,[\\cos(\\nu t)-1]}{\\sinh(t/2)}\\,dt}.\n\\]\n\\[\n\\boxed{\\chi_1(\\nu)\\ne-\\chi_0''(\\nu)}\n\\]\nfor the kernels as defined. The proposed identity would require a different kernel and subtraction prescription; the contradiction is already visible from \\(\\chi_1(0)=0\\) and \\(-\\chi_0''(0)=28\\zeta(3)\\)."
+            },
+            {
+              "step": 4,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 1.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 6810,
+              "memory_chars": 5336,
+              "latency_s": 30.01,
+              "response_excerpt": "on is not \\(-\\chi_0''(\\nu)\\).\n\nFINAL RESULT:\n\\[\n\\boxed{\\chi_{\\epsilon,\\eta}(\\nu)=\\chi_0(\\nu)-\\epsilon\\pi^2\\tanh^2(\\pi\\nu)+\\eta\\left[-\\chi_0''(\\nu)-28\\zeta(3)\\right].}\n\\]\nThe \\(\\epsilon\\) term follows from the trigamma reflection formula. The \\(\\eta\\) term follows from two Fourier derivatives and the subtraction at \\(\\nu=0\\); the coefficients of \\(\\chi_0^{(3)}\\) and \\(\\chi_0^{(4)}\\) are both \\(0\\)."
+            }
+          ]
+        },
+        {
+          "task_id": 15,
+          "paper_name": "2401.09908",
+          "arm": "agent_memory_single_call_full",
+          "num_steps": 3,
+          "sr": 1.0,
+          "ps": 1.0,
+          "steps": [
+            {
+              "step": 1,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 1674,
+              "memory_chars": 0,
+              "latency_s": 19.66,
+              "response_excerpt": "rac14I_1\\right)=0.\n\\]\nDivide by \\(z\\) and simplify:\n\\[\nz(1-z)I_1''(z)+(1-2z)I_1'(z)-\\frac14I_1(z)=0.\n\\]\n\nFINAL RESULT:\n\\[\nI_1(z)=\\pi\\sum_{n=0}^{\\infty}\\frac{(\\tfrac12)_n^2}{(n!)^2}z^n,\n\\qquad\n\\left[\\theta^2-z\\left(\\theta+\\tfrac12\\right)^2\\right]I_1(z)=0.\n\\]\nThe coefficient recurrence is \\(n^2c_n=(n-\\tfrac12)^2c_{n-1}\\). Using \\(\\theta^2I=z^2I''+zI'\\) gives \\(z(1-z)I_1''+(1-2z)I_1'-\\tfrac14I_1=0\\)."
+            },
+            {
+              "step": 2,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 0.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 3351,
+              "memory_chars": 2335,
+              "latency_s": 12.63,
+              "response_excerpt": "left(\\theta+\\tfrac12\\right)^3\\right]I_2(z)=0.}\n\\]\n\nFINAL RESULT:\n\\[\n\\boxed{I_2(z)=\\pi^2\\sum_{n=0}^{\\infty}\\frac{(\\tfrac12)_n^3}{(n!)^3}z^n},\n\\qquad\n\\boxed{\\left[\\theta^3-z\\left(\\theta+\\tfrac12\\right)^3\\right]I_2(z)=0}.\n\\]\nThe series coefficients obey \\(n^3c_n=(n-\\tfrac12)^3c_{n-1}\\). Applying \\(\\theta z^n=nz^n\\) converts this recurrence directly into the required third-order differential equation."
+            },
+            {
+              "step": 3,
+              "passed": true,
+              "rubric_score": 1.0,
+              "expr_recall": 1.0,
+              "admitted_missing_context": false,
+              "prompt_chars": 4855,
+              "memory_chars": 3852,
+              "latency_s": 14.01,
+              "response_excerpt": " Thus its order, \\(4\\), is minimal over \\(\\mathbb C(z)\\).\n\nFINAL RESULT:\n\\[\n\\boxed{L_3=\\theta^4-z\\left(\\theta+\\tfrac12\\right)^4},\n\\qquad\n\\boxed{L_3I_3(z)=0},\n\\]\n\\[\n\\boxed{I_3(z)=\\pi^3\\sum_{n=0}^{\\infty}\n\\frac{(\\tfrac12)_n^4}{(n!)^4}z^n}.\n\\]\nThe coefficients satisfy \\(n^4c_n=(n-\\tfrac12)^4c_{n-1}\\). This recurrence gives the minimal fourth-order Euler operator \\(L_3=\\theta^4-z(\\theta+\\tfrac12)^4\\)."
             }
           ]
         }
@@ -1129,7 +2647,7 @@
               "step": 4,
               "passed": true,
               "rubric_score": 1.0,
-              "expr_recall": 0.286,
+              "expr_recall": 0.429,
               "admitted_missing_context": false,
               "prompt_chars": 10614,
               "memory_chars": 9746,
@@ -1140,7 +2658,7 @@
               "step": 5,
               "passed": true,
               "rubric_score": 1.0,
-              "expr_recall": 0.2,
+              "expr_recall": 0.4,
               "admitted_missing_context": false,
               "prompt_chars": 6331,
               "memory_chars": 5502,
@@ -1184,7 +2702,7 @@
               "step": 9,
               "passed": true,
               "rubric_score": 1.0,
-              "expr_recall": 0.0,
+              "expr_recall": 0.25,
               "admitted_missing_context": false,
               "prompt_chars": 12951,
               "memory_chars": 12117,

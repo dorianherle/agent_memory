@@ -1,5 +1,6 @@
 import hashlib
 import json
+import re
 import sqlite3
 import threading
 import time
@@ -12,6 +13,11 @@ import numpy
 
 CATALOG_FILE = "catalog.sqlite3"
 SCHEMA_VERSION = 5
+_FTS_STOP = frozenset(
+    "a an and are as at be by can do for from has have how in into is it its "
+    "may of on or our should so such than that the their them then there these "
+    "they this to was we were what when where which who will with would".split()
+)
 # Rebuild the Git projection after exact line-ending decoding changes.
 
 
@@ -356,11 +362,12 @@ class Catalog:
         if sequence_order:
             ordering = "memories.sequence DESC"
         if fts_query is not None:
-            words = [word for word in fts_query.replace('"', " ").split() if word]
+            raw_words = re.findall(r"\w+", fts_query)
+            words = [w for w in raw_words if w.lower() not in _FTS_STOP] or raw_words
             if not words:
                 return []
             where.append("memory_fts MATCH ?")
-            values.append(" OR ".join(f'"{word}"' for word in words))
+            values.append(" OR ".join(f'"{word}"' for word in dict.fromkeys(words)))
             search_join = "JOIN memory_fts ON memory_fts.memory_id = memories.id "
             search_rank = ", bm25(memory_fts) AS fts_rank "
             ordering = "fts_rank ASC, " + ordering

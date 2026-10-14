@@ -161,6 +161,12 @@ class TestFind(MemoryTestCase):
         )
         self.assertIn("Auth timeout is 30s", result)
         self.assertNotIn("src/auth.py:88", result)
+        full_result = call_tool(
+            self.memory,
+            "memory",
+            {"action": "find", "query": "determine $(src/auth.py:88)$.", "full": True},
+        )
+        self.assertIn("src/auth.py:88", full_result)
 
     def test_ids_return_full_bodies(self):
         from agent_memory import call_tool

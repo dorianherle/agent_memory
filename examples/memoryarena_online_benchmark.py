@@ -2,28 +2,27 @@
 Dataset: https://huggingface.co/datasets/ZexueHe/memoryarena (formal_reasoning_phys)
 
 Evaluates `agent_memory` on the official multi-session interdependent Formal Reasoning
-(Physics) benchmark from MemoryArena and compares directly against the 12 published
-leaderboard baselines (Mem0, Mem0-g, ReasoningBank, Letta/MemGPT, BM25, MemoRAG,
-GraphRAG, Text-Embedding-3-Small, and 4 Long-Context models).
-
-Runs two complementary evaluations:
-1. Full-Dataset Symbolic & Equation Retention Diagnostic (all 20 tasks, 86 subtasks):
-   Measures exact equation/symbol recall and prompt token footprint across:
-   - `no_memory` (0D isolated session: only current subtask's background + question)
-   - `agent_memory_passive_state` (auto-injected 1,200-char `MEMORY STATE` packet only)
-   - `agent_memory_headlines_only` (`memory_find(query)` without `ids=...` / `full=True`)
-   - `agent_memory_active_consecutive` (`MEMORY STATE` + two-step `memory_find(ids=..., full=True)`
-     + consecutive lemma/law compression)
-2. Live Multi-Session End-to-End LLM Benchmark (8 tasks, 27 sequential isolated sessions):
-   Executes isolated cold-start LLM sessions (`gpt-5.6-sol` via `codex exec --ephemeral`)
-   across `no_memory`, `agent_memory_passive_state`, and `agent_memory_active_consecutive`,
-   computing official MemoryArena Task Success Rate (SR), Progress Score (PS), and SR@k.
+(Physics) benchmark from MemoryArena and compares against:
+1. All 12 published ICML 2026 leaderboard baselines (Mem0, Mem0-g, ReasoningBank,
+   Letta/MemGPT, BM25, MemoRAG, GraphRAG, Text-Embedding-3-Small, and 4 Long-Context models).
+2. Same-LLM (`gpt-5.6-sol`) controlled head-to-head baselines across all 8 multi-session
+   task chains (27 sequential sessions per system):
+   - `no_memory` (0D isolated session baseline)
+   - `mem0_style_extracted_facts` (1D atomic fact bullet memory on `gpt-5.6-sol`)
+   - `bm25_chunk_rag` (0D top-3 fixed-chunk BM25 RAG on `gpt-5.6-sol`)
+   - `agent_memory_passive_state` (Upgraded 1,200-char `MEMORY STATE` packet with dynamic
+     section budget reclamation and equation-priority `_excerpt`)
+   - `agent_memory_single_call_full` (Upgraded single-call `memory_find(query=..., full=True)`
+     + consecutive compression)
+   - `agent_memory_active_consecutive` (`MEMORY STATE` + `memory_find(ids=..., full=True)`
+     + consecutive compression)
 """
 
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
+import math
 from pathlib import Path
 import re
 import shutil
@@ -37,7 +36,6 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from agent_memory import Memory
-from agent_memory.prompt import render_packet
 from agent_memory.tools import call_tool
 
 # Import the isolated codex worker helper used in the repo's lab harness
@@ -125,6 +123,14 @@ TASK_GRADING_RUBRIC: dict[tuple[int, int], list[list[str]]] = {
     (15, 2): [["\\theta^4-z", "(\\theta+\\tfrac12)^4", "\\left(\\theta+\\tfrac12\\right)^4", "\\left(\\theta+\\frac12\\right)^4"]],
 }
 
+_STOP = frozenset(
+    "the a an is are was were be been being have has had do does did will would "
+    "shall should may might must can could of in to for with on at from by about "
+    "as into like through after over between out against during without before "
+    "under around among what which who whom whose how why where when find show "
+    "determine compute calculate derive express evaluate obtain".split()
+)
+
 
 def download_dataset() -> list[dict]:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -152,24 +158,107 @@ def extract_latex_expressions(text: str) -> list[str]:
     return out[:25]
 
 
+def extract_mem0_facts(step_idx: int, bg: str, answer: str) -> list[str]:
+    """Replicate 1D atomic fact extraction (Mem0 / ReasoningBank style):
+    Distills a session into up to 4 short declarative fact bullets (<= 130 chars each),
+    which inevitably truncates multi-line LaTeX setups and full operator definitions.
+    """
+    facts = []
+    if bg.strip():
+        sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", bg.strip()) if s.strip()]
+        for s in sentences[:2]:
+            clean = re.sub(r"\s+", " ", s)[:130]
+            facts.append(f"[Fact S{step_idx + 1}] {clean}")
+    ans_lines = [l.strip() for l in answer.strip().splitlines() if l.strip()]
+    for l in ans_lines[-2:]:
+        clean = re.sub(r"\s+", " ", l)[:130]
+        facts.append(f"[Fact S{step_idx + 1} Result] {clean}")
+    return facts[:4]
+
+
+def retrieve_mem0_facts(facts: list[str], query: str, k: int = 5) -> str:
+    """Retrieve top-k atomic facts by lexical overlap with query (Mem0 top-5 retrieval)."""
+    if not facts:
+        return ""
+    q_words = set(re.findall(r"\w+", query.lower())) - _STOP
+    scored = []
+    for idx, f in enumerate(facts):
+        f_words = set(re.findall(r"\w+", f.lower())) - _STOP
+        overlap = len(q_words & f_words)
+        scored.append((overlap, idx, f))
+    scored.sort(key=lambda x: (-x[0], -x[1]))
+    chosen = [f for _, _, f in scored[:k]]
+    return "## Retrieved Atomic Memory Facts (Mem0 1D top-5)\n" + "\n".join(chosen)
+
+
+def chunk_text(text: str, chunk_size: int = 450) -> list[str]:
+    """Split session text into fixed-size chunks for 0D BM25 RAG."""
+    clean = text.strip()
+    if not clean:
+        return []
+    return [clean[i : i + chunk_size] for i in range(0, len(clean), chunk_size)]
+
+
+def retrieve_bm25_chunks(chunks: list[str], query: str, k: int = 3) -> str:
+    """Standard BM25 scoring over fixed-size text chunks (0D BM25 RAG baseline)."""
+    if not chunks:
+        return ""
+    q_words = [w for w in re.findall(r"\w+", query.lower()) if w not in _STOP]
+    if not q_words:
+        return "\n---\n".join(chunks[:k])
+    n_docs = len(chunks)
+    doc_tokens = [re.findall(r"\w+", c.lower()) for c in chunks]
+    avgdl = sum(len(dt) for dt in doc_tokens) / max(1, n_docs)
+    df = {
+        w: sum(1 for dt in doc_tokens if w in dt)
+        for w in set(q_words)
+    }
+    k1, b = 1.5, 0.75
+    scored = []
+    for idx, dt in enumerate(doc_tokens):
+        dl = len(dt)
+        score = 0.0
+        for w in set(q_words):
+            tf = dt.count(w)
+            if tf == 0:
+                continue
+            idf = math.log(1.0 + (n_docs - df[w] + 0.5) / (df[w] + 0.5))
+            score += idf * (tf * (k1 + 1.0)) / (tf + k1 * (1.0 - b + b * dl / max(1.0, avgdl)))
+        scored.append((score, idx, chunks[idx]))
+    scored.sort(key=lambda x: (-x[0], x[1]))
+    chosen = [c for _, _, c in scored[:k]]
+    return "## Retrieved BM25 Chunks (top-3 x 450 chars)\n" + "\n---\n".join(chosen)
+
+
 def build_state_packet(mem: Memory, query: str) -> str:
     """Replicate Cursor's `MEMORY STATE` packet (`mem.render_packet(query)`) for a session."""
     return mem.render_packet(query)
 
 
-def build_active_consecutive_context(mem: Memory, query: str) -> str:
-    """Replicate an agent using `agent_memory` actively:
-    1. Reads `MEMORY STATE` (`render_packet`).
-    2. Calls `memory(action='find', query=...)` to get matching note IDs, and expands
-       their full bodies via `memory(action='find', ids=..., full=True)` so equations
-       are not truncated at 100 chars.
-    3. Includes the active consecutive summary / task model if present.
+def build_single_call_full_context(
+    mem: Memory, query: str, packet: str | None = None
+) -> str:
+    """Upgraded single-call `agent_memory` retrieval:
+    1. Auto-injected `MEMORY STATE` (`render_packet`).
+    2. ONE single tool call: `memory(action='find', query=query, full=True)` returning
+       complete uncut bodies for top FTS matches directly.
     """
-    packet = build_state_packet(mem, query)
-    # Find relevant notes and also include foundational setup + latest consecutive summary
+    pkt = packet if packet is not None else build_state_packet(mem, query)
+    found = call_tool(
+        mem,
+        "memory",
+        {"action": "find", "query": query, "full": True},
+    )
+    return f"{pkt}\n\n## Retrieved Memory Notes (memory_find query full=True)\n{found}"
+
+
+def build_active_consecutive_context(
+    mem: Memory, query: str, packet: str | None = None
+) -> str:
+    """Two-step explicit ID expansion (`memory_find(ids=..., full=True)`)."""
+    pkt = packet if packet is not None else build_state_packet(mem, query)
     hits = mem.find(query, k=4) if query else []
     state_items = mem.state()
-    # Always expand the foundational background note (first item) + latest summary + top query hits
     expand_ids = []
     for item in state_items[:2]:
         if item.id not in expand_ids:
@@ -187,11 +276,7 @@ def build_active_consecutive_context(mem: Memory, query: str) -> str:
         "memory",
         {"action": "find", "ids": expand_ids[:5], "full": True},
     )
-    model_info = mem.model_get()
-    model_str = ""
-    if model_info and model_info.get("status") != "empty":
-        model_str = f"\n\n## Active Task Model\n{json.dumps(model_info, indent=2)}"
-    return f"{packet}\n\n## Expanded Memory Notes (memory_find full=True)\n{expanded}{model_str}"
+    return f"{pkt}\n\n## Expanded Memory Notes (memory_find ids full=True)\n{expanded}"
 
 
 def run_retention_diagnostic(tasks: list[dict]) -> dict:
@@ -201,8 +286,11 @@ def run_retention_diagnostic(tasks: list[dict]) -> dict:
     """
     stats = {
         "no_memory": {"recalls": [], "chars": []},
+        "mem0_style_extracted_facts": {"recalls": [], "chars": []},
+        "bm25_chunk_rag": {"recalls": [], "chars": []},
         "agent_memory_passive_state": {"recalls": [], "chars": []},
         "agent_memory_headlines_only": {"recalls": [], "chars": []},
+        "agent_memory_single_call_full": {"recalls": [], "chars": []},
         "agent_memory_active_consecutive": {"recalls": [], "chars": []},
     }
 
@@ -213,37 +301,43 @@ def run_retention_diagnostic(tasks: list[dict]) -> dict:
             bgs = task["backgrounds"]
             qs = task["questions"]
             ans = task["answers"]
-
-            # Extract reference mathematical expressions from background[0]
             bg0_exprs = extract_latex_expressions(bgs[0])
+            mem0_facts: list[str] = []
+            bm25_chunks: list[str] = []
+            prev_summary_id: str | None = None
 
             for step_idx in range(len(qs)):
                 q = qs[step_idx]
                 bg = bgs[step_idx]
                 if step_idx > 0:
-                    # Target tokens needed at step t: expressions from bg[0] + prior answers
                     prior_exprs = list(bg0_exprs)
                     for prev_a in ans[:step_idx]:
                         prior_exprs.extend(extract_latex_expressions(prev_a)[:8])
-                    # Deduplicate
                     target_exprs = list(dict.fromkeys(prior_exprs))
 
-                    # 1. no_memory
+                    packet = build_state_packet(mem, q)
                     ctx_none = f"{bg}\n{q}"
-                    # 2. passive MEMORY STATE packet
-                    ctx_passive = f"{build_state_packet(mem, q)}\n{bg}\n{q}"
-                    # 3. headlines-only memory_find(query)
+                    ctx_mem0 = f"{retrieve_mem0_facts(mem0_facts, q)}\n{bg}\n{q}"
+                    ctx_bm25 = f"{retrieve_bm25_chunks(bm25_chunks, q)}\n{bg}\n{q}"
+                    ctx_passive = f"{packet}\n{bg}\n{q}"
                     headlines = call_tool(
                         mem, "memory", {"action": "find", "query": q, "full": False}
                     )
-                    ctx_headlines = f"{build_state_packet(mem, q)}\n{headlines}\n{bg}\n{q}"
-                    # 4. active consecutive retrieval (full=True on matched/summary IDs)
-                    ctx_active = f"{build_active_consecutive_context(mem, q)}\n{bg}\n{q}"
+                    ctx_headlines = f"{packet}\n{headlines}\n{bg}\n{q}"
+                    ctx_single_full = (
+                        f"{build_single_call_full_context(mem, q, packet=packet)}\n{bg}\n{q}"
+                    )
+                    ctx_active = (
+                        f"{build_active_consecutive_context(mem, q, packet=packet)}\n{bg}\n{q}"
+                    )
 
                     for arm_name, ctx in [
                         ("no_memory", ctx_none),
+                        ("mem0_style_extracted_facts", ctx_mem0),
+                        ("bm25_chunk_rag", ctx_bm25),
                         ("agent_memory_passive_state", ctx_passive),
                         ("agent_memory_headlines_only", ctx_headlines),
+                        ("agent_memory_single_call_full", ctx_single_full),
                         ("agent_memory_active_consecutive", ctx_active),
                     ]:
                         if target_exprs:
@@ -254,11 +348,16 @@ def run_retention_diagnostic(tasks: list[dict]) -> dict:
                         stats[arm_name]["recalls"].append(recall)
                         stats[arm_name]["chars"].append(len(ctx))
 
-                # Update memory after step_idx completes
+                # Update stores after step_idx completes
+                mem0_facts.extend(extract_mem0_facts(step_idx, bg, ans[step_idx]))
+                if bg.strip():
+                    bm25_chunks.extend(chunk_text(bg))
+                bm25_chunks.extend(chunk_text(f"Q: {q}\nA: {ans[step_idx]}"))
+
                 if bg.strip():
                     mem.save(
                         f"Paper Setup ({task['paper_name']}):\n{bg}",
-                        {"role": "goal", "step": step_idx},
+                        {"goal": True, "step": step_idx},
                         agent="phys_agent",
                     )
                 mem.save(
@@ -266,9 +365,9 @@ def run_retention_diagnostic(tasks: list[dict]) -> dict:
                     {"step": step_idx + 1},
                     agent="phys_agent",
                 )
-                # Consecutive compression: fold completed subtask notes into a cumulative
-                # formal state summary preserving key derived equations
                 if step_idx >= 1:
+                    if prev_summary_id:
+                        mem.delete(prev_summary_id)
                     distilled_steps = []
                     for s_i in range(step_idx + 1):
                         exprs_i = ", ".join(
@@ -278,7 +377,7 @@ def run_retention_diagnostic(tasks: list[dict]) -> dict:
                             f"Step {s_i + 1} key equations: {exprs_i}\n"
                             f"Conclusion: {ans[s_i][:450]}"
                         )
-                    mem.save(
+                    prev_summary_id = mem.save(
                         f"Consecutive Formal State (Steps 1..{step_idx + 1}):\n"
                         + "\n\n".join(distilled_steps),
                         summary=True,
@@ -303,6 +402,7 @@ def run_retention_diagnostic(tasks: list[dict]) -> dict:
 def normalize_math(text: str) -> str:
     """Normalize whitespace and formatting for grading."""
     s = text.replace("\\left", "").replace("\\right", "").replace("\\,", "")
+    s = re.sub(r"\\[dt]?frac\s*([0-9a-zA-Z])\s*([0-9a-zA-Z])", r"\\frac{\1}{\2}", s)
     s = re.sub(r"\s+", " ", s)
     return s
 
@@ -361,8 +461,16 @@ def build_subtask_prompt(
     question: str,
     memory_context: str,
 ) -> str:
-    bg_block = background.strip() if background.strip() else "(None provided in this session; rely on <memory_context> from prior sessions.)"
-    mem_block = memory_context.strip() if memory_context.strip() else "(No persistent memory available.)"
+    bg_block = (
+        background.strip()
+        if background.strip()
+        else "(None provided in this session; rely on <memory_context> from prior sessions.)"
+    )
+    mem_block = (
+        memory_context.strip()
+        if memory_context.strip()
+        else "(No persistent memory available.)"
+    )
     return (
         "You are a theoretical physics formal reasoning agent evaluated on the "
         "MemoryArena (ICML 2026) multi-session benchmark.\n"
@@ -386,7 +494,12 @@ def build_subtask_prompt(
     )
 
 
-def run_single_task_chain(task: dict, arm: str, work_root: Path) -> dict:
+def run_single_task_chain(
+    task: dict,
+    arm: str,
+    work_root: Path,
+    seed_step0: dict | None = None,
+) -> dict:
     """Execute one full multi-session task chain (Subtask 0 -> Subtask K-1) for `arm`."""
     task_id = task["id"]
     bgs = task["backgrounds"]
@@ -397,61 +510,91 @@ def run_single_task_chain(task: dict, arm: str, work_root: Path) -> dict:
     tmpdir = work_root / f"task_{task_id}_{arm}"
     tmpdir.mkdir(parents=True, exist_ok=True)
     mem = Memory(tmpdir / ".agent_memory")
+    mem0_facts: list[str] = []
+    bm25_chunks: list[str] = []
+    prev_summary_id: str | None = None
 
     step_results = []
     for step_idx in range(n_steps):
         q = qs[step_idx]
         bg = bgs[step_idx]
 
-        # Retrieve memory context according to arm
-        if arm == "no_memory":
-            mem_ctx = ""
-        elif arm == "agent_memory_passive_state":
-            mem_ctx = build_state_packet(mem, q) if step_idx > 0 else ""
-        elif arm == "agent_memory_active_consecutive":
-            mem_ctx = build_active_consecutive_context(mem, q) if step_idx > 0 else ""
+        if step_idx == 0 and seed_step0 is not None:
+            response_text = seed_step0["response_excerpt"]
+            grade = grade_subtask_response(task_id, 0, response_text, ans[0])
+            step_results.append(
+                {
+                    "step": 1,
+                    "passed": grade["passed"],
+                    "rubric_score": grade["rubric_score"],
+                    "expr_recall": grade["expr_recall"],
+                    "admitted_missing_context": grade["admitted_missing_context"],
+                    "prompt_chars": seed_step0["prompt_chars"],
+                    "memory_chars": 0,
+                    "latency_s": seed_step0["latency_s"],
+                    "response_excerpt": response_text,
+                }
+            )
         else:
-            raise ValueError(f"Unknown arm: {arm}")
+            if step_idx == 0 or arm == "no_memory":
+                mem_ctx = ""
+            elif arm == "mem0_style_extracted_facts":
+                mem_ctx = retrieve_mem0_facts(mem0_facts, q)
+            elif arm == "bm25_chunk_rag":
+                mem_ctx = retrieve_bm25_chunks(bm25_chunks, q)
+            elif arm == "agent_memory_passive_state":
+                mem_ctx = build_state_packet(mem, q)
+            elif arm == "agent_memory_single_call_full":
+                mem_ctx = build_single_call_full_context(mem, q)
+            elif arm == "agent_memory_active_consecutive":
+                mem_ctx = build_active_consecutive_context(mem, q)
+            else:
+                raise ValueError(f"Unknown arm: {arm}")
 
-        prompt = build_subtask_prompt(
-            task["paper_name"], step_idx, n_steps, bg, q, mem_ctx
-        )
+            prompt = build_subtask_prompt(
+                task["paper_name"], step_idx, n_steps, bg, q, mem_ctx
+            )
 
-        call_dir = tmpdir / f"step_{step_idx}"
-        t0 = time.monotonic()
-        res = worker_common.complete(
-            prompt,
-            call_dir,
-            timeout=95,
-            model="gpt-5.6-sol",
-        )
-        latency = round(time.monotonic() - t0, 2)
-        response_text = res.get("text") or ""
+            call_dir = tmpdir / f"step_{step_idx}"
+            t0 = time.monotonic()
+            res = worker_common.complete(
+                prompt,
+                call_dir,
+                timeout=95,
+                model="gpt-5.6-sol",
+            )
+            latency = round(time.monotonic() - t0, 2)
+            response_text = res.get("text") or ""
 
-        grade = grade_subtask_response(task_id, step_idx, response_text, ans[step_idx])
-        step_results.append(
-            {
-                "step": step_idx + 1,
-                "passed": grade["passed"],
-                "rubric_score": grade["rubric_score"],
-                "expr_recall": grade["expr_recall"],
-                "admitted_missing_context": grade["admitted_missing_context"],
-                "prompt_chars": len(prompt),
-                "memory_chars": len(mem_ctx),
-                "latency_s": latency,
-                "response_excerpt": response_text[-400:],
-            }
-        )
+            grade = grade_subtask_response(task_id, step_idx, response_text, ans[step_idx])
+            step_results.append(
+                {
+                    "step": step_idx + 1,
+                    "passed": grade["passed"],
+                    "rubric_score": grade["rubric_score"],
+                    "expr_recall": grade["expr_recall"],
+                    "admitted_missing_context": grade["admitted_missing_context"],
+                    "prompt_chars": len(prompt),
+                    "memory_chars": len(mem_ctx),
+                    "latency_s": latency,
+                    "response_excerpt": response_text[-400:],
+                }
+            )
 
-        # Update persistent memory after session completes (Memory-Agent-Environment loop)
-        if arm != "no_memory":
+        # Update persistent memory after session completes
+        if arm == "mem0_style_extracted_facts":
+            mem0_facts.extend(extract_mem0_facts(step_idx, bg, response_text))
+        elif arm == "bm25_chunk_rag":
+            if bg.strip():
+                bm25_chunks.extend(chunk_text(bg))
+            bm25_chunks.extend(chunk_text(f"Q: {q}\nA: {response_text[-800:]}"))
+        elif arm.startswith("agent_memory_"):
             if bg.strip():
                 mem.save(
                     f"Paper Setup ({task['paper_name']}):\n{bg}",
-                    {"role": "goal", "step": step_idx + 1},
+                    {"goal": True, "step": step_idx + 1},
                     agent="phys_agent",
                 )
-            # Extract FINAL RESULT section if present, else save full derivation
             final_match = re.search(
                 r"FINAL RESULT:(.*)", response_text, flags=re.DOTALL | re.IGNORECASE
             )
@@ -465,15 +608,18 @@ def run_single_task_chain(task: dict, arm: str, work_root: Path) -> dict:
                 {"step": step_idx + 1},
                 agent="phys_agent",
             )
-            if arm == "agent_memory_active_consecutive" and step_idx >= 1:
-                # Consecutive compression: fold intermediate step notes into a single
-                # cumulative derivation law note while keeping foundational setup intact
+            if (
+                arm in ("agent_memory_single_call_full", "agent_memory_active_consecutive")
+                and step_idx >= 1
+            ):
+                if prev_summary_id:
+                    mem.delete(prev_summary_id)
                 prior_summaries = []
                 for prev_idx, sr in enumerate(step_results):
                     prior_summaries.append(
                         f"Step {prev_idx + 1}: {sr['response_excerpt'][-300:]}"
                     )
-                mem.save(
+                prev_summary_id = mem.save(
                     f"Consecutive Derivation Law (Steps 1..{step_idx + 1} for {task['paper_name']}):\n"
                     + "\n".join(prior_summaries),
                     summary=True,
@@ -497,14 +643,13 @@ def run_single_task_chain(task: dict, arm: str, work_root: Path) -> dict:
 def main() -> None:
     print("Downloading/loading MemoryArena (ICML 2026) `formal_reasoning_phys` dataset...")
     tasks = download_dataset()
-    print(f"Loaded {len(tasks)} multi-session physics tasks ({sum(len(t['questions']) for t in tasks)} subtasks).")
+    print(
+        f"Loaded {len(tasks)} multi-session physics tasks "
+        f"({sum(len(t['questions']) for t in tasks)} subtasks)."
+    )
 
     print("\n1. Running Full-Dataset Equation & Symbol Retention Diagnostic (20 tasks, 86 subtasks)...")
-    if RESULTS_PATH.exists() and "--fresh" not in sys.argv:
-        cached_top = json.loads(RESULTS_PATH.read_text(encoding="utf-8"))
-        retention_summary = cached_top.get("retention_diagnostic_all_20_tasks") or run_retention_diagnostic(tasks)
-    else:
-        retention_summary = run_retention_diagnostic(tasks)
+    retention_summary = run_retention_diagnostic(tasks)
     for arm, m in retention_summary.items():
         print(
             f"  - {arm:32s}: recall={m['avg_equation_recall']*100:5.1f}% | "
@@ -515,18 +660,35 @@ def main() -> None:
     task_by_id = {t["id"]: t for t in live_tasks}
     arms = [
         "no_memory",
+        "mem0_style_extracted_facts",
+        "bm25_chunk_rag",
         "agent_memory_passive_state",
+        "agent_memory_single_call_full",
         "agent_memory_active_consecutive",
     ]
+
+    cached_live = {}
+    step0_seeds: dict[int, dict] = {}
+    if RESULTS_PATH.exists():
+        old_data = json.loads(RESULTS_PATH.read_text(encoding="utf-8"))
+        cached_live = old_data.get("live_llm_benchmark_8_tasks", {})
+        # Extract verified step 0 seed responses (where memory_context == "")
+        ref_arm = cached_live.get("agent_memory_active_consecutive") or cached_live.get("no_memory")
+        if ref_arm:
+            for tr in ref_arm.get("tasks", []):
+                if tr.get("steps"):
+                    step0_seeds[tr["task_id"]] = tr["steps"][0]
+
+    # Decide which arms to reuse vs run live
+    reuse_arms = {"no_memory", "agent_memory_active_consecutive"}
+    if "--all-cached" in sys.argv:
+        reuse_arms = set(cached_live.keys())
+
     all_runs: list[dict] = []
-    if RESULTS_PATH.exists() and "--fresh" not in sys.argv:
-        print(
-            f"\n2. Re-evaluating recorded live LLM sessions from {RESULTS_PATH} "
-            "(pass --fresh to re-run all 111 live codex exec calls)..."
-        )
-        cached = json.loads(RESULTS_PATH.read_text(encoding="utf-8"))
-        for arm in arms:
-            for tr in cached["live_llm_benchmark_8_tasks"][arm]["tasks"]:
+    arms_to_run_live = []
+    for arm in arms:
+        if arm in reuse_arms and arm in cached_live:
+            for tr in cached_live[arm]["tasks"]:
                 tid = tr["task_id"]
                 gt_answers = task_by_id[tid]["answers"]
                 for s_idx, step_obj in enumerate(tr["steps"]):
@@ -536,31 +698,33 @@ def main() -> None:
                     step_obj["passed"] = grade["passed"]
                     step_obj["rubric_score"] = grade["rubric_score"]
                     step_obj["expr_recall"] = grade["expr_recall"]
-                    step_obj["admitted_missing_context"] = grade[
-                        "admitted_missing_context"
-                    ]
+                    step_obj["admitted_missing_context"] = grade["admitted_missing_context"]
                 passed_count = sum(1 for s in tr["steps"] if s["passed"])
                 tr["ps"] = round(passed_count / tr["num_steps"], 4)
                 tr["sr"] = 1.0 if tr["steps"][-1]["passed"] else 0.0
                 all_runs.append(tr)
-                print(
-                    f"  [Graded] Task {tid:2d} ({arm:32s}) -> "
-                    f"SR={tr['sr']:.0f}, PS={tr['ps']*100:5.1f}% "
-                    f"({passed_count}/{tr['num_steps']} steps)"
-                )
-    else:
+            print(f"  [Cached] Loaded verified runs for {arm}")
+        else:
+            arms_to_run_live.append(arm)
+
+    if arms_to_run_live:
         print(
-            f"\n2. Running Live Multi-Session LLM Benchmark on {len(live_tasks)} tasks "
-            f"({sum(len(t['questions']) for t in live_tasks)} subtasks x {len(arms)} arms = "
-            f"{sum(len(t['questions']) for t in live_tasks) * len(arms)} isolated LLM sessions)..."
+            f"\n2. Running Live Same-LLM (`gpt-5.6-sol`) Multi-Session Benchmark on "
+            f"{len(live_tasks)} tasks for arms: {arms_to_run_live}..."
         )
         work_root = Path(tempfile.mkdtemp(prefix="memoryarena_live_"))
         try:
             futures = {}
-            with ThreadPoolExecutor(max_workers=12) as pool:
+            with ThreadPoolExecutor(max_workers=16) as pool:
                 for task in live_tasks:
-                    for arm in arms:
-                        fut = pool.submit(run_single_task_chain, task, arm, work_root)
+                    for arm in arms_to_run_live:
+                        fut = pool.submit(
+                            run_single_task_chain,
+                            task,
+                            arm,
+                            work_root,
+                            step0_seeds.get(task["id"]),
+                        )
                         futures[fut] = (task["id"], arm)
                 for fut in as_completed(futures):
                     tid, arm = futures[fut]
@@ -582,7 +746,6 @@ def main() -> None:
         )
         avg_sr = sum(r["sr"] for r in arm_runs) / len(arm_runs)
         avg_ps = sum(r["ps"] for r in arm_runs) / len(arm_runs)
-        # Compute SR@k (accuracy at session depth k = 1, 2, 3, 4)
         sr_at_k = {}
         for k in (1, 2, 3, 4):
             eligible = [r["steps"][k - 1]["passed"] for r in arm_runs if len(r["steps"]) >= k]

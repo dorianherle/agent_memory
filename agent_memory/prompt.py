@@ -307,7 +307,8 @@ def _latest_user_text(items: list[MemoryItem]) -> str:
 
 
 _QUERY_STOP = frozenset("the a an is are was were what which how why can should to of in on for and or it this that return resume continue task work exact required selected".split())
-_PRIORITY_LINE = re.compile(r"^(next|blocked|remaining|decision|rejected|rollback|constraint|evidence|verified|do not|never|keep)\b", re.I)
+_PRIORITY_LINE = re.compile(r"^(next|blocked|remaining|decision|rejected|rollback|constraint|evidence|verified|result|final|law|formula|invariant|do not|never|keep)\b|\\boxed", re.I)
+_EQUATION_LINE = re.compile(r"(\\equiv|\\propto|\\implies|\\iff|=[^{\s]|[<>]=|\\frac|\\sum|\\int)")
 
 
 def _excerpt(item: MemoryItem, query: str, limit: int) -> str:
@@ -318,7 +319,9 @@ def _excerpt(item: MemoryItem, query: str, limit: int) -> str:
     words = set(re.findall(r"[\w-]+", query.lower())) - _QUERY_STOP
     ranked = sorted(enumerate(raw[1:], 1), key=lambda pair: (
         -bool(_PRIORITY_LINE.match(pair[1])),
-        -len(words & set(re.findall(r"[\w-]+", pair[1].lower()))), pair[0]))
+        -len(words & set(re.findall(r"[\w-]+", pair[1].lower()))),
+        -bool(_EQUATION_LINE.search(pair[1])),
+        pair[0]))
     head_limit = min(SUBJECT_MAX, limit - 1)
     chosen = [(0, raw[0][:head_limit] + ("…" if len(raw[0]) > head_limit else ""))]
     used = len(chosen[0][1])
@@ -382,11 +385,13 @@ def render_packet(
     if inspecting:
         sections.append(f"INSPECTING [{inspecting['id'][:8]}]: files rewound; inspect_done returns.")
     goal = _goal(items)
-    add("Goal", [goal] if goal else [], 260)
     steering = _steering(items, goal)
-    add("Steering", [steering] if steering else [], 220)
     handoff = _handoff(items, covered=model["covered"] if model else ())
-    add("Handoff", [handoff] if handoff else [], 360)
+    questions = split_open_questions(items)
+    spare = (0 if steering else 220) + (0 if model else 200) + (0 if questions else 120)
+    add("Goal", [goal] if goal else [], 260 + spare // 2)
+    add("Steering", [steering] if steering else [], 220)
+    add("Handoff", [handoff] if handoff else [], 360 + spare // 3)
     if model:
         head = (f"r{model['revision']} {model['status']}; "
                 f"{len(model['rules'])} rules. Read model_get for conditions.")
@@ -407,11 +412,10 @@ def render_packet(
         from datetime import datetime
         model_item = MemoryItem(model["id"], "\n".join(lines), {}, datetime.now().astimezone())
         add("Task model", [model_item], 300)
-    questions = split_open_questions(items)
     add("Open questions", questions[:8], 120)
     omitted += max(0, len(questions) - 8)
     covered = set(model["covered"]) if model else set()
-    add("Related", [item for item in related if item.id not in covered], 260)
+    add("Related", [item for item in related if item.id not in covered], 260 + spare // 3)
     if branches and len(branches) > 1:
         current = next((b for b in branches if b["current"]), None)
         if current:
@@ -430,7 +434,7 @@ def render_find(
     children: dict[str, list[MemoryItem]] | None = None,
     full: bool = False,
 ) -> str:
-    """Search hits. Full body only for explicit ids; others are subjects.
+    """Search hits. Full body when full=True or explicit ids; others are subjects.
 
     A summary hit lists a few covered child headlines underneath.
     """
@@ -438,7 +442,7 @@ def render_find(
     children = children or {}
     lines = []
     for item in items:
-        if item.id in full_ids:
+        if full or item.id in full_ids:
             lines.append(_line(item) if full else _capped_line(item))
         else:
             lines.append(_subject(item))
