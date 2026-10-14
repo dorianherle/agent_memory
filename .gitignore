@@ -1,3 +1,4 @@
+.DS_Store
 .agent_memory/
 .agent_memory_archive_*/
 .env
