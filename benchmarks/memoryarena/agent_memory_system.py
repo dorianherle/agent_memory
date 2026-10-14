@@ -17,8 +17,12 @@ import shutil
 import tempfile
 from typing import Optional
 
-from agent_memory import Memory
-from agent_memory.tools import call_tool
+try:
+    from agent_memory import Memory
+    from agent_memory.tools import call_tool
+except ImportError:  # pragma: no cover - optional until agent_memory backend is selected
+    Memory = None  # type: ignore[assignment]
+    call_tool = None  # type: ignore[assignment]
 
 
 class AgentMemorySystem:
@@ -30,6 +34,11 @@ class AgentMemorySystem:
         mode: str = "single_call_full",
         workspace_root: Optional[str | Path] = None,
     ):
+        if Memory is None:
+            raise ImportError(
+                "agent-memory is required for AgentMemorySystem. "
+                "Install via: pip install git+https://github.com/dorianherle/agent_memory.git"
+            )
         self.user_id = user_id or "default"
         self.mode = mode
         self._owns_tempdir = workspace_root is None
