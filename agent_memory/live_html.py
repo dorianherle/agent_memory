@@ -7,8 +7,9 @@ Writes into ``.agent_memory/live/``:
 - ``actions.js`` — recent tool calls, including retrievals (rewritten on each call)
 
 Open ``index.html`` in a browser. The page polls and re-renders when memory
-changes. Three cards: commit history, the current state packet, and agent
-actions. Dirty files come from the reveal helper's ``/working`` endpoint.
+changes. Designed around what a human needs at a glance: a readable project
+notebook with full notes and drift explanations, the active agent context
+packet, and live activity / recall.
 """
 
 from __future__ import annotations
@@ -20,7 +21,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 # Bump when SHELL_TEMPLATE changes so existing installs pick up the new shell.
-SHELL_VERSION = "23"
+SHELL_VERSION = "24"
 
 SHELL_TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
@@ -31,52 +32,78 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
 <title>agent-memory</title>
 <style>
   :root {
-    --bg: #f4f7fb;
+    --bg: #f6f5f1;
     --ink: #0f172a;
+    --ink-soft: #334155;
     --muted: #64748b;
     --faint: #94a3b8;
     --line: #e2e8f0;
+    --line-soft: #edf1f7;
     --card: #ffffff;
     --navy: #0b1220;
     --teal: #0f766e;
     --blue: #2563eb;
     --amber: #b45309;
+    --purple: #6d28d9;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; min-height: 100%; }
   body {
     background: var(--bg);
     color: var(--ink);
-    font: 14px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", sans-serif;
   }
   button, input { font: inherit; color: inherit; }
   button { cursor: pointer; }
-  button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 36px 20px 56px; }
-  header { text-align: center; }
-  .logo { display: inline-flex; filter: drop-shadow(0 8px 16px rgba(15, 23, 42, 0.12)); }
-  h1 {
-    margin: 14px 0 8px;
-    font-size: 40px;
-    line-height: 1;
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .logo { display: inline-flex; filter: drop-shadow(0 6px 14px rgba(15, 23, 42, 0.1)); }
+  .brand-text h1 {
+    margin: 0;
+    font-size: 24px;
+    line-height: 1.15;
     font-weight: 750;
-    letter-spacing: -1.4px;
+    letter-spacing: -0.6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
+  .repo-btn {
+    border: 1px solid var(--line);
+    background: #fff;
+    padding: 2px 9px;
+    border-radius: 8px;
+    font: 600 13px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: var(--ink-soft);
+  }
+  .repo-btn:hover { border-color: #cbd5e1; background: #f8fafc; }
   .lede {
-    margin: 0 auto;
-    max-width: 640px;
+    margin: 4px 0 0;
     color: var(--muted);
-    font-size: 15px;
-    line-height: 1.55;
+    font-size: 13.5px;
+    line-height: 1.45;
   }
-  .lede strong { color: var(--ink); font-weight: 650; }
   .status {
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    margin: 14px 0 0;
-    color: var(--faint);
-    font: 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    margin: 0;
+    padding: 6px 11px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    font: 500 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
   }
   .status::before {
     content: "";
@@ -85,20 +112,19 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     border-radius: 99px;
     background: currentColor;
   }
-  .status.live { color: var(--teal); }
+  .status.live { color: var(--teal); border-color: #99f6e4; background: #f0fdfa; }
   .grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr) minmax(0, 0.96fr);
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1.05fr) minmax(0, 0.9fr);
     gap: 16px;
-    align-items: stretch;
-    margin-top: 28px;
+    align-items: start;
+    margin-top: 20px;
   }
   .card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 16px;
-    box-shadow: 0 1px 1px rgba(15, 23, 42, 0.04), 0 10px 28px rgba(15, 23, 42, 0.05);
-    min-height: 460px;
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.04);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -106,158 +132,233 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
   .card-h {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
+    align-items: center;
     gap: 12px;
-    padding: 13px 14px;
+    padding: 13px 16px;
     border-bottom: 1px solid var(--line);
     font: 12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
   }
-  .card-h strong { font-weight: 650; }
+  .card-h strong { font-weight: 700; font-size: 12.5px; letter-spacing: -0.1px; }
   .card-h span { color: var(--muted); font-size: 11px; white-space: nowrap; }
-  .tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 12px 0; }
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line-soft);
+    background: #fafaf8;
+  }
+  .toolbar[hidden] { display: none; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; }
   .tabs[hidden] { display: none; }
   .branch-tab {
     border: 1px solid var(--line);
     background: #fff;
     border-radius: 999px;
-    padding: 3px 9px;
+    padding: 3px 10px;
     font-size: 11px;
     font-weight: 650;
-    color: #334155;
+    color: var(--ink-soft);
   }
   .branch-tab.here { background: var(--ink); border-color: var(--ink); color: #fff; }
-  #commits { position: relative; flex: 1; overflow: auto; padding: 6px 0 8px; max-height: 560px; }
-  .spine {
-    position: absolute;
-    left: 20px;
-    top: 18px;
-    bottom: 18px;
-    width: 2px;
-    background: #e2e8f0;
+  .search-input {
+    flex: 1;
+    min-width: 150px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 12px;
+    background: #fff;
   }
-  .entry { position: relative; }
+  #commits {
+    flex: 1;
+    overflow: auto;
+    padding: 12px 14px 16px;
+    max-height: 760px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .entry {
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    background: #fff;
+    transition: border-color 0.12s ease, box-shadow 0.12s ease;
+  }
+  .entry:hover { border-color: #cbd5e1; }
+  .entry.on { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12); }
+  .entry.child-entry {
+    margin-left: 22px;
+    background: #f8fafc;
+    border-style: dashed;
+  }
+  .entry.role-goal { border-left: 3.5px solid var(--blue); }
+  .entry.role-handoff { border-left: 3.5px solid var(--teal); }
+  .entry.role-summary { border-left: 3.5px solid #d97706; }
+  .entry.role-open { border-left: 3.5px solid var(--amber); background: #fffdf7; }
   .commit {
-    display: grid;
-    grid-template-columns: 18px 62px max-content minmax(0, 1fr);
-    gap: 8px;
-    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
     width: 100%;
-    padding: 7px 14px 7px 12px;
+    padding: 11px 13px;
     border: 0;
     background: transparent;
     text-align: left;
   }
-  .commit:hover, .commit.on { background: #f8fafc; }
-  .dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 99px;
-    border: 2px solid var(--ink);
-    background: #fff;
-    position: relative;
-    z-index: 1;
-    justify-self: center;
+  .commit-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px;
+    font: 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: var(--muted);
   }
-  .dot.goal { border-color: var(--blue); background: #dbeafe; }
-  .dot.summary { border-color: var(--teal); background: #ccfbf1; }
-  .dot.handoff { border-color: var(--ink); background: var(--ink); }
-  .dot.user { border-color: var(--blue); background: #fff; }
-  .dot.open { border-color: #d97706; background: #fef3c7; }
-  .dot.current { box-shadow: 0 0 0 3px #dbeafe; }
-  .sha { font: 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 650; }
   .pill {
-    font: 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-weight: 650;
+    font: 700 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
     padding: 3px 6px;
-    border-radius: 6px;
+    border-radius: 5px;
     border: 1px solid var(--line);
     background: #f8fafc;
-    color: var(--ink);
+    color: var(--ink-soft);
   }
-  .pill.goal { color: #1d4ed8; background: #eff6ff; border-color: #bfdbfe; }
-  .pill.summary { color: var(--teal); background: #f0fdfa; border-color: #99f6e4; }
-  .pill.open { color: var(--amber); background: #fffbeb; border-color: #fde68a; }
-  .pill.user { color: #1d4ed8; background: #eff6ff; border-color: #bfdbfe; }
+  .pill.goal, .pill.user { color: #1d4ed8; background: #eff6ff; border-color: #bfdbfe; }
+  .pill.handoff { color: #0f766e; background: #f0fdfa; border-color: #99f6e4; }
+  .pill.summary { color: #b45309; background: #fffbeb; border-color: #fde68a; }
+  .pill.open { color: #b45309; background: #fffbeb; border-color: #fde68a; }
+  .pill.step { color: #334155; background: #f1f5f9; border-color: #cbd5e1; }
+  .agent-tag { font-weight: 600; color: var(--ink-soft); }
+  .sha { color: var(--faint); font-weight: 600; }
+  .commit-time { margin-left: auto; color: var(--faint); }
+  .fold-badge {
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: #fef3c7;
+    color: #92400e;
+    font-weight: 650;
+    font-size: 10.5px;
+  }
   .title {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    color: #475569;
-    font-size: 13px;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 620;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
   }
+  .note-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 2px;
+  }
+  .note-line {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .note-line .k {
+    display: inline-block;
+    margin-right: 5px;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font: 650 10.5px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: #f1f5f9;
+    color: #0f172a;
+  }
+  .note-line.k-next .k { background: #dcfce7; color: #166534; }
+  .note-line.k-blocked .k { background: #fee2e2; color: #991b1b; }
+  .note-line.k-evidence .k { background: #e0f2fe; color: #075985; }
+  .drift-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin: 0 13px 10px;
+    padding: 6px 9px;
+    border-radius: 7px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    color: #92400e;
+    font: 11.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  .drift-file {
+    border: 0;
+    background: rgba(217, 119, 6, 0.12);
+    color: #78350f;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font: inherit;
+    font-weight: 600;
+  }
+  .drift-file:hover { text-decoration: underline; }
   .msg, .catalog {
-    margin: 0 14px 8px 42px;
-    padding: 8px 10px;
+    margin: 0 13px 10px;
+    padding: 9px 11px;
     border-radius: 8px;
     border: 1px solid var(--line);
     background: #f8fafc;
     white-space: pre-wrap;
     font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
-    color: #334155;
+    color: var(--ink-soft);
+    overflow-wrap: anywhere;
   }
-  .catalog { white-space: pre-wrap; }
   .catalog summary { cursor: pointer; font-weight: 650; }
-  .files { border-top: 1px solid var(--line); padding: 8px 12px 12px; }
-  .file {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    margin-top: 6px;
-    padding: 7px 8px;
-    border: 0;
-    border-radius: 8px;
-    background: #f8fafc;
-    text-align: left;
-    font: 12px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
-  }
-  .file .path { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #334155; }
-  .ok { color: var(--teal); font-weight: 650; white-space: nowrap; }
-  .stale {
-    color: var(--amber);
-    background: #fef3c7;
-    border: 1px solid #fde68a;
-    border-radius: 6px;
-    padding: 1px 6px;
-    font-weight: 650;
-    white-space: nowrap;
-  }
   .state {
     background: var(--navy);
     border-color: var(--navy);
     color: #e2e8f0;
-    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16);
   }
   .state .card-h { border-bottom-color: #1e293b; }
   .state .card-h span { color: #94a3b8; }
-  #state-body { flex: 1; overflow: auto; padding: 6px 0 12px; }
-  .sec { display: grid; grid-template-columns: 3px minmax(0, 1fr); gap: 10px; padding: 12px 14px 4px; }
+  .budget-meter {
+    height: 3px;
+    background: #1e293b;
+    width: 100%;
+  }
+  .budget-fill {
+    height: 100%;
+    background: #2dd4bf;
+    width: 0%;
+    transition: width 0.2s ease;
+  }
+  #state-body { flex: 1; overflow: auto; padding: 8px 0 14px; }
+  .sec { display: grid; grid-template-columns: 3px minmax(0, 1fr); gap: 10px; padding: 10px 15px 6px; }
   .bar { border-radius: 99px; background: #64748b; }
   .bar.goal { background: #3b82f6; }
-  .bar.steer { background: #64748b; }
+  .bar.steer { background: #60a5fa; }
   .bar.handoff { background: #2dd4bf; }
+  .bar.model { background: #a78bfa; }
   .bar.open { background: #f59e0b; }
-  .bar.related { background: #f59e0b; }
+  .bar.related { background: #94a3b8; }
   .sec h3 {
     display: flex;
     justify-content: space-between;
     gap: 8px;
-    margin: 0 0 6px;
-    font: 650 12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+    margin: 0 0 5px;
+    font: 650 11.5px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
     color: #93c5fd;
   }
   .sec.handoff h3 { color: #5eead4; }
+  .sec.model h3 { color: #c4b5fd; }
   .sec.steer h3 { color: #cbd5e1; }
-  .sec.open h3, .sec.related h3 { color: #fcd34d; }
+  .sec.open h3 { color: #fcd34d; }
+  .sec.related h3 { color: #cbd5e1; }
   .bud { color: #64748b; font-weight: 500; }
   .line, .more {
     margin: 0 0 4px;
     font: 12.5px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
-    color: #e2e8f0;
+    color: #f1f5f9;
+    overflow-wrap: anywhere;
   }
-  .more { color: #94a3b8; }
+  .more { color: #94a3b8; font-size: 12px; }
   button.id {
     border: 0;
     background: none;
@@ -269,75 +370,144 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
   button.id:hover { text-decoration: underline; }
   .mark {
     color: #fbbf24;
-    font-weight: 650;
+    font-weight: 600;
+    font-size: 11.5px;
+  }
+  .raw-packet {
+    margin: 10px 15px 2px;
+    border-top: 1px solid #1e293b;
+    padding-top: 10px;
+    font: 11.5px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: #94a3b8;
+  }
+  .raw-packet summary { cursor: pointer; color: #cbd5e1; font-weight: 600; }
+  .raw-packet pre {
+    margin: 8px 0 0;
+    padding: 10px;
+    border-radius: 8px;
+    background: #060a12;
+    color: #cbd5e1;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 11.5px;
   }
   #running[hidden] { display: none; }
-  #running { padding: 8px 14px 0; }
+  #running {
+    padding: 10px 14px;
+    background: #f0fdfa;
+    border-bottom: 1px solid #ccfbf1;
+  }
   .run {
-    margin: 0 0 6px;
-    color: var(--muted);
-    font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
+    margin: 0 0 4px;
+    color: var(--teal);
+    font: 600 12px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  #action-list { flex: 1; overflow: auto; max-height: 640px; }
-  .act { padding: 10px 14px; border-bottom: 1px solid #f1f5f9; }
+  .run:last-child { margin-bottom: 0; }
+  .workspace-box {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line-soft);
+    background: #fafaf8;
+    font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: var(--ink-soft);
+  }
+  .workspace-box details summary {
+    cursor: pointer;
+    color: var(--muted);
+    font-weight: 600;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .workspace-box details summary::-webkit-details-marker { display: none; }
+  .workspace-clean { color: var(--teal); font-weight: 600; font-size: 12px; }
+  .ws-files { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+  .file {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 5px 8px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+    text-align: left;
+    font: 11.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  .file:hover { border-color: #cbd5e1; }
+  .file .path { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-soft); }
+  .badge-mod { color: var(--blue); font-weight: 650; white-space: nowrap; font-size: 11px; }
+  .badge-untracked { color: var(--muted); white-space: nowrap; font-size: 11px; }
+  #action-list { flex: 1; overflow: auto; max-height: 600px; }
+  .act { padding: 10px 14px; border-bottom: 1px solid var(--line-soft); }
   .act-top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
-  .tool { font: 12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 700; }
-  .tool.find { color: #1d4ed8; }
-  .tool.summarize { color: var(--teal); }
+  .tool { font: 700 12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .tool.find { color: var(--blue); }
+  .tool.save, .tool.summarize { color: var(--teal); }
   .tool.delete { color: #be123c; }
   .when { color: var(--faint); font: 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
   .detail {
-    margin: 6px 0 0;
+    margin: 5px 0 0;
     padding: 6px 8px;
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: 7px;
     background: #f8fafc;
-    color: #334155;
+    color: var(--ink-soft);
     font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
     overflow-wrap: anywhere;
   }
-  .empty { margin: 8px 14px; color: var(--muted); font-size: 13px; }
+  .empty { margin: 12px 14px; color: var(--muted); font-size: 13px; }
   .empty.light { color: #94a3b8; }
-  @media (max-width: 980px) {
+  @media (max-width: 1040px) {
     .grid { grid-template-columns: 1fr; }
-    h1 { font-size: 32px; }
-    .card { min-height: 0; }
   }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <div class="logo" aria-hidden="true">
-      <svg width="56" height="56" viewBox="0 0 64 64">
-        <rect width="64" height="64" rx="16" fill="#0B1220"/>
-        <path d="M23 18 L43 32 L23 46" fill="none" stroke="#E2E8F0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="23" cy="18" r="4.4" fill="#0B1220" stroke="#F8FAFC" stroke-width="2.3"/>
-        <circle cx="23" cy="46" r="4.4" fill="#0B1220" stroke="#F8FAFC" stroke-width="2.3"/>
-        <circle cx="43" cy="32" r="5.3" fill="#2DD4BF"/>
-      </svg>
+  <header class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg width="44" height="44" viewBox="0 0 64 64">
+          <rect width="64" height="64" rx="15" fill="#0B1220"/>
+          <path d="M23 18 L43 32 L23 46" fill="none" stroke="#E2E8F0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="23" cy="18" r="4.4" fill="#0B1220" stroke="#F8FAFC" stroke-width="2.3"/>
+          <circle cx="23" cy="46" r="4.4" fill="#0B1220" stroke="#F8FAFC" stroke-width="2.3"/>
+          <circle cx="43" cy="32" r="5.3" fill="#2DD4BF"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>
+          <span>agent-memory</span>
+          <button type="button" class="repo-btn" id="repo-btn" hidden></button>
+        </h1>
+        <p class="lede">Project notebook for humans &amp; AI agents — readable findings, verified handoffs, and bounded context.</p>
+      </div>
     </div>
-    <h1>agent-memory</h1>
-    <p class="lede">Local, Git-backed engineering notebook for <strong>multi-session AI agents</strong> — keeping uncut notes, file snapshots, and a bounded state packet across fresh contexts.</p>
     <p class="status" id="status">connecting…</p>
   </header>
   <div class="grid">
-    <section class="card" id="history" aria-label="Commit history">
-      <div class="card-h"><strong>1. .agent_memory/</strong><span>Git DAG + SHA-256</span></div>
-      <div class="tabs" id="branches" hidden></div>
+    <section class="card" id="history" aria-label="Project notebook">
+      <div class="card-h"><strong>1. Project Notebook (.agent_memory/)</strong><span id="notebook-count">0 notes</span></div>
+      <div class="toolbar" id="toolbar" hidden>
+        <div class="tabs" id="branches" hidden></div>
+        <input type="search" class="search-input" id="search" placeholder="Filter notes, files, @agent…" aria-label="Filter notes">
+      </div>
       <div id="commits"></div>
-      <div class="files" id="files"></div>
     </section>
     <section class="card state" id="state" aria-label="Memory state">
-      <div class="card-h"><strong>2. # MEMORY STATE</strong><span id="state-budget">≤ 1,200 chars</span></div>
+      <div class="card-h"><strong>2. # MEMORY STATE (Agent Prompt)</strong><span id="state-budget">≤ 1,200 chars</span></div>
+      <div class="budget-meter"><div class="budget-fill" id="budget-fill"></div></div>
       <div id="state-body"></div>
     </section>
-    <section class="card" id="actions" aria-label="Agent actions">
-      <div class="card-h"><strong>3. Lookup</strong><span>Uncut recall</span></div>
+    <section class="card" id="actions" aria-label="Live activity and tool calls">
+      <div class="card-h"><strong>3. Activity &amp; Recall</strong><span>Live status &amp; tool log</span></div>
       <div id="running" hidden></div>
+      <div class="workspace-box" id="files"></div>
       <div id="action-list"></div>
     </section>
   </div>
@@ -346,7 +516,7 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
 <script>
 (function () {
   const POLL_MS = 1500;
-  const STORE_KEY = "agent-memory-live-ui-v2";
+  const STORE_KEY = "agent-memory-live-ui-v3";
   const TOOLS = {
     find: "memory_find",
     save: "memory_save",
@@ -357,11 +527,18 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     inspect_done: "memory_inspect_done",
     open_questions: "memory_open_questions",
     goal_create: "memory_goal_create",
-    goal_use: "memory_goal_use"
+    goal_use: "memory_goal_use",
+    model_propose: "memory_model (propose)",
+    model_accept: "memory_model (accept)",
+    model_handoff: "memory_model (handoff)",
+    model_reduce: "memory_model (reduce)",
+    model_predict: "memory_model (predict)"
   };
+  const KEY_RE = /^(Next|Blocked|Remaining|Evidence|Verified|Decision|Decided|Constraint|Rollback|Root cause|Changed|Benchmark|Path|Formula|Result):\s*(.*)$/i;
   let graph = window.__AGENT_MEMORY_LIVE__ || { nodes: [], edges: [], branches: [] };
   let lastHash = "";
   let lastNow = null;
+  let filterText = "";
   const state = loadState();
 
   function loadState() {
@@ -387,21 +564,31 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     return parts.length ? parts[parts.length - 1] : "";
   }
   function firstLine(text) { return String(text || "").trim().split("\n")[0]; }
-  function restLines(text) {
-    return String(text || "").trim().split("\n").slice(1).map((s) => s.trim()).filter(Boolean).slice(0, 3);
+  function bodyLines(text) {
+    return String(text || "").trim().split("\n").slice(1).map((s) => s.trim()).filter(Boolean);
   }
   function shortId(id) { return String(id || "").slice(0, 7); }
   function formatWhen(iso) {
     if (!iso) return "";
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return "";
-    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   }
   function setStatus(text, live) {
     const el = document.getElementById("status");
     const name = repoName();
     el.textContent = name ? (text + " · " + name) : text;
     el.classList.toggle("live", !!live);
+    const repoBtn = document.getElementById("repo-btn");
+    if (repoBtn) {
+      if (name) {
+        repoBtn.hidden = false;
+        repoBtn.textContent = name;
+        repoBtn.onclick = (e) => openInFinder(projectRoot(), e);
+      } else {
+        repoBtn.hidden = true;
+      }
+    }
   }
   function lineage(tip) {
     const parents = {};
@@ -428,6 +615,7 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
   function roleOf(n) {
     const p = graph.prompt || {};
     if (p.goal && n.id === p.goal.id) return "goal";
+    if (p.steering && n.id === p.steering.id) return "steering";
     if (n.kind === "summary") return "summary";
     if (n.kind === "open_question") return "open";
     if (n.kind === "user") return "user";
@@ -435,13 +623,22 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     if (found.length && n.id === found[found.length - 1].id) return "handoff";
     return "step";
   }
+  function roleLabel(role) {
+    if (role === "step") return "finding";
+    return role;
+  }
   function rowsFor(name) {
     const all = byId();
     const branch = (graph.branches || []).find((b) => b.name === name);
     const keep = branch && branch.tip ? lineage(branch.tip) : null;
+    const q = filterText.trim().toLowerCase();
     const nodes = (graph.nodes || []).filter((n) => {
       if (!n || n.kind === "delete" || n.folded) return false;
       if (keep && keep.size && !keep.has(n.id)) return false;
+      if (q) {
+        const hay = [n.id, n.title, n.body, n.agent, (n.stale_files || []).join(" ")].join(" ").toLowerCase();
+        if (hay.indexOf(q) < 0) return false;
+      }
       return true;
     });
     nodes.sort((a, b) => String(a.committed_at || "").localeCompare(String(b.committed_at || "")));
@@ -475,67 +672,140 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     saveState();
     render();
     const hit = document.querySelector('.entry[data-id="' + String(id).replace(/"/g, "") + '"]');
-    if (hit) hit.scrollIntoView({ block: "nearest" });
+    if (hit) hit.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }
   function renderBranches() {
+    const toolbar = document.getElementById("toolbar");
     const el = document.getElementById("branches");
     const rows = graph.branches || [];
+    const totalNodes = (graph.nodes || []).filter((n) => n && n.kind !== "delete" && !n.folded).length;
     el.innerHTML = "";
-    if (rows.length <= 1) { el.hidden = true; return; }
-    el.hidden = false;
-    const focus = focusedBranch();
-    rows.forEach((b) => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "branch-tab" + (b.name === focus ? " here" : "");
-      btn.textContent = b.name + (b.current ? " · you" : "");
-      btn.addEventListener("click", () => {
-        state.branch = b.name;
-        saveState();
-        render();
+    if (rows.length > 1) {
+      el.hidden = false;
+      const focus = focusedBranch();
+      rows.forEach((b) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "branch-tab" + (b.name === focus ? " here" : "");
+        btn.textContent = b.name + (b.current ? " · active" : "");
+        btn.addEventListener("click", () => {
+          state.branch = b.name;
+          saveState();
+          render();
+        });
+        el.appendChild(btn);
       });
-      el.appendChild(btn);
-    });
+    } else {
+      el.hidden = true;
+    }
+    toolbar.hidden = rows.length <= 1 && totalNodes <= 2;
+  }
+  function renderStructuredLine(text) {
+    const p = document.createElement("p");
+    p.className = "note-line";
+    const m = KEY_RE.exec(text);
+    if (m) {
+      const key = m[1];
+      const rest = m[2];
+      const kl = key.toLowerCase();
+      if (kl === "next") p.className += " k-next";
+      else if (kl === "blocked" || kl === "remaining") p.className += " k-blocked";
+      else if (kl === "evidence" || kl === "verified" || kl === "benchmark") p.className += " k-evidence";
+      const badge = document.createElement("span");
+      badge.className = "k";
+      badge.textContent = key;
+      p.appendChild(badge);
+      p.appendChild(document.createTextNode(rest));
+    } else {
+      p.textContent = text;
+    }
+    return p;
   }
   function renderCommits() {
     const box = document.getElementById("commits");
+    const countEl = document.getElementById("notebook-count");
     const atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 28;
     const first = !box.childElementCount;
     box.innerHTML = "";
     const rows = rowsFor(focusedBranch());
+    countEl.textContent = rows.length + (rows.length === 1 ? " note" : " notes");
     if (!rows.length) {
       const empty = document.createElement("p");
       empty.className = "empty";
-      empty.textContent = "Commits show up here after the first save.";
+      empty.textContent = filterText ? "No notes match filter." : "Notes appear here as goals, findings, and summaries are saved.";
       box.appendChild(empty);
       return;
     }
-    const spine = document.createElement("div");
-    spine.className = "spine";
-    box.appendChild(spine);
+    const root = projectRoot();
     rows.forEach((n) => {
-      const entry = document.createElement("div");
-      entry.className = "entry";
-      entry.dataset.id = n.id;
       const role = roleOf(n);
+      const entry = document.createElement("div");
+      entry.className = "entry role-" + role + (state.selected === n.id ? " on" : "") + (n.child ? " child-entry" : "");
+      entry.dataset.id = n.id;
+
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "commit" + (state.selected === n.id ? " on" : "");
-      const dot = document.createElement("i");
-      dot.className = "dot " + role + (n.current ? " current" : "");
+      btn.className = "commit";
+
+      const meta = document.createElement("div");
+      meta.className = "commit-meta";
+      const pill = document.createElement("span");
+      pill.className = "pill " + role;
+      pill.textContent = roleLabel(role);
+      meta.appendChild(pill);
+
+      if (n.agent) {
+        const who = document.createElement("span");
+        who.className = "agent-tag";
+        who.textContent = "@" + n.agent;
+        meta.appendChild(who);
+      }
       const sha = document.createElement("span");
       sha.className = "sha";
       sha.textContent = shortId(n.id);
-      const pill = document.createElement("span");
-      pill.className = "pill " + role;
-      pill.textContent = role;
-      const title = document.createElement("span");
+      meta.appendChild(sha);
+
+      if ((n.children || []).length) {
+        const fold = document.createElement("span");
+        fold.className = "fold-badge";
+        fold.textContent = (isExpanded(n.id) ? "▾ " : "▸ ") + n.children.length + " folded";
+        meta.appendChild(fold);
+      }
+
+      const when = formatWhen(n.committed_at);
+      if (when) {
+        const t = document.createElement("time");
+        t.className = "commit-time";
+        t.textContent = when;
+        meta.appendChild(t);
+      }
+      btn.appendChild(meta);
+
+      const fullText = (n.body || n.title || "").trim();
+      const headline = firstLine(fullText || n.title || n.kind || "entry");
+      const title = document.createElement("div");
       title.className = "title";
-      title.textContent = firstLine(n.title || n.kind || "entry");
-      btn.appendChild(dot);
-      btn.appendChild(sha);
-      btn.appendChild(pill);
+      title.textContent = headline;
       btn.appendChild(title);
+
+      const extra = bodyLines(fullText);
+      if (extra.length) {
+        const linesBox = document.createElement("div");
+        linesBox.className = "note-lines";
+        const limit = state.selected === n.id ? extra.length : Math.min(extra.length, 6);
+        extra.slice(0, limit).forEach((ln) => {
+          linesBox.appendChild(renderStructuredLine(ln));
+        });
+        if (extra.length > limit) {
+          const more = document.createElement("p");
+          more.className = "note-line";
+          more.style.color = "var(--blue)";
+          more.textContent = "+ " + (extra.length - limit) + " more lines (click to expand)";
+          linesBox.appendChild(more);
+        }
+        btn.appendChild(linesBox);
+      }
+
       btn.addEventListener("click", () => {
         if ((n.children || []).length) toggleExpand(n.id);
         state.selected = state.selected === n.id ? null : n.id;
@@ -543,11 +813,36 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
         render();
       });
       entry.appendChild(btn);
+
+      const drifted = n.stale_files || [];
+      if (drifted.length) {
+        const drift = document.createElement("div");
+        drift.className = "drift-bar";
+        drift.appendChild(document.createTextNode("Code edited since this note:"));
+        drifted.forEach((rel) => {
+          const fb = document.createElement("button");
+          fb.type = "button";
+          fb.className = "drift-file";
+          fb.textContent = rel;
+          const abs = rel.startsWith("/") ? rel : (root ? root + "/" + rel : rel);
+          fb.addEventListener("click", (e) => openInFinder(abs, e));
+          drift.appendChild(fb);
+        });
+        entry.appendChild(drift);
+      }
+
       if (state.selected === n.id) {
-        const msg = document.createElement("div");
-        msg.className = "msg";
-        msg.textContent = (n.body || n.title || "").trim() || "(empty)";
-        entry.appendChild(msg);
+        if (n.packet || n.memory_state) {
+          const pkt = document.createElement("details");
+          pkt.className = "catalog";
+          const sum = document.createElement("summary");
+          sum.textContent = "Turn prompt packet";
+          const pre = document.createElement("div");
+          pre.textContent = n.packet || n.memory_state;
+          pkt.appendChild(sum);
+          pkt.appendChild(pre);
+          entry.appendChild(pkt);
+        }
         if (n.mcp_tools) {
           const cat = document.createElement("details");
           cat.className = "catalog";
@@ -572,6 +867,12 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     btn.addEventListener("click", () => selectId(id));
     return btn;
   }
+  function staleLabel(entry) {
+    if (!entry || !entry.stale) return "";
+    const files = entry.stale_files || [];
+    if (files.length) return " · edited since note: " + files.slice(0, 2).join(", ");
+    return " · code edited since note";
+  }
   function addBlock(parent, tone, title, entry, withBudget) {
     if (!entry || !(entry.text || "").trim()) return;
     const sec = document.createElement("div");
@@ -584,22 +885,23 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     if (withBudget) {
       const bud = document.createElement("span");
       bud.className = "bud";
-      bud.textContent = String(entry.text || "").length + "c";
+      bud.textContent = String(entry.text || "").length + " chars";
       h.appendChild(bud);
     }
     const line = document.createElement("p");
     line.className = "line";
     line.appendChild(idButton(entry.id));
     line.appendChild(document.createTextNode(" " + firstLine(entry.text)));
-    if (entry.stale) {
+    const drift = staleLabel(entry);
+    if (drift) {
       const mark = document.createElement("span");
       mark.className = "mark";
-      mark.textContent = " [stale]";
+      mark.textContent = drift;
       line.appendChild(mark);
     }
     body.appendChild(h);
     body.appendChild(line);
-    restLines(entry.text).forEach((t) => {
+    bodyLines(entry.text).slice(0, 4).forEach((t) => {
       const more = document.createElement("p");
       more.className = "more";
       more.textContent = t;
@@ -625,10 +927,11 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
       line.className = "line";
       line.appendChild(idButton(entry.id));
       line.appendChild(document.createTextNode(" " + firstLine(entry.text)));
-      if (entry.stale) {
+      const drift = staleLabel(entry);
+      if (drift) {
         const mark = document.createElement("span");
         mark.className = "mark";
-        mark.textContent = " [stale]";
+        mark.textContent = drift;
         line.appendChild(mark);
       }
       body.appendChild(line);
@@ -640,23 +943,44 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
   function renderState() {
     const body = document.getElementById("state-body");
     const budget = document.getElementById("state-budget");
+    const fill = document.getElementById("budget-fill");
     const p = graph.prompt || {};
-    const injected = String(p.injected || "");
-    budget.textContent = injected ? (injected.length + " / 1,200") : "≤ 1,200 chars";
+    const packet = String(p.packet || p.injected || "");
+    const used = packet.length;
+    budget.textContent = used ? (used + " / 1,200 chars") : "≤ 1,200 chars";
+    if (fill) fill.style.width = Math.min(100, Math.round((used / 1200) * 100)) + "%";
     body.innerHTML = "";
     const found = p.findings || [];
-    if (!p.goal && !p.steering && !(p.questions || []).length && !found.length && !injected) {
+    if (!p.goal && !p.steering && !(p.questions || []).length && !found.length && !packet) {
       const empty = document.createElement("p");
       empty.className = "empty light";
-      empty.textContent = "The first request becomes the goal.";
+      empty.textContent = "The first user request establishes the goal.";
       body.appendChild(empty);
       return;
     }
     addBlock(body, "goal", "Goal", p.goal, true);
     addBlock(body, "steer", "Steering", p.steering, false);
     if (found.length) addBlock(body, "handoff", "Handoff", found[found.length - 1], true);
-    addMany(body, "open", "Open", p.questions || []);
-    if (found.length > 1) addMany(body, "related", "Related", found.slice(0, -1).slice(-3));
+    if (p.model && p.model.id) {
+      const rules = (p.model.rules || []).map((r) => r.id + ": " + r.claim).join("\n");
+      addBlock(body, "model", "Task model", {
+        id: p.model.id,
+        text: "r" + p.model.revision + " " + p.model.status + " (" + (p.model.rules || []).length + " rules)\n" + rules
+      }, false);
+    }
+    addMany(body, "open", "Open questions", p.questions || []);
+    if (found.length > 1) addMany(body, "related", "Related findings", found.slice(0, -1).slice(-3));
+    if (packet) {
+      const raw = document.createElement("details");
+      raw.className = "raw-packet";
+      const sum = document.createElement("summary");
+      sum.textContent = "View exact injected rule (.cursor/rules/agent-memory-state.mdc)";
+      const pre = document.createElement("pre");
+      pre.textContent = packet;
+      raw.appendChild(sum);
+      raw.appendChild(pre);
+      body.appendChild(raw);
+    }
   }
   function toolLabel(action) {
     return TOOLS[action] || action || "memory";
@@ -668,7 +992,7 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     if (!rows.length) {
       const empty = document.createElement("p");
       empty.className = "empty";
-      empty.textContent = "Retrievals show up here when the agent calls memory_find.";
+      empty.textContent = "Memory saves and memory_find lookups appear here.";
       box.appendChild(empty);
       return;
     }
@@ -709,7 +1033,7 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     }
     window.open(toFileUrl(absPath), "_blank");
   }
-  function fileRow(label, badge, stale, abs) {
+  function fileRow(label, badge, isMod, abs) {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "file";
@@ -717,7 +1041,7 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     path.className = "path";
     path.textContent = label;
     const mark = document.createElement("span");
-    mark.className = stale ? "stale" : "ok";
+    mark.className = isMod ? "badge-mod" : "badge-untracked";
     mark.textContent = badge;
     btn.appendChild(path);
     btn.appendChild(mark);
@@ -731,13 +1055,14 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     if (inspecting && inspecting.id) {
       const line = document.createElement("p");
       line.className = "run";
-      line.textContent = "inspecting " + shortId(inspecting.id);
+      line.textContent = "Inspecting snapshot " + shortId(inspecting.id) + " (detached)";
       box.appendChild(line);
     }
     ((data && data.processes) || []).forEach((proc) => {
       const line = document.createElement("p");
       line.className = "run";
-      line.textContent = proc.command || "running";
+      const secs = proc.running_for_ms ? " (" + Math.round(proc.running_for_ms / 1000) + "s)" : "";
+      line.textContent = "▶ " + (proc.command || "running") + secs;
       box.appendChild(line);
     });
     box.hidden = !box.childElementCount;
@@ -747,30 +1072,60 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     const box = document.getElementById("files");
     box.innerHTML = "";
     if (!data) {
-      const wait = document.createElement("p");
-      wait.className = "empty";
-      wait.textContent = "checking files…";
-      box.appendChild(wait);
+      box.textContent = "Workspace status unavailable";
       return;
     }
     renderRunning(data);
     const files = data.files || [];
     if (!files.length) {
-      box.appendChild(fileRow("working tree", "sha256 ✓", false, null));
+      const clean = document.createElement("div");
+      clean.className = "workspace-clean";
+      clean.textContent = "Workspace matches latest memory commit ✓";
+      box.appendChild(clean);
       return;
     }
+    const modified = files.filter((f) => f && f.status !== "?");
+    const untracked = files.filter((f) => f && f.status === "?");
+    const parts = [];
+    if (modified.length) parts.push(modified.length + " modified");
+    if (untracked.length) parts.push(untracked.length + " untracked");
+
+    const det = document.createElement("details");
+    const sum = document.createElement("summary");
+    const left = document.createElement("span");
+    left.textContent = "Workspace since last save: " + parts.join(", ");
+    const right = document.createElement("span");
+    right.textContent = "show ▾";
+    sum.appendChild(left);
+    sum.appendChild(right);
+    det.appendChild(sum);
+
+    const list = document.createElement("div");
+    list.className = "ws-files";
     const root = projectRoot();
-    files.slice(0, 8).forEach((f) => {
+    modified.slice(0, 10).forEach((f) => {
       const rel = String(f.path || "");
       const abs = rel.startsWith("/") ? rel : (root ? root + "/" + rel : rel);
-      box.appendChild(fileRow(rel, "[stale]", true, abs));
+      const label = f.status === "A" ? "added" : (f.status === "D" ? "deleted" : "modified");
+      list.appendChild(fileRow(rel, label, true, abs));
     });
-    if (files.length > 8) {
-      const more = document.createElement("p");
-      more.className = "empty";
-      more.textContent = "+" + (files.length - 8) + " more changed";
-      box.appendChild(more);
+    if (untracked.length) {
+      untracked.slice(0, 4).forEach((f) => {
+        const rel = String(f.path || "");
+        const abs = rel.startsWith("/") ? rel : (root ? root + "/" + rel : rel);
+        list.appendChild(fileRow(rel, "untracked", false, abs));
+      });
+      if (untracked.length > 4) {
+        const note = document.createElement("div");
+        note.style.color = "var(--muted)";
+        note.style.fontSize = "11px";
+        note.style.padding = "2px 4px";
+        note.textContent = "+ " + (untracked.length - 4) + " more untracked workspace files";
+        list.appendChild(note);
+      }
     }
+    det.appendChild(list);
+    box.appendChild(det);
   }
   function workingEndpoint() {
     if (graph && graph.working) return graph.working;
@@ -845,6 +1200,15 @@ SHELL_TEMPLATE = r"""<!DOCTYPE html>
     setTimeout(() => s.remove(), 5000);
   }
   function schedule() { setTimeout(poll, POLL_MS); }
+
+  const searchEl = document.getElementById("search");
+  if (searchEl) {
+    searchEl.addEventListener("input", (e) => {
+      filterText = e.target.value || "";
+      renderCommits();
+    });
+  }
+
   applyData(graph);
   setStatus(isDemo() ? "demo" : "live", true);
   pollWorking();
@@ -945,6 +1309,19 @@ def write_live_html(
     payload = compact_graph(graph_data(memory))
     attach_turn_prompts(payload["nodes"], out_dir)
     payload["prompt"] = memory.prompt_payload()
+    try:
+        stale_map = memory._stale_files(memory.state())
+    except Exception:
+        stale_map = {}
+    for node in payload.get("nodes", []):
+        drifted = stale_map.get(node.get("id") or "", [])
+        if drifted:
+            node["stale"] = True
+            node["stale_files"] = drifted[:4]
+    for finding in (payload.get("prompt") or {}).get("findings") or []:
+        drifted = stale_map.get(finding.get("id") or "", [])
+        if drifted:
+            finding["stale_files"] = drifted[:4]
     payload["root"] = str(Path(memory._path).resolve())
     try:
         payload["reveal"] = ensure_reveal_server(

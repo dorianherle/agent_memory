@@ -156,7 +156,7 @@ class WriteCanvasTests(MemoryTestCase):
         shell = index.read_text()
         payload = data.read_text()
         self.assertIn("agent-memory-live-shell", shell)
-        self.assertIn('content="23"', shell)
+        self.assertIn('content="24"', shell)
         self.assertIn('id="history"', shell)
         self.assertIn('id="state"', shell)
         self.assertIn('id="actions"', shell)
@@ -181,6 +181,19 @@ class WriteCanvasTests(MemoryTestCase):
         forced = self.memory.write_live_html(force_shell=True)
         self.assertEqual(forced, index)
         self.assertGreaterEqual(index.stat().st_mtime_ns, mtime)
+
+    def test_live_html_attaches_stale_files_and_keeps_goal_fresh(self) -> None:
+        self.file.write_text("v1")
+        goal = self.memory.save_user("understand the circuit")
+        finding = self.save("verified circuit check")
+        self.file.write_text("v2")
+        packet = self.memory.render_packet("circuit")
+        self.assertNotIn(f"[{goal[:8]}] [stale]", packet)
+        self.assertIn(f"[{finding[:8]}] [stale]", packet)
+        index = self.memory.write_live_html()
+        payload = (index.parent / "data.js").read_text()
+        self.assertIn('"stale_files"', payload)
+        self.assertIn("work.txt", payload)
 
     def test_find_is_recorded_on_the_live_page(self) -> None:
         self.save("checkout retries duplicate the write")

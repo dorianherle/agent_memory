@@ -791,18 +791,14 @@ class Memory:
             closed.append(target)
         return closed
 
-    def _stale_ids(self, items: list[MemoryItem]) -> set[str]:
-        """Ids whose snapshot files or declared dependencies changed, including unsaved edits.
-
-        Explicit file dependencies also cover note-only saves. Inspect mode
-        skips this — HEAD is the detached snapshot, not the live tree.
-        """
-        stale: set[str] = set()
+    def _stale_files(self, items: list[MemoryItem]) -> dict[str, list[str]]:
+        """Map item id -> snapshot or declared files that changed since item."""
+        drifted: dict[str, list[str]] = {}
         if not items or self.inspecting() is not None:
-            return stale
+            return drifted
         head = self._run("rev-parse", "HEAD", check=False)
         if not head:
-            return stale
+            return drifted
         declared = sorted({name for item in items for name in item.payload.get("files", [])})
         untracked = set()
         if declared:
@@ -811,6 +807,8 @@ class Memory:
             untracked = set(self._run("ls-files", "--others", "-z", "--", *declared,
                                       check=False).split("\0"))
         for item in {entry.id: entry for entry in items}.values():
+            if item.payload.get("user") or item.payload.get("open_question"):
+                continue
             names = self._run(
                 "show", "--pretty=format:", "--name-only", item.id, check=False
             )
@@ -825,9 +823,18 @@ class Memory:
                 ).splitlines()
                 if name.strip()
             }
-            if files & (later | untracked):
-                stale.add(item.id)
-        return stale
+            changed = sorted(files & (later | untracked))
+            if changed:
+                drifted[item.id] = changed
+        return drifted
+
+    def _stale_ids(self, items: list[MemoryItem]) -> set[str]:
+        """Ids whose snapshot files or declared dependencies changed, including unsaved edits.
+
+        Explicit file dependencies also cover note-only saves. Inspect mode
+        skips this — HEAD is the detached snapshot, not the live tree.
+        """
+        return set(self._stale_files(items))
 
     def prompt_payload(self) -> dict:
         """Current prompt: compact injected text plus full-body sections.
@@ -870,8 +877,9 @@ class Memory:
         from agent_memory.models import TaskModels
         model = TaskModels(self).view(items=items)
         payload["model"] = model
+        payload["packet"] = self.render_packet()
         if model:
-            payload["injected"] = self.render_packet()
+            payload["injected"] = payload["packet"]
         return payload
 
     def render_state(self) -> str:

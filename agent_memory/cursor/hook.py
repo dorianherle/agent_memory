@@ -199,6 +199,8 @@ def handle(event: str, data: dict) -> dict:
     if event == "afterAgentResponse":
         # Finished answers belong to the conversation. Agents explicitly save
         # only durable knowledge through memory_save / memory_summarize.
+        if memory._git_dir.exists() and memory.state():
+            _refresh_dashboard(memory)
         return {}
 
     if event == "subagentStart":
