@@ -51,65 +51,7 @@ def main(argv: list[str] | None = None) -> None:
         help="Never prompt; require --gemini-api-key / env / .env or --skip-gemini",
     )
 
-    studio = sub.add_parser(
-        "studio",
-        help="Local goal board: auto-run isolated goals against pytest",
-    )
-    studio.add_argument("--host", default="127.0.0.1")
-    studio.add_argument("--port", type=int, default=8788)
-    studio.add_argument("--no-browser", action="store_true")
-
-    run = sub.add_parser(
-        "run",
-        help="Auto-run a goal: write failing pytests, respawn until green",
-    )
-    run.add_argument("--goal", dest="goal_text", default=None, help="Goal text")
-    run.add_argument("--resume", dest="goal_id", default=None, help="Existing goal id")
-    run.add_argument("--root", default=".", help="Project root")
-    run.add_argument("--max-agents", type=int, default=8)
-    run.add_argument(
-        "--pytest",
-        nargs=argparse.REMAINDER,
-        default=[],
-        help="Extra pytest args after --pytest",
-    )
-
     args = parser.parse_args(argv)
-
-    if args.command == "run":
-        from agent_memory.runner import detect_worker, run_goal
-
-        if not args.goal_text and not args.goal_id:
-            parser.error("run requires --goal TEXT or --resume ID")
-        name, worker = detect_worker()
-        if worker is None:
-            print("error: connect Codex (codex login) or set CURSOR_API_KEY", file=sys.stderr)
-            sys.exit(2)
-
-        def report(status: dict) -> None:
-            pytest = status.get("pytest") or {}
-            print(
-                f"[{status.get('goal_id')}] {name} agent {status.get('agent')} "
-                f"{pytest.get('summary', '')} {status.get('state')}",
-                flush=True,
-            )
-
-        status = run_goal(
-            args.root,
-            args.goal_text,
-            goal_id=args.goal_id,
-            worker=worker,
-            max_agents=args.max_agents,
-            pytest_args=args.pytest,
-            on_observe=report,
-        )
-        sys.exit(0 if status.get("state") == "passed" else 1)
-
-    if args.command == "studio":
-        from agent_memory.studio import serve
-
-        serve(args.host, args.port, open_browser=not args.no_browser)
-        return
 
     if args.command == "cursor" and args.cursor_command == "install":
         from agent_memory.cursor.install import GeminiSetupError, install_cursor

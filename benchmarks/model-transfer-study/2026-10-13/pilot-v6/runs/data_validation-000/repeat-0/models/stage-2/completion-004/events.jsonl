@@ -1,4 +1,0 @@
-{"type":"thread.started","thread_id":"01a1362c-4357-70f2-810c-b80b7a90ffee"}
-{"type":"turn.started"}
-{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"action\":\"run\",\"arguments_json\":\"{\\\"command\\\":[\\\"python\\\",\\\"-c\\\",\\\"from work import evaluate\\\\np={'base_unit':'m','units':{'m':1},'unique':False}\\\\nfor name,r in [('huge',{'rows':[{'id':'x','amount':10**1000}]}),('unhashable_unit',{'rows':[{'id':'x','amount':1,'unit':[]}]} )]:\\\\n try: print(name,evaluate(r,p))\\\\n except Exception as e: print(name,type(e).__name__,str(e))\\\"]}\"}"}}
-{"type":"turn.completed","usage":{"input_tokens":13282,"cached_input_tokens":6528,"cache_write_input_tokens":0,"output_tokens":1109,"reasoning_output_tokens":974}}

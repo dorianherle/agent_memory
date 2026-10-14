@@ -1,7 +1,0 @@
-{
-  "questions_with_repeated_session_ids": 12,
-  "questions_with_repeated_gold_ids": 0,
-  "duplicate_gold_question_ids": [],
-  "questions_with_CR": 5,
-  "note": "Repeated relevant corpus IDs change the official ideal DCG denominator. Primary all-evidence recall uses sets and is unchanged."
-}

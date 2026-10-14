@@ -1,9 +1,0 @@
-{
-  "status": "Original strict verifier stopped",
-  "first_assertion": "The verifier mapped one note per session ID. The dataset repeats a session ID at different dates. Both stored notes existed; the assertion incorrectly compared the last occurrence with the first.",
-  "verifier_change": "Compare the complete multiset of text and payload, including every occurrence.",
-  "separate_real_source_defect": "Subprocess text mode converts CR and CRLF to LF. Five eligible questions contain CR text. The v5 reader preserves UTF-8 bytes and rebuilds the old catalog.",
-  "original_results_preserved": true,
-  "full_replay_needed": true,
-  "dataset_edge_cases": "../dataset-edge-cases.json"
-}

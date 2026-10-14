@@ -1,2 +1,0 @@
-Stage done: source_dependencies-050 repeat=0 method=models stage=1 stop=finished pass=True tokens=354791
-{"stop": "finished", "task_checks_pass": true, "model_active": true, "tokens": 354791}

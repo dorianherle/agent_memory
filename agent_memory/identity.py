@@ -17,7 +17,7 @@ SESSIONS_FILE = "agent_sessions.json"
 DEFAULT_AGENT = "agent"
 USER_AGENT = "user"
 
-# Stable category keys for Cursor canvas ``theme.category`` / HTML fallback.
+# Stable category keys for HTML graph rendering.
 AGENT_COLORS = (
     "blue",
     "green",
@@ -29,7 +29,7 @@ AGENT_COLORS = (
     "gray",
 )
 
-# Hex used by the standalone HTML graph (canvas uses theme tokens instead).
+# Hex used by the standalone HTML graph.
 AGENT_COLOR_HEX = {
     "blue": "#7BAFE9",
     "green": "#3FA266",
@@ -84,13 +84,6 @@ def agent_color_key(name: str) -> str:
 
 def agent_color_hex(name: str) -> str:
     return AGENT_COLOR_HEX[agent_color_key(name)]
-
-
-def display_name(agent: str, *, kind: str | None = None) -> str:
-    """Human label for timelines."""
-    if kind == "user" or agent == USER_AGENT:
-        return "user"
-    return agent
 
 
 def sessions_path(git_dir: Path) -> Path:

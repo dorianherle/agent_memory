@@ -1,4 +1,0 @@
-{"type":"thread.started","thread_id":"01a135c4-3600-7803-a4db-772844a0bd41"}
-{"type":"turn.started"}
-{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"action\":\"memory\",\"arguments_json\":\"{\\\"action\\\":\\\"find\\\",\\\"query\\\":\\\"accepted model rule schema valid rule fields claim when then alternatives\\\"}\"}"}}
-{"type":"turn.completed","usage":{"input_tokens":31686,"cached_input_tokens":24192,"cache_write_input_tokens":0,"output_tokens":225,"reasoning_output_tokens":154}}

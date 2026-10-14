@@ -1,4 +1,0 @@
-{"type":"thread.started","thread_id":"01a13606-52ad-78b1-858b-d619d61d04c9"}
-{"type":"turn.started"}
-{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"action\":\"run\",\"arguments_json\":\"{\\\"command\\\":[\\\"python\\\",\\\"-c\\\",\\\"import json\\\\nfor p in ('stored-model.json','model.json'):\\\\n with open(p) as f: x=json.load(f)\\\\n print(p, list(x), x.get('id'), x.get('event'), 'model' in x)\\\\n m=x.get('model',x)\\\\n print(' ',m.get('title'),len(m.get('rules',[])),len(m.get('cases',[])))\\\"]}\"}"}}
-{"type":"turn.completed","usage":{"input_tokens":38802,"cached_input_tokens":25344,"cache_write_input_tokens":0,"output_tokens":909,"reasoning_output_tokens":656}}

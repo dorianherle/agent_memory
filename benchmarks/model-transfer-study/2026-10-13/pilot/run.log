@@ -1,9 +1,0 @@
-Run state_transitions-000 repeat=0 method=notebook
-Run source_dependencies-000 repeat=0 method=notebook
-Run configuration_changes-000 repeat=0 method=notes
-Stage done: source_dependencies-000 repeat=0 method=notebook stage=1 stop=completion_protocol_failure pass=False tokens=102195
-Stage done: state_transitions-000 repeat=0 method=notebook stage=1 stop=finished pass=True tokens=168250
-Stage done: configuration_changes-000 repeat=0 method=notes stage=1 stop=completion_protocol_failure pass=False tokens=155555
-Stage done: source_dependencies-000 repeat=0 method=notebook stage=2 stop=finished pass=True tokens=180494
-Stage done: state_transitions-000 repeat=0 method=notebook stage=2 stop=finished pass=False tokens=110492
-Stage done: configuration_changes-000 repeat=0 method=notes stage=2 stop=completion_protocol_failure pass=False tokens=123769

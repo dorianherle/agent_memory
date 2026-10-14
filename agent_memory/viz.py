@@ -289,3 +289,58 @@ def export_html(memory, path=None) -> Path:
     page = Path(path) if path else memory._git_dir / "graph.html"
     page.write_text(TEMPLATE.replace("__DATA__", encoded))
     return page
+
+
+_MAX_BODY = 2400
+
+
+def compact_graph(data: dict) -> dict:
+    """Slim graph payload for embedding in the live HTML monitor."""
+    nodes = []
+    for node in data.get("nodes", []):
+        message = node.get("message") or ""
+        title = message.split("\n", 1)[0].strip()[:80] or node.get("kind", "step")
+        body = message
+        if len(body) > _MAX_BODY:
+            body = body[: _MAX_BODY - 1] + "…"
+        nodes.append(
+            {
+                "id": node["id"],
+                "kind": node.get("kind", "step"),
+                "agent": node.get("agent") or "agent",
+                "color": node.get("color") or "gray",
+                "title": title,
+                "body": body,
+                "tip": bool(node.get("tip")),
+                "current": bool(node.get("current")),
+                "folded": bool(node.get("folded")),
+                "branches": list(node.get("branches") or []),
+                "committed_at": node.get("committed_at") or "",
+                "children": list(node.get("children") or []),
+                "depends_on": list(node.get("depends_on") or []),
+            }
+        )
+    edges = []
+    for edge in data.get("edges", []):
+        row = {
+            "from": edge["from"],
+            "to": edge["to"],
+            "kind": edge.get("kind", "parent"),
+        }
+        if edge.get("fold"):
+            row["fold"] = edge["fold"]
+        edges.append(row)
+    agents = [
+        {
+            "name": row.get("name") or "agent",
+            "color": row.get("color") or "gray",
+        }
+        for row in data.get("agents") or []
+    ]
+    return {
+        "nodes": nodes,
+        "edges": edges,
+        "branches": list(data.get("branches") or []),
+        "agents": agents,
+    }
+

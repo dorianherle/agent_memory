@@ -475,7 +475,8 @@ def install_cursor(
 
     from agent_memory.core import Memory
 
-    Memory(root)
+    with Memory(root):
+        pass
 
     cred_path = credentials_path(root)
     if provider_env:

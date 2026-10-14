@@ -246,9 +246,25 @@ def inspecting_state(root: Path) -> dict | None:
     return data if isinstance(data, dict) else None
 
 
-def _terminals_dir(root: Path, projects: Path | None = None) -> Path | None:
-    from agent_memory.canvas import _cursor_project_candidates
+def project_slug(root: Path) -> str:
+    """Cursor project folder name for a workspace path."""
+    text = str(root.resolve())
+    if text.startswith("/"):
+        text = text[1:]
+    return text.replace("/", "-")
 
+
+def _cursor_project_candidates(root: Path) -> list[str]:
+    """Possible ~/.cursor/projects/<slug> names for this workspace."""
+    slug = project_slug(root)
+    names = [slug]
+    alt = slug.replace("_", "-")
+    if alt != slug:
+        names.append(alt)
+    return names
+
+
+def _terminals_dir(root: Path, projects: Path | None = None) -> Path | None:
     base = Path(projects) if projects is not None else Path.home() / ".cursor" / "projects"
     best: Path | None = None
     best_n = -1

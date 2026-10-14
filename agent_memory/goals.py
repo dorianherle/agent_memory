@@ -130,8 +130,8 @@ def create_goal(project: str | Path, text: str) -> dict:
     goal_id = _new_id({item["id"] for item in goals})
     workspace = _hidden(project) / GOALS_DIR / goal_id / "workspace"
     branch = _checkout(project, goal_id, workspace)
-    memory = Memory(workspace)
-    memory.ensure_goal(text)
+    with Memory(workspace) as memory:
+        memory.ensure_goal(text)
     (workspace / HIDDEN_DIR / MARKER).write_text(goal_id + "\n")
     record = {
         "id": goal_id,
@@ -167,14 +167,7 @@ def resolve_goal(project: str | Path, goal_id: str) -> dict:
 
 def list_goals(project: str | Path) -> list[dict]:
     project = host_project(project)
-    rows = []
-    for item in _load(project):
-        row = resolve_goal(project, item["id"])
-        status_path = _hidden(project) / GOALS_DIR / item["id"] / "status.json"
-        if status_path.is_file():
-            row["status"] = json.loads(status_path.read_text())
-        rows.append(row)
-    return rows
+    return [resolve_goal(project, item["id"]) for item in _load(project)]
 
 
 def memory_for(path: str | Path, goal_id: str | None = None) -> Memory:
@@ -187,8 +180,8 @@ def memory_for(path: str | Path, goal_id: str | None = None) -> Memory:
 
 def bind_packet(project: str | Path, goal_id: str, question: str | None = None) -> str:
     record = resolve_goal(project, goal_id)
-    memory = Memory(record["workspace"])
-    packet = memory.render_packet(question)
+    with Memory(record["workspace"]) as memory:
+        packet = memory.render_packet(question)
     branch = record.get("branch") or "(copy)"
     return (
         f"Goal [{record['id']}] {record['title']}\n"
@@ -208,11 +201,6 @@ def format_goal_list(project: str | Path) -> str:
         lines.append(f"  workspace: {row['workspace']}")
         if row.get("branch"):
             lines.append(f"  branch: {row['branch']}")
-        status = row.get("status") or {}
-        if status:
-            lines.append(
-                f"  status: {status.get('state', '')} agent {status.get('agent', '')}".rstrip()
-            )
     return "\n".join(lines)
 
 
@@ -224,19 +212,3 @@ def format_created(record: dict, packet: str) -> str:
         f"Branch: {branch}\n\n"
         f"{packet}"
     )
-
-
-def write_status(project: str | Path, goal_id: str, payload: dict) -> Path:
-    record = resolve_goal(project, goal_id)
-    path = _hidden(record["project"]) / GOALS_DIR / record["id"] / "status.json"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2) + "\n")
-    return path
-
-
-def read_status(project: str | Path, goal_id: str) -> dict:
-    record = resolve_goal(project, goal_id)
-    path = _hidden(record["project"]) / GOALS_DIR / record["id"] / "status.json"
-    if not path.is_file():
-        return {}
-    return json.loads(path.read_text())

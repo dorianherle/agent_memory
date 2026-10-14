@@ -101,7 +101,6 @@ def _recent_findings(items: list[MemoryItem]) -> list[MemoryItem]:
         and item.id not in pinned
         and not item.payload.get("user")
         and not item.payload.get("auto")
-        and not item.payload.get("model_event")
         and not (
             item.payload.get("subagent")
             and item.payload.get("event") == "start"

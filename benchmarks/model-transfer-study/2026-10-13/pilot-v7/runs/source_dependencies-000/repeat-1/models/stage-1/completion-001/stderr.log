@@ -1,9 +1,0 @@
-2026-10-13T18:51:30.191585Z ERROR codex_models_manager::manager: failed to refresh available models: timeout waiting for child process to exit
-2026-10-13T18:51:30.307698Z ERROR codex_models_manager::manager: failed to refresh available models: timeout waiting for child process to exit
-2026-10-13T18:51:30.357755Z ERROR codex_api::endpoint::responses_websocket: failed to connect to websocket: IO error: failed to lookup address information: Name does not resolve, url: wss://chatgpt.com/backend-api/codex/responses
-2026-10-13T18:51:30.404459Z ERROR codex_api::endpoint::responses_websocket: failed to connect to websocket: IO error: failed to lookup address information: Name does not resolve, url: wss://chatgpt.com/backend-api/codex/responses
-2026-10-13T18:51:30.603603Z ERROR codex_api::endpoint::responses_websocket: failed to connect to websocket: IO error: failed to lookup address information: Name does not resolve, url: wss://chatgpt.com/backend-api/codex/responses
-2026-10-13T18:51:31.010362Z ERROR codex_api::endpoint::responses_websocket: failed to connect to websocket: IO error: failed to lookup address information: Name does not resolve, url: wss://chatgpt.com/backend-api/codex/responses
-2026-10-13T18:51:34.115174Z ERROR codex_api::endpoint::responses_websocket: failed to connect to websocket: IO error: failed to lookup address information: Name does not resolve, url: wss://chatgpt.com/backend-api/codex/responses
-2026-10-13T18:51:35.720759Z ERROR codex_api::endpoint::responses_websocket: failed to connect to websocket: IO error: failed to lookup address information: Name does not resolve, url: wss://chatgpt.com/backend-api/codex/responses
-2026-10-13T18:51:38.816867Z ERROR codex_api::endpoint::responses_websocket: failed to connect to websocket: IO error: failed to lookup address information: Name does not resolve, url: wss://chatgpt.com/backend-api/codex/responses

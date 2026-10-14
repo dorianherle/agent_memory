@@ -1,6 +1,0 @@
-2026-10-13T20:47:59.608221Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
-2026-10-13T20:47:59.619613Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
-2026-10-13T20:47:59.663922Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
-2026-10-13T20:47:59.677448Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
-2026-10-13T20:48:00.213603Z  WARN codex_core_plugins::manifest: ignoring interface.defaultPrompt[0]: prompt must be at most 128 characters path=file:///Users/dorianherle/.codex/.tmp/plugins/plugins/ngs-analysis/.codex-plugin/plugin.json
-2026-10-13T20:48:00.216640Z  WARN codex_core_plugins::manifest: ignoring interface.defaultPrompt[0]: prompt must be at most 128 characters path=file:///Users/dorianherle/.codex/.tmp/plugins/plugins/ngs-analysis/.codex-plugin/plugin.json

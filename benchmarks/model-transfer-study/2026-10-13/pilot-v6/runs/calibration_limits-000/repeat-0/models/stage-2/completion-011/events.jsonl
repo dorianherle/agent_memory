@@ -1,4 +1,0 @@
-{"type":"thread.started","thread_id":"01a13629-ce95-7a53-a8dd-1cc4b9c2c45c"}
-{"type":"turn.started"}
-{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"action\":\"memory\",\"arguments_json\":\"{\\\"action\\\":\\\"save\\\",\\\"text\\\":\\\"Final Stage 2 verification passed 8 checks after the canonical-condition fix: sorted missing names, canonical nested condition agreement, eligible supersession, rejection of ineligible superseders, conflicts unaffected by source counts, Boolean false as unsupported, absent value preserved as null, input immutability, and exact report.json reproduction.\\\",\\\"payload\\\":{\\\"files\\\":[\\\"work.py\\\",\\\"TASK.md\\\",\\\"policy.json\\\",\\\"evidence.json\\\",\\\"requests.json\\\",\\\"report.json\\\"]}}\"}"}}
-{"type":"turn.completed","usage":{"input_tokens":22938,"cached_input_tokens":6528,"cache_write_input_tokens":0,"output_tokens":635,"reasoning_output_tokens":516}}

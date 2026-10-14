@@ -1,4 +1,0 @@
-{"type":"thread.started","thread_id":"01a1370a-5163-7000-96f9-a0de161a8fdb"}
-{"type":"turn.started"}
-{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"text\":\"{\\\"answer\\\":\\\"135 C\\\",\\\"source\\\":\\\"Q08\\\"}\"}"}}
-{"type":"turn.completed","usage":{"input_tokens":10173,"cached_input_tokens":6528,"cache_write_input_tokens":0,"output_tokens":26,"reasoning_output_tokens":0}}

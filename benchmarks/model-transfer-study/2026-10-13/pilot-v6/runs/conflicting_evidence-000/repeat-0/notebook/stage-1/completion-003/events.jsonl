@@ -1,4 +1,0 @@
-{"type":"thread.started","thread_id":"01a13637-e91d-76e1-a850-606242f9be1f"}
-{"type":"turn.started"}
-{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"action\":\"run\",\"arguments_json\":\"{\\\"command\\\":[\\\"python\\\",\\\"-c\\\",\\\"import json, copy; from work import evaluate; evidence=json.load(open('evidence.json')); policy=json.load(open('policy.json')); requests=json.load(open('requests.json')); before=copy.deepcopy((requests,evidence,policy)); results=[evaluate(r,evidence,policy) for r in requests]; assert (requests,evidence,policy)==before; assert results==[{'status':'supported','value':30,'sources':['S1'],'unknowns':[]},{'status':'unsupported','value':False,'sources':['D1'],'unknowns':[]}]; print(json.dumps(results,sort_keys=True))\\\"]}\"}"}}
-{"type":"turn.completed","usage":{"input_tokens":10566,"cached_input_tokens":6528,"cache_write_input_tokens":0,"output_tokens":229,"reasoning_output_tokens":75}}

@@ -3,13 +3,14 @@ import json
 import re
 import sqlite3
 import threading
-import time
 import uuid
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
 
-import numpy
+from agent_memory.vector_store import VectorStoreMixin, vector_bytes
+
+__all__ = ["CATALOG_FILE", "Catalog", "canonical_document", "content_hash", "vector_bytes"]
 
 CATALOG_FILE = "catalog.sqlite3"
 SCHEMA_VERSION = 5
@@ -18,7 +19,6 @@ _FTS_STOP = frozenset(
     "may of on or our should so such than that the their them then there these "
     "they this to was we were what when where which who will with would".split()
 )
-# Rebuild the Git projection after exact line-ending decoding changes.
 
 
 def locked(method):
@@ -45,20 +45,7 @@ def canonical_document(message: str, payload: dict) -> str:
     return f"{message}\nMetadata: {metadata}"
 
 
-def vector_bytes(vector: list[float]) -> tuple[int, bytes]:
-    values = numpy.asarray(vector, dtype=numpy.float64)
-    if values.ndim != 1 or values.size == 0 or not numpy.isfinite(values).all():
-        raise ValueError("embedding provider must return a finite nonempty one-dimensional vector")
-    scale = numpy.max(numpy.abs(values))
-    if not scale:
-        raise ValueError("embedding provider returned a zero vector")
-    # Scaling before the norm prevents overflow for large valid vectors.
-    values = values / scale
-    values = numpy.asarray(values / numpy.linalg.norm(values), dtype=numpy.float32)
-    return len(values), values.tobytes()
-
-
-class Catalog:
+class Catalog(VectorStoreMixin):
     def __init__(self, git_dir: Path) -> None:
         self.path = git_dir / CATALOG_FILE
         self.lock = threading.RLock()
@@ -73,9 +60,6 @@ class Catalog:
     def _create_schema(self) -> None:
         version = self.connection.execute("PRAGMA user_version").fetchone()[0]
         if version != SCHEMA_VERSION:
-            # The catalog is a projection of Git, so an outdated schema is
-            # dropped and rebuilt from history instead of migrated in place.
-            # Embeddings are kept: they cannot be recomputed from Git alone.
             self.connection.execute("PRAGMA foreign_keys=OFF")
             self.connection.execute("DROP TABLE IF EXISTS memory_fts")
             names = [
@@ -89,8 +73,6 @@ class Catalog:
                 if name != "embeddings":
                     self.connection.execute(f'DROP TABLE IF EXISTS "{name}"')
             self.connection.execute("PRAGMA foreign_keys=ON")
-            # Rebuilding reassigns content row ids, so persisted HNSW labels
-            # would point at the wrong vectors. Force a rebuild from SQLite.
             for stale in self.path.parent.glob("vectors-*"):
                 stale.unlink()
         self.connection.executescript(
@@ -171,11 +153,6 @@ class Catalog:
             self.connection.close()
         except Exception:
             pass
-
-    @locked
-    def is_empty(self) -> bool:
-        row = self.connection.execute("SELECT 1 FROM memories LIMIT 1").fetchone()
-        return row is None
 
     @locked
     def known_refs(self) -> dict[str, str]:
@@ -409,11 +386,6 @@ class Catalog:
             JOIN ref_memories scope ON scope.memory_id = memories.id
                 AND scope.ref_name = ?
             WHERE memories.kind != 'delete'
-              AND NOT EXISTS (
-                  SELECT 1 FROM payload_fields model_fields
-                  WHERE model_fields.memory_id = memories.id
-                    AND model_fields.key = 'model_event'
-              )
               AND memories.id NOT IN (
                   SELECT covered.value
                   FROM payload_fields fields
@@ -448,354 +420,6 @@ class Catalog:
         ).fetchone()
 
     @locked
-    def hydrate(self, ids: list[str]) -> list[sqlite3.Row]:
-        if not ids:
-            return []
-        rows = self.connection.execute(
-            f"""
-            SELECT memories.*, contents.hash AS content_hash, contents.text AS document
-            FROM memories JOIN contents ON contents.id = memories.content_id
-            WHERE memories.id IN ({','.join('?' for _ in ids)})
-            """,
-            ids,
-        ).fetchall()
-        by_id = {row["id"]: row for row in rows}
-        return [by_id[item_id] for item_id in ids if item_id in by_id]
-
-    @locked
     def fts(self, query: str, limit: int, *, branch: str | None = None, **filters) -> list[tuple[str, float]]:
-        # Apply scope and evidence filters before LIMIT. Global top hits can
-        # otherwise hide all valid matches on a smaller branch.
         rows = self.select(branch=branch, fts_query=query, limit=limit, **filters)
         return [(row["id"], -float(row["fts_rank"])) for row in rows]
-
-    @locked
-    def missing_documents(self, provider: str) -> list[sqlite3.Row]:
-        return self.connection.execute(
-            """
-            SELECT contents.hash AS input_hash, contents.text
-            FROM contents
-            LEFT JOIN embeddings ON embeddings.provider = ?
-                AND embeddings.purpose = 'document'
-                AND embeddings.input_hash = contents.hash
-            WHERE embeddings.input_hash IS NULL
-              AND EXISTS (
-                  SELECT 1 FROM memories
-                  WHERE memories.content_id = contents.id
-                    AND memories.kind != 'delete'
-              )
-            """,
-            (provider,),
-        ).fetchall()
-
-    @locked
-    def embedding(self, provider: str, purpose: str, digest: str) -> numpy.ndarray | None:
-        row = self.connection.execute(
-            """
-            SELECT dimensions, vector FROM embeddings
-            WHERE provider = ? AND purpose = ? AND input_hash = ?
-            """,
-            (provider, purpose, digest),
-        ).fetchone()
-        if row is None:
-            return None
-        return numpy.frombuffer(row["vector"], dtype=numpy.float32).copy()
-
-    @locked
-    def save_embeddings(
-        self,
-        provider: str,
-        purpose: str,
-        values: list[tuple[str, str, list[float]]],
-    ) -> None:
-        with self.connection:
-            for digest, text, vector in values:
-                dimensions, raw = vector_bytes(vector)
-                self.connection.execute(
-                    """
-                    INSERT OR IGNORE INTO embeddings(
-                        provider, purpose, input_hash, text, dimensions, vector
-                    ) VALUES (?, ?, ?, ?, ?, ?)
-                    """,
-                    (provider, purpose, digest, text, dimensions, raw),
-                )
-                self.connection.execute(
-                    """
-                    DELETE FROM embedding_jobs
-                    WHERE provider = ? AND purpose = ? AND input_hash = ?
-                      AND owner = ?
-                    """,
-                    (provider, purpose, digest, self.owner),
-                )
-
-    @locked
-    def queue_embeddings(
-        self, provider: str, purpose: str, inputs: list[tuple[str, str]]
-    ) -> None:
-        with self.connection:
-            self.connection.executemany(
-                """
-                INSERT OR IGNORE INTO embedding_jobs(
-                    provider, purpose, input_hash, text
-                ) VALUES (?, ?, ?, ?)
-                """,
-                [(provider, purpose, digest, text) for digest, text in inputs],
-            )
-
-    @locked
-    def claim_embeddings(
-        self,
-        provider: str,
-        purpose: str,
-        inputs: list[tuple[str, str]],
-    ) -> list[tuple[str, str]]:
-        claimed = []
-        for start in range(0, len(inputs), 400):
-            claimed.extend(
-                self._claim_chunk(provider, purpose, inputs[start:start + 400])
-            )
-        return claimed
-
-    def _claim_chunk(
-        self,
-        provider: str,
-        purpose: str,
-        inputs: list[tuple[str, str]],
-    ) -> list[tuple[str, str]]:
-        if not inputs:
-            return []
-        now = time.time_ns() // 1000
-        stale = now - 120_000_000
-        self.connection.execute("BEGIN IMMEDIATE")
-        try:
-            self.connection.executemany(
-                """
-                INSERT OR IGNORE INTO embedding_jobs(
-                    provider, purpose, input_hash, text
-                ) VALUES (?, ?, ?, ?)
-                """,
-                [(provider, purpose, digest, text) for digest, text in inputs],
-            )
-            self.connection.execute(
-                """
-                UPDATE embedding_jobs
-                SET state = 'pending', claimed_us = NULL, owner = NULL
-                WHERE provider = ? AND purpose = ?
-                  AND state = 'running' AND claimed_us < ?
-                """,
-                (provider, purpose, stale),
-            )
-            digests = [digest for digest, _ in inputs]
-            rows = self.connection.execute(
-                f"""
-                SELECT jobs.input_hash, jobs.text FROM embedding_jobs jobs
-                WHERE jobs.provider = ? AND jobs.purpose = ?
-                  AND jobs.state = 'pending'
-                  AND jobs.input_hash IN ({','.join('?' for _ in digests)})
-                  AND NOT EXISTS (
-                      SELECT 1 FROM embeddings
-                      WHERE embeddings.provider = jobs.provider
-                        AND embeddings.purpose = jobs.purpose
-                        AND embeddings.input_hash = jobs.input_hash
-                  )
-                """,
-                [provider, purpose, *digests],
-            ).fetchall()
-            if rows:
-                claimed = [row["input_hash"] for row in rows]
-                self.connection.execute(
-                    f"""
-                    UPDATE embedding_jobs
-                    SET state = 'running', claimed_us = ?, owner = ?
-                    WHERE provider = ? AND purpose = ?
-                      AND input_hash IN ({','.join('?' for _ in claimed)})
-                    """,
-                    [now, self.owner, provider, purpose, *claimed],
-                )
-            self.connection.commit()
-        except Exception:
-            self.connection.rollback()
-            raise
-        return [(row["input_hash"], row["text"]) for row in rows]
-
-    @locked
-    def renew_embeddings(
-        self,
-        provider: str,
-        purpose: str,
-        inputs: list[tuple[str, str]],
-    ) -> None:
-        if not inputs:
-            return
-        digests = [digest for digest, _ in inputs]
-        with self.connection:
-            for start in range(0, len(digests), 400):
-                chunk = digests[start:start + 400]
-                self.connection.execute(
-                    f"""
-                    UPDATE embedding_jobs SET claimed_us = ?
-                    WHERE provider = ? AND purpose = ? AND owner = ?
-                      AND input_hash IN ({','.join('?' for _ in chunk)})
-                    """,
-                    [
-                        time.time_ns() // 1000,
-                        provider,
-                        purpose,
-                        self.owner,
-                        *chunk,
-                    ],
-                )
-
-    @locked
-    def fail_embeddings(
-        self,
-        provider: str,
-        purpose: str,
-        inputs: list[tuple[str, str]],
-        error: str,
-    ) -> None:
-        if not inputs:
-            return
-        digests = [digest for digest, _ in inputs]
-        with self.connection:
-            for start in range(0, len(digests), 400):
-                chunk = digests[start:start + 400]
-                self.connection.execute(
-                    f"""
-                    UPDATE embedding_jobs
-                    SET state = 'pending', claimed_us = NULL, owner = NULL,
-                        error = ?
-                    WHERE provider = ? AND purpose = ?
-                      AND owner = ?
-                      AND input_hash IN ({','.join('?' for _ in chunk)})
-                    """,
-                    [error, provider, purpose, self.owner, *chunk],
-                )
-
-    @locked
-    def vectors(self, provider: str) -> list[tuple[int, str, numpy.ndarray]]:
-        rows = self.connection.execute(
-            """
-            SELECT contents.id, contents.hash, embeddings.vector
-            FROM contents JOIN embeddings
-              ON embeddings.input_hash = contents.hash
-             AND embeddings.provider = ?
-             AND embeddings.purpose = 'document'
-            ORDER BY contents.id
-            """,
-            (provider,),
-        ).fetchall()
-        return [
-            (
-                row["id"],
-                row["hash"],
-                numpy.frombuffer(row["vector"], dtype=numpy.float32).copy(),
-            )
-            for row in rows
-        ]
-
-    @locked
-    def vector_count(self, provider: str) -> int:
-        return self.connection.execute(
-            """
-            SELECT COUNT(*) FROM embeddings
-            WHERE provider = ? AND purpose = 'document'
-            """,
-            (provider,),
-        ).fetchone()[0]
-
-    @locked
-    def vector_metadata(self, provider: str) -> dict[int, str]:
-        rows = self.connection.execute(
-            """
-            SELECT contents.id, contents.hash
-            FROM contents JOIN embeddings
-              ON embeddings.input_hash = contents.hash
-             AND embeddings.provider = ?
-             AND embeddings.purpose = 'document'
-            """,
-            (provider,),
-        ).fetchall()
-        return {row["id"]: row["hash"] for row in rows}
-
-    @locked
-    def vector_dimensions(self, provider: str) -> int:
-        row = self.connection.execute(
-            """
-            SELECT dimensions FROM embeddings
-            WHERE provider = ? AND purpose = 'document' LIMIT 1
-            """,
-            (provider,),
-        ).fetchone()
-        return row["dimensions"] if row else 0
-
-    @locked
-    def vectors_for_ids(
-        self, provider: str, labels: list[int]
-    ) -> dict[int, numpy.ndarray]:
-        if not labels:
-            return {}
-        rows = []
-        for start in range(0, len(labels), 400):
-            chunk = labels[start:start + 400]
-            rows.extend(self.connection.execute(
-                f"""
-                SELECT contents.id, embeddings.vector
-                FROM contents JOIN embeddings
-                  ON embeddings.input_hash = contents.hash
-                 AND embeddings.provider = ?
-                 AND embeddings.purpose = 'document'
-                WHERE contents.id IN ({','.join('?' for _ in chunk)})
-                """,
-                [provider, *chunk],
-            ).fetchall())
-        return {
-            row["id"]: numpy.frombuffer(
-                row["vector"], dtype=numpy.float32
-            ).copy()
-            for row in rows
-        }
-
-    @locked
-    def memory_ids_for_content(self, hashes: list[str]) -> dict[str, list[str]]:
-        if not hashes:
-            return {}
-        rows = []
-        for start in range(0, len(hashes), 400):
-            chunk = hashes[start:start + 400]
-            rows.extend(self.connection.execute(
-                f"""
-                SELECT contents.hash, memories.id
-                FROM contents JOIN memories ON memories.content_id = contents.id
-                WHERE contents.hash IN ({','.join('?' for _ in chunk)})
-                """,
-                chunk,
-            ).fetchall())
-        result: dict[str, list[str]] = {}
-        for row in rows:
-            result.setdefault(row["hash"], []).append(row["id"])
-        return result
-
-    @locked
-    def document_vectors(
-        self, provider: str, hashes: list[str]
-    ) -> dict[str, numpy.ndarray]:
-        if not hashes:
-            return {}
-        rows = []
-        for start in range(0, len(hashes), 400):
-            chunk = hashes[start:start + 400]
-            rows.extend(self.connection.execute(
-                f"""
-                SELECT input_hash, vector FROM embeddings
-                WHERE provider = ? AND purpose = 'document'
-                  AND input_hash IN ({','.join('?' for _ in chunk)})
-                """,
-                [provider, *chunk],
-            ).fetchall())
-        return {
-            row["input_hash"]: numpy.frombuffer(
-                row["vector"], dtype=numpy.float32
-            ).copy()
-            for row in rows
-        }

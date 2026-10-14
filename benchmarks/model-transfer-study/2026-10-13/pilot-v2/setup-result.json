@@ -1,5 +1,0 @@
-{
-  "valid_for_model_transfer": false,
-  "reason": "The model workflow was optional. The first completed new-memory trajectory created no task model. The intended transfer method was not exercised.",
-  "action": "Retain data as setup evidence; use mandatory checked-model instructions in a new frozen pilot."
-}

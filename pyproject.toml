@@ -22,7 +22,6 @@ Paper = "https://github.com/dorianherle/agent_memory/blob/main/paper/agent_memor
 # FastMCP lives in mcp 1.x; mcp 2.0 removed it
 cursor = ["mcp>=1.2,<2", "google-genai"]
 gemini = ["google-genai"]
-studio = ["cursor-sdk"]
 test = ["pytest>=8", "mcp>=1.2,<2", "google-genai"]
 benchmark = ["tiktoken>=0.7"]
 
@@ -37,9 +36,7 @@ build-backend = "hatchling.build"
 packages = ["agent_memory"]
 
 [tool.hatch.build.targets.wheel.force-include]
-"agent_memory/studio.html" = "agent_memory/studio.html"
-
-"agent_memory/studio_bridge.mjs" = "agent_memory/studio_bridge.mjs"
+"agent_memory/live_shell.html" = "agent_memory/live_shell.html"
 
 [tool.pytest.ini_options]
 testpaths = ["agent_memory/tests"]

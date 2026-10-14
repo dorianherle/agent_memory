@@ -1,4 +1,0 @@
-{"type":"thread.started","thread_id":"01a1370a-772b-7360-a500-93de295d5133"}
-{"type":"turn.started"}
-{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"text\":\"{\\\"answer\\\":\\\"11 minutes\\\",\\\"source\\\":\\\"Q21\\\"}\"}"}}
-{"type":"turn.completed","usage":{"input_tokens":14156,"cached_input_tokens":12160,"cache_write_input_tokens":0,"output_tokens":26,"reasoning_output_tokens":0}}

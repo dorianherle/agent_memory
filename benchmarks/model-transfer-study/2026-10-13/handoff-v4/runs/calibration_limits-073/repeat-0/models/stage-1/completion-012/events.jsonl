@@ -1,4 +1,0 @@
-{"type":"thread.started","thread_id":"01a135f9-2a8c-71d0-bb3a-147c1b4ac9ae"}
-{"type":"turn.started"}
-{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"action\":\"run\",\"arguments_json\":\"{\\\"command\\\":[\\\"python\\\",\\\"-c\\\",\\\"from work import evaluate\\\\nr={'claim':'c','conditions':{'mode':'x'}}\\\\np={'required_conditions':['mode'],'require_verified':False}\\\\ne=[{'source':'s','claim':'c','conditions':{'mode':'x'},'value':7,'supersedes':['s']}]\\\\ngot=evaluate(r,e,p)\\\\nprint(got)\\\\nassert got=={'status':'supported','value':7,'sources':['s'],'unknowns':[]}, 'a record is not superseded by itself because the contract says other eligible records'\\\"]}\"}"}}
-{"type":"turn.completed","usage":{"input_tokens":37654,"cached_input_tokens":24448,"cache_write_input_tokens":0,"output_tokens":1388,"reasoning_output_tokens":1076}}

@@ -14,7 +14,7 @@ The project's own `.git/` is never read or written by this. Rewinding memory
 does not move the user's real branch, and committing to their repository does
 not create memory entries.
 
-Never snapshotted (from `EXCLUDE_ENTRIES` in `core.py`):
+Never snapshotted (from `EXCLUDE_ENTRIES` in `git_ops.py`):
 
 ```
 .agent_memory/   .git/   .svn/   .hg/   .env
@@ -33,22 +33,21 @@ derived state and rebuild themselves from the git history.
 
 | Tool | Signature | Effect |
 |---|---|---|
-| `memory_save` | `(text, agent=None)` | Commit + snapshot. Returns `Saved [id8] @agent`. Warns if line 1 is over 100 chars or reads like narration. Raises while inspecting. |
+| `memory_save` | `(text, agent=None, payload=None)` | Commit + snapshot. Returns `Saved [id8] @agent`. Warns if line 1 is over 100 chars or reads like narration. Raises while inspecting. |
 | `memory_summarize` | `(text, agent=None)` | Same, plus `covers` = every entry since the last summary. Returns `Summarized [id8] @agent`. Same headline warning as save. |
 | `memory_open_questions` | `(text="", depends_on=None, ids=None)` | Add a question (`text` + notes it stands on). Empty `text` closes all, or only `ids`. Several can be live. |
 | `memory_delete` | `(ids)` | Tombstone. Hides those ids from state / find / history / live HTML. Returns `Deleted [id8], …`. Raises on unknown id. The delete commit is `kind=delete` and does not appear in Recent. |
-| `memory_find` | `(query=None, text=None, ids=None, all_branches=False)` | Read. Search returns up to 12 headlines; `ids=` returns those full bodies. A matched summary lists folded child headlines. `query=` without embeddings appends a substring-fallback notice. |
+| `memory_find` | `(query=None, text=None, ids=None, all_branches=False, full=False)` | Read. Search returns up to 8 headlines; `ids=` returns capped bodies, `full=True` removes that cap. A matched summary lists folded child headlines. `query=` without embeddings uses local full-text search. |
 | `memory_history` | `(full=False)` | Current branch, oldest first, folded steps indented under their summary. Headlines by default; `full=True` for bodies. |
 | `memory_state` | `()` | The same compact state that is already injected each turn. |
-| `memory_check` | `(command)` | Run a recognized check. Exit 0 advances last green. Nonzero writes a `RED` latch under `.agent_memory/LATCH`; save/summarize/delete/inspect then raise. Only `memory_branch` clears it. |
-| `memory_branch` | `(id, name, label)` | `label` required: one precise line of what went wrong (`save_hygiene` is an error here). Caps the dead line, **restores files**. While red, `id` is ignored and last green is used. That sentence is Avoid. |
+| `memory_branch` | `(id, name, label)` | Save label as a summary of the current line, then restore working files to the requested id. Old work stays searchable. |
 | `memory_inspect` | `(id)` | **Restores files** to that entry, detached, and blocks saving until closed. |
 | `memory_inspect_done` | `()` | Restores the branch and its files. |
-| `memory_goal_create` | `(text)` | Allocate a goal id and isolated tree. Notebook is `Memory(workspace)`. |
-| `memory_goal_list` | `()` | Goal ids, titles, workspaces, last runner status. |
-| `memory_goal_use` | `(id)` | Bind packet. Not a process-global current goal. |
+| `memory_goal_create` | `(text)` | Allocate a goal id and isolated tree (`git worktree` or copy). Notebook is `Memory(workspace)`. |
+| `memory_goal_list` | `()` | Goal ids, titles, and workspaces. |
+| `memory_goal_use` | `(id)` | Bind packet (`Goal [id]`, workspace, branch). Not a process-global current goal. |
 
-Other tools accept optional `goal=`. Omit it for the project notebook. Preferred host setup: `cwd` and MCP `--root` are the goal workspace.
+Other tools accept optional `goal=` to target that workspace. Omit it for the project notebook. Preferred host setup: `cwd` and MCP `--root` are the goal workspace.
 
 There is no edit tool. `memory_delete` appends a tombstone; git history is
 never rewritten. Default find / state / history / live HTML skip deleted
@@ -56,37 +55,28 @@ targets. `Memory.find(..., include_historical=True)` can still retrieve them.
 
 ## How state is rendered
 
-`render(compact=True)` produces what you see injected:
+`render_packet()` is the injected view, capped at 1,200 characters by default.
+It includes Goal, latest Steering, Handoff, up to eight Open questions and three
+Related excerpts as space permits. Omitted entries are signposted and remain
+searchable. `render_state()` is the older Goal/Steering/Recent display, retained
+for compatibility and dashboard use; it is not the injected packet.
 
-- **Goal** is the original job (`goal=True` on the first user save, or
-  the oldest user entry if none is marked). It is not folded.
-- **Steering** is the latest user note that is not the goal. It is not folded.
-- **Open questions** are all `open_question=True` entries. Each line is
-  `[id] text [dep] [dep]`. They are not folded. The packet keeps the
-  first of any same-text pair (case and spacing ignored). Adding that
-  text again returns the existing id. Closing one closes its twins.
-- **Current branch** is a single `* name (you are here)` line when more than
-  one branch exists. Other branch listings stay in `memory_history`.
-- **Recent** is the newest 8 work subjects since the last summary
-  (user prompts and auto-saved answers are omitted; Goal and Steering
-  already hold the ones that matter). Older Recent lines stay findable;
-  a `(+N earlier)` marker says they exist.
-- `[stale]` on a Recent subject means that entry's own files changed
-  between its commit and HEAD. Goal, Steering, and open questions are
-  never marked stale. Note-only (empty) commits are never stale.
-- `last @agent checkpoint N steps ago` appears when 8+ Recent items have
-  passed since the last non-auto, non-user save.
-- Each line is `[8-char id] @agent <prefix><first line of the message>`, where
-  prefix is `Summary: ` for folds and `user: ` for the user's own prompts.
-- **Only the first line is shown, truncated to 100 characters** with a trailing
-  `…`. Multi-paragraph entries are treated as commit bodies.
-- Over 30 entries in Recent (full count, not the visible 10) adds a nudge
-  to summarize.
-- While inspecting, an `INSPECTING [id]` banner is prepended.
+An explicit `payload={"handoff": true}` checkpoint takes precedence over incidental
+notes. Otherwise a work note supplies the handoff; a summary provides the
+fallback. Excerpts
+copy complete useful body lines, prioritizing next steps, decisions, rejected
+approaches, rollback, constraints and evidence. They do not invoke a model.
 
-The same text is written to `.cursor/rules/agent-memory-state.mdc` (an
-always-applied rule, rewritten on every durable write) and mirrored to
-`.cursor/MEMORY_STATE.md`. Both are gitignored.
+The first request is stored as the goal. Later prompts and finished answers stay
+in conversation unless the agent explicitly saves distilled durable knowledge.
+`[stale]` compares files changed by the note's snapshot, plus declared
+`payload.files`, against the current working tree.
+It includes unsaved tracked edits. Notes without changed or declared files have
+no automatic evidence invalidation; missing stale markers do not prove validity.
+
+The packet is written to `.cursor/rules/agent-memory-state.mdc` and mirrored to
+`.cursor/MEMORY_STATE.md`. Both are gitignored. A character cap is deterministic;
+it is not an exact model-token cap. Benchmarks measure tokens separately.
 
 ## The search pipeline
 
@@ -98,19 +88,16 @@ always-applied rule, rewritten on every durable write) and mirrored to
    can see is always findable.
 2. **Ids.** Short ids are resolved through `git rev-parse`. An unresolvable id
    is passed through unchanged and simply matches nothing; there is no error.
-3. **Ranking.** With an embedding provider (`AGENT_MEMORY_PROVIDER` +
-   `GEMINI_API_KEY`), `query=` runs a hybrid semantic search with a small
-   recency weight (0.05) and de-duplication. Without a provider — or if
-   embedding raises for any reason, including a missing key — `query` is
-   treated as a substring and the result ends with
-   `(substring fallback — set GEMINI_API_KEY for semantic)`.
+3. **Ranking.** With an embedding provider, `query=` runs hybrid semantic
+   search. Without a provider, or when the provider fails, it uses local SQLite
+   full-text search. This does not require a key or a model call.
 4. **Substring.** `text=` is a case-insensitive `instr` match on the message.
-   Under fallback, `query` is appended to `text`.
 5. **Unfolding.** Any matched summary lists the entries in its `covers`
    as indented headlines, so hitting a summary shows the work behind it
    without dumping those bodies.
 6. **Output.** Search uses `k=8` headlines and skips auto-saved answers.
-   Explicit `ids=` return those bodies, capped at 800 characters.
+   Explicit `ids=` return bodies capped at 800 characters; `full=True` opts
+   into the complete body when essential evidence is beyond that cap.
 
 Practical consequence: `memory_find(query="…")` returns a short headline
 list of work notes. Prefer `ids=` when you need the body.
@@ -151,41 +138,28 @@ marker. While that marker exists:
 - edits to files are discarded when `inspect_done` force-checks the branch back
   out
 
-A session that dies while inspecting is repaired on the next load: the store
-detects the stale marker and returns to the branch automatically.
+Inspection persists across client creation and process restarts. Readers never
+restore working files. After interruption, explicitly call `inspect_done` to
+return; automatic recovery cannot distinguish a crashed owner from another
+active agent. Saves remain blocked until inspection ends.
 
-`memory_check(command)` runs the command in the project root. Exit 0 writes
-`.agent_memory/LATCH` as `GREEN(HEAD)`. Nonzero writes `RED(last_green,
-command, digest, failure_id)`. While red, `save` / `summarize` / `delete` /
-`inspect` / another `check` raise. Hook `save_user` / `auto_save` still
-work. **This cannot stop Shell or Write** — only memory mutations and
-callers of `require_green`.
-
-`memory_branch(id, name, label)`:
-
-- `label` is required: one precise line. Vague (`tests failed`) or
-  multiline labels raise; `save_hygiene` is an error, not a warning.
-- first commits that sentence as a dead-end autopsy on the current line
-- while red, `id` is ignored and last green is restored; the latch is
-  consumed (`GREEN` at that checkpoint). One `failure_id` → one Avoid row.
-- if `id` is the tip of an existing branch, that branch is resumed and `name` is
-  ignored; otherwise a new branch `name` is created at `id`
-- working files are restored to the target snapshot
-- the autopsy is injected under Avoid on later turns
+`memory_branch(id, name, label)` saves the current line's summary, then restores
+files to the requested snapshot. If that snapshot is another branch's tip, it
+resumes that branch; otherwise it creates `name`. The summary stays searchable
+in the old history. No test outcome forces a branch change.
 
 ## Hook events
 
 | Event | What it does |
 |---|---|
 | `sessionStart` | Injects instructions and the agent name; sets `AGENT_MEMORY_AGENT`; refreshes the state rule and live HTML |
-| `beforeSubmitPrompt` | Saves the user's prompt as `@user`; rewrites the alwaysApply state rule; `additional_context` is only a pointer to that rule (the packet is not pasted twice) |
-| `afterAgentResponse` | Saves the finished answer under the acting agent |
+| `beforeSubmitPrompt` | Creates the goal from the first request only; rewrites the alwaysApply state rule for the current prompt; `additional_context` is only a pointer to that rule (the packet is not pasted twice) |
+| `afterAgentResponse` | No-op; ordinary answers remain conversation, not memory |
 | `subagentStart` | Registers the subagent's name and saves `Spawned @name: <task>` under the parent |
 | `subagentStop` | Saves `[status] <summary>` under the subagent's name |
 
-Duplicate suppression: an identical consecutive auto-save is skipped, and a user
-prompt identical to the newest user entry is skipped. Hooks fail open — a memory
-error never blocks the agent loop, it just means nothing was saved.
+Hooks fail open — a memory error never blocks the agent loop, it just means the
+goal or state refresh may be unavailable.
 
 ## Environment
 
@@ -201,7 +175,6 @@ error never blocks the agent loop, it just means nothing was saved.
 | Path | Role |
 |---|---|
 | `.agent_memory/` | The store: git dir, SQLite catalog, HNSW index, credentials |
-| `.agent_memory/LATCH` | Persisted GREEN/RED check state (survives process restart) |
 | `.agent_memory/live/index.html` | Self-refreshing browser view of the timeline and prompt packets |
 | `.cursor/rules/agent-memory.mdc` | Always-applied bootstrap rule |
 | `.cursor/rules/agent-memory-state.mdc` | Always-applied live MEMORY STATE (generated, gitignored) |

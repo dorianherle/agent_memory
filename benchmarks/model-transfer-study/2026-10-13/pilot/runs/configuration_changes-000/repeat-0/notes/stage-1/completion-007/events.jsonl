@@ -1,4 +1,0 @@
-{"type":"thread.started","thread_id":"01a1359a-f87d-7961-922c-4be4c4858b60"}
-{"type":"turn.started"}
-{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"action\":\"run\",\"arguments_json\":\"{\\\"command\\\":[\\\"python\\\",\\\"-c\\\",\\\"import json; from work import evaluate; p=json.load(open('policy.json')); rs=json.load(open('requests.json')); print(json.dumps([evaluate(r,p) for r in rs],sort_keys=True)); cases=[({'layers':[{'x':1}]},p),({'layers':[{'retries':True}]},p),({'layers':[{'label':''}]},p),({'layers':[{'enabled':None}]},p),({'layers':[],'environment':{'retries':'2'}},p)]; print(json.dumps([evaluate(r,q) for r,q in cases],sort_keys=True))\\\"]}\"}"}}
-{"type":"turn.completed","usage":{"input_tokens":14205,"cached_input_tokens":10624,"cache_write_input_tokens":0,"output_tokens":209,"reasoning_output_tokens":54}}

@@ -1,4 +1,0 @@
-{"type":"thread.started","thread_id":"01a1366f-b90a-7fc2-ba19-3b8b351546cf"}
-{"type":"turn.started"}
-{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"action\":\"memory\",\"arguments_json\":\"{\\\"action\\\":\\\"model_get\\\",\\\"full\\\":false,\\\"result_file\\\":\\\"stored-model.json\\\"}\"}"}}
-{"type":"turn.completed","usage":{"input_tokens":15245,"cached_input_tokens":6528,"cache_write_input_tokens":0,"output_tokens":127,"reasoning_output_tokens":88}}

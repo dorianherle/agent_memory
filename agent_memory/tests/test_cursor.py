@@ -149,23 +149,7 @@ class MemoryRootTests(MemoryTestCase):
             self.assertEqual(common.memory_root(), other.resolve())
 
 
-class WriteCanvasTests(MemoryTestCase):
-    def test_write_canvas_is_instant_tsx(self) -> None:
-        self.save("first step")
-        self.memory.summarize("done first")
-        out = self.path / "out"
-        path = self.memory.write_canvas(out / "graph.canvas.tsx")
-        text = path.read_text()
-        self.assertTrue(path.exists())
-        self.assertIn("useCanvasState", text)
-        self.assertIn("drill-trail", text)
-        self.assertIn("selected-entry", text)
-        self.assertIn("Subgraph (", text)
-        self.assertIn('"body"', text)
-        self.assertIn("children", text)
-        self.assertIn("first step", text)
-        self.assertIn("Live", text)
-
+class LiveHtmlTests(MemoryTestCase):
     def test_write_live_html_creates_shell_and_data(self) -> None:
         self.save("first step")
         self.memory.summarize("done first")
@@ -230,24 +214,6 @@ class WriteCanvasTests(MemoryTestCase):
         self.assertIn("text=checkout", payload)
         self.assertIn("text=checkout", (index.parent / "actions.js").read_text())
 
-    def test_write_live_demo_is_self_contained(self) -> None:
-        from agent_memory.live_html import write_live_demo
-
-        path = write_live_demo(self.path / "demo.html")
-        text = path.read_text()
-        self.assertIn("agent-memory · demo", text)
-        self.assertIn('"demo": true', text)
-        self.assertIn("retry", text)
-        self.assertIn("pytest", text)
-        self.assertIn("live_html.py", text)
-        self.assertIn('id="state"', text)
-        self.assertIn('id="actions"', text)
-        self.assertIn("memory_find", text)
-        self.assertIn("branch-tab", text)
-        self.assertIn("explore", text)
-        self.assertIn("query=login p95", text)
-        self.assertNotIn('src="data.js"', text)
-
     def test_live_html_hides_deleted(self) -> None:
         noise = self.save("opened file X")
         self.save("real finding")
@@ -257,45 +223,6 @@ class WriteCanvasTests(MemoryTestCase):
         self.assertNotIn(noise, payload)
         self.assertNotIn("opened file X", payload)
         self.assertIn("real finding", payload)
-
-    def test_default_canvas_dir_slug(self) -> None:
-        from agent_memory.canvas import default_canvas_dir, project_slug
-
-        root = Path("/Users/me/proj")
-        self.assertEqual(project_slug(root), "Users-me-proj")
-        self.assertEqual(
-            default_canvas_dir(root),
-            Path.home()
-            / ".cursor"
-            / "projects"
-            / "Users-me-proj"
-            / "canvases",
-        )
-
-    def test_default_canvas_dir_prefers_live_ide_project(self) -> None:
-        """When `_` vs `-` folders both exist, prefer the live IDE project."""
-        import tempfile
-        from unittest import mock
-
-        from agent_memory.canvas import default_canvas_dir
-
-        root = Path("/Users/me/agent_memory")
-        with tempfile.TemporaryDirectory() as tmp:
-            home = Path(tmp)
-            projects = home / ".cursor" / "projects"
-            underscored = projects / "Users-me-agent_memory"
-            hyphenated = projects / "Users-me-agent-memory"
-            (underscored / "canvases").mkdir(parents=True)
-            (hyphenated / "canvases").mkdir(parents=True)
-            (hyphenated / "terminals").mkdir()
-            with mock.patch(
-                "agent_memory.canvas.Path.home",
-                return_value=home,
-            ):
-                self.assertEqual(
-                    default_canvas_dir(root),
-                    hyphenated / "canvases",
-                )
 
 
 class GraphDataTests(MemoryTestCase):

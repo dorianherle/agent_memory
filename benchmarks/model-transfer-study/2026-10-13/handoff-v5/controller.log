@@ -1,7 +1,0 @@
-Stage done: source_dependencies-073 repeat=0 method=models stage=1 stop=finished pass=True tokens=199613
-Stage done: calibration_limits-073 repeat=0 method=models stage=1 stop=finished pass=True tokens=208859
-Stage done: calibration_limits-073 repeat=0 method=models stage=2 stop=finished pass=True tokens=267293
-Stage done: source_dependencies-073 repeat=0 method=models stage=2 stop=finished pass=True tokens=284905
-Stage done: source_dependencies-073 repeat=0 method=models stage=3 stop=finished pass=True tokens=332237
-Stage done: calibration_limits-073 repeat=0 method=models stage=3 stop=finished pass=True tokens=362900
-{"ready": true, "passed": true, "scored": false, "purpose": "Full three-stage model handoffs; no token-saving estimate", "tokens": 1655807, "known_tokens": 1655807, "preflight": {"model": "gpt-5.6-sol", "model_access": true, "metering": true, "isolation": true, "errors": [], "image_id": "sha256:48b44ee4e4547f204ef766dd3e934cfea8ae7d6f8626713ab6d665cef866f07a", "ready": true}}

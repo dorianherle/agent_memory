@@ -1,4 +1,0 @@
-{"type":"thread.started","thread_id":"01a13652-31a8-72c3-a0cc-4c1b904e965d"}
-{"type":"turn.started"}
-{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"action\":\"run\",\"arguments_json\":\"{\\\"command\\\":[\\\"git\\\",\\\"diff\\\",\\\"--check\\\"]}\"}"}}
-{"type":"turn.completed","usage":{"input_tokens":11795,"cached_input_tokens":6528,"cache_write_input_tokens":0,"output_tokens":140,"reasoning_output_tokens":106}}

@@ -1,6 +1,0 @@
-{
-  "status": "passed",
-  "checked_original_artifacts": 4,
-  "score_and_cost_checks": "passed",
-  "note": "No benchmark rerun; verification reads the retained output."
-}

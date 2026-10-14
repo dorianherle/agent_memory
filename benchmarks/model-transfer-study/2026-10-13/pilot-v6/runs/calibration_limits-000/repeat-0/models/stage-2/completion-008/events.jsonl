@@ -1,4 +1,0 @@
-{"type":"thread.started","thread_id":"01a13628-9804-7ac1-911a-058d8bd47a24"}
-{"type":"turn.started"}
-{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"action\":\"memory\",\"arguments_json\":\"{\\\"action\\\":\\\"save\\\",\\\"text\\\":\\\"After changing required-condition comparison to canonical JSON, local checks passed for typed condition mismatch (true vs 1 does not match), object-key-order condition agreement, ineligible superseder retention, supersession chains, typed value conflict, unverified evidence allowed when policy permits, input immutability, and exact current report reproduction.\\\",\\\"payload\\\":{\\\"files\\\":[\\\"work.py\\\",\\\"TASK.md\\\",\\\"policy.json\\\",\\\"evidence.json\\\",\\\"requests.json\\\",\\\"report.json\\\"]}}\"}"}}
-{"type":"turn.completed","usage":{"input_tokens":41653,"cached_input_tokens":29696,"cache_write_input_tokens":0,"output_tokens":526,"reasoning_output_tokens":381}}

@@ -1,4 +1,0 @@
-{"type":"thread.started","thread_id":"01a13706-91e2-7b70-aa12-edfd4e002e0c"}
-{"type":"turn.started"}
-{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"text\":\"Rev 4 handoff: Do not overwrite raw captures. CSV columns 1–2 must be wavelength_nm, intensity_counts, in that order. Missing calibration remains UNKNOWN; never use zero. Limit: 8.50 counts (12.0 superseded). Trial: 9.10 counts; fail. Prior pass claim withdrawn. Minimum exposure: 0.50 ms. Exception: batch K9 can use 0.20 ms at temperature ≤18.0 °C, including 18.0 °C. Above 18.0 °C, use 0.50 ms. Other batches: 0.50 ms. Rev 4 is untested. Release is on hold pending verification. Noise is unresolved; cause unknown. Proposed cable cause is untested and not established.\"}"}}
-{"type":"turn.completed","usage":{"input_tokens":10900,"cached_input_tokens":6528,"cache_write_input_tokens":0,"output_tokens":215,"reasoning_output_tokens":38}}

@@ -14,7 +14,7 @@ The project's own `.git/` is never read or written by this. Rewinding memory
 does not move the user's real branch, and committing to their repository does
 not create memory entries.
 
-Never snapshotted (from `EXCLUDE_ENTRIES` in `core.py`):
+Never snapshotted (from `EXCLUDE_ENTRIES` in `git_ops.py`):
 
 ```
 .agent_memory/   .git/   .svn/   .hg/   .env
@@ -44,7 +44,7 @@ derived state and rebuild themselves from the git history.
 | `memory_inspect` | `(id)` | **Restores files** to that entry, detached, and blocks saving until closed. |
 | `memory_inspect_done` | `()` | Restores the branch and its files. |
 | `memory_goal_create` | `(text)` | Allocate a goal id and isolated tree (`git worktree` or copy). Notebook is `Memory(workspace)`. |
-| `memory_goal_list` | `()` | Goal ids, titles, workspaces, last runner status. |
+| `memory_goal_list` | `()` | Goal ids, titles, and workspaces. |
 | `memory_goal_use` | `(id)` | Bind packet (`Goal [id]`, workspace, branch). Not a process-global current goal. |
 
 Other tools accept optional `goal=` to target that workspace. Omit it for the project notebook. Preferred host setup: `cwd` and MCP `--root` are the goal workspace.

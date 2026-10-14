@@ -1,9 +1,0 @@
-{
-  "model": "gpt-5.6-sol",
-  "model_access": true,
-  "metering": true,
-  "isolation": true,
-  "errors": [],
-  "image_id": "sha256:48b44ee4e4547f204ef766dd3e934cfea8ae7d6f8626713ab6d665cef866f07a",
-  "ready": true
-}

@@ -1,4 +1,0 @@
-{"type":"thread.started","thread_id":"01a1359a-f9ac-7f13-9bc9-fabee7ea5d9d"}
-{"type":"turn.started"}
-{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"action\":\"run\",\"arguments_json\":\"{\\\"command\\\":[\\\"python\\\",\\\"-c\\\",\\\"import copy,json,work; p=json.load(open('policy.json')); rs=json.load(open('requests.json')); expected=[work.evaluate(r,p) for r in rs]; actual=json.load(open('report.json')); assert actual==expected; rb=copy.deepcopy(rs); pb=copy.deepcopy(p); [work.evaluate(r,p) for r in rs]; assert rs==rb and p==pb; print('final checks passed')\\\"]}\"}"}}
-{"type":"turn.completed","usage":{"input_tokens":14545,"cached_input_tokens":10624,"cache_write_input_tokens":0,"output_tokens":208,"reasoning_output_tokens":90}}

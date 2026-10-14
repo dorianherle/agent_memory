@@ -1,7 +1,0 @@
-{
-  "conclusion": "inconclusive",
-  "stop_reason": "Native usage missing after the 600-second stage limit",
-  "observed_run": "source_dependencies-000/repeat-0/models/stage-1",
-  "further_dispatch": "stopped",
-  "preserve": "All completed and interrupted evidence"
-}

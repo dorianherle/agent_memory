@@ -13,18 +13,30 @@ from pathlib import Path
 from typing import Iterator
 
 from agent_memory.catalog import Catalog
+from agent_memory.git_ops import (
+    ARCHIVE_PREFIX,
+    EXCLUDE_ENTRIES,
+    FIELD_SEPARATOR,
+    GENERATED_STATE_FILES,
+    HIDDEN_DIR,
+    OPERATION_KEY,
+    PAYLOAD_PREFIX,
+    RECORD_SEPARATOR,
+    ensure_exclude,
+    head_file_history,
+    mentioned_files,
+    nested_repo_excludes,
+    parse_record,
+    read_records,
+    stale_files,
+)
 from agent_memory.providers.base import EmbeddingProvider
 
-HIDDEN_DIR = ".agent_memory"
-ARCHIVE_PREFIX = ".agent_memory_archive_"
 MARKER = "AGENT_MEMORY"
 LOCK_FILE = "AGENT_LOCK"
 INSPECT_FILE = "INSPECTING"
-PAYLOAD_PREFIX = "Agent-Memory-Payload: "
-OPERATION_KEY = "_agent_memory"
-FIELD_SEPARATOR = "\x00"
-RECORD_SEPARATOR = "\x02"
-GENERATED_STATE_FILES = (".cursor/MEMORY_STATE.md", ".cursor/rules/agent-memory-state.mdc")
+OPEN_QUESTION_KEY = "open_question"
+GOAL_KEY = "goal"
 
 _SMALL_TALK_RE = re.compile(
     r"^(hi|hello|hey|yo|sup|howdy|good\s+(morning|afternoon|evening)|"
@@ -40,42 +52,6 @@ _STEERING_PROMPT_RE = re.compile(
     r"wait\s+also\s+|"
     r"keep\s+the\s+[^\n]*\b(?:unchanged|compatible|intact|same)\b)",
     re.IGNORECASE,
-)
-_FILE_TOKEN_RE = re.compile(
-    r"(?:[\w.-]+/)+[\w.-]+\.[A-Za-z0-9]+|\b[\w.-]+\.(?:py|ts|tsx|js|jsx|rs|go|java|cpp|c|h|hpp|json|yaml|yml|toml|sql|sh|md|txt|cfg|ini)\b"
-)
-_GLOBAL_DECISION_RE = re.compile(
-    r"^(decision|constraint|policy|convention|architecture)\s*:",
-    re.IGNORECASE,
-)
-
-
-def _first_line(text: str, max_len: int) -> str:
-    head = (text or "").strip().split("\n", 1)[0].strip()
-    if len(head) > max_len:
-        head = head[: max_len - 1].rstrip() + "…"
-    return head
-
-# Never snapshot VCS metadata into the memory store. The host project's
-# `.git/` and any nested clone would otherwise be picked up by `git add -A`
-# (agent-memory uses its own `--git-dir`, so those look like normal folders).
-EXCLUDE_ENTRIES = (
-    f"{HIDDEN_DIR}/",
-    f"{ARCHIVE_PREFIX}*/",
-    ".git/",
-    ".svn/",
-    ".hg/",
-    ".env",
-    "__pycache__/",
-    ".pytest_cache/",
-    "node_modules/",
-    ".venv/",
-    "venv/",
-    ".tox/",
-    ".mypy_cache/",
-    ".ruff_cache/",
-    ".next/",
-    *GENERATED_STATE_FILES,
 )
 
 
@@ -95,10 +71,6 @@ def split_state(items: list[MemoryItem]) -> tuple[list[MemoryItem], list[MemoryI
         if "covers" in item.payload:
             last_summary = index
     return items[: last_summary + 1], items[last_summary + 1 :]
-
-
-OPEN_QUESTION_KEY = "open_question"
-GOAL_KEY = "goal"
 
 
 def all_open_questions(items: list[MemoryItem]) -> list[MemoryItem]:
@@ -175,7 +147,6 @@ class Memory:
             cwd=self._path,
             capture_output=True,
         )
-        # Text mode converts CR and CRLF to LF, which changes saved notes.
         stdout = result.stdout.decode("utf-8")
         stderr = result.stderr.decode("utf-8")
         if check and result.returncode:
@@ -195,78 +166,20 @@ class Memory:
         first_exclude = not exclude.exists()
         exclude.parent.mkdir(parents=True, exist_ok=True)
         self._ensure_exclude(exclude, scan_nested=first_exclude)
-        # Opening a reader must never restore another agent's working files.
-        # An interrupted inspection remains explicit until inspect_done().
         self._catalog = Catalog(self._git_dir)
         self._sync_catalog()
 
     def _ensure_exclude(self, path: Path, *, scan_nested: bool = True) -> None:
-        """Keep info/exclude up to date (merge, never wipe user lines)."""
-        raw = path.read_text() if path.exists() else ""
-        existing = [line.rstrip("\n") for line in raw.splitlines()]
-        known = {line.strip() for line in existing if line.strip()}
-        lines = list(existing)
-        for entry in EXCLUDE_ENTRIES:
-            if entry not in known:
-                lines.append(entry)
-        if scan_nested:
-            for entry in self._nested_repo_excludes():
-                if entry not in known:
-                    lines.append(entry)
-                    known.add(entry)
-        updated = "\n".join(lines).rstrip() + "\n"
-        if updated != raw:
-            path.write_text(updated)
+        ensure_exclude(path, self._path, scan_nested=scan_nested)
 
     def _nested_repo_excludes(self) -> list[str]:
-        """Paths of nested git checkouts to keep out of ``git add -A``.
-
-        A directory containing ``.git`` is treated as a gitlink/submodule
-        candidate; excluding only ``.git/`` is not enough — the whole
-        nested project must be skipped or summarize/save fails.
-        """
-        found: list[str] = []
-        root = self._path
-        skip_dirs = {
-            HIDDEN_DIR,
-            ".git",
-            ".svn",
-            ".hg",
-            "__pycache__",
-            ".pytest_cache",
-            "node_modules",
-            ".venv",
-            "venv",
-            ".tox",
-            ".mypy_cache",
-            ".ruff_cache",
-            ".next",
-        }
-        for dirpath, dirs, files in os.walk(root):
-            current = Path(dirpath)
-            if current != root and (".git" in dirs or ".git" in files):
-                try:
-                    rel = current.relative_to(root).as_posix().rstrip("/") + "/"
-                    found.append(rel)
-                except ValueError:
-                    pass
-                dirs.clear()
-                continue
-            dirs[:] = [
-                d
-                for d in dirs
-                if d not in skip_dirs and not d.startswith(ARCHIVE_PREFIX)
-            ]
-        return sorted(set(found))
+        return nested_repo_excludes(self._path)
 
     @contextmanager
     def _lock(self) -> Iterator[None]:
         with open(self._git_dir / LOCK_FILE, "w") as handle:
             fcntl.flock(handle, fcntl.LOCK_EX)
             yield
-
-    def _has_commits(self) -> bool:
-        return bool(self._run("rev-parse", "--verify", "HEAD", check=False))
 
     def _branch_name(self) -> str:
         return self._run("branch", "--show-current", check=False)
@@ -303,59 +216,14 @@ class Memory:
         return resolved
 
     def _parse_record(self, raw: str) -> dict:
-        item_id, parents, timestamp, body = raw.split(FIELD_SEPARATOR, 3)
-        marker = f"\n\n{PAYLOAD_PREFIX}"
-        if marker in body:
-            message, payload_text = body.rsplit(marker, 1)
-            payload = json.loads(payload_text.strip())
-        else:
-            message, payload = body, {}
-        payload = dict(payload)
-        operation = payload.pop(OPERATION_KEY, {})
-        message_format = operation.get("message_format")
-        if message_format == "json-v1":
-            message = json.loads(message)
-        return {
-            "id": item_id.strip(),
-            "parents": parents.split(),
-            "datetime": datetime.fromisoformat(timestamp),
-            "message": message if message_format in ("verbatim-v1", "json-v1") else message.strip(),
-            "payload": payload,
-            "kind": operation.get("operation", "put"),
-            "target_id": operation.get("target"),
-        }
+        return parse_record(raw)
 
     def _read_records(
         self,
         new_tips: list[str],
         old_tips: list[str],
     ) -> list[dict]:
-        if not new_tips:
-            return []
-        arguments = [
-            "log",
-            "--reverse",
-            "--format=%H%x00%P%x00%cI%x00%B%x02",
-            *new_tips,
-        ]
-        if old_tips:
-            arguments.extend(["--not", *old_tips])
-        raw = self._run(*arguments)
-        try:
-            return [
-                self._parse_record(record)
-                for record in raw.split(RECORD_SEPARATOR)
-                if record.strip()
-            ]
-        except ValueError:
-            # Older notes can contain the stream separator. Read those commits
-            # individually so existing stores remain readable after the fix.
-            id_arguments = list(arguments)
-            id_arguments[2] = "--format=%H"
-            ids = self._run(*id_arguments).splitlines()
-            return [self._parse_record(self._run(
-                "show", "--no-patch", "--format=%H%x00%P%x00%cI%x00%B", item_id
-            )) for item_id in ids]
+        return read_records(self._run, new_tips, old_tips)
 
     def _sync_catalog(self) -> None:
         refs = self._refs()
@@ -418,8 +286,6 @@ class Memory:
         summary: bool = False,
         _operation: dict | None = None,
         agent: str | None = None,
-        _expected_head: str | None = None,
-        _model_record: bool = False,
         _snapshot: bool = True,
     ) -> str:
         if self.inspecting() is not None:
@@ -436,7 +302,6 @@ class Memory:
         )
         if summary:
             allow_empty = True
-            # Goal, latest steering, and open questions are not finished work.
             state = self.state()
             recent = [item for item in state if "covers" not in item.payload]
             goal = split_goals(state)
@@ -457,8 +322,6 @@ class Memory:
             if recent:
                 stored_payload["covers"] = [item.id for item in recent]
         operation = dict(_operation or {})
-        # ASCII JSON protects exact text from Git cleanup, encoding repair,
-        # newline conversion, and characters used by the log framing.
         operation["message_format"] = "json-v1"
         stored_payload[OPERATION_KEY] = operation
         stored_message = json.dumps(message, ensure_ascii=True)
@@ -466,13 +329,10 @@ class Memory:
         with self._lock():
             if self.inspecting() is not None:
                 raise RuntimeError("cannot save while inspecting; call inspect_done first")
-            if _expected_head is not None and self._run("rev-parse", "HEAD") != _expected_head:
-                raise ValueError("Memory changed during model checks; check the proposal again")
             if _snapshot:
-                # Refresh excludes each save: nested clones may appear mid-session.
                 self._ensure_exclude(self._git_dir / "info" / "exclude", scan_nested=True)
-                # Also untrack state already captured by older saves; keep local files.
-                self._run("rm", "--cached", "--ignore-unmatch", "--", *GENERATED_STATE_FILES)
+                if any((self._path / name).exists() for name in GENERATED_STATE_FILES):
+                    self._run("rm", "--cached", "--ignore-unmatch", "--", *GENERATED_STATE_FILES)
                 self._run("add", "-A")
             arguments = ["commit", "--cleanup=verbatim"]
             if allow_empty:
@@ -507,17 +367,12 @@ class Memory:
         wanted = None
         if ids is not None:
             wanted = [ids] if isinstance(ids, str) else ids
-            # Short ids from a rendered state resolve to full ids;
-            # unknown ids stay as given and simply match nothing.
             wanted = [
                 self._run(
                     "rev-parse", "--verify", f"{item}^{{commit}}", check=False
                 ) or item
                 for item in wanted
             ]
-            # An explicit id that is not reachable from the current branch
-            # widens the search to every branch; nothing saved is ever out
-            # of reach. Ids reachable here keep the branch-local view.
             if branch == "current" and branch_name and wanted:
                 reachable = self._catalog.select(
                     branch=branch_name,
@@ -550,8 +405,6 @@ class Memory:
                 )
                 items = [self._row_item(row, score) for row, score in ranked]
             except Exception:
-                # Embedding stack optional; missing API key / provider errors
-                # fall back to local FTS.
                 use_semantic = False
                 self._find_used_substring = False
         if not use_semantic:
@@ -665,17 +518,6 @@ class Memory:
 
         return graph_data(self)
 
-    def write_canvas(
-        self,
-        path: str | Path | None = None,
-        *,
-        name: str = "agent-memory-live",
-    ) -> Path:
-        """Write a Cursor ``.canvas.tsx`` live dashboard and return it."""
-        from agent_memory.canvas import write_canvas
-
-        return write_canvas(self, path, name=name)
-
     def write_live_html(
         self,
         path: str | Path | None = None,
@@ -726,16 +568,11 @@ class Memory:
         return result
 
     def save_user(self, text: str, *, agent: str | None = None) -> str | None:
-        """Record the user's own words as an entry.
-
-        Skipped while inspecting and when the newest user entry already
-        holds the same text (compact mode resends the same prompt).
-        """
+        """Record the user's own words as an entry."""
         from agent_memory.identity import USER_AGENT
 
         if self.inspecting() is not None:
             return None
-        # Keep durable evidence intact; prompt rendering owns the size limit.
         text = text.strip()
         if not text:
             return None
@@ -774,11 +611,7 @@ class Memory:
         return _latest_user_text(items)
 
     def ensure_goal(self, text: str, *, agent: str | None = None) -> str | None:
-        """Create the initial goal from the first request, but no chat log.
-
-        Turn text remains transient after a goal exists, except explicit
-        durable user constraints/directives which update Steering.
-        """
+        """Create the initial goal from the first request, but no chat log."""
         cleaned = (text or "").strip()
         if not cleaned:
             return None
@@ -795,14 +628,9 @@ class Memory:
         *,
         agent: str | None = None,
     ) -> str | None:
-        """Runtime durability save for a finished agent turn.
-
-        Called by hooks/wrappers — not by the model. Skips empty text,
-        inspect mode, and an identical consecutive auto entry.
-        """
+        """Runtime durability save for a finished agent turn."""
         from agent_memory.identity import DEFAULT_AGENT, resolve_agent
 
-        # Keep durable evidence intact; prompt rendering owns the size limit.
         text = text.strip()
         if not text or self.inspecting() is not None:
             return None
@@ -895,37 +723,15 @@ class Memory:
         cached = self._head_history_cache
         if cached is not None and cached[0] == head:
             return cached[1], cached[2], cached[3]
-        raw = self._run(
-            "log", "--root", "--pretty=format:\x02%H", "--name-only", head, check=False
+        changed_commits, known_files, unique_basenames = head_file_history(
+            self._run, head, self._commit_files_cache
         )
-        commit_order: list[str] = []
-        commit_files: dict[str, set[str]] = {}
-        known_files: set[str] = set()
-        for block in raw.split(RECORD_SEPARATOR):
-            if not block.strip():
-                continue
-            lines = [line.strip() for line in block.splitlines() if line.strip()]
-            if not lines:
-                continue
-            cid = lines[0]
-            files = set(lines[1:]) - set(GENERATED_STATE_FILES)
-            commit_order.append(cid)
-            commit_files[cid] = files
-            self._commit_files_cache[cid] = files
-            known_files |= files
-        changed_commits: dict[str, set[str]] = {}
-        acc: set[str] = set()
-        for cid in commit_order:
-            changed_commits[cid] = set(acc)
-            acc |= commit_files[cid]
-        by_base: dict[str, list[str]] = {}
-        for rel in known_files:
-            base = rel.rsplit("/", 1)[-1]
-            by_base.setdefault(base, []).append(rel)
-        unique_basenames = {
-            base: paths[0] for base, paths in by_base.items() if len(paths) == 1
-        }
-        self._head_history_cache = (head, changed_commits, known_files, unique_basenames)
+        self._head_history_cache = (
+            head,
+            changed_commits,
+            known_files,
+            unique_basenames,
+        )
         return changed_commits, known_files, unique_basenames
 
     def _mentioned_files(
@@ -934,120 +740,22 @@ class Memory:
         known_files: set[str] | None = None,
         unique_basenames: dict[str, str] | None = None,
     ) -> set[str]:
-        found: set[str] = set()
-        known = known_files or set()
-        basenames = unique_basenames or {}
-        for raw in _FILE_TOKEN_RE.findall(message or ""):
-            candidate = raw.strip().lstrip("./")
-            if not candidate or candidate in GENERATED_STATE_FILES:
-                continue
-            target = (self._path / candidate).resolve()
-            try:
-                rel = target.relative_to(self._path).as_posix()
-            except ValueError:
-                continue
-            if target.is_file() or rel in known:
-                found.add(rel)
-            elif "/" not in rel and rel in basenames:
-                found.add(basenames[rel])
-        return found
+        return mentioned_files(
+            self._path, message, known_files, unique_basenames
+        )
 
     def _stale_files(self, items: list[MemoryItem]) -> dict[str, list[str]]:
-        """Map item id -> snapshot or declared/mentioned files that changed since item."""
-        drifted: dict[str, list[str]] = {}
-        if not items or self.inspecting() is not None:
-            return drifted
-        head = self._run("rev-parse", "HEAD", check=False)
-        if not head:
-            return drifted
-        unique_items = [
-            item
-            for item in {entry.id: entry for entry in items}.values()
-            if not item.payload.get("user") and not item.payload.get("open_question")
-        ]
-        if not unique_items:
-            return drifted
-        changed_commits, known_files, unique_basenames = self._head_file_history(head)
-        item_files: dict[str, set[str]] = {}
-        all_explicit: set[str] = set()
-        for item in unique_items:
-            declared = {
-                str(name).strip()
-                for name in (item.payload.get("files") or [])
-                if str(name).strip()
-            }
-            mentioned = self._mentioned_files(
-                item.message, known_files, unique_basenames
-            )
-            explicit = declared | mentioned
-            all_explicit.update(explicit)
-            if declared:
-                files = explicit
-            elif _GLOBAL_DECISION_RE.match((item.message or "").strip()):
-                files = explicit
-            else:
-                files = self._committed_files(item.id) | explicit
-            if files:
-                item_files[item.id] = files
-        if not item_files:
-            return drifted
-        untracked = set()
-        if all_explicit:
-            # Include ignored paths when the caller explicitly declares them.
-            # Git diff alone does not report newly created untracked evidence.
-            untracked = set(
-                self._run(
-                    "ls-files", "--others", "-z", "--", *sorted(all_explicit), check=False
-                ).split("\0")
-            )
-        wt_diff = {
-            name.strip()
-            for name in self._run(
-                "diff", "--name-only", head, "--", check=False
-            ).splitlines()
-            if name.strip()
-        }
-        diff_cache: dict[str, set[str]] = {}
-        for item_id, files in item_files.items():
-            if item_id in changed_commits:
-                later = changed_commits[item_id] | wt_diff
-            else:
-                later = diff_cache.get(item_id)
-                if later is None:
-                    later = {
-                        name.strip()
-                        for name in self._run(
-                            "diff", "--name-only", item_id, "--", *sorted(files), check=False
-                        ).splitlines()
-                        if name.strip()
-                    }
-                    diff_cache[item_id] = later
-            changed = sorted(files & (later | untracked))
-            if changed:
-                drifted[item_id] = changed
-        return drifted
+        return stale_files(self, items)
 
     def _stale_ids(self, items: list[MemoryItem]) -> set[str]:
-        """Ids whose snapshot files or declared dependencies changed, including unsaved edits.
-
-        Explicit file dependencies also cover note-only saves. Inspect mode
-        skips this — HEAD is the detached snapshot, not the live tree.
-        """
         return set(self._stale_files(items))
 
     def prompt_payload(self) -> dict:
-        """Current prompt: compact injected text plus full-body sections.
-
-        ``injected`` is what the model sees. Goal / steering / findings
-        keep full bodies for the live HTML monitor.
-        """
+        """Current prompt: compact injected text plus full-body sections."""
         from agent_memory.prompt import (
             RECENT_CAP,
-            RELATED_CAP,
             _goal,
             _handoff,
-            _latest_user_text,
-            _recent_findings,
             _steering,
             current_prompt,
             render,
@@ -1077,9 +785,7 @@ class Memory:
             all_candidates.append(handoff)
         all_candidates.extend(related)
         stale_ids = self._stale_ids(all_candidates)
-        payload = current_prompt(
-            items, stale_ids=stale_ids
-        )
+        payload = current_prompt(items, stale_ids=stale_ids)
         text = render(
             items,
             branches,
@@ -1132,17 +838,13 @@ class Memory:
             ]
             if len(related) >= cap or len(items) < limit:
                 return related[:cap]
-            # Transcript/folded hits must not crowd useful work out of the result set.
-            # This grows local retrieval only, never the model-visible packet.
             limit *= 2
 
     def render_packet(self, question: str | None = None, *, max_chars: int = 1200) -> str:
         """Goal / Handoff / questions / Related for this question."""
         from agent_memory.prompt import (
-            RELATED_CAP,
             _goal,
             _handoff,
-            _recent_findings,
             _steering,
             render_packet,
         )
@@ -1155,7 +857,6 @@ class Memory:
             related = self.related_notes(active_q, _state=items)
         goal = _goal(items)
         handoff = _handoff(items)
-        # Check only candidates that can enter the bounded packet, not all history.
         candidates = [entry for entry in (goal, _steering(items, goal), handoff) if entry]
         candidates += split_open_questions(items)[:8] + related
         return render_packet(
@@ -1176,11 +877,7 @@ class Memory:
         return MEMORY_TOOLS
 
     def call(self, name_or_args, arguments: dict | None = None) -> str:
-        """Run a memory tool call from the model.
-
-            memory.call(json.loads(call.function.arguments))
-            memory.call(call.function.name, json.loads(call.function.arguments))
-        """
+        """Run a memory tool call from the model."""
         from agent_memory.tools import call_tool
 
         if arguments is None:
@@ -1188,11 +885,7 @@ class Memory:
         return call_tool(self, name_or_args, arguments)
 
     def messages(self, prompt: str) -> list[dict[str, str]]:
-        """Build the system + user messages for one agent turn.
-
-        The first prompt establishes the goal. Later prompts are used to
-        retrieve relevant memory for this turn without becoming memory notes.
-        """
+        """Build the system + user messages for one agent turn."""
         from agent_memory.prompt import MEMORY_INSTRUCTIONS
 
         self.ensure_goal(prompt)
@@ -1250,11 +943,7 @@ class Memory:
                 self._run("checkout", branch)
 
     def branch(self, base_id: str, name: str, summary: str) -> Memory:
-        """Save the current line's summary, then restore the requested snapshot.
-
-        If the target is another branch's tip, resume it; otherwise create
-        the named branch. The summary remains searchable in the old history.
-        """
+        """Save the current line's summary, then restore the requested snapshot."""
         if self.inspecting() is not None:
             raise RuntimeError(
                 "cannot branch while inspecting; call inspect_done first"
@@ -1271,8 +960,6 @@ class Memory:
                 raise RuntimeError("save current changes before branching")
             current = self._branch_name()
             for existing, tip in sorted(self._refs().items()):
-                # Jumping to another branch's tip resumes that branch;
-                # the own tip still starts a new named line.
                 if tip == commit_id and existing != current:
                     self._run("checkout", existing)
                     break
@@ -1290,11 +977,7 @@ class Memory:
         return None
 
     def inspect(self, item_id: str) -> MemoryItem:
-        """Set every working file to exactly how it was at an entry.
-
-        The repo stays there until inspect_done() checks the branch back
-        out. Inspecting again just switches snapshots.
-        """
+        """Set every working file to exactly how it was at an entry."""
         with self._lock():
             item = self._item(item_id)
             marker = self.inspecting()

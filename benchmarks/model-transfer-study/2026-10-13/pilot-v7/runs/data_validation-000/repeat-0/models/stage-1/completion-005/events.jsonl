@@ -1,4 +1,0 @@
-{"type":"thread.started","thread_id":"01a13669-aabf-75b3-82f1-4b97c9fec8eb"}
-{"type":"turn.started"}
-{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"action\":\"write\",\"arguments_json\":\"{\\\"path\\\":\\\"report.json\\\",\\\"content\\\":\\\"[\\\\n  {\\\\n    \\\\\\\"ok\\\\\\\": true,\\\\n    \\\\\\\"records\\\\\\\": [\\\\n      {\\\\n        \\\\\\\"id\\\\\\\": \\\\\\\"sample_0\\\\\\\",\\\\n        \\\\\\\"amount\\\\\\\": 4\\\\n      }\\\\n    ],\\\\n    \\\\\\\"errors\\\\\\\": []\\\\n  }\\\\n]\\\\n\\\"}\"}"}}
-{"type":"turn.completed","usage":{"input_tokens":23577,"cached_input_tokens":17920,"cache_write_input_tokens":0,"output_tokens":532,"reasoning_output_tokens":314}}

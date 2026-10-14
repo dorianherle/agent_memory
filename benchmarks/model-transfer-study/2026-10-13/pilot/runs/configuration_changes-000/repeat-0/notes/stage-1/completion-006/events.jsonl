@@ -1,4 +1,0 @@
-{"type":"thread.started","thread_id":"01a1359a-d16b-7d33-82ab-b63f0adf94c1"}
-{"type":"turn.started"}
-{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"action\":\"run\",\"arguments_json\":\"{\\\"command\\\":[\\\"python\\\",\\\"-m\\\",\\\"py_compile\\\",\\\"work.py\\\"]}\"}"}}
-{"type":"turn.completed","usage":{"input_tokens":14138,"cached_input_tokens":10624,"cache_write_input_tokens":0,"output_tokens":213,"reasoning_output_tokens":175}}

@@ -1,7 +1,0 @@
-2026-10-13T20:43:07.310169Z ERROR codex_models_manager::manager: failed to refresh available models: timeout waiting for child process to exit
-2026-10-13T20:43:07.364421Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
-2026-10-13T20:43:07.381888Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
-2026-10-13T20:43:07.395844Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
-2026-10-13T20:43:07.406658Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
-2026-10-13T20:43:12.465064Z  WARN codex_core_plugins::manifest: ignoring interface.defaultPrompt[0]: prompt must be at most 128 characters path=file:///Users/dorianherle/.codex/.tmp/plugins/plugins/ngs-analysis/.codex-plugin/plugin.json
-2026-10-13T20:43:12.468165Z  WARN codex_core_plugins::manifest: ignoring interface.defaultPrompt[0]: prompt must be at most 128 characters path=file:///Users/dorianherle/.codex/.tmp/plugins/plugins/ngs-analysis/.codex-plugin/plugin.json

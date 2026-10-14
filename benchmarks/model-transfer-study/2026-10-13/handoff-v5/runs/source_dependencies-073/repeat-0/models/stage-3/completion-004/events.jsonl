@@ -1,4 +1,0 @@
-{"type":"thread.started","thread_id":"01a13605-8474-7d02-9518-f4d79e30b0b0"}
-{"type":"turn.started"}
-{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"action\":\"run\",\"arguments_json\":\"{\\\"command\\\":[\\\"python\\\",\\\"-c\\\",\\\"import json\\\\np='stored-model.json'\\\\nd=json.load(open(p))\\\\nprint(type(d).__name__, sorted(d) if isinstance(d,dict) else '')\\\\nprint('model' in d if isinstance(d,dict) else False)\\\"]}\"}"}}
-{"type":"turn.completed","usage":{"input_tokens":14554,"cached_input_tokens":6528,"cache_write_input_tokens":0,"output_tokens":601,"reasoning_output_tokens":516}}

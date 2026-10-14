@@ -9,10 +9,10 @@ from pathlib import Path
 from unittest import mock
 
 from agent_memory import Memory
-from agent_memory.canvas import project_slug
 from agent_memory.live_reveal import (
     ensure_reveal_server,
     now_state,
+    project_slug,
     reveal_path,
     reveal_url,
     running_processes,

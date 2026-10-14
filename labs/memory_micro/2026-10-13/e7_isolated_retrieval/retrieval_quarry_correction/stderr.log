@@ -1,7 +1,0 @@
-2026-10-13T20:53:05.529182Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
-2026-10-13T20:53:05.543068Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
-2026-10-13T20:53:05.587752Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
-2026-10-13T20:53:05.598723Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
-2026-10-13T20:53:06.491856Z  WARN codex_core_plugins::manifest: ignoring interface.defaultPrompt[0]: prompt must be at most 128 characters path=file:///Users/dorianherle/.codex/.tmp/plugins/plugins/ngs-analysis/.codex-plugin/plugin.json
-2026-10-13T20:53:06.493789Z  WARN codex_core_plugins::manifest: ignoring interface.defaultPrompt[0]: prompt must be at most 128 characters path=file:///Users/dorianherle/.codex/.tmp/plugins/plugins/ngs-analysis/.codex-plugin/plugin.json
-2026-10-13T20:53:09.871850Z  WARN codex_core::shell_snapshot: Failed to delete shell snapshot at AbsolutePathBuf("/Users/dorianherle/.codex/shell_snapshots/01a1370a-5163-7000-96f9-a0de161a8fdb.1791924785508301000.sh"): Os { code: 2, kind: NotFound, message: "No such file or directory" }
