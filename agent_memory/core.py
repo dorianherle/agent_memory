@@ -1043,9 +1043,11 @@ class Memory:
         """
         from agent_memory.prompt import (
             RECENT_CAP,
+            RELATED_CAP,
             _goal,
             _handoff,
             _latest_user_text,
+            _recent_findings,
             _steering,
             current_prompt,
             render,
@@ -1115,7 +1117,9 @@ class Memory:
         cap = RELATED_CAP if k is None else k
         state = self.state() if _state is None else _state
         active_ids = {item.id for item in state}
-        skip = {item.id for item in (_goal(state), _handoff(state)) if item}
+        skip = {item.id for item in (_goal(state), _handoff(state)) if item} | {
+            item.id for item in state if item.payload.get("handoff")
+        }
         limit = max(cap * 3, 8)
         while True:
             items = self.find(query=question, k=limit, branch="current")
@@ -1134,14 +1138,25 @@ class Memory:
 
     def render_packet(self, question: str | None = None, *, max_chars: int = 1200) -> str:
         """Goal / Handoff / questions / Related for this question."""
-        from agent_memory.prompt import _goal, _steering, _handoff, render_packet
+        from agent_memory.prompt import (
+            RELATED_CAP,
+            _goal,
+            _handoff,
+            _recent_findings,
+            _steering,
+            render_packet,
+        )
 
         items = self.state()
-        query = (question or "").strip() or self._active_query(items)
+        active_q = self._active_query(items)
+        query = (question or "").strip() or active_q
         related = self.related_notes(query, _state=items) if query else []
-        # Check only candidates that can enter the bounded packet, not all history.
+        if not related and active_q and active_q != query:
+            related = self.related_notes(active_q, _state=items)
         goal = _goal(items)
-        candidates = [entry for entry in (goal, _steering(items, goal), _handoff(items)) if entry]
+        handoff = _handoff(items)
+        # Check only candidates that can enter the bounded packet, not all history.
+        candidates = [entry for entry in (goal, _steering(items, goal), handoff) if entry]
         candidates += split_open_questions(items)[:8] + related
         return render_packet(
             items,

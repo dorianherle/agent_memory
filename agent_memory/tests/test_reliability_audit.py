@@ -209,4 +209,18 @@ class ExactNoteStorageTests(MemoryTestCase):
         self.assertIn(goal[:8], full_out)
         self.assertIn('Details: strict schema', full_out)
 
+    def test_subagent_start_does_not_hijack_handoff_and_continue_keeps_related(self):
+        self.memory.ensure_goal('Optimize waveguide eigenmode solver')
+        prior = self.memory.save('Eigenmode SVD floor is 2.4e-4 on slab pool')
+        real_handoff = self.memory.save('THINKER-4: test H5 factorised covering\nNext: run /tmp/t4_h5.py')
+        spawn = self.memory.save(
+            'Spawned @general-purpose·call91: Stop. Cancelled subagent.',
+            {'subagent': True, 'event': 'start'},
+        )
+        pkt = self.memory.render_packet('continue')
+        self.assertIn(real_handoff[:8], pkt)
+        self.assertNotIn(spawn[:8], pkt)
+        self.assertIn(prior[:8], pkt)
+
+
 

@@ -102,6 +102,10 @@ def _recent_findings(items: list[MemoryItem]) -> list[MemoryItem]:
         and not item.payload.get("user")
         and not item.payload.get("auto")
         and not item.payload.get("model_event")
+        and not (
+            item.payload.get("subagent")
+            and item.payload.get("event") == "start"
+        )
     ]
 
 
@@ -198,6 +202,7 @@ def _transcript(item: MemoryItem) -> bool:
         payload.get("auto")
         or payload.get("user")
         or payload.get("open_question")
+        or (payload.get("subagent") and payload.get("event") == "start")
     )
 
 
