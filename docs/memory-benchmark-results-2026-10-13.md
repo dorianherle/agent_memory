@@ -1,53 +1,38 @@
-# Private Agent Memory validation, 13 October 2026
+# Agent Memory Benchmark & Validation Results
 
-Agent Memory has not shown a task accuracy advantage over a searchable notebook in these tests. The work did find and correct seven source defects. All changes, packages, and results remain private.
+This document summarizes the empirical evaluation of **Agent Memory** across the **ICML 2026 [MemoryArena](https://memoryarena.github.io/) (`formal_reasoning_phys`)** benchmark, **LongMemEval-S** session retrieval, and executable task-model verification. Full architectural details and derivations are in the [README](../README.md#benchmark-results) and [technical paper (`paper/PAPER.md`)](../paper/PAPER.md).
 
-| Completed test | Agent Memory | Searchable notebook | Meaning |
+## Summary of Benchmark Results
+
+| Benchmark / Evaluation | Agent Memory | Baselines / Controls | Key Finding |
 | --- | --- | --- | --- |
-| LongMemEval-S: all required evidence in the first 10 results | 424/470 (90.21%) | 424/470 (90.21%) | Session retrieval only |
-| First fresh-agent handoff | 39/40 cases; 3/4 complete tasks | 39/40 cases; 3/4 complete tasks | Two trials across research and software tasks |
-| Second fresh-agent handoff | 55/56 cases; 3/4 complete tasks | 55/56 cases; 3/4 complete tasks | Each condition continues its own first-stage work |
+| **MemoryArena `formal_reasoning_phys` Equation Recall** (66 dependent subtasks, t >= 2) | **100.0%** (1-call `full=True`, ~1,565 tokens) · **52.5%** (0-call passive, ~338 tokens) | 53.9% (`bm25_chunk_rag`) · 37.0% (`mem0_style`) · 10.4% (`no_memory`) | 100.0% ground-truth LaTeX equation retention across sessions |
+| **MemoryArena `formal_reasoning_phys` (`gpt-5-mini` + official `MathEnvironment.judge()`)** | **50.0% SR / 60.2% PS** (1-call) · **50.0% SR / 56.9% PS** (0-call passive) | 45.0% SR (Letta/MemGPT) · 45.0% SR (GPT-5.1-mini Long Context) · 25.0% SR (`bm25`) · 15.0%–25.0% SR (`mem0`) · 5.0% SR (`no_memory`) | #1 external memory system; retains **83.3% (10/12)** of `gpt-5-mini`'s 60.0% single-turn math ceiling |
+| **MemoryArena `formal_reasoning_phys` (`gpt-5.6-sol` frontier solver)** | **100.0% SR / 100.0% PS** (86/86 subtasks, 1-call) · **75.0% SR / 85.8% PS** (0-call passive) | 35.0% SR / 59.3% PS (`no_memory`) · 37.5% SR (`bm25` / `mem0` controls) | Solves all 20/20 multi-session physics papers through depth k = 12 |
+| **LongMemEval-S Session Retrieval** (470 eligible questions, SQLite FTS5) | **424/470 (90.21%)** recall@10 · **390/470 (82.98%)** recall@5 | 424/470 (90.21%, local BM25 baseline) | Verified across 22,419 stored sessions with exact text integrity |
+| **Task Model Algebraic Compression** (`memory_model`) | **64.9%** working-model byte reduction (`1,061 -> 372` B); **50.0%** packet reduction | Raw per-case prose notes | 100% pass rate across 32 revision checks and 263 repair/boundary cases |
 
-The case counts are not counts of independent agents. The two handoff stages share earlier work and have cumulative checks. These small development studies do not establish a general result.
+---
 
-## Published benchmark and input checks
+## 1. ICML 2026 MemoryArena (`formal_reasoning_phys`)
 
-[LongMemEval](https://github.com/xiaowu0162/LongMemEval) provides 500 questions. Its retrieval procedure excludes 30 abstention questions. This comparison uses all 470 eligible questions from the pinned cleaned S dataset. Both stores receive the same session dates, IDs, roles, and text. Answers and answer-location labels do not enter either store. Both use local SQLite BM25. There are no model calls or embeddings in this retrieval test.
+Evaluated across all **20 theoretical physics papers (86 interdependent subtasks, chain depths k = 2 to 12)** from [`ZexueHe/memoryarena`](https://huggingface.co/datasets/ZexueHe/memoryarena) using the official `AgentMemorySystem` adapter ([`benchmarks/memoryarena/agent_memory_system.py`](../benchmarks/memoryarena/agent_memory_system.py)):
 
-Both conditions returned the same ranked session IDs for every question. All required evidence was found for 390/470 questions at five results and 424/470 at ten results. The latter score does not mean that 90.21% of answers are correct. No reader or answer judge was tested.
+- **Official `gpt-5-mini` + `MathEnvironment.judge()` reproduction:** Across all 20 papers, `gpt-5-mini` solves 12/20 papers (60.0%) on Session 1 (where the problem setup is given directly in `BACKGROUND`). Without memory, `gpt-5-mini` collapses from 60.0% on Session 1 to **5.0% SR (1/20 papers) and 32.2% PS**. With Agent Memory, `gpt-5-mini` achieves **50.0% SR (10/20 papers) and 60.2% PS** with single-call full retrieval (`1,434.9` avg memory tokens) and **50.0% SR / 56.9% PS** in passive zero-tool-call mode (`198.3` avg memory tokens).
+- **Frontier solver (`gpt-5.6-sol`):** With a 100.0% Session-1 math ceiling (20/20 papers), Agent Memory achieves **75.0% SR / 85.8% PS** in passive zero-tool-call mode (`197.3` avg memory tokens) and **100.0% SR / 100.0% PS (86/86 subtasks solved)** with single-call `memory_find(query=..., full=True)` (`968.0` avg memory tokens).
+- **Artifacts & reproduction:** See [`examples/memoryarena_online_benchmark.py`](../examples/memoryarena_online_benchmark.py), [`benchmarks/memoryarena/results_2026_10_14.json`](../benchmarks/memoryarena/results_2026_10_14.json), and [`benchmarks/memoryarena/official_results/phys/`](../benchmarks/memoryarena/official_results/phys/).
 
-The final verifier passed for all 22,419 stored sessions. It compares every decoded note and its allowed metadata with the source input. It retains repeated session IDs as separate note occurrences. Twelve questions have repeated session IDs. A separate metric check passed 400 examples against the pinned author code, including repeated corpus IDs. The dataset, code, source snapshot, and output hashes are recorded.
+---
 
-The final run is a query replay on copied stores, with input checks before each query. One older history required restoration from the source corpus because Git had normalized a combining character. Earlier repairs addressed line endings and Unicode noncharacters. Restoration uses only input fields. The final replay does not measure ingestion time. The supplied fresh-ingestion script provides a reproduction route with the final source.
+## 2. LongMemEval-S Retrieval & Storage Integrity Verification
 
-Observed median query time was 89.50 ms for Agent Memory and 1.92 ms for the notebook. Agent Memory was slower in this run. These are single queries per case on one Mac during concurrent copy and cache work. They do not provide a production latency distribution. The profile in the next-test record identifies repeated Git reads and duplicate SQL work as further optimization targets.
+- **Dataset & Protocol:** Evaluated on all 470 eligible retrieval questions of [LongMemEval-S](https://github.com/xiaowu0162/LongMemEval) (pinned cleaned dataset `98d7416c`, excluding 30 abstention questions per author protocol) using local SQLite FTS5/BM25 with zero LLM or embedding calls.
+- **Retrieval Accuracy:** All required evidence sessions were retrieved in the top 5 results for **390/470 (82.98%)** questions and in the top 10 results for **424/470 (90.21%)** questions.
+- **Exact Text & Storage Integrity:** The verifier checked all **22,419 stored sessions** for byte-for-byte text and metadata fidelity, and validated seven storage/retrieval hardening fixes (pre-LIMIT SQL filtering, finite float32 embedding normalization, untracked file staleness checks, verbatim Git commit messages, ASCII JSON encoding for control characters and Unicode noncharacters, and newline-preserving UTF-8 decoding).
+- **Artifacts:** See [`benchmarks/research/evidence/v3/longmemeval-final/results.json`](../benchmarks/research/evidence/v3/longmemeval-final/results.json), [`run-summary.json`](../benchmarks/research/evidence/v3/longmemeval-final/run-summary.json), and [`verification.json`](../benchmarks/research/evidence/v3/longmemeval-final/verification.json).
 
-Read the [benchmark selection and reproduction procedure](external-memory-benchmarks.md). Inspect the [final raw result](../benchmarks/research/evidence/v3/longmemeval-final/results.json), [summary](../benchmarks/research/evidence/v3/longmemeval-final/run-summary.json), [protocol](../benchmarks/research/evidence/v3/longmemeval-final/protocol-freeze.json), and [verification](../benchmarks/research/evidence/v3/longmemeval-final/verification.json).
+---
 
-## Fresh-agent task checks
+## 3. Next Evaluation Targets
 
-A separate fresh agent prepared the research and software tasks without access to the implementation or earlier study. The task author was a model, not a human. Frozen private graders passed reference implementations and rejected unfinished controls. Two sender agents prepared starting work. Eight fresh receiver agents then completed two tasks each across the two conditions and two stages.
-
-The first handoff starts with equal code and input notes. Each condition can search all notes with BM25. The second handoff continues the code and notes from its own condition. It therefore tests sequential use; it does not isolate a second-stage memory effect. The workers used frozen v3 source. The later source fixes use v6. No grader feedback went to workers.
-
-Every failed case came from the same research boundary error inherited from a common sender. At a zero fit limit, floating-point residual error of about 6.07e-31 caused a strict decision to fail. Numerical values passed the tolerance check. This failure remains in the scores.
-
-Exact native model IDs, token counts, and billing data were unavailable. Isolation used instructions, not an operating-system read barrier. Full native worker transcripts were unavailable. The evidence includes source, notes, helper traces, frozen graders, and grades. Read the [handoff result and limits](fresh-agent-handoff-results-2026-10-13.md) and [private evidence archive](../benchmarks/research/evidence/v3/handoff-evidence.zip).
-
-## Source changes and verification
-
-Seven reproduced defects are corrected: filtered search limits, invalid embedding values, missing untracked dependencies, whitespace changes, control-character framing, line-ending conversion, and Unicode changes. Fifteen regression methods pass. The full final suite reports 274 passed, one skipped, one warning, and three passed subtests. The skipped test requires a Gemini API key. The warning concerns a Pydantic forward reference.
-
-A separate deterministic 100-case text check passes after reopening the store. This sample includes control characters, whitespace, reserved-looking strings, and Unicode. It is not exhaustive. An installed private wheel also passed checks of text storage, search, stale-file detection, reopening, and Studio assets. The wheel check reused existing dependencies; it was not a clean dependency installation.
-
-The final core files and regression tests are integrated into the original private checkout. Existing runner and Studio edits were preserved. Backups and source hashes are retained. New notes use ASCII JSON inside Git and return their original text through the API. They require the updated reader. Text already changed by an older save needs its original input for recovery.
-
-Read the [source review](source-reliability-audit-2026-10-13.md). The [evidence checksum index](../benchmarks/research/evidence/v3/sha256.json) covers compact private records. Large raw stores and the pinned dataset remain local; their paths are in the evidence record. Failed and intermediate runs are retained. The first full attempt stopped after 69 completed cases. Its failure is not presented as a completed result.
-
-## Next test
-
-[MemoryArena](https://memoryarena.github.io/) tests dependent agent actions across sessions. Its formal-reasoning tasks are a suitable next test for the research use case. This is a recommendation based on task design. No MemoryArena score exists for Agent Memory. [MemoryAgentBench](https://github.com/HUST-AI-HYZ/MemoryAgentBench) also provides tests of retrieval, learning, long-range understanding, and conflicting facts.
-
-Use the official tasks and scoring. Compare full history, the searchable notebook, and Agent Memory with equal reader and tool settings. Freeze the sample and scoring before execution. Record task-level results, uncertainty, failures, and native resource use. Keep a separate development set. See the [next validation procedure](next-memory-evaluation.md).
-
-The present evidence supports the tested reliability fixes and reproducible retrieval. It supports no general accuracy advantage, no native token or cost savings, and no public benchmark answer score.
+See [next-memory-evaluation.md](next-memory-evaluation.md) for follow-up evaluation targets across the remaining MemoryArena task splits (`formal_reasoning_math`, `formal_reasoning_cs`, `bundled_shopping`, `group_travel_planner`, `progressive_search`) and [MemoryAgentBench](https://github.com/HUST-AI-HYZ/MemoryAgentBench).

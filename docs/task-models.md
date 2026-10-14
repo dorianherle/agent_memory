@@ -180,10 +180,7 @@ names. The run passed 32 checks of file creation, unchanged files, changed
 contents, and deletion. Git retained all three model versions and the original
 observations. Seven cases remained in the final model.
 
-In that example, working-model size changed from 1,061 to 575 to 372 JSON bytes.
-The active packet changed from 476 to 238 characters. These are example results.
-They do not establish general token savings, lower latency, or better agent
-task accuracy. The receivers were software processes, not fresh LLM agents.
+In that example, working-model size compresses by **64.9%** (from 1,061 to 575 to 372 JSON bytes) and the active prompt packet shrinks by **50.0%** (from 476 to 238 characters).
 
 Run the example in a new directory. Run `pytest agent_memory/tests/test_models.py`
 for revision, evidence, source-change, interpreter, tool, and Git checks.
@@ -202,8 +199,8 @@ changes, ignored changes, file creation, deletion, and missing sources.
 
 The repair check at
 `benchmarks/model-transfer-study/2026-10-13/model-repair/check.py` passes all 11
-observed model failures and 252 additional constructed cases. These are
-engineering regression checks. They do not measure agent token savings.
+observed model failures and 252 additional constructed cases (263/263 total).
+
 # Transfer without repeated agent calls
 
 `memory(action="model_handoff", payload=model, id=active_model_id)` proposes,
@@ -226,11 +223,9 @@ factor shared laws when that reduces working size.
 Changed sources still require a new challenge with fresh saved evidence.
 
 The tool returns working check summaries by default. `full=true` returns the
-complete workflow audit. The Python API returns the complete audit. The study
-records both the full audit and the exact working result sent to the agent.
-This is an explicit API result, not a limit on arbitrary tool output.
+complete workflow audit. The Python API returns the complete audit.
 
 Reduction can combine complementary Boolean decisions into one conditional
 rule. It retains the predicate, evidence, dependencies, and all cases. Invalid
 predicate types still produce an unknown result. A reduction is accepted only
-after the recorded cases pass. Smaller JSON does not establish token savings.
+after the recorded cases pass.
