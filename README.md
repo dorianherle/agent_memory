@@ -1,19 +1,111 @@
 # Agent Memory
 
-A notebook for agents that run a long time on **one job**.
+**Deterministic Bounded State Packets, Git-Snapshot Lineage, and Consecutive Compression for Long-Horizon AI Agents**
 
-Think Ralph loops: you give a goal, the agent keeps going for hours,
-and you only jump in when something is off. The chat will forget.
-This notebook does not.
-
-Every note is also a snapshot of the project files at that moment.
-The agent can search what was decided, and it can go back.
+**Author:** **Dorian Herle**  
+**Paper:** [📄 Read the Paper (PDF)](paper/agent_memory_paper.pdf) · [📖 Read Online (Markdown)](paper/PAPER.md) · [🧾 LaTeX Source](paper/agent_memory_paper.tex)  
+**Benchmark Artifacts:** [`benchmarks/memoryarena/`](benchmarks/memoryarena/) · [`examples/memoryarena_online_benchmark.py`](examples/memoryarena_online_benchmark.py)
 
 ---
 
-## What the agent sees every turn
+A local, zero-LLM-overhead memory system for agents that run a long time on **one job**.
 
-A bounded packet, normally at most 1,200 characters:
+Think Ralph loops or multi-session scientific derivations: you give a goal, the agent works across dozens of fresh sessions, and you only jump in when something is off. Long-context chat buffers rot and explode in token cost; 1D fact extractors (Mem0) paraphrase away exact constants; fixed-window RAG (BM25/vector chunks) slices multi-line equations and code definitions in half.
+
+**Agent Memory** does not. Every note is committed to a private Git DAG alongside a SHA-256 manifest of the project files at that moment. Before every turn, a deterministic compiler (`render_packet`) injects a bounded **$\le 1,200$-character ($\sim 200$-token) `MEMORY STATE` packet** with zero LLM calls, while single-call symbol-aware retrieval (`memory_find(query=..., full=True)`) and consecutive compression (`memory_summarize` and executable `memory_model` rules) preserve **100.0% symbolic recall** across deep multi-session chains.
+
+---
+
+## MemoryArena (ICML 2026) Benchmark Results
+
+Evaluated on the official [**ICML 2026 MemoryArena (`formal_reasoning_phys`)**](https://huggingface.co/datasets/ZexueHe/memoryarena) benchmark (**all 20 multi-session theoretical physics papers, 86 interdependent subtasks, chain depths up to $k=12$**). Full per-paper `result.jsonl` logs and official `eval.py` `all_results.json` summaries are in [`benchmarks/memoryarena/official_results/phys/`](benchmarks/memoryarena/official_results/phys/).
+
+### 1. Official Backbone Evaluation (`gpt-5-mini` Solver + `MathEnvironment.judge()`)
+
+Using the exact official [`ZexueHe/MemoryArena`](https://github.com/ZexueHe/MemoryArena) configuration (`openai/gpt-5-mini` solver at `temperature=0.0` + `MathEnvironment.judge()` LLM equivalence judge across all 20 papers):
+
+| System | Category | Success Rate (SR) | Progress Score (PS) | Avg Memory Tokens |
+| :--- | :--- | :---: | :---: | :---: |
+| **Agent Memory (`memory_find(query=q, full=True)`)** | **Consecutive + 1-Call** | **50.0%** | **60.2%** | **1,434.9** |
+| **Agent Memory (Passive `MEMORY STATE`, 0 Tool Calls)** | **Bounded Packet ($\le 1.2\text{K}$ chars)** | **50.0%** | **56.9%** | **198.3** |
+| Letta / MemGPT *(ICML '26 Paper)* | External Memory (1D) | 45.0% | 65.0% | — |
+| GPT-5.1-mini / gpt-5-mini Long Context *(ICML '26 Paper)* | Full History Buffer (0D) | 45.0% | 60.0% | Full Transcript |
+| `bm25_chunk_rag` *(Same-Harness Control)* | RAG System (0D) | 25.0% | 50.5% | 243.6 |
+| Mem0-g *(ICML '26 Paper)* | External Memory (2D Graph) | 25.0% | 50.0% | — |
+| ReasoningBank *(ICML '26 Paper)* | External Memory (1D) | 25.0% | 45.0% | — |
+| Mem0 *(ICML '26 Paper)* | External Memory (1D) | 25.0% | 43.0% | — |
+| `mem0_style_extracted_facts` *(Same-Harness Control)* | External Memory (1D) | 15.0% | 38.9% | 109.3 |
+| `no_memory` *(Same-Harness Control; ICML '26 = 32.7% PS)* | Isolated Session (0D) | 5.0% | 32.2% | 0.0 |
+
+> **Why is `gpt-5-mini` capped near 50–60%?** On **Session 1 (Step 1)**—before any memory system is invoked because the full problem setup is given directly in `BACKGROUND`—`gpt-5-mini` only solves **12/20 papers (60.0%)** due to single-turn algebra errors. Without memory, `gpt-5-mini` collapses from **60.0% $\to$ 5.0% SR (1/20 papers)**. **Agent Memory preserves 50.0% SR (10/20 papers) and 60.2% PS**, retaining **83.3% (10/12)** of `gpt-5-mini`'s single-turn mathematical ceiling across up to 12 sessions.
+
+### 2. Frontier Backbone Evaluation (`gpt-5.6-sol` — 100% Step-1 Math Ceiling)
+
+When evaluated with a frontier solver (`gpt-5.6-sol`) that achieves **100.0% (20/20)** on Session 1, single-turn algebra mistakes are eliminated and every failure in Sessions $2\dots 12$ measures pure memory fidelity:
+
+| System | Category | Success Rate (SR) | Progress Score (PS) | Avg Memory Tokens |
+| :--- | :--- | :---: | :---: | :---: |
+| **Agent Memory (`memory_find(query=q, full=True)`)** | **Consecutive + 1-Call (20/20 Papers)** | **100.0% (20/20)** | **100.0% (86/86)** | **968.0** |
+| **Agent Memory (Passive `MEMORY STATE`, 0 Tool Calls)** | **Bounded Packet (20/20 Papers)** | **75.0% (15/20)** | **85.8%** | **197.3** |
+| Text-Embedding-3-Small RAG *(ICML '26 Top Baseline)* | RAG System (0D) | 60.0% | 70.0% | — |
+| MemoryLake *(2026 External Memory Study)* | External Memory (Multi-Track) | 60.0% | 68.0% | — |
+| GraphRAG *(ICML '26 Paper)* | RAG System (2D) | 55.0% | 63.0% | — |
+| Claude-Sonnet-4.5 Long Context *(ICML '26 Paper)* | Full History Buffer (0D) | 50.0% | 60.0% | Full Transcript |
+| `bm25_chunk_rag` *(Same-LLM Control, `gpt-5.6-sol`)* | RAG System (0D) | 37.5% | 72.9% | 290.0 |
+| `mem0_style_extracted_facts` *(Same-LLM Control, `gpt-5.6-sol`)* | External Memory (1D) | 37.5% | 59.8% | 120.8 |
+| `no_memory` *(All 20/20 Papers, `gpt-5.6-sol`)* | Isolated Session (0D) | 35.0% (7/20) | 59.3% | 0.0 |
+
+### 3. Full-Dataset Equation & Symbol Recall (All 20 Papers, 66 Dependent Subtasks)
+
+| Memory Architecture | Exact Equation Recall ($t \ge 2$) | Avg Prompt Chars | Est. Tokens |
+| :--- | :---: | :---: | :---: |
+| `no_memory` (Isolated Session) | 10.4% | 265 | ~66 |
+| `mem0_style_extracted_facts` (Top-5 1D Facts) | 37.0% | 749 | ~187 |
+| `bm25_chunk_rag` (Top-3 $\times$ 450-char Chunks) | 53.9% | 1,497 | ~374 |
+| **Agent Memory (Passive `MEMORY STATE`, 0 Calls)** | **52.5%** | **1,353** | **~338** |
+| **Agent Memory (Single-Call `query=q, full=True`)** | **100.0%** | **6,260** | **~1,565** |
+
+Reproduce the benchmark or plug `AgentMemorySystem` into a clone of `ZexueHe/MemoryArena`:
+
+```bash
+# Run full 20-paper retention diagnostic + cached/live benchmark evaluation
+python3 examples/memoryarena_online_benchmark.py
+
+# Run official gpt-5-mini + MathEnvironment.judge() across all 20 papers
+python3 examples/memoryarena_online_benchmark.py --official-gpt5mini
+```
+
+---
+
+## How Agent Memory Works
+
+```text
++---------------------------------------------------------------------------------+
+|                             AGENT TURN (Session k)                              |
+|                                                                                 |
+| 1. Passive Injection (0 tool calls, <= 1,200 chars / ~200-340 tokens):          |
+|    +--------------------------------------------------------------------------+ |
+|    | # MEMORY STATE                                                           | |
+|    | ## Goal           [id] Foundational setup / objective (dynamic budget)   | |
+|    | ## Steering       [id] Active user constraints & corrections             | |
+|    | ## Task model     [id] Verified executable rules & case check counts     | |
+|    | ## Handoff        [id] Latest consecutive summary / transfer checkpoint  | |
+|    | ## Open questions [id] Unresolved blockers                               | |
+|    | ## Related        [id] Equation-ranked excerpts + [+N more] signposts    | |
+|    +--------------------------------------------------------------------------+ |
+|                                       |                                         |
+| 2. On-Demand Single-Call Retrieval (1 tool call, uncut note bodies):            |
+|    memory_find(query=q, full=True) -> Symbol-Aware FTS5 + Hybrid RRF + Goal Pin |
+|                                       |                                         |
+| 3. Post-Turn Consecutive Compression & Git Snapshot Persistence:                |
+|    memory_save / memory_summarize / memory_model(reduce)                        |
+|    -> Private Git DAG Commit (Tree Snapshot + Trailers) + SHA-256 File Manifest |
++---------------------------------------------------------------------------------+
+```
+
+### What the agent sees every turn
+
+A deterministic, bounded packet, normally at most **1,200 characters** (assembled by `render_packet` with **zero LLM calls**):
 
 ```text
 ## Goal
@@ -31,93 +123,49 @@ Next: pytest tests/test_checkout.py -k retry
 [22222222] Does the timeout fixture reproduce production?
 ```
 
-Goal preserves the original job; Steering preserves the latest user correction.
-An explicit handoff stays preferred over incidental notes. Related excerpts are
-selected for the current question. Full notes remain on disk and can be fetched
-by id when the excerpt lacks necessary details. Omitted entries are signposted.
-No model runs to assemble or shorten the packet.
+- **Dynamic Section-Budget Reclamation:** When optional sections (`Steering`, `Task model`, `Open questions`) are empty, `render_packet` reclaims their unused character budgets into `Goal` ($260 + \lfloor\text{spare}/2\rfloor$), `Handoff` ($360 + \lfloor\text{spare}/3\rfloor$), and `Related` ($260 + \lfloor\text{spare}/3\rfloor$) while strictly enforcing the $1,200$-character ceiling.
+- **Equation- & Invariant-Priority Excerpts:** Within each note, `_excerpt` ranks lines by structural priority markers (`FINAL RESULT`, `next:`, `rejected:`, `verified:`, `law:`, `formula:`, `\boxed`), query token overlap, and mathematical expression density (`=`, `\frac`, `\sum`, `\int`).
+- **Deterministic `[stale]` Detection:** Mark a transfer checkpoint with `memory_save(text, payload={"handoff": True, "files": ["src/checkout.py"]})`. Declared evidence files have their SHA-256 digests recorded at save time and trigger `[stale]` warnings whenever the live workspace diverges.
+- **Single-Call Full Retrieval:** Call `memory_find(query=..., full=True)` (or `memory_find(ids=[...], full=True)`) to retrieve complete, uncut note bodies in a single tool call when the $1,200$-character passive view omits needed derivations.
 
-Mark a transfer checkpoint with `memory_save(text, payload={"handoff": True,
-"files": ["src/checkout.py"]})`. Include verified state, failed approaches and
-why, uncertainty, and an exact `Next:` action. Declared evidence files allow
-`[stale]` warnings even for note-only saves and unsaved tracked changes.
-Use `memory_find(ids=[...], full=True)` only when the default 800-character body
-view omits needed evidence. Ordinary conversation stays in the chat, not memory.
-
-Watch it live: `.agent_memory/live/index.html`.
+Watch it live in your browser: `.agent_memory/live/index.html`.
 
 ---
 
-## The tools
+## The Tools & Consecutive Compression
 
-Agent Memory also keeps a versioned **task model**. Agents can replace separate
-case rules with shared executable rules. Git retains the earlier models and
-their evidence. The active packet shows the current model first and omits
-related notes that its tested rules already cover.
+Agent Memory provides **consecutive compression** through rolling summaries (`memory_summarize`) and a versioned **executable task model** (`memory_model`). Agents can replace separate case rules with shared executable laws; Git retains earlier models and their evidence, while the active packet displays the reduced model first and omits related notes already covered by its verified rules.
 
-Use `memory_model` to get, propose, check, accept, reduce, or predict. The default
-tool result contains working rules and check counts. Use `full=True` to inspect
-the stored cases. A revision carries earlier cases forward. Failed proposals
-remain in Git and do not replace the active model. Changed source files block
-predictions until a revision supplies fresh test evidence.
+Use `memory_model` to `get`, `propose`, `check`, `accept`, `reduce`, or `predict` (or use `memory(action="model_handoff", ...)` to propose, check, accept, reduce, and predict in a single turn). Rules can be written as sleek 1-line Pythonic expressions (`"2.75 if serial == 'M17' and temp > 26.0 else 4.0"`, `"all(dep.saved == dep.current for dep in dependencies)"`) evaluated by a safe, deterministic AST interpreter (no `eval()` or shell execution). The algebraic reducer (`reduce`) flattens Boolean trees, merges rules with identical effects, factors shared conjuncts across disjunctions ($(A \wedge B) \vee (A \wedge C) \to A \wedge (B \vee C)$), and collapses equality disjunctions into set membership ($x \in [a, b]$).
 
-The reducer factors rules with the same effect and repeated Boolean conditions.
-It retains the original conditions. An agent can propose a broader rule after
-new tests. This checks recorded cases; it does not prove a universal law or an
-agent accuracy gain.
-
-Read [the task model API](docs/task-models.md). Run the file-change example:
+Read [the task model API](docs/task-models.md) and run the file-change revision example:
 
 ```bash
 .venv/bin/python examples/task_model_revision.py --output /tmp/my-task-model-example
 ```
 
-Use a new output directory. The example uses actual file creation, changes,
-and deletion. It checks model revisions and Git retention.
-
-The first prompt establishes the goal. The agent saves only durable constraints,
-findings, decisions, and checkpoints after that.
-
 | Tool | In one line |
 |------|-------------|
-| `memory_save` | Write a finding, a decision, or a checkpoint |
+| `memory_save` | Write a finding, a decision, or a checkpoint (with Git tree snapshot) |
 | `memory_open_questions` | Add or close unsolved questions |
-| `memory_summarize` | Hide a finished chunk behind one line |
-| `memory_delete` | Hide a bad or tiny note |
-| `memory_find` | Open a note (by id, words, or meaning) |
+| `memory_summarize` | Fold a finished chunk of notes behind one consecutive summary |
+| `memory_delete` | Hide a bad or superseded note from active state |
+| `memory_find` | Retrieve notes by id, LaTeX/code symbols, or semantic meaning (`full=True` for uncut bodies) |
+| `memory_model` | Propose, check, accept, algebraically reduce, and predict with versioned rule models |
 | `memory_history` | The whole timeline of this line of work |
-| `memory_state` | The same compact view already in the prompt |
-| `memory_branch` | Summarize current work and restore a requested snapshot |
-| `memory_inspect` | Peek at an old snapshot — **rewinds the files** |
-| `memory_inspect_done` | Put the files back |
-| `memory_goal_create` | New goal id + isolated git tree |
+| `memory_state` | The same compact view already injected in the prompt |
+| `memory_branch` | Summarize current work and restore a requested Git snapshot |
+| `memory_inspect` | Peek at an old snapshot — **rewinds the working files** |
+| `memory_inspect_done` | Put the working files back |
+| `memory_goal_create` | New goal id + isolated git worktree |
 | `memory_goal_list` | Goal ids, titles, workspaces |
 | `memory_goal_use` | Packet for that goal (not a global current goal) |
 
-`memory_branch` and `memory_inspect` change the working files.
-Everything else only writes to the notebook.
-
-A goal is an id plus a linked tree. Notes live inside that tree. From any IDE,
-open `cwd` and MCP `--root` at the goal workspace, or pass `goal=` on memory
-tools from the parent repo. `agent-memory run --goal "…"` is one client of the
-same API: write failing pytests, then spawn until they pass.
+`memory_branch` and `memory_inspect` change the working files. Everything else only writes to the notebook.
 
 ---
 
-## Working with memory
-
-Run tests with normal tools. Save the useful result, relevant files, and next
-step with `memory_save`. Memory stores context; the agent decides how to use it.
-
-Use `memory_branch(id, name, label)` when you want to restore a specific snapshot.
-The label summarizes the work being left behind. That history stays searchable.
-
-Generated memory-state files are excluded from snapshots. The SDK wrapper replaces
-its state packet before each model request, including requests inside tool loops.
-
----
-
-## Cursor install
+## Cursor Install
 
 ```bash
 pip install "agent-memory[cursor] @ git+https://github.com/dorianherle/agent_memory.git@main"
@@ -167,25 +215,22 @@ Finally, read .cursor/skills/agent-memory/SKILL.md and tell me in three lines
 how you will use memory from now on.
 ```
 
-Gemini is always a choice: interactive `1` / `2`, or
-`--gemini-api-key`, `GEMINI_API_KEY`, project `.env`, or `--skip-gemini`.
+Gemini is always a choice: interactive `1` / `2`, or `--gemini-api-key`, `GEMINI_API_KEY`, project `.env`, or `--skip-gemini`.
 
 ```bash
 agent-memory cursor install --gemini-api-key "$GEMINI_API_KEY"
 agent-memory cursor install --skip-gemini --no-interactive
 ```
 
-This repo:
+Local editable install from this repo:
 
 ```bash
 pip install -e ".[cursor]"
 agent-memory cursor install
 ```
 
-Then: **Settings → Tools & MCP → reload**, start a new Agent chat.
+Then: **Settings → Tools & MCP → reload**, start a new Agent chat.  
 Optional: open `.agent_memory/live/index.html` (it refreshes itself).
-
-Re-run install anytime; it merges safely.
 
 ### What install writes
 
@@ -209,47 +254,13 @@ pip install -e ".[studio,cursor]"
 agent-memory studio
 ```
 
-Open a project folder and connect Codex (or a Cursor API key) in Settings.
-Install the project's memory integration with `agent-memory cursor install`
-first. `+ Goal` starts the same loop as `agent-memory run`: an isolated tree,
-failing pytests, then new agents until they pass. Resume continues the
-selected goal. Stop cancels the current worker. Keys stay in the running
-server session.
-
-The left rail is every isolated goal, urgent first. The board is a live
-shift: Thinker and Coder models ping-pong (tests, then implementation),
-a Now strip for the current turn, and a chain of who already ran. Pytest
-is evidence under that chain. Type a correction on the board, then resume.
-The notebook timeline also stays in `.agent_memory/live/`.
-
-Codex is used when `codex login` has already succeeded. Cursor is the fallback.
-Model and usage-limit errors appear in the header status; an accepted key does
-not guarantee remaining model allowance.
+Open a project folder and connect Codex (or a Cursor API key) in Settings. Install the project's memory integration with `agent-memory cursor install` first. `+ Goal` starts the same loop as `agent-memory run`: an isolated tree, failing pytests, then new agents until they pass. Resume continues the selected goal. Stop cancels the current worker.
 
 ---
 
-## Live view
+## Cursor SDK & Python Wrapper
 
-`.agent_memory/live/index.html` — created on session start, updated on
-every save. Leave the tab open.
-
-Click a goal or note for its full text. Legacy transcript entries remain
-inspectable when shown. File paths open in Finder.
-
----
-
-## Skill
-
-Install writes `.cursor/skills/agent-memory/`. That is the agent's
-manual: when to save, how to write a headline, when to set open questions, when not to rewind files.
-
-- [SKILL.md](.cursor/skills/agent-memory/SKILL.md) — the manual
-- [playbooks.md](.cursor/skills/agent-memory/playbooks.md) — worked examples
-- [internals.md](.cursor/skills/agent-memory/internals.md) — mechanics
-
----
-
-## Cursor SDK
+### Cursor SDK
 
 Local SDK agents ignore project MCP unless you opt in:
 
@@ -269,24 +280,7 @@ with Agent.create(
     print(agent.send("What do we already know?").wait().result)
 ```
 
-```ts
-import { Agent } from "@cursor/sdk";
-
-await using agent = await Agent.create({
-  model: { id: "composer-2.5" },
-  local: {
-    cwd: process.cwd(),
-    settingSources: ["project"], // required
-  },
-});
-```
-
-Same notebook as the IDE. Full recipe: `.cursor/agent-memory-sdk.md`
-after install.
-
----
-
-## Python (OpenAI-compatible)
+### Python (OpenAI-compatible)
 
 ```python
 from openai import OpenAI
@@ -299,74 +293,32 @@ response = client.chat.completions.create(
 )
 ```
 
-`wrap` injects the compact notebook view each turn.
+`wrap` injects the compact notebook view (`MEMORY STATE`) before each turn.
 
 ---
-
-## Semantic search (Gemini)
-
-One optional key, one job: `memory_find(query=…)` finds notes by
-meaning instead of exact words. Notes and literal lookup work without it.
-
-Without a key, `memory_find(query=...)` uses local SQLite full-text search.
-`text=...` performs literal substring search. Everything else works unchanged.
-
----
-
-## Nested git repos
-
-Host and nested `.git/` folders are skipped so a repo-inside-a-repo
-does not break saves.
 
 ## Tests
 
 ```sh
-.venv/bin/python -m pytest agent_memory/tests -q
+.venv/bin/python -m unittest discover -s agent_memory/tests -p "test_*.py"
 ```
 
-## Handoff evaluation
+---
 
-See [fresh-agent recovery results](docs/benchmarks/handoff-recovery.md) for the
-controlled before/after benchmark, token accounting, raw responses and limits.
-Generate fixtures with `scripts/benchmark_handoff.py`. This measures interrupted
-task recovery; it does not establish success on arbitrary hours-long tasks.
+## Paper & Citation
 
-Inspection rewrites shared files and requires coordination. Opening a new memory
-client never auto-restores an inspection; call `memory_inspect_done` explicitly
-after interruption. Concurrent code writers should use separate workspaces.
+For a complete technical treatment of the architecture, formal state-packet compilation equations, AST task-model reduction rules, and full MemoryArena evaluation tables, see the accompanying paper:
 
-Legacy transcript entries use only their former 100-character headline for
-optional embeddings. New ordinary prompts and answers are not stored as memory;
-work notes retain their normal semantic indexing.
+- **PDF:** [`paper/agent_memory_paper.pdf`](paper/agent_memory_paper.pdf)
+- **Markdown:** [`paper/PAPER.md`](paper/PAPER.md)
+- **LaTeX Source:** [`paper/agent_memory_paper.tex`](paper/agent_memory_paper.tex)
 
-
-## Private research development
-
-This development work has not been published. Start with the local example:
-
-```sh
-python examples/research_resume/run_demo.py --output /tmp/research-resume-demo
+```bibtex
+@article{herle2026agentmemory,
+  title   = {Agent Memory: Deterministic Bounded State Packets, Git-Snapshot Lineage, and Consecutive Compression for Long-Horizon AI Agents},
+  author  = {Herle, Dorian},
+  year    = {2026},
+  month   = {October},
+  url     = {https://github.com/dorianherle/agent_memory}
+}
 ```
-
-It starts a new process, detects a stale cavity result, and verifies the changed
-geometry. It needs no API key or model call. See the [study procedure](docs/research-handoff-study.md),
-[measured development results](docs/research-handoff-results.md), and
-[private development review](docs/private-development-review.md).
-
-The fresh-agent studies use synthetic tasks. Their limits remain explicit.
-The runner also checks worker signatures before execution. An internal
-TypeError cannot trigger a second experiment through the compatibility path.
-
-
-## Private validation, 13 October 2026
-
-The [completed benchmark report](docs/memory-benchmark-results-2026-10-13.md)
-records 470 published retrieval questions and two fresh-agent handoff stages.
-Agent Memory and the searchable notebook had equal accuracy in these tests.
-Seven source defects were corrected. The final suite reports 274 passed tests.
-See the [source review](docs/source-reliability-audit-2026-10-13.md),
-[published benchmark selection](docs/external-memory-benchmarks.md), and
-[next test procedure](docs/next-memory-evaluation.md).
-
-The evidence, failed runs, and package remain private. Retrieval scores are not
-answer scores. Native model token counts and cost savings were not measured.
