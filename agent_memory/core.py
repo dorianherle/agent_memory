@@ -33,9 +33,12 @@ _SMALL_TALK_RE = re.compile(
     re.IGNORECASE,
 )
 _STEERING_PROMPT_RE = re.compile(
-    r"^(constraint\s*:|requirement\s*:|rule\s*:|important\s*:|"
+    r"(?:^|[.!?\n]\s*)(?:(?:please|wait|also|actually|btw|note)\b[,\s]*)*"
+    r"(?:constraint\s*:|requirement\s*:|rule\s*:|important\s*:|"
     r"always\s+|never\s+|do\s+not\s+|don'?t\s+|must\s+not\s+|"
-    r"keep\s+the\s+[^\n]*\b(unchanged|compatible|intact|same)\b)",
+    r"use\s+only\s+|avoid\s+|make\s+sure\s+|remember\s+to\s+|"
+    r"wait\s+also\s+|"
+    r"keep\s+the\s+[^\n]*\b(?:unchanged|compatible|intact|same)\b)",
     re.IGNORECASE,
 )
 _FILE_TOKEN_RE = re.compile(
@@ -147,7 +150,18 @@ class Memory:
         self._last_tool_result = "Nothing yet."
         self._find_used_substring = False
         self._commit_files_cache: dict[str, set[str]] = {}
+        self._head_history_cache: tuple[str, dict[str, set[str]], set[str], dict[str, str]] | None = None
         self._init()
+
+    def close(self) -> None:
+        if self._catalog is not None:
+            self._catalog.close()
+
+    def __enter__(self) -> Memory:
+        return self
+
+    def __exit__(self, *args) -> None:
+        self.close()
 
     def _run(self, *args: str, check: bool = True) -> str:
         command = [
@@ -178,14 +192,15 @@ class Memory:
             self._run("config", "user.name", "Agent Memory")
 
         exclude = self._git_dir / "info" / "exclude"
+        first_exclude = not exclude.exists()
         exclude.parent.mkdir(parents=True, exist_ok=True)
-        self._ensure_exclude(exclude)
+        self._ensure_exclude(exclude, scan_nested=first_exclude)
         # Opening a reader must never restore another agent's working files.
         # An interrupted inspection remains explicit until inspect_done().
         self._catalog = Catalog(self._git_dir)
         self._sync_catalog()
 
-    def _ensure_exclude(self, path: Path) -> None:
+    def _ensure_exclude(self, path: Path, *, scan_nested: bool = True) -> None:
         """Keep info/exclude up to date (merge, never wipe user lines)."""
         raw = path.read_text() if path.exists() else ""
         existing = [line.rstrip("\n") for line in raw.splitlines()]
@@ -194,10 +209,11 @@ class Memory:
         for entry in EXCLUDE_ENTRIES:
             if entry not in known:
                 lines.append(entry)
-        for entry in self._nested_repo_excludes():
-            if entry not in known:
-                lines.append(entry)
-                known.add(entry)
+        if scan_nested:
+            for entry in self._nested_repo_excludes():
+                if entry not in known:
+                    lines.append(entry)
+                    known.add(entry)
         updated = "\n".join(lines).rstrip() + "\n"
         if updated != raw:
             path.write_text(updated)
@@ -404,6 +420,7 @@ class Memory:
         agent: str | None = None,
         _expected_head: str | None = None,
         _model_record: bool = False,
+        _snapshot: bool = True,
     ) -> str:
         if self.inspecting() is not None:
             raise RuntimeError(
@@ -451,11 +468,12 @@ class Memory:
                 raise RuntimeError("cannot save while inspecting; call inspect_done first")
             if _expected_head is not None and self._run("rev-parse", "HEAD") != _expected_head:
                 raise ValueError("Memory changed during model checks; check the proposal again")
-            # Refresh excludes each save: nested clones may appear mid-session.
-            self._ensure_exclude(self._git_dir / "info" / "exclude")
-            # Also untrack state already captured by older saves; keep local files.
-            self._run("rm", "--cached", "--ignore-unmatch", "--", *GENERATED_STATE_FILES)
-            self._run("add", "-A")
+            if _snapshot:
+                # Refresh excludes each save: nested clones may appear mid-session.
+                self._ensure_exclude(self._git_dir / "info" / "exclude", scan_nested=True)
+                # Also untrack state already captured by older saves; keep local files.
+                self._run("rm", "--cached", "--ignore-unmatch", "--", *GENERATED_STATE_FILES)
+                self._run("add", "-A")
             arguments = ["commit", "--cleanup=verbatim"]
             if allow_empty:
                 arguments.append("--allow-empty")
@@ -855,6 +873,7 @@ class Memory:
                 {},
                 allow_empty=True,
                 _operation={"operation": "delete", "target": target},
+                _snapshot=False,
             )
             closed.append(target)
         return closed
@@ -870,8 +889,54 @@ class Memory:
         self._commit_files_cache[item_id] = files
         return files
 
-    def _mentioned_files(self, message: str) -> set[str]:
+    def _head_file_history(
+        self, head: str
+    ) -> tuple[dict[str, set[str]], set[str], dict[str, str]]:
+        cached = self._head_history_cache
+        if cached is not None and cached[0] == head:
+            return cached[1], cached[2], cached[3]
+        raw = self._run(
+            "log", "--root", "--pretty=format:\x02%H", "--name-only", head, check=False
+        )
+        commit_order: list[str] = []
+        commit_files: dict[str, set[str]] = {}
+        known_files: set[str] = set()
+        for block in raw.split(RECORD_SEPARATOR):
+            if not block.strip():
+                continue
+            lines = [line.strip() for line in block.splitlines() if line.strip()]
+            if not lines:
+                continue
+            cid = lines[0]
+            files = set(lines[1:]) - set(GENERATED_STATE_FILES)
+            commit_order.append(cid)
+            commit_files[cid] = files
+            self._commit_files_cache[cid] = files
+            known_files |= files
+        changed_commits: dict[str, set[str]] = {}
+        acc: set[str] = set()
+        for cid in commit_order:
+            changed_commits[cid] = set(acc)
+            acc |= commit_files[cid]
+        by_base: dict[str, list[str]] = {}
+        for rel in known_files:
+            base = rel.rsplit("/", 1)[-1]
+            by_base.setdefault(base, []).append(rel)
+        unique_basenames = {
+            base: paths[0] for base, paths in by_base.items() if len(paths) == 1
+        }
+        self._head_history_cache = (head, changed_commits, known_files, unique_basenames)
+        return changed_commits, known_files, unique_basenames
+
+    def _mentioned_files(
+        self,
+        message: str,
+        known_files: set[str] | None = None,
+        unique_basenames: dict[str, str] | None = None,
+    ) -> set[str]:
         found: set[str] = set()
+        known = known_files or set()
+        basenames = unique_basenames or {}
         for raw in _FILE_TOKEN_RE.findall(message or ""):
             candidate = raw.strip().lstrip("./")
             if not candidate or candidate in GENERATED_STATE_FILES:
@@ -881,8 +946,10 @@ class Memory:
                 rel = target.relative_to(self._path).as_posix()
             except ValueError:
                 continue
-            if target.is_file():
+            if target.is_file() or rel in known:
                 found.add(rel)
+            elif "/" not in rel and rel in basenames:
+                found.add(basenames[rel])
         return found
 
     def _stale_files(self, items: list[MemoryItem]) -> dict[str, list[str]]:
@@ -900,6 +967,7 @@ class Memory:
         ]
         if not unique_items:
             return drifted
+        changed_commits, known_files, unique_basenames = self._head_file_history(head)
         item_files: dict[str, set[str]] = {}
         all_explicit: set[str] = set()
         for item in unique_items:
@@ -908,7 +976,9 @@ class Memory:
                 for name in (item.payload.get("files") or [])
                 if str(name).strip()
             }
-            mentioned = self._mentioned_files(item.message)
+            mentioned = self._mentioned_files(
+                item.message, known_files, unique_basenames
+            )
             explicit = declared | mentioned
             all_explicit.update(explicit)
             if declared:
@@ -930,18 +1000,28 @@ class Memory:
                     "ls-files", "--others", "-z", "--", *sorted(all_explicit), check=False
                 ).split("\0")
             )
+        wt_diff = {
+            name.strip()
+            for name in self._run(
+                "diff", "--name-only", head, "--", check=False
+            ).splitlines()
+            if name.strip()
+        }
         diff_cache: dict[str, set[str]] = {}
         for item_id, files in item_files.items():
-            later = diff_cache.get(item_id)
-            if later is None:
-                later = {
-                    name.strip()
-                    for name in self._run(
-                        "diff", "--name-only", item_id, "--", check=False
-                    ).splitlines()
-                    if name.strip()
-                }
-                diff_cache[item_id] = later
+            if item_id in changed_commits:
+                later = changed_commits[item_id] | wt_diff
+            else:
+                later = diff_cache.get(item_id)
+                if later is None:
+                    later = {
+                        name.strip()
+                        for name in self._run(
+                            "diff", "--name-only", item_id, "--", *sorted(files), check=False
+                        ).splitlines()
+                        if name.strip()
+                    }
+                    diff_cache[item_id] = later
             changed = sorted(files & (later | untracked))
             if changed:
                 drifted[item_id] = changed
@@ -1136,6 +1216,7 @@ class Memory:
             {},
             allow_empty=True,
             _operation={"operation": "delete", "target": target},
+            _snapshot=False,
         )
 
     @contextmanager
@@ -1167,7 +1248,9 @@ class Memory:
         if not text:
             raise ValueError("branch requires a summary")
         commit_id = self._resolve(base_id)
-        self.save(text, summary=True)
+        if self._run("status", "--porcelain", check=False):
+            raise RuntimeError("save current changes before branching")
+        self.save(text, summary=True, _snapshot=False)
         with self._lock():
             if self._run("status", "--porcelain", check=False):
                 raise RuntimeError("save current changes before branching")

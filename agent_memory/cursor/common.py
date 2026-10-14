@@ -26,7 +26,11 @@ def _usable_root(raw: str | None) -> Path | None:
         return None
 
 
-def resolve_root(argv: list[str] | None = None) -> Path:
+def resolve_root(
+    argv: list[str] | None = None,
+    *,
+    fallback_root: str | Path | None = None,
+) -> Path:
     """Resolve the project root without touching the process-wide cache."""
     args = list(sys.argv[1:] if argv is None else argv)
     if "--root" in args:
@@ -43,6 +47,10 @@ def resolve_root(argv: list[str] | None = None) -> Path:
     root = _usable_root(os.environ.get(ENV_ROOT))
     if root is not None:
         return root
+    if fallback_root is not None:
+        root = _usable_root(str(fallback_root))
+        if root is not None:
+            return root
     return Path.cwd().resolve()
 
 
@@ -53,7 +61,11 @@ def remember_root(argv: list[str] | None = None) -> Path:
     return _resolved_root
 
 
-def memory_root(argv: list[str] | None = None) -> Path:
+def memory_root(
+    argv: list[str] | None = None,
+    *,
+    fallback_root: str | Path | None = None,
+) -> Path:
     """Project root that owns `.agent_memory/`.
 
     Uses the pinned root when ``remember_root()`` was called (MCP server),
@@ -61,11 +73,15 @@ def memory_root(argv: list[str] | None = None) -> Path:
     """
     if argv is None and _resolved_root is not None:
         return _resolved_root
-    return resolve_root(argv)
+    return resolve_root(argv, fallback_root=fallback_root)
 
 
-def get_memory(goal: str | None = None) -> Memory:
-    root = memory_root()
+def get_memory(
+    goal: str | None = None,
+    *,
+    fallback_root: str | Path | None = None,
+) -> Memory:
+    root = memory_root(fallback_root=fallback_root)
     # Gemini key + AGENT_MEMORY_PROVIDER from cursor install.
     from agent_memory.cursor.install import apply_credentials_env
 

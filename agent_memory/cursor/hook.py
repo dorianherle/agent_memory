@@ -97,9 +97,28 @@ def _memory_rule_text(memory) -> str:
         return ""
 
 
-def handle(event: str, data: dict) -> dict:
-    memory = get_memory()
+def _payload_root(data: dict) -> str | None:
+    roots = data.get("workspace_roots")
+    if isinstance(roots, list):
+        for candidate in roots:
+            if isinstance(candidate, str) and candidate.strip():
+                return candidate.strip()
+    for key in ("workspace_root", "cwd"):
+        val = data.get(key)
+        if isinstance(val, str) and val.strip():
+            return val.strip()
+    return None
 
+
+def handle(event: str, data: dict) -> dict:
+    memory = get_memory(fallback_root=_payload_root(data))
+    try:
+        return _handle_with_memory(event, data, memory)
+    finally:
+        memory.close()
+
+
+def _handle_with_memory(event: str, data: dict, memory) -> dict:
     if event == "sessionStart":
         sid = _session_id(data) or data.get("session_id")
         agent = lookup_session_agent(memory._git_dir, sid) or DEFAULT_AGENT
@@ -121,7 +140,15 @@ def handle(event: str, data: dict) -> dict:
         state_block = ""
         try:
             if memory._git_dir.exists() and memory.state():
-                packet = memory.render_packet()
+                query = next(
+                    (
+                        str(data[k]).strip()
+                        for k in ("prompt", "query", "message", "text")
+                        if isinstance(data.get(k), str) and str(data[k]).strip()
+                    ),
+                    None,
+                )
+                packet = memory.render_packet(query)
                 if packet.strip():
                     state_block = f"\n\n# MEMORY STATE\n{packet}"
         except Exception:
@@ -178,7 +205,7 @@ def handle(event: str, data: dict) -> dict:
                     mcp_tools=mcp_tools_catalog(),
                 )
                 memory.write_live_html()
-            except Exception:
+            except (Exception, SystemExit):
                 pass
         return {
             "continue": True,
@@ -275,7 +302,7 @@ def main() -> None:
         event = sys.argv[1]
     try:
         _emit(handle(event, data))
-    except Exception as error:
+    except (Exception, SystemExit) as error:
         # Fail open: never block the agent loop on memory errors.
         sys.stderr.write(f"agent-memory hook error: {error}\n")
         _emit({})

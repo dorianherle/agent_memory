@@ -166,6 +166,12 @@ class Catalog:
     def close(self) -> None:
         self.connection.close()
 
+    def __del__(self) -> None:
+        try:
+            self.connection.close()
+        except Exception:
+            pass
+
     @locked
     def is_empty(self) -> bool:
         row = self.connection.execute("SELECT 1 FROM memories LIMIT 1").fetchone()
@@ -363,7 +369,12 @@ class Catalog:
             ordering = "memories.sequence DESC"
         if fts_query is not None:
             raw_words = re.findall(r"\w+", fts_query)
-            words = [w for w in raw_words if w.lower() not in _FTS_STOP] or raw_words
+            expanded: list[str] = []
+            for token in raw_words:
+                expanded.append(token)
+                if "_" in token:
+                    expanded.extend(part for part in token.split("_") if part)
+            words = [w for w in expanded if w.lower() not in _FTS_STOP] or expanded
             if not words:
                 token = fts_query.strip()
                 if not token:

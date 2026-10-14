@@ -317,8 +317,13 @@ def _run_action(memory: Memory, arguments: dict) -> str:
             branch=branch,
         )
         used_substring = memory._find_used_substring
+        full = bool(arguments.get("full"))
         if not explicit:
-            items = [item for item in items if not _transcript(item)]
+            items = [
+                item
+                for item in items
+                if not _transcript(item) or (full and item.payload.get("goal"))
+            ]
             covered_by = {}
             if branch == "current":
                 for state_item in memory.state():

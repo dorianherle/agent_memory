@@ -121,13 +121,9 @@ class MemoryEnhancedOpenAI:
                     current_prompt = message["content"]
                     self.memory.ensure_goal(current_prompt)
                 break
-        state_text = self.memory.render_packet(current_prompt)
         messages = [
             {"role": "system", "content": MEMORY_INSTRUCTIONS},
-            {
-                "role": "system",
-                "content": f"MEMORY STATE\n{state_text}",
-            },
+            {"role": "system", "content": ""},
             *messages,
         ]
         tools = MEMORY_TOOLS + list(tools or [])
@@ -150,11 +146,15 @@ class MemoryEnhancedOpenAI:
             ):
                 for call in calls:
                     if call.function.name == MEMORY_TOOL_NAME:
-                        call_tool(
+                        result = call_tool(
                             self.memory,
                             call.function.name,
                             json.loads(call.function.arguments),
                         )
+                        try:
+                            call.output = result
+                        except Exception:
+                            pass
                 return response
             messages.append(message)
             for call in calls:

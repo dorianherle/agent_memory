@@ -48,7 +48,7 @@ def mcp_tools_catalog() -> str:
             lines.append(doc)
             lines.append("")
         return "\n".join(lines).rstrip() + "\n"
-    except Exception as error:
+    except (Exception, SystemExit) as error:
         return f"(could not load MCP catalog: {error})\n"
 
 

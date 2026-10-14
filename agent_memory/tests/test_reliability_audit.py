@@ -147,3 +147,66 @@ class ExactNoteStorageTests(MemoryTestCase):
             item_id = self.memory.save('Saved offline without API key')
             self.assertTrue(item_id)
 
+    def test_deleted_mentioned_file_and_unique_basename_mark_note_stale(self):
+        pkg = self.path / 'src'
+        pkg.mkdir(parents=True, exist_ok=True)
+        ep = pkg / 'test_episodes.py'
+        ep.write_text('assert True\n')
+        self.memory.save('Added episode test suite')
+        note = self.memory.save('Verified: test_episodes.py passes 14 checks')
+        self.assertNotIn(note, self.memory._stale_ids([ self.memory.find(ids=note)[0] ]))
+        ep.unlink()
+        self.memory.save('Removed obsolete episode suite')
+        self.assertIn(note, self.memory._stale_ids([ self.memory.find(ids=note)[0] ]))
+
+    def test_branch_refuses_dirty_worktree_without_clobbering_edits(self):
+        first = self.save('first')
+        self.save('second')
+        self.file.write_text('uncommitted-wip')
+        with self.assertRaisesRegex(RuntimeError, 'save current changes before branching'):
+            self.memory.branch(first, 'retry', summary='try again')
+        self.assertEqual(self.file.read_text(), 'uncommitted-wip')
+
+    def test_delete_and_close_questions_do_not_steal_uncommitted_files(self):
+        noise = self.save('noise')
+        q_id = self.memory.open_question('Is cache warm?')
+        self.file.write_text('important-code-change')
+        self.memory.delete(noise)
+        self.memory.close_questions([q_id])
+        checkpoint = self.memory.save('Real checkpoint for code change')
+        self.assertIn('work.txt', self.memory._committed_files(checkpoint))
+
+    def test_ensure_goal_captures_polite_and_mid_sentence_steering(self):
+        self.memory.ensure_goal('Build the auth service')
+        self.assertIsNotNone(self.memory.ensure_goal('wait also clean the readme'))
+        self.assertIsNotNone(self.memory.ensure_goal('Please never touch the migration files'))
+        self.assertIsNotNone(self.memory.ensure_goal('Fix the login bug. Important: do not break v1 tokens'))
+        self.assertIsNone(self.memory.ensure_goal('What did we discuss earlier?'))
+
+    def test_hook_respects_workspace_roots_and_survives_missing_mcp(self):
+        import os
+        from unittest.mock import patch
+        from agent_memory import Memory
+        from agent_memory.cursor.hook import handle
+
+        with patch.dict(os.environ, {}, clear=False):
+            os.environ.pop('AGENT_MEMORY_ROOT', None)
+            with patch('agent_memory.cursor.mcp._build_server', side_effect=SystemExit('no mcp')):
+                out = handle(
+                    'beforeSubmitPrompt',
+                    {'workspace_roots': [str(self.path)], 'prompt': 'Ship workspace_roots fix'},
+                )
+        self.assertTrue(out.get('continue'))
+        with Memory(self.path) as mem:
+            self.assertEqual([item.message for item in mem.state()], ['Ship workspace_roots fix'])
+
+    def test_find_full_includes_matching_goal_note(self):
+        goal = self.memory.save_user('Migrate billing database to Postgres 16 with JWT leeway 30s\nDetails: strict schema')
+        self.memory.save('Auth service uses JWT with 30s leeway')
+        default_out = self.memory.call('memory', {'action': 'find', 'query': 'JWT leeway'})
+        full_out = self.memory.call('memory', {'action': 'find', 'query': 'JWT leeway', 'full': True})
+        self.assertNotIn(goal[:8], default_out)
+        self.assertIn(goal[:8], full_out)
+        self.assertIn('Details: strict schema', full_out)
+
+
