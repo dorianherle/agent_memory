@@ -2,7 +2,7 @@
 
 ![agent-memory](docs/assets/banner.png)
 
-**[📄 Read the Paper (PDF)](paper/agent_memory_paper.pdf)** · **[📖 Paper (Markdown)](paper/PAPER.md)** · **[⚡ Install](#install)** · **[🛠️ How to Use](#how-to-use)** · **[🏆 Benchmarks](#benchmark-results)**
+**[📘 General Overview (PDF)](paper/agent_memory_overview.pdf)** · **[📄 Technical Paper (PDF)](paper/agent_memory_paper.pdf)** · **[📖 Paper (Markdown)](paper/PAPER.md)** · **[⚡ Install](#install)** · **[🛠️ How to Use](#how-to-use)** · **[🏆 Benchmarks](#benchmark-results)**
 
 *Author: **Dorian Herle** (`herle.dorian@gmail.com`)*
 
@@ -130,9 +130,8 @@ with Agent.create(
 
 ## Paper & Citation
 
-- **PDF Paper:** [`paper/agent_memory_paper.pdf`](paper/agent_memory_paper.pdf)
-- **Markdown Paper:** [`paper/PAPER.md`](paper/PAPER.md)
-- **LaTeX Source:** [`paper/agent_memory_paper.tex`](paper/agent_memory_paper.tex)
+- **General Audience Overview (PDF):** [`paper/agent_memory_overview.pdf`](paper/agent_memory_overview.pdf) ([LaTeX Source](paper/agent_memory_overview.tex)) — *"Giving AI Assistants a Reliable Notebook"*
+- **Technical Paper (PDF):** [`paper/agent_memory_paper.pdf`](paper/agent_memory_paper.pdf) ([LaTeX Source](paper/agent_memory_paper.tex) · [Markdown](paper/PAPER.md)) — *"Agent Memory: Deterministic Bounded State Packets, Git-Snapshot Lineage, and Consecutive Compression for Long-Horizon AI Agents"*
 
 ```bibtex
 @article{herle2026agentmemory,
