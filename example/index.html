@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CHRONO BREAKER — Ralph Loop (New Empty Codex Agents + agent-memory)</title>
+  <style>
+    :root {
+      --bg: #070913;
+      --panel: #0e1326;
+      --panel-2: #131a33;
+      --border: #23305d;
+      --text: #e8eeff;
+      --muted: #8ea0cf;
+      --cyan: #22d3ee;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --red: #f43f5e;
+      --purple: #a855f7;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(circle at 50% 0%, #131c3d 0%, var(--bg) 70%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      padding: 16px 20px 36px;
+    }
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      background: rgba(14, 19, 38, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+    }
+    .title-block h1 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge-sdk {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(34, 211, 238, 0.14);
+      color: var(--cyan);
+      border: 1px solid rgba(34, 211, 238, 0.35);
+    }
+    .title-block p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .mode-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 9px;
+      font-size: 12.5px;
+      font-weight: 600;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+    .btn:hover {
+      border-color: var(--cyan);
+      transform: translateY(-1px);
+    }
+    .btn.active {
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.22), rgba(168, 85, 247, 0.22));
+      border-color: var(--cyan);
+      color: #fff;
+      box-shadow: 0 0 18px rgba(34, 211, 238, 0.25);
+    }
+    .btn.action-emp {
+      background: linear-gradient(135deg, #0891b2, #7c3aed);
+      border-color: #38bdf8;
+      color: #fff;
+    }
+    .btn.action-parry {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: var(--green);
+      color: #6ee7b7;
+    }
+
+    /* Controls & Demo Action Bar */
+    .control-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 16px;
+      background: rgba(19, 26, 51, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 14px;
+    }
+    .control-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+    .hint-pill {
+      font-size: 12px;
+      color: var(--muted);
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    /* Stage selector bar (visible in single-stage mode or to inspect stages) */
+    .stage-strip {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .stage-card {
+      cursor: pointer;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      transition: all 0.15s ease;
+      position: relative;
+    }
+    .stage-card:hover {
+      border-color: var(--cyan);
+    }
+    .stage-card.selected {
+      border-color: var(--cyan);
+      background: linear-gradient(180deg, rgba(34, 211, 238, 0.14), rgba(14, 19, 38, 0.95));
+      box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+    }
+    .stage-card.amnesiac.selected {
+      border-color: var(--red);
+      background: linear-gradient(180deg, rgba(244, 63, 94, 0.16), rgba(14, 19, 38, 0.95));
+    }
+    .stage-card .st-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .stage-card .st-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .stage-card .st-desc {
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .pass-pill {
+      padding: 2px 6px;
+      border-radius: 99px;
+      font-size: 10.5px;
+      font-weight: 700;
+    }
+    .pass-pill.good { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .pass-pill.mid { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .pass-pill.bad { background: rgba(244, 63, 94, 0.2); color: #fb7185; }
+
+    /* Arenas Grid */
+    .arenas-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .arenas-container.single-view {
+      grid-template-columns: 1.35fr 0.65fr;
+    }
+    .arena-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+    }
+    .arena-box.with-mem {
+      border-color: rgba(16, 185, 129, 0.55);
+    }
+    .arena-box.without-mem {
+      border-color: rgba(244, 63, 94, 0.55);
+    }
+    .arena-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .arena-title {
+      font-size: 14px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .dot.green { background: var(--green); box-shadow: 0 0 10px var(--green); }
+    .dot.red { background: var(--red); box-shadow: 0 0 10px var(--red); }
+    .hud-row {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+    }
+    .hud-stat {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 5px 8px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .hud-stat .k {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: block;
+    }
+    .hud-stat .v {
+      font-size: 13.5px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+    canvas.game-canvas {
+      width: 100%;
+      aspect-ratio: 760 / 520;
+      background: #050711;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: block;
+    }
+    .arena-footer {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 2px;
+    }
+
+    /* Bottom Inspector Grid */
+    .inspector-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .card h3 {
+      font-size: 13.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--cyan);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .rule-item {
+      padding: 9px 11px;
+      border-radius: 9px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      transition: all 0.15s ease;
+    }
+    .rule-item.firing {
+      border-color: var(--green);
+      background: rgba(16, 185, 129, 0.14);
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.2);
+    }
+    .rule-item .r-head {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+    .rule-item code {
+      font-family: "JetBrains Mono", "SF Mono", Menlo, monospace;
+      font-size: 11px;
+      color: #a5b4fc;
+    }
+    pre.packet-box {
+      background: #060914;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 9px;
+      padding: 10px;
+      font-family: "JetBrains Mono", "SF Mono", Menlo, monospace;
+      font-size: 11.5px;
+      line-height: 1.45;
+      color: #cbd5e1;
+      white-space: pre-wrap;
+      max-height: 290px;
+      overflow-y: auto;
+    }
+    .mcp-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      max-height: 290px;
+      overflow-y: auto;
+    }
+    .mcp-call {
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: #080c1b;
+      border-left: 3px solid var(--cyan);
+      font-size: 11.5px;
+    }
+    .mcp-call .m-tool {
+      font-family: "JetBrains Mono", "SF Mono", Menlo, monospace;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+    .mcp-call .m-res {
+      color: var(--muted);
+      margin-top: 3px;
+      font-family: "JetBrains Mono", "SF Mono", Menlo, monospace;
+      font-size: 11px;
+      white-space: pre-wrap;
+    }
+    .check-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .check-table th, .check-table td {
+      padding: 6px 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      text-align: left;
+    }
+    .check-table th {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+    @media (max-width: 1100px) {
+      .arenas-container, .arenas-container.single-view, .inspector-grid {
+        grid-template-columns: 1fr;
+      }
+      .stage-strip {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title-block">
+      <h1>
+        <span>🛡️ CHRONO BREAKER: RALPH LOOP ARENA</span>
+        <span class="badge-sdk">@openai/codex-sdk + agent-memory MCP</span>
+      </h1>
+      <p>
+        Built across 3 iterations by <strong>brand-new, empty Codex SDK agents</strong>. Cross-turn specs (`Stage 2 Open Question` &amp; `Stage 3 User Steering`) lived <strong>exclusively inside `.agent_memory`</strong>.
+      </p>
+    </div>
+    <div class="mode-tabs">
+      <button id="btnSplitMode" class="btn active" onclick="setViewMode('split')">
+        ⚡ Split-Screen: WITH vs WITHOUT Memory
+      </button>
+      <button id="btnSingleMode" class="btn" onclick="setViewMode('single')">
+        🕹️ Time-Travel Stage Explorer (Stages 0 → 3)
+      </button>
+      <a class="btn" href=".agent_memory/live/index.html" target="_blank">
+        📒 Open .agent_memory Live Notebook ↗
+      </a>
+    </div>
+  </div>
+
+  <!-- Interactive Demo Action Bar -->
+  <div class="control-bar">
+    <div class="control-group">
+      <button class="btn action-emp" onclick="triggerDemoOverdrive()">
+        ⚡ [SPACE] Test Chrono-Overdrive &amp; EMP Blast Now
+      </button>
+      <button class="btn action-parry" onclick="triggerDemoParry()">
+        🛡️ [P] Test Perfect Dash-Parry Now
+      </button>
+      <button id="btnPilot" class="btn active" onclick="toggleAutoPilot()">
+        🤖 [A] AI Auto-Pilot: ON
+      </button>
+      <button class="btn" onclick="resetArenas()">
+        🔄 [R] Reset Arena
+      </button>
+    </div>
+    <div class="control-group">
+      <span class="hint-pill">Manual Controls: <strong>Mouse</strong> or <strong>← / → / A / D</strong> to Steer · <strong>Shift</strong> Dash-Parry · <strong>Space</strong> Chrono-Overdrive</span>
+    </div>
+  </div>
+
+  <!-- 5 Stage Timeline Strip -->
+  <div class="stage-strip" id="stageStrip"></div>
+
+  <!-- Main Arenas Container -->
+  <div class="arenas-container" id="arenasContainer">
+    <!-- Left / Primary Arena -->
+    <div class="arena-box with-mem" id="leftArenaBox">
+      <div class="arena-header">
+        <div class="arena-title">
+          <span class="dot green" id="leftDot"></span>
+          <span id="leftTitle">Stage 3A: @ralph-agent-3 (WITH agent-memory)</span>
+        </div>
+        <span class="pass-pill good" id="leftBadge">7/7 Checks Passing</span>
+      </div>
+      <div class="hud-row" id="leftHud"></div>
+      <canvas id="leftCanvas" class="game-canvas" width="760" height="520"></canvas>
+      <div class="arena-footer">
+        <span id="leftDesc">Read `## Steering` from `# MEMORY STATE` → Chrono-Overdrive (0.3x slow-mo), EMP Mine Wipe &amp; Perfect Parry active!</span>
+        <strong id="leftEvent" style="color: var(--cyan);">EVENT: init</strong>
+      </div>
+    </div>
+
+    <!-- Right / Comparison Arena (or Stage Inspector in single mode) -->
+    <div class="arena-box without-mem" id="rightArenaBox">
+      <div class="arena-header">
+        <div class="arena-title">
+          <span class="dot red" id="rightDot"></span>
+          <span id="rightTitle">Stage 3B: @amnesiac-agent-3 (WITHOUT agent-memory)</span>
+        </div>
+        <span class="pass-pill bad" id="rightBadge">3/7 Checks (Missed Steering!)</span>
+      </div>
+      <div class="hud-row" id="rightHud"></div>
+      <canvas id="rightCanvas" class="game-canvas" width="760" height="520"></canvas>
+      <div class="arena-footer">
+        <span id="rightDesc">Spawned with the EXACT same Iteration 3 prompt but no `# MEMORY STATE` → Blind to `## Steering` (Overdrive &amp; Parry fail!)</span>
+        <strong id="rightEvent" style="color: #fb7185;">EVENT: init</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Live Inspector -->
+  <div class="inspector-grid">
+    <!-- Column 1: Live Task Model & Stage Verification Matrix -->
+    <div class="card">
+      <h3>
+        <span>🧮 Live Executable Task Model (`memory_model`)</span>
+        <span class="pass-pill good">60 FPS Eval</span>
+      </h3>
+      <div id="liveRulesList" style="display:flex; flex-direction:column; gap:7px;"></div>
+      <h3 style="margin-top:8px;">
+        <span>✅ Automated Stage Verification Matrix</span>
+      </h3>
+      <table class="check-table" id="checkMatrixTable"></table>
+    </div>
+
+    <!-- Column 2: Injected # MEMORY STATE Packet -->
+    <div class="card">
+      <h3>
+        <span>📥 Injected `# MEMORY STATE` Packet</span>
+        <span id="packetAgentLabel" class="badge-sdk">ralph-agent-3</span>
+      </h3>
+      <pre class="packet-box" id="packetBox"></pre>
+    </div>
+
+    <!-- Column 3: MCP Tool Calls Made by Selected Fresh Agent -->
+    <div class="card">
+      <h3>
+        <span>🧠 Fresh Agent MCP Tool Calls (`agent_memory`)</span>
+        <span id="mcpCountBadge" class="badge-sdk">0 calls</span>
+      </h3>
+      <div class="mcp-list" id="mcpList"></div>
+    </div>
+  </div>
+
+  <script src="ralph_data.js"></script>
+  <script>
+    // Compile any stage's game_logic.js string into a live isolated module instance
+    function compileStageModule(codeStr) {
+      const mod = { exports: {} };
+      const fn = new Function("module", "exports", codeStr);
+      fn(mod, mod.exports);
+      return mod.exports;
+    }
+
+    const DATA = window.RALPH_DATA;
+    const STAGE_ORDER = [
+      "stage0",
+      "stage1",
+      "stage2",
+      "stage3_with_memory",
+      "stage3_without_memory",
+    ];
+
+    const compiledModules = {};
+    for (const key of STAGE_ORDER) {
+      compiledModules[key] = compileStageModule(DATA.stages[key].code);
+    }
+
+    let viewMode = "split"; // 'split' | 'single'
+    let selectedStageKey = "stage3_with_memory";
+    let autoPilot = true;
+    const keys = { left: false, right: false, dash: false, overdrive: false };
+    let mouseX = null;
+
+    function createSimInstance(stageKey) {
+      const api = compiledModules[stageKey];
+      const state = api.createState();
+      state.ball.vx = 3.4;
+      state.ball.vy = -5.0;
+      return {
+        stageKey,
+        api,
+        state,
+        particles: [],
+        shockwaves: [],
+        floatingTexts: [],
+        parryFlash: 0,
+        failedOverdriveFlash: 0,
+      };
+    }
+
+    let leftSim = createSimInstance("stage3_with_memory");
+    let rightSim = createSimInstance("stage3_without_memory");
+
+    function spawnParticles(sim, x, y, color, count = 14, speed = 4) {
+      for (let i = 0; i < count; i++) {
+        const ang = (Math.PI * 2 * i) / count + Math.random() * 0.4;
+        const spd = (0.4 + Math.random() * 0.8) * speed;
+        sim.particles.push({
+          x,
+          y,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd,
+          life: 24 + Math.floor(Math.random() * 14),
+          maxLife: 38,
+          color,
+        });
+      }
+    }
+
+    function addBanner(sim, text, x, y, color = "#22d3ee") {
+      sim.floatingTexts.push({ text, x, y, color, life: 48 });
+    }
+
+    function computeAutoPilotInput(sim) {
+      const s = sim.state;
+      const p = s.paddle;
+      const b = s.ball;
+
+      // Predict where ball or closest threatening mine is
+      let targetX = b.x + b.vx * 5;
+      // Add slight deliberate offset so angled shield bounces aim toward boss/bricks
+      const aimOffset = Math.sin(s.tick * 0.05) * 24;
+      targetX += aimOffset;
+
+      // Dodge falling mines that are about to hit paddle unless we can EMP them
+      for (const m of s.mines) {
+        if (m.y > p.y - 95 && m.y < p.y + 15 && Math.abs(m.x - p.x) < p.w * 0.68) {
+          targetX = m.x < stateCenter(s) ? m.x + 95 : m.x - 95;
+        }
+      }
+
+      const diff = targetX - p.x;
+      const input = {
+        left: diff < -6,
+        right: diff > 6,
+        dash: false,
+        overdrive: false,
+      };
+
+      // Trigger dash right as ball approaches paddle to score Perfect Parries!
+      if (
+        b.vy > 0 &&
+        b.y + b.r >= p.y - 26 &&
+        b.y - b.r <= p.y + 8 &&
+        Math.abs(b.x - p.x) <= p.w * 0.65
+      ) {
+        input.dash = true;
+      }
+
+      // Automatically fire Chrono-Overdrive when ready and mines or boss armor exist
+      if (s.combo >= 3 && s.energy >= 40 && s.overdriveTimer <= 0 && (s.mines.length > 0 || s.tick % 90 === 0)) {
+        input.overdrive = true;
+      }
+      return input;
+    }
+
+    function stateCenter(s) {
+      return s.width / 2;
+    }
+
+    function stepArena(sim) {
+      const s = sim.state;
+      let input;
+      if (autoPilot) {
+        input = computeAutoPilotInput(sim);
+      } else {
+        input = {
+          left: keys.left,
+          right: keys.right,
+          dash: keys.dash,
+          overdrive: keys.overdrive,
+        };
+        if (mouseX !== null) {
+          const dx = mouseX - s.paddle.x;
+          input.left = dx < -6;
+          input.right = dx > 6;
+        }
+      }
+
+      const prevEvent = s.lastEvent;
+      const prevMines = s.mines.length;
+      const prevArmor = s.boss.armor.filter(Boolean).length;
+      const prevHp = s.boss.hp;
+      const prevLives = s.lives;
+      const wantedOverdrive = Boolean(input.overdrive && s.combo >= 3 && s.energy >= 40);
+
+      sim.api.stepFrame(s, input);
+
+      // Keep ball moving horizontally if stuck purely vertical in Stage 0
+      if (Math.abs(s.ball.vx) < 0.05 && s.tick % 120 === 0 && sim.stageKey === "stage0") {
+        s.ball.vx = 2.5;
+      }
+
+      // Visual FX triggers based on state transitions
+      if (s.lastEvent !== prevEvent || wantedOverdrive) {
+        if (s.lastEvent === "overdrive_emp") {
+          sim.shockwaves.push({ x: s.paddle.x, y: s.paddle.y, r: 16, maxR: 620, color: "#22d3ee" });
+          spawnParticles(sim, s.boss.x, s.boss.y, "#22d3ee", 28, 6);
+          addBanner(sim, "⚡ CHRONO-OVERDRIVE 0.3x + EMP BLAST!", s.width / 2, 250, "#22d3ee");
+        } else if (wantedOverdrive && s.lastEvent !== "overdrive_emp") {
+          sim.failedOverdriveFlash = 25;
+          addBanner(sim, "❌ OVERDRIVE UNIMPLEMENTED (NO MEMORY OF STEERING!)", s.width / 2, 250, "#f43f5e");
+        } else if (s.lastEvent === "perfect_parry") {
+          sim.parryFlash = 16;
+          spawnParticles(sim, s.ball.x, s.paddle.y - 8, "#10b981", 20, 5);
+          addBanner(sim, "🛡️ PERFECT PARRY! +25 ENERGY +2 COMBO", s.paddle.x, s.paddle.y - 34, "#34d399");
+        } else if (s.lastEvent === "brick_hit") {
+          spawnParticles(sim, s.ball.x, s.ball.y, "#a855f7", 12, 3.5);
+        } else if (s.lastEvent === "armor_shattered" || s.boss.armor.filter(Boolean).length < prevArmor) {
+          spawnParticles(sim, s.boss.x, s.boss.y, "#f59e0b", 24, 5.5);
+          addBanner(sim, "💥 BOSS ARMOR SHATTERED!", s.boss.x, s.boss.y + 52, "#fbbf24");
+        } else if (s.lastEvent === "boss_core_hit" || s.boss.hp < prevHp) {
+          spawnParticles(sim, s.boss.x, s.boss.y, "#f43f5e", 26, 6);
+          addBanner(sim, "🔥 BOSS CORE HIT! -20 HP", s.boss.x, s.boss.y + 52, "#fb7185");
+        }
+      }
+
+      if (s.lives < prevLives) {
+        spawnParticles(sim, s.paddle.x, s.paddle.y, "#f43f5e", 24, 5.5);
+        addBanner(sim, s.lastEvent === "mine_hit_paddle" ? "💣 MINE HIT PADDLE! -1 LIFE" : "⚠️ BALL LOST! -1 LIFE", s.paddle.x, s.paddle.y - 35, "#f43f5e");
+      }
+
+      // Respawn bricks or boss HP if cleared so demo runs continuously
+      if (s.bricks.every((b) => !b.alive)) {
+        for (const b of s.bricks) b.alive = true;
+        s.boss.armor = [true, true, true, true];
+      }
+      if (s.boss.hp <= 0) {
+        s.boss.hp = 100;
+        s.boss.armor = [true, true, true, true];
+        addBanner(sim, "🏆 BOSS DEFEATED! RESPAWNING WAVE...", s.width / 2, 220, "#10b981");
+      }
+    }
+
+    function renderArena(sim, canvas) {
+      const ctx = canvas.getContext("2d");
+      const s = sim.state;
+
+      ctx.save();
+      // Background with bullet-time tint when overdriveTimer > 0
+      if (s.overdriveTimer > 0) {
+        ctx.fillStyle = "#041624";
+      } else if (sim.failedOverdriveFlash > 0) {
+        ctx.fillStyle = "#230814";
+        sim.failedOverdriveFlash--;
+      } else {
+        ctx.fillStyle = "#050814";
+      }
+      ctx.fillRect(0, 0, s.width, s.height);
+
+      // Subtle tactical grid
+      ctx.strokeStyle = s.overdriveTimer > 0 ? "rgba(34, 211, 238, 0.11)" : "rgba(142, 160, 207, 0.05)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x < s.width; x += 40) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, s.height); ctx.stroke();
+      }
+      for (let y = 0; y < s.height; y += 40) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(s.width, y); ctx.stroke();
+      }
+
+      // Chrono-Overdrive active banner in canvas
+      if (s.overdriveTimer > 0) {
+        ctx.fillStyle = "rgba(34, 211, 238, 0.14)";
+        ctx.fillRect(0, 0, s.width, 28);
+        ctx.fillStyle = "#22d3ee";
+        ctx.font = "bold 12px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(`⏱️ CHRONO-OVERDRIVE BULLET-TIME ACTIVE (timeScale=${s.timeScale.toFixed(2)}x · ${s.overdriveTimer}f left)`, s.width / 2, 18);
+      }
+
+      // Draw Boss & Rotating Armor Segments
+      const boss = s.boss;
+      const armorCount = boss.armor.filter(Boolean).length;
+      for (let i = 0; i < 4; i++) {
+        if (!boss.armor[i]) continue;
+        const startAng = boss.angle + i * (Math.PI / 2) + 0.12;
+        const endAng = startAng + Math.PI / 2 - 0.24;
+        ctx.beginPath();
+        ctx.arc(boss.x, boss.y, boss.r + 9, startAng, endAng);
+        ctx.strokeStyle = "#f59e0b";
+        ctx.lineWidth = 6;
+        ctx.shadowColor = "#f59e0b";
+        ctx.shadowBlur = 10;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      }
+
+      // Boss Core
+      ctx.beginPath();
+      ctx.arc(boss.x, boss.y, boss.r, 0, Math.PI * 2);
+      ctx.fillStyle = armorCount === 0 ? "#f43f5e" : "#312e81";
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = armorCount === 0 ? "#fda4af" : "#818cf8";
+      ctx.stroke();
+
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 11px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(`BOSS ${boss.hp}HP`, boss.x, boss.y + 4);
+
+      // Draw Bricks
+      for (const b of s.bricks) {
+        if (!b.alive) continue;
+        ctx.fillStyle = "rgba(99, 102, 241, 0.28)";
+        ctx.strokeStyle = "#818cf8";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(b.x - b.w / 2, b.y - b.h / 2, b.w, b.h, 4);
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      // Draw Homing Mines
+      for (const m of s.mines) {
+        ctx.beginPath();
+        ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
+        ctx.fillStyle = "#f43f5e";
+        ctx.shadowColor = "#f43f5e";
+        ctx.shadowBlur = 10;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = "#fecdd3";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      // Draw Curved Shield Paddle
+      const p = s.paddle;
+      ctx.save();
+      ctx.beginPath();
+      ctx.roundRect(p.x - p.w / 2, p.y - p.h / 2, p.w, p.h, 7);
+      ctx.fillStyle = p.dashTimer > 0 || sim.parryFlash > 0 ? "#10b981" : "#22d3ee";
+      ctx.shadowColor = p.dashTimer > 0 ? "#10b981" : "#22d3ee";
+      ctx.shadowBlur = p.dashTimer > 0 ? 18 : 10;
+      ctx.fill();
+      ctx.restore();
+      if (sim.parryFlash > 0) sim.parryFlash--;
+
+      // Draw Ball
+      const b = s.ball;
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+      ctx.fillStyle = "#ffffff";
+      ctx.shadowColor = "#38bdf8";
+      ctx.shadowBlur = 14;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Draw EMP Shockwaves
+      for (let i = sim.shockwaves.length - 1; i >= 0; i--) {
+        const sw = sim.shockwaves[i];
+        sw.r += 18;
+        const alpha = Math.max(0, 1 - sw.r / sw.maxR);
+        ctx.beginPath();
+        ctx.arc(sw.x, sw.y, sw.r, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(34, 211, 238, ${alpha})`;
+        ctx.lineWidth = 4;
+        ctx.stroke();
+        if (sw.r >= sw.maxR) sim.shockwaves.splice(i, 1);
+      }
+
+      // Draw Particles
+      for (let i = sim.particles.length - 1; i >= 0; i--) {
+        const pt = sim.particles[i];
+        pt.x += pt.vx;
+        pt.y += pt.vy;
+        pt.life -= 1;
+        const alpha = Math.max(0, pt.life / pt.maxLife);
+        ctx.fillStyle = pt.color;
+        ctx.globalAlpha = alpha;
+        ctx.fillRect(pt.x - 2, pt.y - 2, 4, 4);
+        ctx.globalAlpha = 1;
+        if (pt.life <= 0) sim.particles.splice(i, 1);
+      }
+
+      // Draw Floating Event Banners
+      for (let i = sim.floatingTexts.length - 1; i >= 0; i--) {
+        const ft = sim.floatingTexts[i];
+        ft.y -= 0.7;
+        ft.life -= 1;
+        ctx.globalAlpha = Math.min(1, ft.life / 20);
+        ctx.font = "bold 13px Inter, sans-serif";
+        ctx.fillStyle = ft.color;
+        ctx.textAlign = "center";
+        ctx.fillText(ft.text, ft.x, ft.y);
+        ctx.globalAlpha = 1;
+        if (ft.life <= 0) sim.floatingTexts.splice(i, 1);
+      }
+
+      ctx.restore();
+    }
+
+    function renderHud(sim, hudEl, eventEl) {
+      const s = sim.state;
+      const armorLeft = s.boss.armor.filter(Boolean).length;
+      hudEl.innerHTML = `
+        <div class="hud-stat"><span class="k">Score</span><span class="v">${s.score}</span></div>
+        <div class="hud-stat"><span class="k">Combo</span><span class="v" style="color:${s.combo >= 3 ? '#34d399' : '#e8eeff'}">${s.combo}x</span></div>
+        <div class="hud-stat"><span class="k">Energy</span><span class="v" style="color:${s.energy >= 40 ? '#22d3ee' : '#e8eeff'}">${s.energy}/100</span></div>
+        <div class="hud-stat"><span class="k">Time Scale</span><span class="v" style="color:${s.timeScale < 1 ? '#22d3ee' : '#e8eeff'}">${(s.timeScale || 1).toFixed(2)}x</span></div>
+        <div class="hud-stat"><span class="k">Boss Armor</span><span class="v">${armorLeft}/4 · ${s.boss.hp}HP</span></div>
+        <div class="hud-stat"><span class="k">EMP / Lives</span><span class="v">⚡${s.empBlasts || 0} · ❤️${s.lives}</span></div>
+      `;
+      eventEl.textContent = `LAST EVENT: ${s.lastEvent}`;
+    }
+
+    function updateLiveTaskModelRules(sim) {
+      const s = sim.state;
+      const armorCount = s.boss.armor.filter(Boolean).length;
+      const overdriveAction = sim.api.evaluatePolicy("overdrive", s.combo, s.energy, armorCount);
+      const bossAction = sim.api.evaluatePolicy("boss_strike", s.combo, s.energy, armorCount);
+
+      const rules = [
+        {
+          id: "overdrive_emp_rule",
+          claim: "Activate Chrono-Overdrive + EMP when combo >= 3 and energy >= 40",
+          formula: "when: kind == 'overdrive' and combo >= 3 and energy >= 40 → action = 'activate_emp'",
+          firing: overdriveAction === "activate_emp" || s.overdriveTimer > 0,
+          current: `combo=${s.combo}, energy=${s.energy} → ${overdriveAction}`,
+        },
+        {
+          id: "overdrive_hold_rule",
+          claim: "Hold Overdrive when combo < 3 or energy < 40",
+          formula: "when: kind == 'overdrive' and (combo < 3 or energy < 40) → action = 'hold'",
+          firing: overdriveAction === "hold" && s.overdriveTimer === 0,
+          current: `combo=${s.combo}, energy=${s.energy} → ${overdriveAction}`,
+        },
+        {
+          id: "boss_shatter_armor_rule",
+          claim: "Ball/EMP strikes shatter rotating Boss Armor when armorCount > 0",
+          formula: "when: kind == 'boss_strike' and armorCount > 0 → action = 'shatter_armor'",
+          firing: bossAction === "shatter_armor",
+          current: `armorCount=${armorCount} → ${bossAction}`,
+        },
+        {
+          id: "boss_damage_core_rule",
+          claim: "Strikes damage Boss Core (-20 HP) once all 4 armor segments are shattered",
+          formula: "when: kind == 'boss_strike' and armorCount == 0 → action = 'damage_core'",
+          firing: bossAction === "damage_core",
+          current: `armorCount=${armorCount} → ${bossAction}`,
+        },
+      ];
+
+      const container = document.getElementById("liveRulesList");
+      container.innerHTML = rules
+        .map(
+          (r) => `
+          <div class="rule-item ${r.firing ? "firing" : ""}">
+            <div class="r-head">
+              <span>${r.firing ? "🟢 FIRING" : "⚪ IDLE"} · ${r.id}</span>
+              <span style="color:var(--cyan)">${r.current}</span>
+            </div>
+            <div style="color:var(--muted); margin-bottom:2px;">${r.claim}</div>
+            <code>${r.formula}</code>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    // One-click demo triggers so human can immediately see the difference
+    function triggerDemoOverdrive() {
+      for (const sim of [leftSim, rightSim]) {
+        sim.state.combo = Math.max(4, sim.state.combo);
+        sim.state.energy = Math.max(75, sim.state.energy);
+        if (sim.state.mines.length === 0) {
+          sim.state.mines.push(
+            { x: sim.state.paddle.x - 45, y: 310, vx: 0, vy: 2.2, r: 8, active: true },
+            { x: sim.state.paddle.x + 45, y: 280, vx: 0, vy: 2.2, r: 8, active: true }
+          );
+        }
+        const prevEvent = sim.state.lastEvent;
+        const ok = sim.api.triggerOverdrive(sim.state);
+        if (ok || sim.state.lastEvent === "overdrive_emp") {
+          sim.shockwaves.push({ x: sim.state.paddle.x, y: sim.state.paddle.y, r: 16, maxR: 620, color: "#22d3ee" });
+          spawnParticles(sim, sim.state.boss.x, sim.state.boss.y, "#22d3ee", 30, 6);
+          addBanner(sim, "⚡ CHRONO-OVERDRIVE 0.3x + EMP BLAST!", sim.state.width / 2, 240, "#22d3ee");
+        } else {
+          sim.failedOverdriveFlash = 30;
+          addBanner(sim, "❌ OVERDRIVE FAILED (AMNESIAC AGENT HAD NO STEERING MEMORY!)", sim.state.width / 2, 240, "#f43f5e");
+        }
+      }
+    }
+
+    function triggerDemoParry() {
+      for (const sim of [leftSim, rightSim]) {
+        const s = sim.state;
+        s.paddle.dashTimer = 10;
+        s.ball.x = s.paddle.x + 12;
+        s.ball.y = s.paddle.y - s.paddle.h / 2 - s.ball.r + 1;
+        s.ball.vx = -2;
+        s.ball.vy = Math.abs(s.ball.speed);
+      }
+    }
+
+    function toggleAutoPilot() {
+      autoPilot = !autoPilot;
+      const btn = document.getElementById("btnPilot");
+      btn.textContent = `🤖 [A] AI Auto-Pilot: ${autoPilot ? "ON" : "OFF (Manual)"}`;
+      btn.classList.toggle("active", autoPilot);
+    }
+
+    function resetArenas() {
+      if (viewMode === "split") {
+        leftSim = createSimInstance("stage3_with_memory");
+        rightSim = createSimInstance("stage3_without_memory");
+      } else {
+        leftSim = createSimInstance(selectedStageKey);
+        rightSim = createSimInstance("stage3_without_memory");
+      }
+    }
+
+    function selectStage(stageKey) {
+      selectedStageKey = stageKey;
+      const st = DATA.stages[stageKey];
+      if (viewMode === "single") {
+        leftSim = createSimInstance(stageKey);
+        const passed = Object.values(st.checks).filter(Boolean).length;
+        const total = Object.keys(st.checks).length;
+        document.getElementById("leftTitle").textContent = st.title;
+        document.getElementById("leftBadge").textContent = `${passed}/${total} Checks Passing`;
+        document.getElementById("leftDesc").textContent = st.description;
+      }
+      renderStageStrip();
+      renderInspectorForStage(stageKey);
+    }
+
+    function setViewMode(mode) {
+      viewMode = mode;
+      document.getElementById("btnSplitMode").classList.toggle("active", mode === "split");
+      document.getElementById("btnSingleMode").classList.toggle("active", mode === "single");
+      const rightBox = document.getElementById("rightArenaBox");
+      if (mode === "split") {
+        rightBox.style.display = "flex";
+        leftSim = createSimInstance("stage3_with_memory");
+        rightSim = createSimInstance("stage3_without_memory");
+        document.getElementById("leftTitle").textContent = DATA.stages.stage3_with_memory.title;
+        document.getElementById("leftBadge").textContent = "7/7 Checks Passing";
+        document.getElementById("leftDesc").textContent = DATA.stages.stage3_with_memory.description;
+        selectStage("stage3_with_memory");
+      } else {
+        rightBox.style.display = "none";
+        document.getElementById("arenasContainer").style.gridTemplateColumns = "1fr";
+        selectStage(selectedStageKey);
+      }
+      if (mode === "split") {
+        document.getElementById("arenasContainer").style.gridTemplateColumns = "1fr 1fr";
+      }
+    }
+
+    function renderStageStrip() {
+      const strip = document.getElementById("stageStrip");
+      strip.innerHTML = STAGE_ORDER.map((key) => {
+        const st = DATA.stages[key];
+        const checks = st.checks || {};
+        const passed = Object.values(checks).filter(Boolean).length;
+        const total = Object.keys(checks).length || 6;
+        const pillClass = passed === total ? "good" : passed >= 3 ? "mid" : "bad";
+        const isAmnesiac = key === "stage3_without_memory";
+        return `
+          <div class="stage-card ${isAmnesiac ? "amnesiac" : ""} ${selectedStageKey === key ? "selected" : ""}"
+               onclick="selectStage('${key}')">
+            <div class="st-top">
+              <span>${st.agent}</span>
+              <span class="pass-pill ${pillClass}">${passed}/${total} checks</span>
+            </div>
+            <div class="st-name">${st.title.split("(")[0].trim()}</div>
+            <div class="st-desc">${st.description}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderInspectorForStage(stageKey) {
+      const st = DATA.stages[stageKey];
+      document.getElementById("packetAgentLabel").textContent = `${st.agent}${st.elapsedSec ? ` · ${st.elapsedSec}s` : ""}`;
+      document.getElementById("packetBox").textContent =
+        st.injectedMemoryState || DATA.finalMemory.final_packet;
+
+      const calls = st.mcpCalls || [];
+      document.getElementById("mcpCountBadge").textContent = `${calls.length} MCP calls`;
+      const mcpList = document.getElementById("mcpList");
+      if (calls.length === 0) {
+        mcpList.innerHTML = `<div class="mcp-call" style="border-left-color:var(--red);">
+          <div class="m-tool">No MCP calls in ${st.agent}</div>
+          <div class="m-res">${
+            stageKey === "stage3_without_memory"
+              ? "Amnesiac baseline had no agent-memory MCP server attached, so it could not read ## Steering or ## Open questions."
+              : "Initial stage before any agent ran."
+          }</div>
+        </div>`;
+      } else {
+        mcpList.innerHTML = calls
+          .map(
+            (c) => `
+          <div class="mcp-call">
+            <div class="m-tool">${c.tool}(${JSON.stringify(c.arguments)})</div>
+            <div class="m-res">${(c.result || "").slice(0, 260)}${(c.result || "").length > 260 ? "…" : ""}</div>
+          </div>
+        `
+          )
+          .join("");
+      }
+    }
+
+    function renderCheckMatrix() {
+      const checkNames = [
+        ["angled_shield_bounce", "Stage 1: Curved Shield Deflection"],
+        ["combo_and_energy_on_brick", "Stage 1: Combo & +15 Energy on Brick"],
+        ["boss_rotates_and_spawns_mine", "Stage 2: Boss Rotation & Homing Mines"],
+        ["boss_armor_and_core_phases", "Stage 2: Armor Shatter → Core Damage"],
+        ["perfect_parry", "Stage 3 (Steering): Perfect Dash-Parry"],
+        ["chrono_overdrive_and_emp", "Stage 3 (Steering): 0.3x Overdrive + EMP"],
+        ["policy_model_fn", "Stage 3 (Steering): Task Model Policy"],
+      ];
+      const tbl = document.getElementById("checkMatrixTable");
+      tbl.innerHTML = `
+        <thead>
+          <tr>
+            <th>Capability</th>
+            <th>S0</th>
+            <th>S1</th>
+            <th>S2</th>
+            <th style="color:#34d399">S3 Mem</th>
+            <th style="color:#fb7185">S3 NoMem</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${checkNames
+            .map(
+              ([key, label]) => `
+            <tr>
+              <td>${label}</td>
+              ${STAGE_ORDER.map(
+                (stKey) =>
+                  `<td>${DATA.stages[stKey].checks?.[key] ? "✅" : "❌"}</td>`
+              ).join("")}
+            </tr>
+          `
+            )
+            .join("")}
+        </tbody>
+      `;
+    }
+
+    // Keyboard & Mouse bindings
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
+        if (e.key === "a" || e.key === "A") {
+          toggleAutoPilot();
+          return;
+        }
+        keys.left = true;
+      }
+      if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") keys.right = true;
+      if (e.key === "Shift") keys.dash = true;
+      if (e.key === " ") {
+        e.preventDefault();
+        triggerDemoOverdrive();
+      }
+      if (e.key === "p" || e.key === "P") triggerDemoParry();
+      if (e.key === "r" || e.key === "R") resetArenas();
+    });
+    window.addEventListener("keyup", (e) => {
+      if (e.key === "ArrowLeft") keys.left = false;
+      if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") keys.right = false;
+      if (e.key === "Shift") keys.dash = false;
+    });
+    document.getElementById("leftCanvas").addEventListener("mousemove", (e) => {
+      const rect = e.target.getBoundingClientRect();
+      mouseX = ((e.clientX - rect.left) / rect.width) * 760;
+    });
+
+    // Initialize UI
+    renderStageStrip();
+    renderCheckMatrix();
+    renderInspectorForStage("stage3_with_memory");
+
+    // 60 FPS Main Loop
+    function loop() {
+      stepArena(leftSim);
+      renderArena(leftSim, document.getElementById("leftCanvas"));
+      renderHud(leftSim, document.getElementById("leftHud"), document.getElementById("leftEvent"));
+
+      if (viewMode === "split") {
+        stepArena(rightSim);
+        renderArena(rightSim, document.getElementById("rightCanvas"));
+        renderHud(rightSim, document.getElementById("rightHud"), document.getElementById("rightEvent"));
+      }
+
+      updateLiveTaskModelRules(leftSim);
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
