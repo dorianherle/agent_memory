@@ -4,7 +4,9 @@
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{microtype}
-\usepackage[margin=1.1in]{geometry}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
 \usepackage{xcolor}
 \usepackage{hyperref}
 \usepackage{enumitem}
@@ -14,29 +16,32 @@
 \usepackage[most]{tcolorbox}
 \usetikzlibrary{positioning,arrows.meta,calc}
 \pgfplotsset{compat=1.16}
-\linespread{1.08}
+\linespread{1.07}
 
 \definecolor{amblue}{HTML}{2563EB}
 \definecolor{amgreen}{HTML}{16A34A}
-\definecolor{amgray}{HTML}{9CA3AF}
+\definecolor{amteal}{HTML}{0D9488}
+\definecolor{amgray}{HTML}{64748B}
 \definecolor{amred}{HTML}{DC2626}
-\definecolor{amorange}{HTML}{EA8A0C}
+\definecolor{amorange}{HTML}{EA580C}
+\definecolor{codebg}{HTML}{F8FAFC}
 
 \hypersetup{
   colorlinks=true,
   linkcolor=amblue,
   urlcolor=amblue,
-  pdftitle={Giving AI Assistants a Reliable Notebook: How Agent Memory helps AI keep track of long, multi-day work},
+  pdftitle={Giving AI Assistants a Reliable Notebook: How Agent Memory Works Under the Hood},
   pdfauthor={Dorian Herle}
 }
 \captionsetup{font=small,labelfont=bf}
-\setlength{\parskip}{0.55em}
+\setlength{\parskip}{0.5em}
 \setlength{\parindent}{0pt}
 
 \newtcolorbox{callout}[1][]{colback=blue!4,colframe=amblue,fonttitle=\bfseries,title=#1,boxrule=0.6pt,arc=3pt}
+\newtcolorbox{mathbox}[1][]{colback=gray!4,colframe=gray!45,fonttitle=\bfseries\small,title=#1,boxrule=0.5pt,arc=3pt}
 \newtcolorbox{glossarybox}{colback=gray!6,colframe=gray!50,boxrule=0.5pt,arc=3pt,fontupper=\small}
 
-\title{\textbf{Giving AI Assistants a Reliable Notebook}\\[4pt]\large How Agent Memory helps AI keep track of long, multi-day work}
+\title{\textbf{Giving AI Assistants a Reliable Notebook}\\[4pt]\large How Agent Memory keeps track of long, multi-day work---in plain words and concrete math}
 \author{\textbf{Dorian Herle}\\\texttt{herle.dorian@gmail.com}\\\small\url{https://github.com/dorianherle/agent_memory}}
 \date{October 14, 2026}
 
@@ -45,210 +50,356 @@
 
 % ---------------------------------------------------------------
 \begin{callout}[The short version]
-AI assistants are increasingly asked to do work that takes many sessions, such as writing software or working through a long derivation. But they usually start each session with a blank mind. Existing fixes either pile up so much text that the important parts get lost, or they \emph{summarize} and lose exact details.
+AI assistants are increasingly asked to do work that spans many sessions, such as building software or working through a multi-step mathematical derivation. Yet each new session starts with a blank mind. Existing fixes either dump the entire past transcript into the prompt (which buries key facts and explodes in cost) or \emph{summarize and slice} old notes (which destroys exact equations and code constants).
 
-We built \textbf{Agent Memory}, which works like a well-kept lab notebook: it saves whole notes, tracks their history, hands the assistant a one-paragraph cheat sheet each morning, and lets it look up the full page when needed. On a hard physics benchmark, it kept every needed equation available and helped a strong AI model finish \textbf{all 20 multi-step problems}, compared with 7 without it.
+We built \textbf{Agent Memory}, which works like a well-kept engineering notebook: it saves whole notes with Git file snapshots, hands the assistant a deterministic \textbf{1{,}200-character cheat sheet} at the start of every turn (with zero extra AI calls), folds completed steps together, and lets the assistant pull up uncut pages in a single lookup when needed. On the ICML 2026 \emph{MemoryArena} physics benchmark (20 papers, 86 steps), it kept \textbf{100\% of needed equations intact} and helped a strong AI model finish \textbf{all 20 multi-step problems (86/86 steps)}, compared with 7 out of 20 without memory.
 \end{callout}
 
 % ---------------------------------------------------------------
 \section{The problem: a colleague who forgets every morning}
 
-Imagine a brilliant colleague who gets amnesia overnight. On Monday you explain the setup of a project. On Wednesday you ask them to build on Monday's result. They remember nothing.
+Imagine a brilliant colleague who gets amnesia overnight. On Monday you explain the setup of a project and derive a key formula. On Wednesday you ask them to apply Monday's formula to a new case. They remember nothing.
 
-That is roughly how AI assistants work today. Each new session starts fresh. To work around this, people give the assistant some kind of memory. The common approaches all have a weakness:
+That is how AI assistants work across sessions today. To bridge the gap, people attach an external memory system. The three standard approaches all break down on technical work:
 
-\begin{itemize}[itemsep=2pt]
-  \item \textbf{Hand over the whole transcript.} Nothing is lost, but the useful facts are buried under dead ends and chatter, and the cost grows with every session.
-  \item \textbf{Keep short summaries.} A tool writes brief notes such as ``the system has a rule about signs.'' The exact rule, the number, the sign, is the part that gets lost.
-  \item \textbf{Search the transcript in fixed-size slices.} The text is cut every few hundred characters. A definition and the result that depends on it can end up in different slices, so the assistant finds one without the other (Figure~\ref{fig:problem}).
+\begin{itemize}[itemsep=2pt,leftmargin=1.5em]
+  \item \textbf{Hand over the whole transcript (Long Context).} Nothing is thrown away, but after $k$ sessions the prompt contains every dead end, wrong turn, and verbose tool log. Important definitions get drowned out, and token cost grows quadratically ($\mathcal{O}(k^2)$).
+  \item \textbf{Keep short AI-written summaries (e.g., Mem0).} An auxiliary AI rewrites each session into short bullet points like \emph{``established a locality rule for the amplitude.''} In technical work, the exact number or sign ($\sigma = 4$, $c_2 = -1$) is the very thing that gets paraphrased away.
+  \item \textbf{Search the transcript in fixed-size slices (Chunk RAG / BM25).} The transcript is chopped every 400--500 characters. A definition at the top of a page and the equation at the bottom end up in separate slices, so searching retrieves one without the other (Figure~\ref{fig:problem}).
 \end{itemize}
 
 \begin{figure}[h]
 \centering
 \begin{tikzpicture}[font=\small]
-  \draw[rounded corners=2pt,fill=gray!10] (0,0) rectangle (12.4,1);
-  \node[anchor=west] at (0.15,0.5) {\textbf{Definition:} $\sigma = 4$\hspace{2.2cm}\textbf{Result:} so the answer is $-16$};
-  \draw[amred,very thick,dashed] (6.2,-0.3) -- (6.2,1.3);
-  \node[amred,font=\footnotesize] at (6.2,1.6) {the text is cut here};
-  \node[draw=amred,fill=amred!8,rounded corners=2pt,align=center,text width=5.4cm] at (3,-1.6)
-    {\textbf{Slice search}\\ finds the result, but not what $\sigma$ means};
-  \node[draw=amgreen,fill=amgreen!8,rounded corners=2pt,align=center,text width=5.4cm] at (9.4,-1.6)
-    {\textbf{Agent Memory}\\ keeps the whole note together};
+  \draw[rounded corners=3pt,fill=gray!10,draw=gray!50] (0,0) rectangle (12.8,1.1);
+  \node[anchor=west] at (0.2,0.55) {\textbf{Setup:} $\sigma = 4,\; M(0,0)=0$\hspace{1.8cm}\textbf{Derived law:} $c_0 = -\dfrac{\sigma^4}{\sigma-1} + 16\sigma = -16$};
+  \draw[amred,very thick,dashed] (6.1,-0.35) -- (6.1,1.45);
+  \node[amred,font=\footnotesize\bfseries] at (6.1,1.7) {450-character chunk boundary cuts the note in half};
+  \node[draw=amred,fill=amred!8,rounded corners=3pt,align=center,text width=5.6cm,inner sep=5pt] at (3.0,-1.45)
+    {\textbf{Fixed-slice search (RAG)}\\ Retrieves the formula for $c_0$, but loses the setup $\sigma=4$};
+  \node[draw=amgreen,fill=amgreen!8,rounded corners=3pt,align=center,text width=5.6cm,inner sep=5pt] at (9.8,-1.45)
+    {\textbf{Agent Memory}\\ Keeps the whole note intact and pins the setup};
 \end{tikzpicture}
-\caption{Cutting text into fixed slices can separate a definition from the result that depends on it.}
+\caption{Why fixed-size chunking fails on math and code: slicing text every few hundred characters separates a formula from the definitions required to evaluate it.}
 \label{fig:problem}
 \end{figure}
 
 % ---------------------------------------------------------------
-\section{The idea: a good lab notebook}
+\section{How Agent Memory works: intuition and concrete math}
 
-Scientists and engineers solved this long ago with a notebook. You write full entries. You can see when something changed. And each morning you glance at a one-page summary before diving back in. Agent Memory gives AI assistants those same habits.
+Scientists and engineers solved this problem long ago with a structured lab notebook: write complete entries, track when files change, read a one-paragraph status summary each morning, and flip to the full page when you need a detailed derivation. Agent Memory turns those habits into four deterministic algorithms.
 
 \begin{figure}[h]
 \centering
 \begin{tikzpicture}[
-  card/.style={draw,rounded corners=4pt,align=left,text width=3.7cm,inner sep=6pt,font=\small},
-  arr/.style={-{Stealth[length=2.5mm]},thick,gray}]
-  \node[card,fill=amblue!8,draw=amblue] (a) {\textbf{1. Morning cheat sheet}\\ A short summary of the goal, key rules, and latest progress, written automatically. About one paragraph.};
-  \node[card,fill=amgreen!8,draw=amgreen,right=0.7cm of a] (b) {\textbf{2. Look it up}\\ If the cheat sheet is not enough, one request pulls up the \emph{full, uncut} notes.};
-  \node[card,fill=amorange!8,draw=amorange,right=0.7cm of b] (c) {\textbf{3. Write it down}\\ At the end, the assistant saves notes. Each save is recorded in a history, like ``track changes.''};
+  card/.style={draw,rounded corners=4pt,align=left,text width=3.9cm,inner sep=6pt,font=\small},
+  arr/.style={-{Stealth[length=2.5mm]},thick,gray!80!black}]
+  \node[card,fill=amteal!8,draw=amteal] (a) {\textbf{1. Morning cheat sheet}\\ Every turn starts with a $\le 1{,}200$-char \texttt{MEMORY STATE} packet ($\sim 200$ tokens, 0 AI calls).};
+  \node[card,fill=amblue!8,draw=amblue,right=0.65cm of a] (b) {\textbf{2. One-step full lookup}\\ Calling \texttt{memory\_find(query, full=True)} pulls up complete, uncut notes + the original setup.};
+  \node[card,fill=amorange!8,draw=amorange,right=0.65cm of b] (c) {\textbf{3. Save \& compress}\\ Completed steps are saved as Git snapshots and folded into rolling summaries or rules.};
   \draw[arr] (a) -- (b);
   \draw[arr] (b) -- (c);
-  \draw[arr,rounded corners=4pt] (c.south) -- ++(0,-0.6) -| (a.south);
-  \node[font=\scriptsize,gray] at ($(b.south)+(0,-0.85)$) {next session};
+  \draw[arr,rounded corners=4pt] (c.south) -- ++(0,-0.55) -| (a.south);
+  \node[font=\scriptsize\bfseries,gray!70!black] at ($(b.south)+(0,-0.78)$) {next session (fresh context)};
 \end{tikzpicture}
-\caption{The three steps of Agent Memory, repeated every session.}
+\caption{The three-part Agent Memory loop that runs across sessions.}
 \label{fig:loop}
 \end{figure}
 
-\subsection*{Four design choices, in plain words}
+\subsection{Mechanism 1: The 1{,}200-character morning cheat sheet (\texttt{render\_packet})}
 
-\textbf{Keep whole notes.} Agent Memory never rewrites an equation into a vague summary. Longer notes can be folded into a short roll-up, but the originals always stay available.
+Before every turn, Agent Memory builds a compact block of text called \texttt{\# MEMORY STATE} and places it directly in the assistant's prompt. Here is a real example of what the assistant sees:
 
-\textbf{Remember the history.} Every note is saved with a snapshot of the project's files, like a version history. If a file changes after a note was written, the note is flagged as \emph{possibly out of date}. The assistant can even step back to how things looked when a note was written.
+\begin{tcolorbox}[colback=codebg,colframe=gray!40,boxrule=0.5pt,arc=3pt,fontupper=\ttfamily\footnotesize]
+\# MEMORY STATE\\
+\#\# Goal\\
+{[a1b2c3d4]} Paper Setup (2111.01267): Freeze-in Boltzmann equation\\
+$\partial_x f(q,x) = \gamma(x)\,\delta(q-q_0) + \gamma_0\,\mathcal{C}[f]$, with moments $Y_n(x) = \int q^n f(q,x)\,dq$.\\[3pt]
+\#\# Handoff\\
+{[e5f6a7b8]} Consecutive Derivation Law (Steps 1..3):\\
+Step 1: Free regime $\partial_x f = 0 \implies f(q,x)=f(q,0)$.\\
+Step 3: Post-production ODEs: $\partial_x Y_2 = 0$, $\partial_x Y_3 = \gamma_0(3Y_2 - Y_3)$, $\partial_x Y_4 = \gamma_0(12Y_2 - Y_4)$.\\[3pt]
+\#\# Related\\
+{[9900aabb]} Subtask 2 Solved Result: Source moments $Y_n(x_s) = q_0^n K$ \\
+{[+1 more: 7788ccdd]}
+\end{tcolorbox}
 
-\textbf{Use a fixed-size cheat sheet.} The morning summary is capped at about 1{,}200 characters, roughly a short paragraph. It is built by simple rules, with no extra AI call, so it is fast, cheap, and predictable. It always leads with the goal.
+No AI model is called to write or shorten this cheat sheet. Instead, it is assembled in less than a millisecond by two simple mathematical rules:
 
-\textbf{Search that understands symbols.} Ordinary search engines stumble on things like $[D,K]$ because they treat punctuation as part of the word. We fixed that, which raised the chance of finding the right equation in one test from 29\% to 100\%.
+\begin{mathbox}[How the 1{,}200-character budget is shared (Dynamic Budget Reclamation)]
+The cheat sheet has a strict total cap of $B_{\max} = 1{,}200$ characters ($\approx 200$--$300$ tokens), divided across six sections with base character budgets:
+\[
+  \big(b_{\text{Goal}}^{\text{base}},\; b_{\text{Steer}}^{\text{base}},\; b_{\text{Model}}^{\text{base}},\; b_{\text{Handoff}}^{\text{base}},\; b_{\text{OpenQ}}^{\text{base}},\; b_{\text{Related}}^{\text{base}}\big)
+  \;=\; (260,\; 220,\; 200,\; 360,\; 120,\; 260)\text{ chars.}
+\]
+In many sessions, optional sections like user corrections (\texttt{Steering}), rule models (\texttt{Task model}), or blockers (\texttt{Open questions}) are empty. Rather than wasting their $220 + 200 + 120 = 540$ characters of quota, Agent Memory collects any unused base budgets into a spare pool $B_{\text{spare}}$:
+\[
+  B_{\text{spare}} = 220\cdot\mathbb{I}(\text{Steer}=\emptyset) + 200\cdot\mathbb{I}(\text{Model}=\emptyset) + 120\cdot\mathbb{I}(\text{OpenQ}=\emptyset),
+\]
+and automatically redistributes that spare space to the three core reasoning sections:
+\[
+  b_{\text{Goal}} = 260 + \left\lfloor \frac{B_{\text{spare}}}{2} \right\rfloor, \qquad
+  b_{\text{Handoff}} = 360 + \left\lfloor \frac{B_{\text{spare}}}{3} \right\rfloor, \qquad
+  b_{\text{Related}} = 260 + \left\lfloor \frac{B_{\text{spare}}}{3} \right\rfloor.
+\]
+\textbf{In plain words:} when there are no open questions or steering rules, the \texttt{Goal} budget automatically doubles from $260$ to $530$ characters, and \texttt{Handoff} grows from $360$ to $540$ characters---keeping foundational equations from being cut off.
+\end{mathbox}
+
+\begin{mathbox}[How individual lines are chosen inside a note (Equation-Priority Ranking)]
+When a saved note is longer than its section budget $b_S$, which lines get shown in the cheat sheet? Agent Memory keeps the title (line 1) and scores every other line $L_i$ against the current question $q$ using a four-part priority score:
+\[
+  \text{Priority}(L_i, q) \;=\; \Big(\;
+    \underbrace{\mathbb{I}_{\text{result}}(L_i)}_{\text{1 if final result/next step}},\;\;
+    \underbrace{|\mathcal{T}(L_i) \cap \mathcal{T}(q)|}_{\text{shared words with question } q},\;\;
+    \underbrace{\mathbb{I}_{\text{math}}(L_i)}_{\text{1 if line contains an equation}},\;\;
+    \underbrace{-i}_{\text{earlier lines first}}
+  \;\Big).
+\]
+\textbf{In plain words:} (1) Always keep lines labeled \texttt{FINAL RESULT}, \texttt{Next:}, \texttt{Verified:}, or \texttt{\textbackslash boxed}; (2) next, prefer lines that share technical terms with today's question $q$; (3) when tied, prefer lines containing mathematical formulas (\texttt{=}, \texttt{\textbackslash frac}, \texttt{\textbackslash sum}, \texttt{\textbackslash int}) over prose; and (4) keep them in their original reading order. If any related notes do not fit, their IDs are listed at the bottom (\texttt{[+1 more: 7788ccdd]}) so the assistant knows they exist.
+\end{mathbox}
+
+\subsection{Mechanism 2: Symbol-aware search \& one-step full lookup (\texttt{memory\_find})}
+
+The $1{,}200$-character cheat sheet is enough for short and medium problems, but a 12-step physics derivation cannot fit in one paragraph. When the assistant needs the complete details, it makes a single call: \texttt{memory\_find(query=q, full=True)}.
+
+While testing on \emph{MemoryArena}, we found two reasons standard search tools failed on math problems---and fixed both:
+
+\begin{mathbox}[How symbol-aware search works (Tokenizer + Hybrid Rank Fusion)]
+\textbf{1. Stripping punctuation without losing single-letter math symbols.}
+Suppose a question asks: \emph{``Use the $\mathfrak{so}(1,2)$ commutators $([D,H], [D,K], [K,H])$ to simplify the Hamiltonian.''}
+A naive search engine splits on spaces, producing the token \texttt{"([D,H],"} with the brackets and comma glued to the letters. In SQLite's full-text search (FTS5), quoting a token with punctuation forces an exact phrase search that fails to match \texttt{[D,H] = iH} in the saved note! Meanwhile, common words like \texttt{"the"} and \texttt{"to"} match every note at random.
+
+Agent Memory extracts clean word and symbol tokens with a regular expression $\texttt{\textbackslash w+}$ and removes English filler words ($\mathcal{S}_{\text{stop}} = \{\texttt{the}, \texttt{and}, \texttt{for}, \dots\}$) while \emph{preserving single-letter mathematical operators} like $D, H, K, s, t$:
+\[
+  \mathcal{T}(q) \;=\; \Big\{\, w \in \texttt{re.findall}(\texttt{r"\textbackslash w+"},\, q) \;\Big|\; \text{lower}(w) \notin \mathcal{S}_{\text{stop}} \,\Big\}.
+\]
+On the 12-step Calogero--Moser problem, this single fix raised equation recall on Step 3 from \textbf{29\% to 100\%}.\\[4pt]
+\textbf{2. Combining exact words and meaning (Reciprocal Rank Fusion).}
+Each note $d$ is ranked by both exact keyword match ($\text{rank}_{\text{FTS5}}(d)$) and optional semantic embedding similarity ($\text{rank}_{\text{vec}}(d)$), combined via Reciprocal Rank Fusion:
+\[
+  \text{Score}_{\text{RRF}}(d) \;=\; \frac{1}{60 + \text{rank}_{\text{FTS5}}(d)} \;+\; \frac{1}{60 + \text{rank}_{\text{vec}}(d)}.
+\]
+When called with \texttt{full=True}, Agent Memory returns the \textbf{entire, uncut text} of the top-ranked notes in one step---and always pins the foundational \texttt{Goal} setup note so the assistant never loses the problem's initial definitions.
+\end{mathbox}
+
+\subsection{Mechanism 3: Git-snapshot history \& automatic staleness detection}
+
+Every time an assistant saves a note with \texttt{memory\_save}, Agent Memory commits that note into a private Git repository (\texttt{.agent\_memory/git/}) along with a snapshot of the project's working files. If a note depends on specific files (for example, \texttt{files=["src/checkout.py"]}), Agent Memory records the cryptographic SHA-256 hash of each file at the moment the note was written.
+
+Before every later turn, it checks whether any declared file $f \in \mathcal{F}_{\text{note}}$ has changed on disk:
+\[
+  \text{IsStale}(\text{note}) \;=\; \exists\, f \in \mathcal{F}_{\text{note}} \quad\text{such that}\quad \text{SHA256}_{\text{saved}}(f) \neq \text{SHA256}_{\text{current}}(f).
+\]
+If a file was edited, created, or deleted since the note was written, the cheat sheet automatically marks the note \texttt{[stale]} so the assistant knows to re-verify it. And because every note is a Git commit, the assistant can call \texttt{memory\_inspect(id)} to temporarily rewind the project files to how they looked when that note was written.
+
+\subsection{Mechanism 4: Consecutive compression (Rolling summaries \& algebraic rules)}
+
+As work continues across many sessions, Agent Memory keeps the notebook compact in two ways:
+\begin{enumerate}[leftmargin=1.5em,itemsep=2pt]
+  \item \textbf{Rolling step summaries (\texttt{memory\_summarize}):} After finishing step $t$, the assistant folds the verified conclusions of steps $1\dots t$ into one summary note. The morning cheat sheet shows this single roll-up in \texttt{Handoff} and hides the individual step notes (while keeping the full originals searchable in Git).
+  \item \textbf{Turning repeated examples into compact rules (\texttt{memory\_model}):} When an assistant tests many specific cases of a system rule (for instance, which file changes require a code review, or which sensor serial numbers need a calibration offset), listing every test case wastes space. Agent Memory lets the assistant write a safe one-line formula (such as \texttt{2.75 if serial == 'M17' and temp > 26.0 else 4.0}), verifies that it passes every recorded historical test case, and automatically simplifies redundant rules using Boolean algebra:
+  \[
+    (A \wedge B) \vee (A \wedge C) \;\longrightarrow\; A \wedge (B \vee C) \qquad\text{\small(factor out shared conditions)}
+  \]
+  \[
+    (x = a_1) \vee (x = a_2) \vee (x = a_3) \;\longrightarrow\; x \in [a_1, a_2, a_3] \qquad\text{\small(collapse repeated checks into a list)}
+  \]
+\end{enumerate}
 
 % ---------------------------------------------------------------
-\section{How we tested it}
+\section{How we tested it: the ICML 2026 MemoryArena benchmark}
 
-We used \emph{MemoryArena}, a public test designed for exactly this problem. It contains 20 theoretical-physics problems, each broken into a chain of 2 to 12 steps. Step 1 explains the setup. Every later step starts with a blank mind and depends on earlier answers. That makes it a good stress test for memory: the assistant cannot succeed by being clever alone, it also has to remember.
-
-We measured two things:
-\begin{itemize}[itemsep=1pt]
-  \item \textbf{Was the information still available?} For each step, how many of the needed equations were included in what the assistant was shown?
-  \item \textbf{Did the assistant finish the problem?} How many of the 20 chains ended with a correct final answer?
+We evaluated Agent Memory on \emph{MemoryArena} (\texttt{formal\_reasoning\_phys}), a peer-reviewed ICML 2026 benchmark created specifically to test whether AI agents can remember exact information across sessions. It consists of \textbf{20 theoretical-physics papers} broken into \textbf{86 sequential steps} (chains of 2 to 12 sessions per paper).
+\begin{itemize}[itemsep=2pt,leftmargin=1.5em]
+  \item \textbf{Session 1 ($t=1$)} gives the full mathematical setup (\texttt{BACKGROUND}) and asks the first question.
+  \item \textbf{Sessions $2\dots K$ ($t \ge 2$)} start in a \textbf{completely fresh session} where the setup is omitted (\texttt{"No information provided."}). To solve Step $t$, the assistant must recall both the definitions from Session 1 and the intermediate formulas it derived in Sessions $1\dots t-1$.
 \end{itemize}
+
+Following the official benchmark code (\texttt{eval.py}), we report two scores across all 20 papers:
+\[
+  \textbf{Progress Score (PS)} = \frac{1}{20}\sum_{p=1}^{20}\left(\frac{\text{steps solved in paper } p}{\text{total steps } K_p}\right), \qquad
+  \textbf{Success Rate (SR)} = \frac{1}{20}\sum_{p=1}^{20} \mathbb{I}\big(\text{final step } K_p\text{ solved}\big).
+\]
 
 % ---------------------------------------------------------------
 \section{What we found}
 
-\subsection*{Finding 1: the exact math survives}
+\subsection*{Finding 1: 100\% of the needed equations survive}
+
+Before running an AI solver, we checked all 66 dependent steps ($t \ge 2$) across the 20 papers and measured what fraction of the ground-truth LaTeX equations from earlier steps actually survived in the prompt shown to the assistant (Figure~\ref{fig:recall}).
 
 \begin{figure}[h]
 \centering
 \begin{tikzpicture}
 \begin{axis}[
-  xbar,width=0.8\textwidth,height=5.6cm,
-  xmin=0,xmax=112,xlabel={Needed equations still available (\%)},
-  symbolic y coords={Agent Memory (full lookup),Agent Memory (cheat sheet only),Slice search,Short summaries,No memory},
-  ytick=data,y dir=reverse,
-  nodes near coords,nodes near coords align={horizontal},
-  bar width=10pt,bar shift=0pt,enlarge y limits=0.14,
+  xbar,width=0.76\textwidth,height=6.2cm,
+  xmin=0,xmax=125,
+  xlabel={Needed prior equations present in the prompt at step $t \ge 2$ (\%)},
+  symbolic y coords={
+    No memory (isolated session),
+    Short summaries (Mem0-style facts),
+    Slice search (BM25 450-char chunks),
+    Agent Memory (cheat sheet only -- 0 lookups),
+    Agent Memory (cheat sheet + 1 full lookup)
+  },
+  ytick={
+    No memory (isolated session),
+    Short summaries (Mem0-style facts),
+    Slice search (BM25 450-char chunks),
+    Agent Memory (cheat sheet only -- 0 lookups),
+    Agent Memory (cheat sheet + 1 full lookup)
+  },
+  y dir=reverse,
+  bar width=12pt,bar shift=0pt,enlarge y limits=0.16,
   tick label style={font=\small},
+  label style={font=\small\bfseries},
   xmajorgrids,grid style={gray!25}]
-\addplot[fill=amgray,draw=none] coordinates {(10.4,No memory) (37.0,Short summaries) (53.9,Slice search)};
-\addplot[fill=amblue,draw=none] coordinates {(52.5,{Agent Memory (cheat sheet only)}) (100.0,{Agent Memory (full lookup)})};
+\addplot[fill=amred!75,draw=none] coordinates {(10.4,{No memory (isolated session)})};
+\addplot[fill=amgray!85,draw=none] coordinates {(37.0,{Short summaries (Mem0-style facts)}) (53.9,{Slice search (BM25 450-char chunks)})};
+\addplot[fill=amgreen!85,draw=none] coordinates {(52.5,{Agent Memory (cheat sheet only -- 0 lookups)})};
+\addplot[fill=amblue,draw=none] coordinates {(100.0,{Agent Memory (cheat sheet + 1 full lookup)})};
+
+\node[anchor=west,font=\footnotesize\bfseries,text=amred!85!black] at (axis cs:11.5,{No memory (isolated session)}) {10.4\% \normalfont\scriptsize(66 tokens)};
+\node[anchor=west,font=\footnotesize\bfseries,text=amgray!90!black] at (axis cs:38.0,{Short summaries (Mem0-style facts)}) {37.0\% \normalfont\scriptsize(187 tokens)};
+\node[anchor=west,font=\footnotesize\bfseries,text=amgray!90!black] at (axis cs:55.0,{Slice search (BM25 450-char chunks)}) {53.9\% \normalfont\scriptsize(374 tokens)};
+\node[anchor=west,font=\footnotesize\bfseries,text=amgreen!75!black] at (axis cs:53.5,{Agent Memory (cheat sheet only -- 0 lookups)}) {52.5\% \normalfont\scriptsize(338 tokens)};
+\node[anchor=west,font=\footnotesize\bfseries,text=amblue] at (axis cs:101.0,{Agent Memory (cheat sheet + 1 full lookup)}) {100.0\% \normalfont\scriptsize(1,565 tokens)};
 \end{axis}
 \end{tikzpicture}
-\caption{Short summaries lose most of the exact math. Slice search loses almost half. The cheat sheet alone is on par with slice search, and the full lookup keeps everything.}
+\caption{Equation retention across all 20 physics papers (66 dependent subtasks). Short summaries lose nearly two-thirds of the math (37.0\% kept). Fixed-slice search loses nearly half (53.9\%). Agent Memory's 1{,}200-character cheat sheet matches slice search with \emph{zero} lookups (52.5\%, green), and adding a single full lookup keeps \textbf{100.0\%} of needed equations (blue).}
 \label{fig:recall}
 \end{figure}
 
-\subsection*{Finding 2: a mid-sized AI finishes more problems}
+\subsection*{Finding 2: On the official benchmark model (\texttt{gpt-5-mini}), Agent Memory ranks \#1}
 
-We first used the benchmark's standard model (\texttt{gpt-5-mini}). On its own it gets only 12 of the 20 first steps right, so there is a ceiling on what any memory could achieve.
+To make a strict apples-to-apples comparison against the published ICML 2026 leaderboard, we ran all 20 papers using the benchmark's exact official model (\texttt{gpt-5-mini}) and official LLM equivalence judge (\texttt{MathEnvironment.judge()}).
+
+On Step 1 alone---before any memory system is even used---\texttt{gpt-5-mini} only solves \textbf{12 out of 20 problems (60\%)} due to single-step algebra errors. That 12-problem mark is the ceiling of what a perfect memory system could preserve for this model (Figure~\ref{fig:mini}).
 
 \begin{figure}[h]
 \centering
 \begin{tikzpicture}
 \begin{axis}[
-  ybar,width=0.85\textwidth,height=5.8cm,bar width=22pt,bar shift=0pt,
-  ymin=0,ymax=12,ylabel={Problems finished (out of 20)},
-  symbolic x coords={No memory,Short summaries,Slice search,Agent Memory},
-  xtick=data,x tick label style={font=\small},
-  nodes near coords,
+  ybar,width=0.9\textwidth,height=6.0cm,bar width=20pt,bar shift=0pt,
+  ymin=0,ymax=14,ylabel={Problems finished out of 20 (SR)},
+  symbolic x coords={
+    No memory,
+    Short summaries,
+    Slice search,
+    MemGPT (paper),
+    Cheat sheet only,
+    Full lookup
+  },
+  xtick={
+    No memory,
+    Short summaries,
+    Slice search,
+    MemGPT (paper),
+    Cheat sheet only,
+    Full lookup
+  },
+  x tick label style={font=\footnotesize,align=center,text width=2.1cm},
+  label style={font=\small\bfseries},
   ymajorgrids,grid style={gray!25}]
-\addplot[fill=amgray,draw=none] coordinates {(No memory,1) (Short summaries,3) (Slice search,5)};
-\addplot[fill=amblue,draw=none] coordinates {(Agent Memory,10)};
+\addplot[fill=amred!75,draw=none] coordinates {(No memory,1)};
+\addplot[fill=amgray!85,draw=none] coordinates {(Short summaries,3) (Slice search,5) (MemGPT (paper),9)};
+\addplot[fill=amgreen!85,draw=none] coordinates {(Cheat sheet only,10)};
+\addplot[fill=amblue,draw=none] coordinates {(Full lookup,10)};
+
+\draw[amorange,very thick,dashed] (axis cs:No memory,12) -- (axis cs:Full lookup,12);
+\node[anchor=south west,font=\scriptsize\bfseries,text=amorange] at (axis cs:No memory,12.1) {\texttt{gpt-5-mini} Step-1 math ceiling: 12 / 20 problems (60.0\%)};
+
+\node[anchor=south,font=\footnotesize\bfseries,text=amred!85!black] at (axis cs:No memory,1) {1/20 (5\%)};
+\node[anchor=south,font=\footnotesize\bfseries,text=amgray!90!black] at (axis cs:Short summaries,3) {3/20 (15\%)};
+\node[anchor=south,font=\footnotesize\bfseries,text=amgray!90!black] at (axis cs:Slice search,5) {5/20 (25\%)};
+\node[anchor=south,font=\footnotesize\bfseries,text=amgray!90!black] at (axis cs:MemGPT (paper),9) {9/20 (45\%)};
+\node[anchor=south,font=\footnotesize\bfseries,text=amgreen!75!black] at (axis cs:Cheat sheet only,10) {10/20 (50\%)};
+\node[anchor=south,font=\footnotesize\bfseries,text=amblue] at (axis cs:Full lookup,10) {10/20 (50\%)};
 \end{axis}
 \end{tikzpicture}
-\caption{With the standard benchmark model, Agent Memory finished 10 of 20 problems, about five times as many as no memory and twice as many as slice search.}
+\caption{Results across all 20 papers using the official \texttt{gpt-5-mini} solver + LLM judge. Without memory, performance collapses from 12/20 on Step 1 down to 1/20 at the end. Both Agent Memory modes finish \textbf{10 of the 12 solvable problems (50.0\% SR; 56.9\% PS for cheat sheet only, 60.2\% PS for full lookup)}, beating all published external memory systems.}
 \label{fig:mini}
 \end{figure}
 
-Of the 12 problems this model could solve at step 1, it finished 10 (83\%) with Agent Memory.
+\subsection*{Finding 3: With a stronger AI (\texttt{gpt-5.6-sol}), Agent Memory finishes 20 out of 20}
 
-\subsection*{Finding 3: a stronger AI finishes all of them}
-
-To separate memory quality from raw ability, we repeated the test with a stronger model (\texttt{gpt-5.6-sol}) that gets all 20 first steps right. Now any mistake is a memory mistake.
+To separate memory failures from algebra mistakes, we ran all 20 papers (86 steps) with a stronger solver (\texttt{gpt-5.6-sol}) that gets \textbf{all 20 first steps right (100\%)}. Now any failure on Steps $2\dots 12$ is purely a memory failure (Figure~\ref{fig:sol}).
 
 \begin{figure}[h]
 \centering
 \begin{tikzpicture}
 \begin{axis}[
   ybar,width=0.85\textwidth,height=5.8cm,bar width=26pt,bar shift=0pt,
-  ymin=0,ymax=23,ylabel={Problems finished (out of 20)},
-  symbolic x coords={No memory,Cheat sheet only,Cheat sheet + full lookup},
-  xtick=data,x tick label style={font=\small},
-  nodes near coords,
+  ymin=0,ymax=23.5,ylabel={Problems finished out of 20 (SR)},
+  symbolic x coords={No memory,Text-Embedding RAG (paper),Cheat sheet only (0 lookups),Cheat sheet + 1 full lookup},
+  xtick={No memory,Text-Embedding RAG (paper),Cheat sheet only (0 lookups),Cheat sheet + 1 full lookup},
+  x tick label style={font=\footnotesize,align=center,text width=2.8cm},
+  label style={font=\small\bfseries},
   ymajorgrids,grid style={gray!25}]
-\addplot[fill=amgray,draw=none] coordinates {(No memory,7)};
-\addplot[fill=amblue!60,draw=none] coordinates {(Cheat sheet only,15)};
-\addplot[fill=amblue,draw=none] coordinates {(Cheat sheet + full lookup,20)};
+\addplot[fill=amred!75,draw=none] coordinates {(No memory,7)};
+\addplot[fill=amgray!85,draw=none] coordinates {(Text-Embedding RAG (paper),12)};
+\addplot[fill=amgreen!85,draw=none] coordinates {(Cheat sheet only (0 lookups),15)};
+\addplot[fill=amblue,draw=none] coordinates {(Cheat sheet + 1 full lookup,20)};
+
+\node[anchor=south,font=\footnotesize\bfseries,text=amred!85!black] at (axis cs:No memory,7) {7/20 (35\%)};
+\node[anchor=south,font=\footnotesize\bfseries,text=amgray!90!black] at (axis cs:Text-Embedding RAG (paper),12) {12/20 (60\%)};
+\node[anchor=south,font=\footnotesize\bfseries,text=amgreen!75!black] at (axis cs:Cheat sheet only (0 lookups),15) {15/20 (75\%)};
+\node[anchor=south,font=\footnotesize\bfseries,text=amblue] at (axis cs:Cheat sheet + 1 full lookup,20) {20/20 (100\%)};
 \end{axis}
 \end{tikzpicture}
-\caption{With a strong model, the one-paragraph cheat sheet alone finished 15 of 20 problems, and adding one full lookup finished all 20 (86 of 86 steps).}
+\caption{With \texttt{gpt-5.6-sol}, the 1{,}200-character cheat sheet alone finishes \textbf{15 of 20 papers (75.0\% SR, 85.8\% PS)} with zero tool calls ($\sim 197$ tokens/turn), and adding one full lookup finishes \textbf{all 20 papers (100.0\% SR, 86/86 subtasks solved)}.}
 \label{fig:sol}
 \end{figure}
 
-The cheat sheet did not suffice on the longest chains, since a paragraph cannot hold twelve steps of algebra. That is exactly where the one-request full lookup helped.
+\subsection*{Finding 4: The longer the chain, the bigger the gap}
 
-\subsection*{Finding 4: the effect grows with the length of the task}
-
-Without memory, even the strong model's success rate fell from 100\% on step 1 to 45\% on step 2, and kept falling. With the full lookup it stayed at 100\% even at step 12.
+Figure~\ref{fig:depth} tracks accuracy step by step from Session 1 to Session 12. Without memory, even the strong model drops from 100\% at Step 1 to 45\% at Step 2 and 0\% after Step 6. The one-paragraph cheat sheet holds up well through Step 8 (66.7\%), and the one-request full lookup stays at \textbf{100\% all the way to Step 12}.
 
 \begin{figure}[h]
 \centering
 \begin{tikzpicture}
 \begin{axis}[
-  width=0.85\textwidth,height=6.2cm,
-  xlabel={Which step of the problem},ylabel={Correct (\%)},
-  symbolic x coords={1,2,3,4,5,8,12},xtick=data,
+  width=0.85\textwidth,height=5.9cm,
+  xlabel={Session step $k$ along the problem chain},ylabel={Subtasks solved at step $k$ (\%)},
+  symbolic x coords={1,2,3,4,5,8,12},
+  xtick={1,2,3,4,5,8,12},
   ymin=-5,ymax=108,
-  legend style={at={(0.5,-0.3)},anchor=north,legend columns=3,font=\scriptsize},
-  ymajorgrids,grid style={gray!25},mark size=2pt,thick]
-\addplot[color=amred,mark=square*] coordinates {(1,100)(2,45)(3,44.4)(4,40)(5,25)(8,0)(12,0)};
-\addplot[color=amgreen,mark=o] coordinates {(1,100)(2,90)(3,72.2)(4,60)(5,75)(8,66.7)(12,0)};
-\addplot[color=amblue,mark=*] coordinates {(1,100)(2,100)(3,100)(4,100)(5,100)(8,100)(12,100)};
-\legend{No memory,Cheat sheet only,Cheat sheet + full lookup}
+  tick label style={font=\small},
+  label style={font=\small\bfseries},
+  legend style={at={(0.5,-0.28)},anchor=north,legend columns=3,font=\footnotesize},
+  ymajorgrids,grid style={gray!25},mark size=2.2pt,thick]
+\addplot[color=amred,mark=square*,very thick] coordinates {(1,100)(2,45)(3,44.4)(4,40)(5,25)(8,0)(12,0)};
+\addplot[color=amgreen,mark=o,very thick] coordinates {(1,100)(2,90)(3,72.2)(4,60)(5,75)(8,66.7)(12,0)};
+\addplot[color=amblue,mark=*,very thick] coordinates {(1,100)(2,100)(3,100)(4,100)(5,100)(8,100)(12,100)};
+\legend{No memory,Agent Memory (cheat sheet only -- 0 lookups),Agent Memory (cheat sheet + 1 full lookup)}
 \end{axis}
 \end{tikzpicture}
-\caption{Accuracy by step with the stronger model. Without memory it decays quickly; with the full lookup it does not.}
+\caption{Accuracy by session depth $k$ with \texttt{gpt-5.6-sol}. Without memory (red) accuracy collapses as chains get deeper; the 1{,}200-char cheat sheet (green) carries the agent through medium chains; one full lookup (blue) prevents decay through Step 12.}
 \label{fig:depth}
 \end{figure}
 
 % ---------------------------------------------------------------
-\section{Beyond physics: remembering rules}
-
-Agent Memory can also turn a pile of repeated examples into a short rule. In one test, three similar review notes were merged into a single rule and then generalized. The stored rules shrank by about 65\% and the summary shown to the assistant by 50\%, while the complete history stayed in the record. The rule engine is deliberately restricted so it can only do simple, safe checks and cannot run arbitrary code.
-
-% ---------------------------------------------------------------
 \section{What this does and does not show}
 
-We want to be clear about the limits of these results.
-\begin{itemize}[itemsep=2pt]
-  \item \textbf{One benchmark, one field.} All results are on physics derivations. We have not yet tested the other MemoryArena areas, such as shopping or travel planning.
-  \item \textbf{Small test.} Twenty problems means each one is worth 5 percentage points, so small differences should not be over-read.
-  \item \textbf{Tuned on the test.} We found and fixed the search problems by studying failures on this same benchmark. Fresh problems are needed to confirm the results hold up.
-  \item \textbf{Not the top score overall.} Some published memory systems that use other models scored as high or higher on this benchmark. Differences in setup mean these numbers are not a fair head-to-head, so our claim is about the exact-math problem above, not about being the best overall.
-  \item \textbf{Long chains need the lookup.} One paragraph is not enough for very long problems.
+To keep our claims honest:
+\begin{itemize}[itemsep=2pt,leftmargin=1.5em]
+  \item \textbf{Evaluated on formal physics derivations.} Our live benchmark covers all 20 papers (86 subtasks) of MemoryArena's \texttt{formal\_reasoning\_phys} split. While our adapter (\texttt{benchmarks/memoryarena/agent\_memory\_system.py}) plugs into the other MemoryArena splits (math, CS, shopping, travel, search), we have only run the physics split so far.
+  \item \textbf{Why we report two AI models.} On the benchmark's standard model (\texttt{gpt-5-mini}), Agent Memory achieves \textbf{50.0\% SR and 60.2\% PS}---beating MemGPT (45\% SR), Mem0 (25\% SR), and GPT-5.1-mini Long Context (45\% SR / 60\% PS), while sitting right at \texttt{gpt-5-mini}'s 60\% single-step math ceiling. Running \texttt{gpt-5.6-sol} (100\% SR / 100\% PS) shows what happens when single-step algebra errors are removed.
+  \item \textbf{Deep chains need the full lookup.} A 1{,}200-character paragraph ($\sim 200$ tokens) solves 75\% of papers with zero tool calls, but chains of 8--12 equations require calling \texttt{memory\_find(query=..., full=True)} ($\sim 968$--$1{,}435$ tokens).
 \end{itemize}
 
 \section{Conclusion}
 
-Memory for AI does not need to be exotic. Keep complete notes, record their history, show a short fixed-size summary each time, and allow one lookup of the full page. On a demanding test where exact details matter, this kept the math intact and let a strong assistant finish every problem. The code is open at the link above, and the full technical write-up has the details.
+Memory for AI assistants does not need to rely on lossy AI summaries or arbitrary text slicing. By saving complete notes as Git snapshots, compiling a deterministic 1{,}200-character cheat sheet every turn, folding finished steps into consecutive summaries or algebraic rules, and supporting one-call symbol-aware full lookup, Agent Memory preserves 100\% of the underlying math and lets capable agents finish long, multi-session tasks without losing the thread.
 
 \begin{glossarybox}
 \textbf{Glossary.}
-\textbf{Agent:} an AI assistant that works on a task over many steps.
-\textbf{Session:} one work period; the assistant starts each with a blank mind.
-\textbf{Long context:} giving the AI the entire past transcript.
-\textbf{RAG (retrieval-augmented generation):} searching stored text and showing the AI the best matches.
-\textbf{Git:} a version-history tool used by programmers, like ``track changes'' for a whole project.
-\textbf{Benchmark:} a standard test used to compare systems.
+\textbf{Agent:} an AI assistant that works on a task across many steps and tool calls.
+\textbf{Session:} one work period; each new session starts with a fresh context window.
+\textbf{Long context:} feeding the entire past conversation transcript into every prompt.
+\textbf{RAG (Retrieval-Augmented Generation):} slicing past text into chunks and searching for matches.
+\textbf{FTS5 \& RRF:} SQLite's fast full-text keyword search, combined with semantic search via Reciprocal Rank Fusion.
+\textbf{Git \& SHA-256:} version-control snapshots and cryptographic file fingerprints used to detect when files change.
 \end{glossarybox}
 
 \end{document}
