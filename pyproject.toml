@@ -1,13 +1,22 @@
 [project]
 name = "agent-memory"
 version = "0.1.0"
-description = "Git-backed memory for long-running research agents"
+description = "Git-backed memory for long-running research and coding agents"
 readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Dorian Herle", email = "herle.dorian@gmail.com"},
+]
 requires-python = ">=3.10"
 dependencies = [
     "hnswlib>=0.8.0",
     "numpy>=2.2.6",
 ]
+
+[project.urls]
+Homepage = "https://github.com/dorianherle/agent_memory"
+Repository = "https://github.com/dorianherle/agent_memory"
+Paper = "https://github.com/dorianherle/agent_memory/blob/main/paper/agent_memory_overview.pdf"
 
 [project.optional-dependencies]
 # FastMCP lives in mcp 1.x; mcp 2.0 removed it
@@ -31,3 +40,7 @@ packages = ["agent_memory"]
 "agent_memory/studio.html" = "agent_memory/studio.html"
 
 "agent_memory/studio_bridge.mjs" = "agent_memory/studio_bridge.mjs"
+
+[tool.pytest.ini_options]
+testpaths = ["agent_memory/tests"]
+

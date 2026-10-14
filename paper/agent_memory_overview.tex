@@ -86,54 +86,91 @@ That is how AI assistants work across sessions today. To bridge the gap, people 
 \end{figure}
 
 % ---------------------------------------------------------------
-\section{How Agent Memory works: intuition and concrete math}
+\section{How Agent Memory works: step-by-step schematic and concrete math}
 
-Scientists and engineers solved this problem long ago with a structured lab notebook: write complete entries, track when files change, read a one-paragraph status summary each morning, and flip to the full page when you need a detailed derivation. Agent Memory turns those habits into four deterministic algorithms.
+Scientists and engineers solved this problem long ago with a structured lab notebook: write complete entries, track when files change, read a one-paragraph status summary each morning, and flip to the full page when you need a detailed derivation. Agent Memory turns those habits into a deterministic six-step pipeline (Figure~\ref{fig:loop}).
 
 \begin{figure}[H]
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
-  card/.style={draw,rounded corners=4pt,align=left,text width=3.9cm,inner sep=6pt,font=\small},
-  arr/.style={-{Stealth[length=2.5mm]},thick,gray!80!black}]
-  \node[card,fill=amteal!8,draw=amteal] (a) {\textbf{1. Morning cheat sheet}\\ Every turn starts with a $\le 1{,}200$-char \texttt{MEMORY STATE} packet ($\sim 200$ tokens, 0 AI calls).};
-  \node[card,fill=amblue!8,draw=amblue,right=0.65cm of a] (b) {\textbf{2. One-step full lookup}\\ Calling \texttt{memory\_find(query, full=True)} pulls up complete, uncut notes + the original setup.};
-  \node[card,fill=amorange!8,draw=amorange,right=0.65cm of b] (c) {\textbf{3. Save \& compress}\\ Completed steps are saved as Git snapshots and folded into rolling summaries or rules.};
-  \draw[arr] (a) -- (b);
-  \draw[arr] (b) -- (c);
-  \draw[arr,rounded corners=4pt] (c.south) -- ++(0,-0.55) -| (a.south);
-  \node[font=\scriptsize\bfseries,gray!70!black] at ($(b.south)+(0,-0.78)$) {next session (fresh context)};
-\end{tikzpicture}
-\caption{The three-part Agent Memory loop that runs across sessions.}
+  box/.style={draw,rounded corners=3.5pt,align=left,inner sep=6pt,font=\footnotesize},
+  lane/.style={draw=gray!40,fill=gray!4,rounded corners=5pt},
+  arr/.style={-{Stealth[length=2.5mm]},thick,gray!80!black},
+  darr/.style={-{Stealth[length=2.5mm]},thick,dashed,amblue!85!black}]
+
+  % Lane A: Write path
+  \draw[lane] (0,4.9) rectangle (15.4,7.55);
+  \node[anchor=north west,font=\footnotesize\bfseries,text=amorange!90!black] at (0.25,7.4)
+    {LANE A --- WRITE \& COMPRESS PATH (During / End of Session)};
+
+  \node[box,fill=amorange!8,draw=amorange,text width=6.7cm,anchor=north west] (w1) at (0.25,6.85)
+    {\textbf{Step 1: Save or Compress Note}\\
+     \texttt{memory\_save(text, payload=\{"handoff":true\})}\\
+     or \texttt{memory\_summarize(ids)} / \texttt{memory\_model(...)}};
+
+  \node[box,fill=amorange!8,draw=amorange,text width=7.1cm,anchor=north west] (w2) at (7.8,6.85)
+    {\textbf{Step 2: Dual Commit to Disk}\\
+     $\bullet$ \textbf{Git store (\texttt{.agent\_memory/git/}):} commits note + working files.\\
+     $\bullet$ \textbf{Catalog (\texttt{catalog.db}):} indexes tokens $\mathcal{T}(d)$ in FTS5 + HNSW.};
+
+  \draw[arr] (w1.east) -- (w2.west);
+
+  % Lane B: Render path
+  \draw[lane] (0,0.4) rectangle (15.4,4.35);
+  \node[anchor=north west,font=\footnotesize\bfseries,text=amteal!90!black] at (0.25,4.2)
+    {LANE B --- RENDER-TIME PIPELINE (\texttt{render\_packet(q)} --- Automatic Before Every Turn, 0 AI Calls, $<1\text{ ms}$)};
+
+  \node[box,fill=amteal!8,draw=amteal,text width=4.45cm,anchor=north west] (r1) at (0.25,3.6)
+    {\textbf{Step 3: Pick Notes \& Check Git}\\
+     $\bullet$ Pick \texttt{Goal}, \texttt{Steer}, \texttt{Handoff} (3-tier ladder), \texttt{Model}, \texttt{OpenQ}.\\
+     $\bullet$ Fetch top-3 \texttt{Related} via FTS5+RRF.\\
+     $\bullet$ Run \texttt{git diff} on $\mathcal{F}_{\text{note}} \to$ \texttt{[stale]}.};
+
+  \node[box,fill=amteal!8,draw=amteal,text width=4.45cm,anchor=north west] (r2) at (5.35,3.6)
+    {\textbf{Step 4: Reclaim Unused Budget}\\
+     $\bullet$ Total cap $B_{\max}=1{,}200$ chars.\\
+     $\bullet$ Pool unused optional quotas into $B_{\text{spare}} \in [0,540]$.\\
+     $\bullet$ Boost \texttt{Goal} ($+\lfloor B_{\text{spare}}/2\rfloor$), \texttt{Handoff} \& \texttt{Related} ($+\lfloor B_{\text{spare}}/3\rfloor$).};
+
+  \node[box,fill=amgreen!8,draw=amgreen,text width=4.45cm,anchor=north west] (r3) at (10.45,3.6)
+    {\textbf{Step 5: Deterministic Line Pack}\\
+     $\bullet$ Pin headline $L_0$ + \texttt{[id[:8]]}.\\
+     $\bullet$ Score lines $L_i$ by $\text{Key}(L_i,q)$.\\
+     $\bullet$ Pack whole lines $\le b_S - 9$, restore order $i$, add \texttt{... [more]}.\\
+     $\bullet$ Inject \texttt{\# MEMORY STATE}.};
+
+  \draw[arr] (r1.east) -- (r2.west);
+  \draw[arr] (r2.east) -- (r3.west);
+  \draw[arr] (w2.south) -- ++(0,-0.32) -| (r1.north);
+
+  % Lane C: On-demand full lookup
+  \draw[lane] (0,-1.85) rectangle (15.4,-0.15);
+  \node[anchor=north west,font=\footnotesize\bfseries,text=amblue] at (0.25,-0.28)
+    {LANE C --- ON-DEMAND DEEP LOOKUP (1 Tool Call When Cheat Sheet Shows \texttt{... [more]} or \texttt{[stale]})};
+
+  \node[box,fill=amblue!8,draw=amblue,text width=14.6cm,anchor=north west] (l1) at (0.25,-0.82)
+    {\textbf{Step 6: Uncut Retrieval or Snapshot Rewind:}
+     \texttt{memory\_find(query=q, full=True)} returns \textbf{100\% uncut note bodies} + pinned \texttt{Goal} setup in one call; \texttt{memory\_inspect(id)} checks out the exact Git working-tree snapshot from commit \texttt{id}.};
+
+  \draw[darr] (r3.south) -- ++(0,-0.32) -| (l1.north);
+\end{tikzpicture}%
+}
+\caption{Complete six-step schematic block diagram of Agent Memory across saving (Lane A), deterministic render-time prompt compilation (Lane B), and on-demand full lookup (Lane C).}
 \label{fig:loop}
 \end{figure}
 
 \subsection{Mechanism 1: The 1{,}200-character morning cheat sheet (\texttt{render\_packet})}
 
-Before every turn, Agent Memory builds a compact block of text called \texttt{\# MEMORY STATE} and places it directly in the assistant's prompt. Here is a real example of what the assistant sees:
+Before every turn, Agent Memory builds a compact block of text called \texttt{\# MEMORY STATE} and places it directly in the assistant's prompt. No AI model is called to write or shorten this cheat sheet; it is compiled deterministically in under a millisecond.
 
-\begin{tcolorbox}[colback=codebg,colframe=gray!40,boxrule=0.5pt,arc=3pt,fontupper=\ttfamily\footnotesize]
-\# MEMORY STATE\\
-\#\# Goal\\
-{[a1b2c3d4]} Paper Setup (2111.01267): Freeze-in Boltzmann equation\\
-$\partial_x f(q,x) = \gamma(x)\,\delta(q-q_0) + \gamma_0\,\mathcal{C}[f]$, with moments $Y_n(x) = \int q^n f(q,x)\,dq$.\\[3pt]
-\#\# Handoff\\
-{[e5f6a7b8]} Consecutive Derivation Law (Steps 1..3):\\
-Step 1: Free regime $\partial_x f = 0 \implies f(q,x)=f(q,0)$.\\
-Step 3: Post-production ODEs: $\partial_x Y_2 = 0$, $\partial_x Y_3 = \gamma_0(3Y_2 - Y_3)$, $\partial_x Y_4 = \gamma_0(12Y_2 - Y_4)$.\\[3pt]
-\#\# Related\\
-{[9900aabb]} Subtask 2 Solved Result: Source moments $Y_n(x_s) = q_0^n K$ \\
-{[+1 more: 7788ccdd]}
-\end{tcolorbox}
-
-No AI model is called to write or shorten this cheat sheet. Instead, it is assembled in less than a millisecond by two simple mathematical rules:
-
-\begin{mathbox}[How the 1{,}200-character budget is shared (Dynamic Budget Reclamation)]
-The cheat sheet has a strict total cap of $B_{\max} = 1{,}200$ characters ($\approx 200$--$300$ tokens), divided across six sections with base character allowances:
+\begin{mathbox}[Step 4 Math: How the 1{,}200-character budget is shared (Dynamic Budget Reclamation)]
+The cheat sheet has a strict total cap of $B_{\max} = 1{,}200$ characters ($\approx 200$--$300$ tokens), with $54$ characters reserved for section headers and omission notices. It is divided across six sections with base character allowances:
 \[
   (b_{\text{Goal}}^0,\, b_{\text{Steer}}^0,\, b_{\text{Model}}^0,\, b_{\text{Handoff}}^0,\, b_{\text{OpenQ}}^0,\, b_{\text{Related}}^0)
   = (260,\, 220,\, 200,\, 360,\, 120,\, 260)\text{ chars.}
 \]
-In many sessions, optional sections like user corrections (\texttt{Steering}), rule models (\texttt{Task model}), or blockers (\texttt{Open questions}) are empty. Rather than wasting their $220 + 200 + 120 = 540$ characters of quota, Agent Memory collects any unused base budgets into a spare pool $B_{\text{spare}}$:
+Whenever optional sections (\texttt{Steering}, \texttt{Task model}, or \texttt{Open questions}) are empty, Agent Memory collects their unused quotas into a spare pool $B_{\text{spare}} \in [0, 540]$:
 \[
   B_{\text{spare}} = 220\,\mathbb{I}(\text{Steer}=\emptyset) + 200\,\mathbb{I}(\text{Model}=\emptyset) + 120\,\mathbb{I}(\text{OpenQ}=\emptyset),
 \]
@@ -143,21 +180,113 @@ and automatically redistributes that spare space to the three core reasoning sec
   b_{\text{Handoff}} = 360 + \left\lfloor \frac{B_{\text{spare}}}{3} \right\rfloor, \qquad
   b_{\text{Related}} = 260 + \left\lfloor \frac{B_{\text{spare}}}{3} \right\rfloor.
 \]
-\textbf{In plain words:} when there are no open questions or steering rules, the \texttt{Goal} budget automatically doubles from $260$ to $530$ characters, and \texttt{Handoff} grows from $360$ to $540$ characters---keeping foundational equations from being cut off.
+\textbf{In plain words:} when there are no open questions or steering rules ($B_{\text{spare}}=540$), the \texttt{Goal} budget automatically doubles from $260$ to $530$ characters, and \texttt{Handoff} grows from $360$ to $540$ characters---keeping foundational equations and handoff instructions from being cut off.
 \end{mathbox}
 
-\begin{mathbox}[How individual lines are chosen inside a note (Equation-Priority Ranking)]
-When a saved note is longer than its section budget $b_S$, which lines get shown in the cheat sheet? Agent Memory keeps the title (line 1) and scores every other line $L_i$ against the current question $q$ using a four-part priority score:
-\[
-  \text{Priority}(L_i, q) = \Big(
-    \underbrace{\mathbb{I}_{\text{result}}(L_i)}_{\text{final result/next}},\;
-    \underbrace{|\mathcal{T}(L_i) \cap \mathcal{T}(q)|}_{\text{query word overlap}},\;
-    \underbrace{\mathbb{I}_{\text{math}}(L_i)}_{\text{has equation}},\;
-    \underbrace{-i}_{\text{line order}}
-  \Big).
-\]
-\textbf{In plain words:} (1) Always keep lines labeled \texttt{FINAL RESULT}, \texttt{Next:}, \texttt{Verified:}, or \texttt{\textbackslash boxed}; (2) next, prefer lines that share technical terms with today's question $q$; (3) when tied, prefer lines containing mathematical formulas (\texttt{=}, \texttt{\textbackslash frac}, \texttt{\textbackslash sum}, \texttt{\textbackslash int}) over prose; and (4) keep them in their original reading order. If any related notes do not fit, their IDs are listed at the bottom (\texttt{[+1 more: 7788ccdd]}) so the assistant knows they exist.
+\subsection{How Handoff and deterministic render-time line selection work}
+
+A critical question in multi-session work is: \emph{how does the next session know exactly where the previous session left off, and how are lines selected when a note is longer than its character allowance?}
+
+\paragraph{Part A: Which note becomes \texttt{\#\# Handoff}? (The 3-Tier Priority Ladder)}
+At render time, \texttt{\_handoff(items)} selects a single transfer note using a strict three-tier priority ladder:
+\begin{enumerate}[leftmargin=1.6em,itemsep=2pt]
+  \item \textbf{Tier 1 --- Explicit transfer checkpoint (\texttt{payload=\{"handoff": true\}}):} If the previous session explicitly saved a handoff checkpoint, always select the newest one.
+  \item \textbf{Tier 2 --- Newest actionable or uncovered finding:} Otherwise, scan backward through saved work notes and select the newest note that either (a) contains an explicit \texttt{Next:}, \texttt{Blocked:}, or \texttt{Remaining:} line, or (b) has not yet been absorbed into a verified \texttt{Task model}.
+  \item \textbf{Tier 3 --- Latest milestone roll-up (\texttt{memory\_summarize}):} If all recent steps have been folded into a milestone summary (\texttt{payload["covers"]}), select the newest summary roll-up.
+\end{enumerate}
+
+\paragraph{Part B: At render time, how does the tool select lines deterministically? (\texttt{\_excerpt})}
+Once a note is chosen for \texttt{Goal}, \texttt{Handoff}, or \texttt{Related} with character allowance $b_S$, \texttt{\_excerpt(item, query, limit=$b_S$)} selects complete lines using a five-step deterministic algorithm---never calling an LLM and never slicing a line, command, or equation in half:
+
+\begin{mathbox}[Step 5 Math: Deterministic Whole-Line Scoring \& Knapsack Selection (\texttt{\_excerpt})]
+\begin{enumerate}[leftmargin=1.5em,itemsep=3pt]
+  \item \textbf{Split into whole non-empty lines:} Split the note into stripped lines $[L_0, L_1, \dots, L_{m-1}]$.
+  \item \textbf{Pin the headline ($L_0$) and reserve the omission badge:} Always include the title line $L_0$ (capped at $\min(100, b_S-1)$ chars) at index $0$, prefixed by \texttt{[id[:8]]} and \texttt{[stale]} if any tracked file changed. Reserve $9$ characters at the end of the budget ($\text{limit}_{\text{body}} = b_S - 9$) for the suffix \texttt{" ... [more]"}.
+  \item \textbf{Score every body line $L_i$ ($i \ge 1$) against the current query $q$:} Each line receives a four-part lexicographic priority tuple:
+  \[
+    \text{Key}(L_i, q) = \Big(
+      \underbrace{\mathbb{I}_{\text{priority}}(L_i)}_{\in \{0,1\}},\;
+      \underbrace{\big|\mathcal{T}(L_i) \cap \mathcal{T}(q)\big|}_{\in \{0,1,2,\dots\}},\;
+      \underbrace{\mathbb{I}_{\text{eq}}(L_i)}_{\in \{0,1\}},\;
+      \underbrace{-i}_{\text{line order}}
+    \Big),
+  \]
+  where:
+  \begin{itemize}[leftmargin=1.2em,itemsep=1pt]
+    \item $\mathbb{I}_{\text{priority}}(L_i) = 1$ if $L_i$ starts with an actionable or conclusion prefix (\texttt{Next:}, \texttt{Blocked:}, \texttt{Remaining:}, \texttt{Decision:}, \texttt{Rejected:}, \texttt{Rollback:}, \texttt{Constraint:}, \texttt{Evidence:}, \texttt{Verified:}, \texttt{Result:}, \texttt{Final:}, \texttt{Law:}, \texttt{Formula:}, \texttt{Invariant:}, \texttt{Do not}, \texttt{Never}, \texttt{Keep}) or contains \texttt{\textbackslash boxed}.
+    \item $|\mathcal{T}(L_i) \cap \mathcal{T}(q)|$ is the number of non-stopword tokens (\texttt{[\textbackslash w-]+}) shared between line $L_i$ and the current user question $q$.
+    \item $\mathbb{I}_{\text{eq}}(L_i) = 1$ if $L_i$ contains a mathematical operator or relation (\texttt{=}, \texttt{<=}, \texttt{>=}, \texttt{\textbackslash equiv}, \texttt{\textbackslash propto}, \texttt{\textbackslash implies}, \texttt{\textbackslash iff}, \texttt{\textbackslash frac}, \texttt{\textbackslash sum}, \texttt{\textbackslash int}).
+    \item $-i$ breaks ties in favor of earlier lines in the note.
+  \end{itemize}
+  \item \textbf{Greedy whole-line knapsack packing:} Sort body lines from highest $\text{Key}(L_i, q)$ to lowest. Walk the sorted list: if line $L_i$ has not been seen and fits within the remaining budget ($\text{used} + \text{len}(L_i) + 1 \le \text{limit}_{\text{body}}$), add $(i, L_i)$ to $\text{chosen}$ and advance $\text{used}$. \emph{If a long line does not fit, skip it and continue testing shorter high-priority lines below it.}
+  \item \textbf{Restore original reading order \& flag omissions:} Sort $\text{chosen}$ back by original line index $i$ ($0 < i_1 < i_2 < \dots$) so the excerpt reads naturally from top to bottom. If any body line $L_i$ was left out, append \texttt{" ... [more]"} so the agent knows it can call \texttt{memory\_find(ids=["..."], full=True)}.
+\end{enumerate}
 \end{mathbox}
+
+\subsection{Worked toy example: a real Handoff across sessions}
+
+To see exactly how this works in practice, suppose an engineer uses an AI assistant across two sessions to fix a double-charge payment bug in \texttt{src/checkout.py}.
+
+\paragraph{1. End of Session 1 (Saving the Handoff checkpoint):}
+Before closing Session 1, Agent A saves a 7-line handoff note (\texttt{id = "8f3a19c2"}) linked to \texttt{files=["src/checkout.py"]}:
+
+\begin{tcolorbox}[colback=codebg,colframe=gray!40,boxrule=0.5pt,arc=3pt,fontupper=\ttfamily\scriptsize]
+L0 (56 chars): Checkout double-charge root cause and webhook fix plan\\
+L1 (74 chars): Investigated Stripe logs from Tuesday afternoon across 14 staging accounts.\\
+L2 (71 chars): Root cause: webhook retry arrives before charge\_id commit finishes.\\
+L3 (62 chars): Invariant: count(charge\_id) <= 1 for every (order\_id, event\_id)\\
+L4 (69 chars): Rejected: Redis TTL lock (drops valid retries if worker crashes mid-tx).\\
+L5 (68 chars): Verified: Postgres UNIQUE(order\_id, idempotency\_key) blocks duplicates.\\
+L6 (66 chars): Next: wire idempotency\_key into src/checkout.py charge\_card() call.
+\end{tcolorbox}
+
+The full 7-line note is $472$ characters long. Suppose in Session 2 the \texttt{Handoff} section has an allowance of $b_{\text{Handoff}} = 310$ characters (so $\text{limit}_{\text{body}} = 310 - 9 = 301$ characters after reserving $9$ chars for \texttt{" ... [more]"}).
+
+\paragraph{2. Start of Session 2 (Deterministic line scoring \& packing):}
+The user opens a fresh session and asks:
+\begin{quote}
+\emph{``Query $q$: Wire the \texttt{idempotency\_key} check into \texttt{src/checkout.py}.''}\\
+\small Non-stopword query tokens: $\mathcal{T}(q) = \{\texttt{wire},\, \texttt{idempotency\_key},\, \texttt{check},\, \texttt{src},\, \texttt{checkout},\, \texttt{py}\}$.
+\end{quote}
+
+At render time, \texttt{\_excerpt} pins headline $L_0$ ($56$ chars used) and scores lines $L_1 \dots L_6$:
+
+\begin{center}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}llcccccr@{}}
+\toprule
+\textbf{Line} & \textbf{Line Preview} & \textbf{Len} & $\mathbb{I}_{\text{priority}}$ & \textbf{Overlap} & $\mathbb{I}_{\text{eq}}$ & \textbf{Tuple Key} & \textbf{Knapsack Decision ($\text{limit}_{\text{body}}=301$)} \\
+\midrule
+$L_0$ & \texttt{Checkout double-charge root...} & 56 & \multicolumn{4}{c}{\emph{(Headline --- always pinned at index 0)}} & \textbf{KEEP} ($\text{used} = 56$) \\
+$L_6$ & \texttt{Next: wire idempotency\_key...} & 66 & $1$ (\texttt{Next:}) & $5$ & $0$ & $(1, 5, 0, -6)$ & \textbf{\#1 KEEP} ($56 + 67 = 123 \le 301$) \\
+$L_5$ & \texttt{Verified: Postgres UNIQUE...} & 68 & $1$ (\texttt{Verified:}) & $1$ & $0$ & $(1, 1, 0, -5)$ & \textbf{\#2 KEEP} ($123 + 69 = 192 \le 301$) \\
+$L_3$ & \texttt{Invariant: count(charge\_id)...} & 62 & $1$ (\texttt{Invariant:}) & $0$ & $1$ (\texttt{<=}) & $(1, 0, 1, -3)$ & \textbf{\#3 KEEP} ($192 + 63 = 255 \le 301$) \\
+$L_4$ & \texttt{Rejected: Redis TTL lock...} & 69 & $1$ (\texttt{Rejected:}) & $0$ & $0$ & $(1, 0, 0, -4)$ & \textcolor{amred!85!black}{\textbf{\#4 SKIP}} ($255 + 70 = 325 > 301$) \\
+$L_2$ & \texttt{Root cause: webhook retry...} & 71 & $0$ & $0$ & $0$ & $(0, 0, 0, -2)$ & \textcolor{amred!85!black}{\textbf{\#5 SKIP}} ($255 + 72 = 327 > 301$) \\
+$L_1$ & \texttt{Investigated Stripe logs...} & 74 & $0$ & $0$ & $0$ & $(0, 0, 0, -1)$ & \textcolor{amred!85!black}{\textbf{\#6 SKIP}} ($255 + 75 = 330 > 301$) \\
+\bottomrule
+\end{tabular}%
+}
+\end{center}
+
+\paragraph{3. Final rendered \texttt{\#\# Handoff} injected into Session 2:}
+After step 5 re-sorts the kept lines $(L_0, L_3, L_5, L_6)$ back into their natural top-to-bottom order $(0 < 3 < 5 < 6)$ and appends \texttt{... [more]}, Session 2 sees:
+
+\begin{tcolorbox}[colback=codebg,colframe=gray!40,boxrule=0.5pt,arc=3pt,fontupper=\ttfamily\scriptsize]
+\#\# Handoff\\
+{[8f3a19c2]} Checkout double-charge root cause and webhook fix plan\\
+Invariant: count(charge\_id) <= 1 for every (order\_id, event\_id)\\
+Verified: Postgres UNIQUE(order\_id, idempotency\_key) blocks duplicates.\\
+Next: wire idempotency\_key into src/checkout.py charge\_card() call. ... {[more]}
+\end{tcolorbox}
+
+Notice what happened without any AI summarizer:
+\begin{itemize}[leftmargin=1.5em,itemsep=1pt]
+  \item Chatty narration ($L_1$) and secondary background ($L_2, L_4$) were automatically left out to fit the budget.
+  \item The mathematical invariant ($L_3$), the verified database constraint ($L_5$), and the exact next step ($L_6$) survived \emph{character-for-character} in their original reading order.
+  \item The \texttt{... [more]} badge tells Agent B that $3$ lines were omitted and can be retrieved verbatim via \texttt{memory\_find(ids=["8f3a19c2"], full=True)}.
+  \item If a teammate edits \texttt{src/checkout.py} before Session 2 starts, Step 3's \texttt{git diff} check sees that \texttt{src/checkout.py} changed since commit \texttt{8f3a19c2} and renders \texttt{[8f3a19c2] [stale] Checkout double-charge...}, warning Agent B to re-check the file before editing!
+\end{itemize}
 
 \subsection{Mechanism 2: Symbol-aware search \& one-step full lookup (\texttt{memory\_find})}
 
