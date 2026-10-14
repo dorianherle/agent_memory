@@ -4,9 +4,10 @@
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{microtype}
-\usepackage[margin=1.0in]{geometry}
+\usepackage[margin=0.92in]{geometry}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{booktabs}
+\usepackage{float}
 \usepackage{xcolor}
 \usepackage{hyperref}
 \usepackage{enumitem}
@@ -68,7 +69,7 @@ That is how AI assistants work across sessions today. To bridge the gap, people 
   \item \textbf{Search the transcript in fixed-size slices (Chunk RAG / BM25).} The transcript is chopped every 400--500 characters. A definition at the top of a page and the equation at the bottom end up in separate slices, so searching retrieves one without the other (Figure~\ref{fig:problem}).
 \end{itemize}
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \begin{tikzpicture}[font=\small]
   \draw[rounded corners=3pt,fill=gray!10,draw=gray!50] (0,0) rectangle (12.8,1.1);
@@ -89,7 +90,7 @@ That is how AI assistants work across sessions today. To bridge the gap, people 
 
 Scientists and engineers solved this problem long ago with a structured lab notebook: write complete entries, track when files change, read a one-paragraph status summary each morning, and flip to the full page when you need a detailed derivation. Agent Memory turns those habits into four deterministic algorithms.
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \begin{tikzpicture}[
   card/.style={draw,rounded corners=4pt,align=left,text width=3.9cm,inner sep=6pt,font=\small},
@@ -127,14 +128,14 @@ Step 3: Post-production ODEs: $\partial_x Y_2 = 0$, $\partial_x Y_3 = \gamma_0(3
 No AI model is called to write or shorten this cheat sheet. Instead, it is assembled in less than a millisecond by two simple mathematical rules:
 
 \begin{mathbox}[How the 1{,}200-character budget is shared (Dynamic Budget Reclamation)]
-The cheat sheet has a strict total cap of $B_{\max} = 1{,}200$ characters ($\approx 200$--$300$ tokens), divided across six sections with base character budgets:
+The cheat sheet has a strict total cap of $B_{\max} = 1{,}200$ characters ($\approx 200$--$300$ tokens), divided across six sections with base character allowances:
 \[
-  \big(b_{\text{Goal}}^{\text{base}},\; b_{\text{Steer}}^{\text{base}},\; b_{\text{Model}}^{\text{base}},\; b_{\text{Handoff}}^{\text{base}},\; b_{\text{OpenQ}}^{\text{base}},\; b_{\text{Related}}^{\text{base}}\big)
-  \;=\; (260,\; 220,\; 200,\; 360,\; 120,\; 260)\text{ chars.}
+  (b_{\text{Goal}}^0,\, b_{\text{Steer}}^0,\, b_{\text{Model}}^0,\, b_{\text{Handoff}}^0,\, b_{\text{OpenQ}}^0,\, b_{\text{Related}}^0)
+  = (260,\, 220,\, 200,\, 360,\, 120,\, 260)\text{ chars.}
 \]
 In many sessions, optional sections like user corrections (\texttt{Steering}), rule models (\texttt{Task model}), or blockers (\texttt{Open questions}) are empty. Rather than wasting their $220 + 200 + 120 = 540$ characters of quota, Agent Memory collects any unused base budgets into a spare pool $B_{\text{spare}}$:
 \[
-  B_{\text{spare}} = 220\cdot\mathbb{I}(\text{Steer}=\emptyset) + 200\cdot\mathbb{I}(\text{Model}=\emptyset) + 120\cdot\mathbb{I}(\text{OpenQ}=\emptyset),
+  B_{\text{spare}} = 220\,\mathbb{I}(\text{Steer}=\emptyset) + 200\,\mathbb{I}(\text{Model}=\emptyset) + 120\,\mathbb{I}(\text{OpenQ}=\emptyset),
 \]
 and automatically redistributes that spare space to the three core reasoning sections:
 \[
@@ -148,12 +149,12 @@ and automatically redistributes that spare space to the three core reasoning sec
 \begin{mathbox}[How individual lines are chosen inside a note (Equation-Priority Ranking)]
 When a saved note is longer than its section budget $b_S$, which lines get shown in the cheat sheet? Agent Memory keeps the title (line 1) and scores every other line $L_i$ against the current question $q$ using a four-part priority score:
 \[
-  \text{Priority}(L_i, q) \;=\; \Big(\;
-    \underbrace{\mathbb{I}_{\text{result}}(L_i)}_{\text{1 if final result/next step}},\;\;
-    \underbrace{|\mathcal{T}(L_i) \cap \mathcal{T}(q)|}_{\text{shared words with question } q},\;\;
-    \underbrace{\mathbb{I}_{\text{math}}(L_i)}_{\text{1 if line contains an equation}},\;\;
-    \underbrace{-i}_{\text{earlier lines first}}
-  \;\Big).
+  \text{Priority}(L_i, q) = \Big(
+    \underbrace{\mathbb{I}_{\text{result}}(L_i)}_{\text{final result/next}},\;
+    \underbrace{|\mathcal{T}(L_i) \cap \mathcal{T}(q)|}_{\text{query word overlap}},\;
+    \underbrace{\mathbb{I}_{\text{math}}(L_i)}_{\text{has equation}},\;
+    \underbrace{-i}_{\text{line order}}
+  \Big).
 \]
 \textbf{In plain words:} (1) Always keep lines labeled \texttt{FINAL RESULT}, \texttt{Next:}, \texttt{Verified:}, or \texttt{\textbackslash boxed}; (2) next, prefer lines that share technical terms with today's question $q$; (3) when tied, prefer lines containing mathematical formulas (\texttt{=}, \texttt{\textbackslash frac}, \texttt{\textbackslash sum}, \texttt{\textbackslash int}) over prose; and (4) keep them in their original reading order. If any related notes do not fit, their IDs are listed at the bottom (\texttt{[+1 more: 7788ccdd]}) so the assistant knows they exist.
 \end{mathbox}
@@ -197,12 +198,12 @@ If a file was edited, created, or deleted since the note was written, the cheat 
 As work continues across many sessions, Agent Memory keeps the notebook compact in two ways:
 \begin{enumerate}[leftmargin=1.5em,itemsep=2pt]
   \item \textbf{Rolling step summaries (\texttt{memory\_summarize}):} After finishing step $t$, the assistant folds the verified conclusions of steps $1\dots t$ into one summary note. The morning cheat sheet shows this single roll-up in \texttt{Handoff} and hides the individual step notes (while keeping the full originals searchable in Git).
-  \item \textbf{Turning repeated examples into compact rules (\texttt{memory\_model}):} When an assistant tests many specific cases of a system rule (for instance, which file changes require a code review, or which sensor serial numbers need a calibration offset), listing every test case wastes space. Agent Memory lets the assistant write a safe one-line formula (such as \texttt{2.75 if serial == 'M17' and temp > 26.0 else 4.0}), verifies that it passes every recorded historical test case, and automatically simplifies redundant rules using Boolean algebra:
+  \item \textbf{Turning repeated examples into compact rules (\texttt{memory\_model}):} When an assistant tests many specific cases of a system rule (for instance, which file changes require a code review, or which sensor serial numbers need a calibration offset), listing every test case wastes space. Agent Memory lets the assistant write a safe one-line formula (such as \texttt{2.75 if serial == 'M17' else 4.0}), verifies that it passes every recorded historical test case, and automatically simplifies redundant rules using Boolean algebra:
   \[
     (A \wedge B) \vee (A \wedge C) \;\longrightarrow\; A \wedge (B \vee C) \qquad\text{\small(factor out shared conditions)}
   \]
   \[
-    (x = a_1) \vee (x = a_2) \vee (x = a_3) \;\longrightarrow\; x \in [a_1, a_2, a_3] \qquad\text{\small(collapse repeated checks into a list)}
+    (x = a_1) \vee (x = a_2) \vee (x = a_3) \;\longrightarrow\; x \in [a_1, a_2, a_3] \qquad\text{\small(collapse repeated checks)}
   \]
 \end{enumerate}
 
@@ -217,8 +218,8 @@ We evaluated Agent Memory on \emph{MemoryArena} (\texttt{formal\_reasoning\_phys
 
 Following the official benchmark code (\texttt{eval.py}), we report two scores across all 20 papers:
 \[
-  \textbf{Progress Score (PS)} = \frac{1}{20}\sum_{p=1}^{20}\left(\frac{\text{steps solved in paper } p}{\text{total steps } K_p}\right), \qquad
-  \textbf{Success Rate (SR)} = \frac{1}{20}\sum_{p=1}^{20} \mathbb{I}\big(\text{final step } K_p\text{ solved}\big).
+  \text{PS} = \frac{1}{20}\sum_{p=1}^{20}\frac{\text{steps solved in paper } p}{K_p}, \qquad
+  \text{SR} = \frac{1}{20}\sum_{p=1}^{20} \mathbb{I}(\text{final step } K_p\text{ solved}).
 \]
 
 % ---------------------------------------------------------------
@@ -228,45 +229,40 @@ Following the official benchmark code (\texttt{eval.py}), we report two scores a
 
 Before running an AI solver, we checked all 66 dependent steps ($t \ge 2$) across the 20 papers and measured what fraction of the ground-truth LaTeX equations from earlier steps actually survived in the prompt shown to the assistant (Figure~\ref{fig:recall}).
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \begin{tikzpicture}
 \begin{axis}[
-  xbar,width=0.76\textwidth,height=6.2cm,
-  xmin=0,xmax=125,
+  xbar,width=0.72\textwidth,height=6.2cm,
+  xmin=0,xmax=128,
   xlabel={Needed prior equations present in the prompt at step $t \ge 2$ (\%)},
-  symbolic y coords={
-    No memory (isolated session),
-    Short summaries (Mem0-style facts),
-    Slice search (BM25 450-char chunks),
-    Agent Memory (cheat sheet only -- 0 lookups),
-    Agent Memory (cheat sheet + 1 full lookup)
-  },
-  ytick={
-    No memory (isolated session),
-    Short summaries (Mem0-style facts),
-    Slice search (BM25 450-char chunks),
-    Agent Memory (cheat sheet only -- 0 lookups),
-    Agent Memory (cheat sheet + 1 full lookup)
+  symbolic y coords={r1,r2,r3,r4,r5},
+  ytick={r1,r2,r3,r4,r5},
+  yticklabels={
+    {No memory (isolated session)},
+    {Short summaries (Mem0-style)},
+    {Slice search (BM25 chunks)},
+    {\textbf{Agent Memory (cheat sheet, 0 calls)}},
+    {\textbf{Agent Memory (1-call full lookup)}}
   },
   y dir=reverse,
   bar width=12pt,bar shift=0pt,enlarge y limits=0.16,
   tick label style={font=\small},
   label style={font=\small\bfseries},
   xmajorgrids,grid style={gray!25}]
-\addplot[fill=amred!75,draw=none] coordinates {(10.4,{No memory (isolated session)})};
-\addplot[fill=amgray!85,draw=none] coordinates {(37.0,{Short summaries (Mem0-style facts)}) (53.9,{Slice search (BM25 450-char chunks)})};
-\addplot[fill=amgreen!85,draw=none] coordinates {(52.5,{Agent Memory (cheat sheet only -- 0 lookups)})};
-\addplot[fill=amblue,draw=none] coordinates {(100.0,{Agent Memory (cheat sheet + 1 full lookup)})};
+\addplot[fill=amred!75,draw=none] coordinates {(10.4,r1)};
+\addplot[fill=amgray!85,draw=none] coordinates {(37.0,r2) (53.9,r3)};
+\addplot[fill=amgreen!85,draw=none] coordinates {(52.5,r4)};
+\addplot[fill=amblue,draw=none] coordinates {(100.0,r5)};
 
-\node[anchor=west,font=\footnotesize\bfseries,text=amred!85!black] at (axis cs:11.5,{No memory (isolated session)}) {10.4\% \normalfont\scriptsize(66 tokens)};
-\node[anchor=west,font=\footnotesize\bfseries,text=amgray!90!black] at (axis cs:38.0,{Short summaries (Mem0-style facts)}) {37.0\% \normalfont\scriptsize(187 tokens)};
-\node[anchor=west,font=\footnotesize\bfseries,text=amgray!90!black] at (axis cs:55.0,{Slice search (BM25 450-char chunks)}) {53.9\% \normalfont\scriptsize(374 tokens)};
-\node[anchor=west,font=\footnotesize\bfseries,text=amgreen!75!black] at (axis cs:53.5,{Agent Memory (cheat sheet only -- 0 lookups)}) {52.5\% \normalfont\scriptsize(338 tokens)};
-\node[anchor=west,font=\footnotesize\bfseries,text=amblue] at (axis cs:101.0,{Agent Memory (cheat sheet + 1 full lookup)}) {100.0\% \normalfont\scriptsize(1,565 tokens)};
+\node[anchor=west,font=\footnotesize\bfseries,text=amred!85!black] at (axis cs:11.5,r1) {10.4\% \normalfont\scriptsize(66 toks)};
+\node[anchor=west,font=\footnotesize\bfseries,text=amgray!90!black] at (axis cs:38.0,r2) {37.0\% \normalfont\scriptsize(187 toks)};
+\node[anchor=west,font=\footnotesize\bfseries,text=amgray!90!black] at (axis cs:55.0,r3) {53.9\% \normalfont\scriptsize(374 toks)};
+\node[anchor=west,font=\footnotesize\bfseries,text=amgreen!75!black] at (axis cs:53.5,r4) {52.5\% \normalfont\scriptsize(338 toks)};
+\node[anchor=west,font=\footnotesize\bfseries,text=amblue] at (axis cs:101.0,r5) {100.0\% \normalfont\scriptsize(1,565 toks)};
 \end{axis}
 \end{tikzpicture}
-\caption{Equation retention across all 20 physics papers (66 dependent subtasks). Short summaries lose nearly two-thirds of the math (37.0\% kept). Fixed-slice search loses nearly half (53.9\%). Agent Memory's 1{,}200-character cheat sheet matches slice search with \emph{zero} lookups (52.5\%, green), and adding a single full lookup keeps \textbf{100.0\%} of needed equations (blue).}
+\caption{Equation retention across all 20 physics papers (66 dependent subtasks). Short summaries lose nearly two-thirds of the math (37.0\% kept). Fixed-slice search loses nearly half (53.9\%). Agent Memory's 1{,}200-character cheat sheet matches slice search with \emph{zero} lookups (52.5\%, green bar), and adding a single full lookup keeps \textbf{100.0\%} of needed equations (blue bar).}
 \label{fig:recall}
 \end{figure}
 
@@ -276,48 +272,42 @@ To make a strict apples-to-apples comparison against the published ICML 2026 lea
 
 On Step 1 alone---before any memory system is even used---\texttt{gpt-5-mini} only solves \textbf{12 out of 20 problems (60\%)} due to single-step algebra errors. That 12-problem mark is the ceiling of what a perfect memory system could preserve for this model (Figure~\ref{fig:mini}).
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \begin{tikzpicture}
 \begin{axis}[
-  ybar,width=0.9\textwidth,height=6.0cm,bar width=20pt,bar shift=0pt,
-  ymin=0,ymax=14,ylabel={Problems finished out of 20 (SR)},
-  symbolic x coords={
-    No memory,
-    Short summaries,
-    Slice search,
-    MemGPT (paper),
-    Cheat sheet only,
-    Full lookup
-  },
-  xtick={
-    No memory,
-    Short summaries,
-    Slice search,
-    MemGPT (paper),
-    Cheat sheet only,
-    Full lookup
+  ybar,width=0.88\textwidth,height=6.0cm,bar width=20pt,bar shift=0pt,
+  ymin=0,ymax=14.2,ylabel={Problems finished out of 20 (SR)},
+  symbolic x coords={m1,m2,m3,m4,m5,m6},
+  xtick={m1,m2,m3,m4,m5,m6},
+  xticklabels={
+    {No memory},
+    {Short summaries},
+    {Slice search},
+    {MemGPT (ICML '26)},
+    {\textbf{Cheat sheet (0 calls)}},
+    {\textbf{Full lookup (1 call)}}
   },
   x tick label style={font=\footnotesize,align=center,text width=2.1cm},
   label style={font=\small\bfseries},
   ymajorgrids,grid style={gray!25}]
-\addplot[fill=amred!75,draw=none] coordinates {(No memory,1)};
-\addplot[fill=amgray!85,draw=none] coordinates {(Short summaries,3) (Slice search,5) (MemGPT (paper),9)};
-\addplot[fill=amgreen!85,draw=none] coordinates {(Cheat sheet only,10)};
-\addplot[fill=amblue,draw=none] coordinates {(Full lookup,10)};
+\addplot[fill=amred!75,draw=none] coordinates {(m1,1)};
+\addplot[fill=amgray!85,draw=none] coordinates {(m2,3) (m3,5) (m4,9)};
+\addplot[fill=amgreen!85,draw=none] coordinates {(m5,10)};
+\addplot[fill=amblue,draw=none] coordinates {(m6,10)};
 
-\draw[amorange,very thick,dashed] (axis cs:No memory,12) -- (axis cs:Full lookup,12);
-\node[anchor=south west,font=\scriptsize\bfseries,text=amorange] at (axis cs:No memory,12.1) {\texttt{gpt-5-mini} Step-1 math ceiling: 12 / 20 problems (60.0\%)};
+\draw[amorange,very thick,dashed] (axis cs:m1,12) -- (axis cs:m6,12);
+\node[anchor=south west,font=\scriptsize\bfseries,text=amorange] at (axis cs:m1,12.15) {\texttt{gpt-5-mini} Step-1 math ceiling: 12 / 20 problems (60.0\%)};
 
-\node[anchor=south,font=\footnotesize\bfseries,text=amred!85!black] at (axis cs:No memory,1) {1/20 (5\%)};
-\node[anchor=south,font=\footnotesize\bfseries,text=amgray!90!black] at (axis cs:Short summaries,3) {3/20 (15\%)};
-\node[anchor=south,font=\footnotesize\bfseries,text=amgray!90!black] at (axis cs:Slice search,5) {5/20 (25\%)};
-\node[anchor=south,font=\footnotesize\bfseries,text=amgray!90!black] at (axis cs:MemGPT (paper),9) {9/20 (45\%)};
-\node[anchor=south,font=\footnotesize\bfseries,text=amgreen!75!black] at (axis cs:Cheat sheet only,10) {10/20 (50\%)};
-\node[anchor=south,font=\footnotesize\bfseries,text=amblue] at (axis cs:Full lookup,10) {10/20 (50\%)};
+\node[anchor=south,font=\footnotesize\bfseries,align=center,text=amred!85!black] at (axis cs:m1,1) {1/20\\\scriptsize(32.2\% PS)};
+\node[anchor=south,font=\footnotesize\bfseries,align=center,text=amgray!90!black] at (axis cs:m2,3) {3/20\\\scriptsize(38.9\% PS)};
+\node[anchor=south,font=\footnotesize\bfseries,align=center,text=amgray!90!black] at (axis cs:m3,5) {5/20\\\scriptsize(50.5\% PS)};
+\node[anchor=south,font=\footnotesize\bfseries,align=center,text=amgray!90!black] at (axis cs:m4,9) {9/20\\\scriptsize(56.6\% PS)};
+\node[anchor=south,font=\footnotesize\bfseries,align=center,text=amgreen!75!black] at (axis cs:m5,10) {10/20\\\scriptsize(56.9\% PS)};
+\node[anchor=south,font=\footnotesize\bfseries,align=center,text=amblue] at (axis cs:m6,10) {10/20\\\scriptsize(60.2\% PS)};
 \end{axis}
 \end{tikzpicture}
-\caption{Results across all 20 papers using the official \texttt{gpt-5-mini} solver + LLM judge. Without memory, performance collapses from 12/20 on Step 1 down to 1/20 at the end. Both Agent Memory modes finish \textbf{10 of the 12 solvable problems (50.0\% SR; 56.9\% PS for cheat sheet only, 60.2\% PS for full lookup)}, beating all published external memory systems.}
+\caption{Results across all 20 papers using the official \texttt{gpt-5-mini} solver + LLM judge. Without memory, performance collapses from 12/20 on Step 1 down to 1/20 at the end. Agent Memory finishes \textbf{10 of the 12 solvable problems (50.0\% SR; 56.9\% PS for cheat sheet only in green, 60.2\% PS for full lookup in blue)}, beating all published external memory systems.}
 \label{fig:mini}
 \end{figure}
 
@@ -325,29 +315,35 @@ On Step 1 alone---before any memory system is even used---\texttt{gpt-5-mini} on
 
 To separate memory failures from algebra mistakes, we ran all 20 papers (86 steps) with a stronger solver (\texttt{gpt-5.6-sol}) that gets \textbf{all 20 first steps right (100\%)}. Now any failure on Steps $2\dots 12$ is purely a memory failure (Figure~\ref{fig:sol}).
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \begin{tikzpicture}
 \begin{axis}[
   ybar,width=0.85\textwidth,height=5.8cm,bar width=26pt,bar shift=0pt,
   ymin=0,ymax=23.5,ylabel={Problems finished out of 20 (SR)},
-  symbolic x coords={No memory,Text-Embedding RAG (paper),Cheat sheet only (0 lookups),Cheat sheet + 1 full lookup},
-  xtick={No memory,Text-Embedding RAG (paper),Cheat sheet only (0 lookups),Cheat sheet + 1 full lookup},
+  symbolic x coords={s1,s2,s3,s4},
+  xtick={s1,s2,s3,s4},
+  xticklabels={
+    {No memory},
+    {Dense RAG (ICML '26 top)},
+    {\textbf{Cheat sheet only (0 lookups)}},
+    {\textbf{Cheat sheet + 1 full lookup}}
+  },
   x tick label style={font=\footnotesize,align=center,text width=2.8cm},
   label style={font=\small\bfseries},
   ymajorgrids,grid style={gray!25}]
-\addplot[fill=amred!75,draw=none] coordinates {(No memory,7)};
-\addplot[fill=amgray!85,draw=none] coordinates {(Text-Embedding RAG (paper),12)};
-\addplot[fill=amgreen!85,draw=none] coordinates {(Cheat sheet only (0 lookups),15)};
-\addplot[fill=amblue,draw=none] coordinates {(Cheat sheet + 1 full lookup,20)};
+\addplot[fill=amred!75,draw=none] coordinates {(s1,7)};
+\addplot[fill=amgray!85,draw=none] coordinates {(s2,12)};
+\addplot[fill=amgreen!85,draw=none] coordinates {(s3,15)};
+\addplot[fill=amblue,draw=none] coordinates {(s4,20)};
 
-\node[anchor=south,font=\footnotesize\bfseries,text=amred!85!black] at (axis cs:No memory,7) {7/20 (35\%)};
-\node[anchor=south,font=\footnotesize\bfseries,text=amgray!90!black] at (axis cs:Text-Embedding RAG (paper),12) {12/20 (60\%)};
-\node[anchor=south,font=\footnotesize\bfseries,text=amgreen!75!black] at (axis cs:Cheat sheet only (0 lookups),15) {15/20 (75\%)};
-\node[anchor=south,font=\footnotesize\bfseries,text=amblue] at (axis cs:Cheat sheet + 1 full lookup,20) {20/20 (100\%)};
+\node[anchor=south,font=\footnotesize\bfseries,text=amred!85!black] at (axis cs:s1,7) {7/20 (35\%)};
+\node[anchor=south,font=\footnotesize\bfseries,text=amgray!90!black] at (axis cs:s2,12) {12/20 (60\%)};
+\node[anchor=south,font=\footnotesize\bfseries,text=amgreen!75!black] at (axis cs:s3,15) {15/20 (75\%)};
+\node[anchor=south,font=\footnotesize\bfseries,text=amblue] at (axis cs:s4,20) {20/20 (100\%)};
 \end{axis}
 \end{tikzpicture}
-\caption{With \texttt{gpt-5.6-sol}, the 1{,}200-character cheat sheet alone finishes \textbf{15 of 20 papers (75.0\% SR, 85.8\% PS)} with zero tool calls ($\sim 197$ tokens/turn), and adding one full lookup finishes \textbf{all 20 papers (100.0\% SR, 86/86 subtasks solved)}.}
+\caption{With \texttt{gpt-5.6-sol}, the 1{,}200-character cheat sheet alone finishes \textbf{15 of 20 papers (75.0\% SR, 85.8\% PS, green)} with zero tool calls ($\sim 197$ tokens/turn), and adding one full lookup finishes \textbf{all 20 papers (100.0\% SR, 86/86 subtasks solved, blue)}.}
 \label{fig:sol}
 \end{figure}
 
@@ -355,7 +351,7 @@ To separate memory failures from algebra mistakes, we ran all 20 papers (86 step
 
 Figure~\ref{fig:depth} tracks accuracy step by step from Session 1 to Session 12. Without memory, even the strong model drops from 100\% at Step 1 to 45\% at Step 2 and 0\% after Step 6. The one-paragraph cheat sheet holds up well through Step 8 (66.7\%), and the one-request full lookup stays at \textbf{100\% all the way to Step 12}.
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \begin{tikzpicture}
 \begin{axis}[
@@ -383,9 +379,9 @@ Figure~\ref{fig:depth} tracks accuracy step by step from Session 1 to Session 12
 
 To keep our claims honest:
 \begin{itemize}[itemsep=2pt,leftmargin=1.5em]
-  \item \textbf{Evaluated on formal physics derivations.} Our live benchmark covers all 20 papers (86 subtasks) of MemoryArena's \texttt{formal\_reasoning\_phys} split. While our adapter (\texttt{benchmarks/memoryarena/agent\_memory\_system.py}) plugs into the other MemoryArena splits (math, CS, shopping, travel, search), we have only run the physics split so far.
+  \item \textbf{Evaluated on formal physics derivations.} Our live benchmark covers all 20 papers (86 subtasks) of MemoryArena's physics split (\texttt{formal\_reasoning\_phys}). While our adapter plugs directly into the other MemoryArena splits (math, CS, shopping, travel, search), we have only run the physics split so far.
   \item \textbf{Why we report two AI models.} On the benchmark's standard model (\texttt{gpt-5-mini}), Agent Memory achieves \textbf{50.0\% SR and 60.2\% PS}---beating MemGPT (45\% SR), Mem0 (25\% SR), and GPT-5.1-mini Long Context (45\% SR / 60\% PS), while sitting right at \texttt{gpt-5-mini}'s 60\% single-step math ceiling. Running \texttt{gpt-5.6-sol} (100\% SR / 100\% PS) shows what happens when single-step algebra errors are removed.
-  \item \textbf{Deep chains need the full lookup.} A 1{,}200-character paragraph ($\sim 200$ tokens) solves 75\% of papers with zero tool calls, but chains of 8--12 equations require calling \texttt{memory\_find(query=..., full=True)} ($\sim 968$--$1{,}435$ tokens).
+  \item \textbf{Deep chains need the full lookup.} A 1{,}200-character paragraph ($\sim 200$ tokens) solves 75\% of papers with zero tool calls, but chains of 8--12 equations require calling \texttt{memory\_find(..., full=True)} ($\sim 968$--$1{,}435$ tokens).
 \end{itemize}
 
 \section{Conclusion}
