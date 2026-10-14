@@ -386,7 +386,6 @@ def _run_question(question: str, write) -> None:
         memory = Memory(project)
         try:
             memory.ensure_goal(question)
-            memory.write_state_file(question=question)
             packet = memory.render_packet(question)
         finally:
             memory._catalog.close()
@@ -463,11 +462,6 @@ def _run_question(question: str, write) -> None:
         if status == "error" and not fail:
             write({"type": "error", "message": leftover or "Agent run failed."})
         if status not in ("cancelled", "error") and not fail:
-            memory = Memory(project)
-            try:
-                memory.write_state_file()
-            finally:
-                memory._catalog.close()
             write({"type": "memory"})
         write({"type": "done", "status": status, "timings": timings})
     except Exception as error:

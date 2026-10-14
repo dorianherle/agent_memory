@@ -949,13 +949,10 @@ class Memory:
 
         items = self.state()
         query = (question or "").strip() or _latest_user_text(items)
-        from agent_memory.models import TaskModels
-        model = TaskModels(self).view(items=items)
-        covered = model["covered"] if model else ()
-        related = self.related_notes(query, _state=items, _covered=covered) if query else []
+        related = self.related_notes(query, _state=items) if query else []
         # Check only candidates that can enter the bounded packet, not all history.
         goal = _goal(items)
-        candidates = [entry for entry in (goal, _steering(items, goal), _handoff(items, covered=covered)) if entry]
+        candidates = [entry for entry in (goal, _steering(items, goal), _handoff(items)) if entry]
         candidates += split_open_questions(items)[:8] + related
         return render_packet(
             items,
@@ -965,55 +962,7 @@ class Memory:
             query=query,
             stale_ids=self._stale_ids(candidates),
             max_chars=max_chars,
-            model=model,
         )
-
-    def write_state_rule(
-        self,
-        path: str | Path | None = None,
-        *,
-        packet: str | None = None,
-    ) -> Path:
-        """Write MEMORY STATE into an alwaysApply Cursor rule.
-
-        Cursor reloads always-apply rules each turn. Embedding live state
-        here is the reliable IDE injection path (beforeSubmitPrompt cannot
-        inject context). File is meant to be gitignored.
-        """
-        target = (
-            Path(path)
-            if path
-            else self._path / ".cursor" / "rules" / "agent-memory-state.mdc"
-        )
-        target.parent.mkdir(parents=True, exist_ok=True)
-        body = (
-            "---\n"
-            "description: Live MEMORY STATE (auto-updated; do not edit)\n"
-            "alwaysApply: true\n"
-            "---\n\n"
-            "# MEMORY STATE\n\n"
-            f"```\n{packet if packet is not None else self.render_packet()}\n```\n"
-        )
-        target.write_text(body)
-        return target
-
-    def write_state_file(
-        self,
-        path: str | Path | None = None,
-        *,
-        question: str | None = None,
-    ) -> Path:
-        """Write MEMORY STATE markdown + alwaysApply rule for prompt injection."""
-        target = Path(path) if path else self._path / ".cursor" / "MEMORY_STATE.md"
-        target.parent.mkdir(parents=True, exist_ok=True)
-        packet = self.render_packet(question)
-        body = (
-            "# MEMORY STATE\n\n"
-            f"```\n{packet}\n```\n"
-        )
-        target.write_text(body)
-        self.write_state_rule(packet=packet)
-        return target
 
     @property
     def tools(self) -> list[dict]:

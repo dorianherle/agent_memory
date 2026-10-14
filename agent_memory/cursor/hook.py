@@ -1,18 +1,16 @@
-"""Cursor hook entrypoint: goal setup + state injection + agent identity.
+"""Cursor hook entrypoint: goal setup + live HTML refresh + agent identity.
 
 Reads JSON from stdin (Cursor hook protocol). Event comes from
 `hook_event_name` in the payload.
 
-- sessionStart        → instructions + agent id; refresh state rule/canvas
-- beforeSubmitPrompt  → create the goal once; refresh MEMORY STATE for prompt
-- afterAgentResponse  → no-op (conversation is not durable memory)
+- sessionStart        → instructions + agent id; refresh live HTML
+- beforeSubmitPrompt  → create the goal once; refresh live HTML
+- afterAgentResponse  → refresh live HTML (conversation is not durable memory)
 - subagentStart       → register subagent session name
 - subagentStop        → save subagent summary under that agent name
 
-MEMORY STATE lands in the model prompt via the gitignored alwaysApply rule
-``.cursor/rules/agent-memory-state.mdc`` (rewritten every durable write).
-beforeSubmitPrompt only points at that rule — it does not paste the
-packet again. Live UI is HTML only.
+Memory is retrieved on demand via MCP tools (`memory_find`, `memory_history`)
+rather than rewriting a dynamic Cursor state rule on every prompt.
 """
 
 from __future__ import annotations
@@ -40,11 +38,11 @@ Do not load skills, search memory, inspect files, narrate checks, recap projects
 or propose tasks unless the user asks for work or context. An old goal is not a
 new request to resume work.
 
-Call memory_save for durable user constraints, useful findings, decisions, and
-checkpoints. Distill the useful fact; do not copy a raw prompt or answer. On a
-completed milestone, call memory_summarize with a verified outcome and key
-evidence to group its commits. Do not wait for the user to request a summary.
-Keep unfinished work and open questions explicit.
+Query memory_find or memory_history on demand when investigating prior context,
+decisions, or dead ends. Call memory_save for dead ends, non-obvious decisions,
+user constraints, and checkpoints before risky edits. Distill the useful fact;
+do not copy a raw prompt or answer. On a completed milestone, call
+memory_summarize with a verified outcome and key evidence to group its commits.
 Do not invent ids.
 Pass agent=<your name> on memory_save / memory_summarize.
 """.strip()
@@ -85,17 +83,13 @@ def _agent_for_event(memory, data: dict) -> str:
 def _refresh_dashboard(memory) -> None:
     """Best-effort live HTML rewrite after durable events."""
     try:
-        memory.write_state_file()
         memory.write_live_html()
     except Exception:
-        try:
-            memory.write_state_file()
-        except Exception:
-            pass
+        pass
 
 
 def _memory_rule_text(memory) -> str:
-    """Static alwaysApply tool-guide rule (not the live state rule)."""
+    """Static alwaysApply tool-guide rule."""
     path = memory._path / ".cursor" / "rules" / "agent-memory.mdc"
     try:
         return path.read_text(encoding="utf-8")
@@ -116,8 +110,6 @@ def handle(event: str, data: dict) -> dict:
                 agent=agent,
                 agent_type=agent,
             )
-        state_path = memory.write_state_file()
-        rule_path = memory._path / ".cursor" / "rules" / "agent-memory-state.mdc"
         html_note = ""
         try:
             html_path = memory.write_live_html()
@@ -129,10 +121,7 @@ def handle(event: str, data: dict) -> dict:
         context = (
             f"{CURSOR_INSTRUCTIONS}\n\n"
             f"Your memory agent name: @{agent}\n"
-            f"Pass agent={agent!r} on memory_save / memory_summarize when possible.\n\n"
-            f"MEMORY STATE is injected every turn via the alwaysApply rule "
-            f"`{rule_path.relative_to(memory._path)}` "
-            f"(also @{state_path.relative_to(memory._path)})."
+            f"Pass agent={agent!r} on memory_save / memory_summarize when possible."
             f"{html_note}"
         )
         return {
@@ -145,25 +134,10 @@ def handle(event: str, data: dict) -> dict:
         entry_id = None
         if isinstance(prompt, str) and prompt.strip():
             entry_id = memory.ensure_goal(prompt.strip(), agent=USER_AGENT)
-            packet = memory.render_packet(prompt.strip())
-            memory.write_state_file(question=prompt.strip())
             try:
                 memory.write_live_html()
             except Exception:
                 pass
-        else:
-            memory.write_state_file()
-        # One delivery channel: the alwaysApply rule. The hook only
-        # points at it so memory state is delivered once.
-        rule_rel = ".cursor/rules/agent-memory-state.mdc"
-        state = (
-            packet
-            if isinstance(prompt, str) and prompt.strip()
-            else memory.render_packet()
-        )
-        pointer = (
-            f"MEMORY STATE is in the alwaysApply rule `{rule_rel}`."
-        )
         if entry_id and isinstance(prompt, str) and prompt.strip():
             try:
                 from agent_memory.live_html import default_live_dir
@@ -183,7 +157,7 @@ def handle(event: str, data: dict) -> dict:
                     default_live_dir(memory),
                     entry_id,
                     goal=prompt.strip(),
-                    memory_state=state,
+                    memory_state="",
                     instructions=instructions,
                     rule=_memory_rule_text(memory),
                     mcp_tools=mcp_tools_catalog(),
@@ -193,7 +167,6 @@ def handle(event: str, data: dict) -> dict:
                 pass
         return {
             "continue": True,
-            "additional_context": pointer,
         }
 
     if event == "afterAgentResponse":
