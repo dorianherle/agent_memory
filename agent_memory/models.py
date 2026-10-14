@@ -673,13 +673,76 @@ def check_inputs(model, inputs):
         raise Unknown("Inputs must contain finite JSON values") from error
 
 
-def _conjuncts(expr) -> frozenset[str]:
+def _num_interval(atom):
+    if not isinstance(atom, dict) or atom.get("op") not in ("eq", "lt", "le", "gt", "ge"):
+        return None
+    left, right = atom["args"]
+    op = atom["op"]
+    if set(left) == {"var"} and set(right) == {"value"} and type(right["value"]) in (int, float):
+        var, c = left["var"], float(right["value"])
+    elif set(right) == {"var"} and set(left) == {"value"} and type(left["value"]) in (int, float):
+        var, c = right["var"], float(left["value"])
+        op = {"eq": "eq", "lt": "gt", "le": "ge", "gt": "lt", "ge": "le"}[op]
+    else:
+        return None
+    if op == "eq":
+        return var, c, True, c, True
+    if op == "lt":
+        return var, -math.inf, False, c, False
+    if op == "le":
+        return var, -math.inf, False, c, True
+    if op == "gt":
+        return var, c, False, math.inf, False
+    return var, c, True, math.inf, False
+
+
+def _finite_set(atom):
+    if not isinstance(atom, dict):
+        return None
+    if atom.get("op") == "eq":
+        left, right = atom["args"]
+        if set(left) == {"var"} and set(right) == {"value"}:
+            return left["var"], frozenset({canonical(right["value"])})
+        if set(right) == {"var"} and set(left) == {"value"}:
+            return right["var"], frozenset({canonical(left["value"])})
+    if atom.get("op") == "in":
+        left, right = atom["args"]
+        if set(left) == {"var"} and set(right) == {"value"} and isinstance(right["value"], list):
+            return left["var"], frozenset(canonical(v) for v in right["value"])
+    return None
+
+
+def _atom_entails(p, q) -> bool:
+    if canonical(p) == canonical(q):
+        return True
+    iv_p, iv_q = _num_interval(p), _num_interval(q)
+    if iv_p is not None and iv_q is not None and iv_p[0] == iv_q[0]:
+        _, l1, lc1, h1, hc1 = iv_p
+        _, l2, lc2, h2, hc2 = iv_q
+        low_ok = l1 > l2 or (l1 == l2 and (lc2 or not lc1))
+        high_ok = h1 < h2 or (h1 == h2 and (hc2 or not hc1))
+        return low_ok and high_ok
+    fs_p, fs_q = _finite_set(p), _finite_set(q)
+    if fs_p is not None and fs_q is not None and fs_p[0] == fs_q[0]:
+        return fs_p[1] <= fs_q[1]
+    return False
+
+
+def _conjuncts(expr) -> tuple[dict, ...]:
     expr = normalize(expr)
     if expr == {"value": True}:
-        return frozenset()
+        return ()
     if isinstance(expr, dict) and expr.get("op") == "and":
-        return frozenset(canonical(arg) for arg in expr["args"])
-    return frozenset({canonical(expr)})
+        return tuple(expr["args"])
+    return (expr,)
+
+
+def _strictly_more_specific(spec_conjuncts, gen_conjuncts) -> bool:
+    entails_forward = all(any(_atom_entails(p, q) for p in spec_conjuncts) for q in gen_conjuncts)
+    if not entails_forward:
+        return False
+    entails_backward = all(any(_atom_entails(q, p) for q in gen_conjuncts) for p in spec_conjuncts)
+    return not entails_backward
 
 
 def prediction(rules, inputs, target):
@@ -702,11 +765,11 @@ def prediction(rules, inputs, target):
         return {"status": "unknown", "reason": str(error), "rules": used}
     if not matched:
         return {"status": "unknown", "reason": "No applicable rule", "rules": []}
-    # A strictly more specific condition (strict superset of conjuncts) overrides
-    # a broader or unconditional default law without ambiguity.
+    # A strictly more specific condition (conjunct superset or interval/set refinement)
+    # overrides a broader or unconditional default law without ambiguity.
     active = [
         item for item in matched
-        if not any(item[1] < other[1] for other in matched)
+        if not any(_strictly_more_specific(other[1], item[1]) for other in matched)
     ]
     values = {item[2]: item[3] for item in active}
     active_ids = [item[0] for item in active]
@@ -784,6 +847,14 @@ _TYPE_NAMES = {
     list: "array",
     dict: "object",
 }
+_TYPE_DEFAULTS = {
+    "boolean": False,
+    "integer": 0,
+    "number": 0.0,
+    "string": "",
+    "array": [],
+    "object": {},
+}
 
 
 def _expand_delta(raw, active):
@@ -812,9 +883,12 @@ def _expand_delta(raw, active):
                 for key, val in obs["inputs"].items():
                     if key not in updated["inputs"] and type(val) in _TYPE_NAMES:
                         updated["inputs"][key] = _TYPE_NAMES[type(val)]
-                        for prior in updated["cases"]:
-                            prior["inputs"].setdefault(key, val)
         updated["cases"] = copy.deepcopy(observations)
+        for obs in updated["cases"]:
+            if isinstance(obs, dict) and isinstance(obs.get("inputs"), dict):
+                for key, kind in updated["inputs"].items():
+                    if key not in obs["inputs"] and kind in _TYPE_DEFAULTS:
+                        obs["inputs"][key] = copy.deepcopy(_TYPE_DEFAULTS[kind])
     if "rules" in raw:
         updated["rules"] = copy.deepcopy(raw["rules"])
     residuals = raw.get("residuals")
@@ -909,14 +983,30 @@ class TaskModels:
             raw.setdefault("unresolved", list(previous["unresolved"]))
             raw.setdefault("resolutions", copy.deepcopy(previous["resolutions"]))
             # Omitting old cases cannot make a failing reduction appear correct.
+            added_inputs = (
+                set(raw["inputs"]) - set(previous["inputs"])
+                if isinstance(raw.get("inputs"), dict)
+                else set()
+            )
             new_cases = {case["id"]: case for case in raw.get("cases", [])}
             for case in previous["cases"]:
                 if case["id"] in new_cases:
-                    supplied = {**new_cases[case["id"]], "challenge": new_cases[case["id"]].get("challenge", False)}
-                    if canonical(supplied) != canonical(case):
+                    supplied = copy.deepcopy(new_cases[case["id"]])
+                    supplied["challenge"] = supplied.get("challenge", False)
+                    compare = copy.deepcopy(supplied)
+                    if isinstance(compare.get("inputs"), dict):
+                        for key in added_inputs:
+                            if key not in case["inputs"]:
+                                compare["inputs"].pop(key, None)
+                    if canonical(compare) != canonical(case):
                         raise ValueError(f"Recorded case {case['id']} cannot be rewritten")
                 else:
                     new_cases[case["id"]] = copy.deepcopy(case)
+                if added_inputs and isinstance(new_cases[case["id"]].get("inputs"), dict):
+                    for key in added_inputs:
+                        kind = raw["inputs"].get(key)
+                        if key not in new_cases[case["id"]]["inputs"] and kind in _TYPE_DEFAULTS:
+                            new_cases[case["id"]]["inputs"][key] = copy.deepcopy(_TYPE_DEFAULTS[kind])
             raw["cases"] = list(new_cases.values())
             old_alts = {alt["id"]: alt for alt in previous["alternatives"]}
             new_alts = {alt["id"]: alt for alt in raw["alternatives"]}

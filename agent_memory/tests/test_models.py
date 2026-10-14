@@ -526,7 +526,7 @@ class TaskModelTests(MemoryTestCase):
         n1 = self.memory.save("Baseline thermal window: 4.0 inside [18.0, 28.0] C, else 0.0.")
         base_model = {
             "title": "Thermal load law",
-            "inputs": {"serial": "string", "temp": "number"},
+            "inputs": {"temp": "number"},
             "rules": [{
                 "id": "thermal-window",
                 "target": "max_load",
@@ -534,9 +534,9 @@ class TaskModelTests(MemoryTestCase):
                 "evidence": [n1],
             }],
             "cases": [
-                {"id": "nominal-22", "target": "max_load", "inputs": {"serial": "M12", "temp": 22.0},
+                {"id": "nominal-22", "target": "max_load", "inputs": {"temp": 22.0},
                  "expected": 4.0, "evidence": [n1], "challenge": True},
-                {"id": "cold-12", "target": "max_load", "inputs": {"serial": "M12", "temp": 12.0},
+                {"id": "cold-12", "target": "max_load", "inputs": {"temp": 12.0},
                  "expected": 0.0, "evidence": [n1], "challenge": False},
             ],
         }
@@ -547,7 +547,7 @@ class TaskModelTests(MemoryTestCase):
         n2 = self.memory.save("Verified nominal load 4.0 at 25.0 C.")
         h2 = self.memory.model_handoff({
             "observations": [{
-                "id": "nominal-25", "target": "max_load", "inputs": {"serial": "M15", "temp": 25.0},
+                "id": "nominal-25", "target": "max_load", "inputs": {"temp": 25.0},
                 "expected": 4.0, "evidence": [n2], "challenge": False,
             }],
         })
