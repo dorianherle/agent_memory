@@ -44,10 +44,12 @@ _CODE_TOKEN_RE = re.compile(
     r"|(?:[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)+)"
     r"|(?:[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)+)"
     r"|(?:[A-Za-z_][A-Za-z0-9_]*_[A-Za-z0-9_]+)"
-    r"|(?:[a-z]+[A-Z][A-Za-z0-9]*)"
+    r"|(?:[A-Za-z0-9]*[a-z][A-Z][A-Za-z0-9]*)"
+    r"|(?:[A-Z]{2,}[a-z0-9][A-Za-z0-9]*)"
     r"|(?:[A-Z][A-Z0-9_]{2,})"
     r"|(?:[A-Za-z0-9_.-]+\.(?:py|js|jsx|ts|tsx|java|go|rs|cpp|c|h|cs|rb|php|sql|yaml|yml|json|toml|md|sh))"
 )
+_CAMEL_BOUNDARY_RE = re.compile(r"([a-z0-9])([A-Z])|([A-Z]+)([A-Z][a-z])")
 _CODE_MARKERS = (
     "```", "traceback", "exception", "error:", "stack trace",
     "pytest", "unittest", "def ", "class ", "import ", "function ",
@@ -101,8 +103,27 @@ _RELATIVE_TIME_PATTERNS = (
 _MAX_SEARCH_RESPONSE_BYTES = 24 * 1024 * 1024  # Safely below AML's 30 MiB multimodal Search cap
 
 
+def _unescape_json_code(text: str) -> str:
+    if "\\n" not in text and "\\t" not in text and '\\"' not in text:
+        return text
+    return text.replace("\\n", "\n").replace("\\t", "\t").replace("\\r", "\r").replace('\\"', '"')
+
+
 def tokenize(text: str, *, drop_stop: bool = True) -> list[str]:
-    tokens = _TOKEN_RE.findall(text.lower())
+    clean = _unescape_json_code(text)
+    camel_expanded = _CAMEL_BOUNDARY_RE.sub(
+        lambda m: f"{m.group(1) or m.group(3)} {m.group(2) or m.group(4)}",
+        clean,
+    )
+    combined = f"{clean} {camel_expanded}" if camel_expanded != clean else clean
+    raw_tokens = _TOKEN_RE.findall(combined.lower())
+    tokens: list[str] = []
+    for t in raw_tokens:
+        tokens.append(t)
+        if len(t) >= 5 and t.endswith("s") and not t.endswith(("ss", "us", "is", "ies")):
+            stem = t[:-2] if t.endswith(("ches", "shes", "xes", "zes", "ses")) else t[:-1]
+            if len(stem) >= 3:
+                tokens.append(stem)
     if not drop_stop:
         return tokens
     filtered = [t for t in tokens if t not in _STOPWORDS]
@@ -113,7 +134,8 @@ _FILE_PATH_RE = re.compile(r'"file_path"\s*:\s*"([^"]+)"')
 
 
 def extract_code_tokens(text: str) -> set[str]:
-    return {m.group(0).casefold() for m in _CODE_TOKEN_RE.finditer(text)}
+    clean = _unescape_json_code(text)
+    return {m.group(0).casefold() for m in _CODE_TOKEN_RE.finditer(clean)}
 
 
 def is_coding_track_user(user_id: str) -> bool:
@@ -136,13 +158,34 @@ def is_low_signal_coding_unit(text: str) -> bool:
             "[tool_call]",
             "[tool_result] task #",
             "[tool_result] updated task #",
+            "(bash completed with no output)",
+            "<persisted-output> output too large",
+            "warning: running pip as the 'root' user",
             "has been updated successfully. (file state is current",
             "file created successfully at:",
             "=== test session starts ===",
         )
     ):
         return True
+    if "] assistant: [thinking]" in lower:
+        return True
     return False
+
+
+def is_high_signal_coding_unit(text: str) -> bool:
+    """Return True for structural code landmarks (file reads, diffs, exploration reports, summaries)."""
+    lower = text.lower()
+    return (
+        "[file: " in lower
+        or "diff --git " in lower
+        or "## report" in lower
+        or "## changes" in lower
+        or "## summary" in lower
+        or "## root cause" in lower
+        or "here's a summary" in lower
+        or "here is the comprehensive report" in lower
+        or "] user: # issue" in lower
+    )
 
 
 def is_code_context(user_id: str, text: str) -> bool:
@@ -244,7 +287,32 @@ def validate_content_parts(content: object) -> tuple[bool, str, bool]:
     return (False, "", False)
 
 
-def _split_long(text: str, limit: int = 1600) -> list[str]:
+def _split_long(text: str, limit: int = 1800) -> list[str]:
+    if len(text) <= limit:
+        return [text]
+    if "\n" in text:
+        lines = text.splitlines(keepends=True)
+        pieces: list[str] = []
+        buf = ""
+        for line in lines:
+            if len(line) > limit:
+                if buf.strip():
+                    pieces.append(buf.rstrip("\n"))
+                    buf = ""
+                for sub in _split_single_line(line.rstrip("\n"), limit):
+                    pieces.append(sub)
+            elif buf and len(buf) + len(line) > limit:
+                pieces.append(buf.rstrip("\n"))
+                buf = line
+            else:
+                buf += line
+        if buf.strip():
+            pieces.append(buf.rstrip("\n"))
+        return pieces or [text[:limit]]
+    return _split_single_line(text, limit)
+
+
+def _split_single_line(text: str, limit: int = 1600) -> list[str]:
     if len(text) <= limit:
         return [text]
     pieces: list[str] = []
@@ -281,7 +349,7 @@ def build_units(
     messages: list[dict],
     *,
     min_chars: int = 24,
-    max_chars: int = 1400,
+    max_chars: int = 1800,
 ) -> list[dict]:
     """Turn validated messages into indexable units while preserving multimodal parts."""
     cleaned: list[tuple[str, int | float | None, str, object | None]] = []
@@ -297,6 +365,8 @@ def build_units(
             fp_match = _FILE_PATH_RE.search(text)
             if fp_match and text.startswith("[tool_use "):
                 last_tool_file_path = fp_match.group(1)
+                if text.startswith(("[tool_use Edit]", "[tool_use Write]")):
+                    text = f"[file: {last_tool_file_path}] {_unescape_json_code(text)}"
             elif text.startswith("[tool_result]") and last_tool_file_path:
                 if last_tool_file_path not in text[:200]:
                     text = f"[file: {last_tool_file_path}] {text}"
@@ -742,10 +812,14 @@ class UserMemoryPartition:
                 fused[npos] += bonus
 
             # Downweight low-signal tool invocations / boilerplate test dumps in Coding trajectories
+            # and boost structural code landmarks (file reads, diffs, architecture reports, summaries)
             if self.has_coding_trajectories:
                 for pos in list(fused.keys()):
-                    if is_low_signal_coding_unit(self.messages[pos]):
-                        fused[pos] *= 0.25
+                    msg_text = self.messages[pos]
+                    if is_low_signal_coding_unit(msg_text):
+                        fused[pos] *= 0.22
+                    elif is_high_signal_coding_unit(msg_text):
+                        fused[pos] *= 1.28
 
             # Mild recency tie-breaker (0.12) aligned with AML's conflict-resolution prompt
             known_ts = [
@@ -764,16 +838,16 @@ class UserMemoryPartition:
 
             ordered = sorted(fused.items(), key=lambda kv: (-kv[1], kv[0]))
 
-            # Coding noise filter: CAMBench Coding injects noisy trajectories and passes top_k=30..100.
-            # Keep compact high-confidence memories on Coding tasks.
+            # Coding noise filter: CAMBench Coding injects noisy trajectories and passes top_k=30..1000.
+            # Keep compact high-confidence memories on Coding tasks (Compact ReturnSize tier).
             effective_limit = min(top_k, 100)
             if self.has_coding_trajectories and ordered:
                 best_score = ordered[0][1]
                 ordered = [
                     (pos, sc)
                     for pos, sc in ordered
-                    if sc >= best_score * 0.28
-                ][: min(effective_limit, 18)]
+                    if sc >= best_score * 0.30
+                ][: min(effective_limit, 12)]
 
             return self._pack_results(ordered, effective_limit)
 
