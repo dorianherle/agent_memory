@@ -1,6 +1,6 @@
 <div align="center">
 
-![agent-memory](docs/assets/banner.png)
+![agent-memory](docs/assets/banner.svg)
 
 **[📘 General Overview (PDF)](paper/agent_memory_overview.pdf)** · **[📄 Technical Paper (PDF)](paper/agent_memory_paper.pdf)** · **[📖 Paper (Markdown)](paper/PAPER.md)** · **[⚡ Install](#install)** · **[🛠️ How to Use](#how-to-use)** · **[🏆 Benchmarks](#benchmark-results)**
 
@@ -25,7 +25,7 @@ Long-context chat buffers rot and explode in token cost. External fact extractor
 
 Evaluated on the [**ICML 2026 MemoryArena (`formal_reasoning_phys`)**](https://huggingface.co/datasets/ZexueHe/memoryarena) benchmark (**all 20 multi-session physics papers, 86 interdependent subtasks, chain depths up to $k=12$**):
 
-![MemoryArena Benchmark Chart](docs/assets/benchmark_chart.png)
+![MemoryArena Benchmark Chart](docs/assets/benchmark_chart.svg)
 
 - **#1 Overall (Frontier `gpt-5.6-sol` Backbone, 20/20 Papers):** **`100.0%` Success Rate (SR) / `100.0%` Progress Score (PS)** (`86/86` subtasks solved, `968` avg memory tokens)—and **`75.0%` SR / `85.8%` PS** in passive **0-tool-call** mode (`197` avg memory tokens).
 - **#1 External Memory (Official `gpt-5-mini` + `MathEnvironment.judge()`, 20/20 Papers):** **`50.0%` SR / `60.2%` PS** (retaining **83%** of `gpt-5-mini`'s `60%` single-turn math ceiling), beating `Letta / MemGPT` (`45.0%` SR), `GPT-5.1-mini Long Context` (`45.0%` SR), `BM25` (`25.0%` SR), and `Mem0` (`15.0%`–`25.0%` SR).

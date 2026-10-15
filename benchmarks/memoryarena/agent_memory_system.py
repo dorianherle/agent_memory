@@ -150,8 +150,8 @@ class AgentMemorySystem:
                 it for it in state_items if it.payload.get("goal") is True
             ]
             extra_goal = ""
-            if goal_items and f"[{goal_items[0].id}]" not in found:
-                extra_goal = f"\n[{goal_items[0].id}] {goal_items[0].message}"
+            if goal_items and f"[{goal_items[0].id[:8]}]" not in found:
+                extra_goal = f"\n[{goal_items[0].id[:8]}] {goal_items[0].message}"
             mem_ctx = (
                 f"{packet}\n\n"
                 f"## Retrieved Memory Notes (memory_find query full=True)\n{found}{extra_goal}"

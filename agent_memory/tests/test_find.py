@@ -266,3 +266,21 @@ class TestFind(MemoryTestCase):
         )
         lines = [line for line in out.splitlines() if line.startswith("[")]
         self.assertEqual(len(lines), 1)
+
+    def test_find_full_pins_goal_even_without_lexical_overlap(self):
+        from agent_memory import call_tool
+
+        goal = self.memory.save(
+            "Foundational convention: metric signature (-,+,+,+)",
+            {"goal": True},
+        )
+        step = self.memory.save("Derived Ward identity for gluon vertex")
+        out = call_tool(
+            self.memory,
+            "memory",
+            {"action": "find", "query": "gluon vertex", "full": True},
+        )
+        self.assertIn(step[:8], out)
+        self.assertIn(goal[:8], out)
+        self.assertIn("metric signature (-,+,+,+)", out)
+

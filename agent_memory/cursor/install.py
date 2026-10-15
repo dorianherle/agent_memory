@@ -47,7 +47,7 @@ decisions, or dead ends. Use `memory_save` for dead ends, non-obvious decisions,
 user constraints, and checkpoints before risky edits; never copy raw prompts or
 answers. Do not invent ids. Pass `agent` on save/summarize.
 
-- `memory_find` — headlines; `ids=` for bodies
+- `memory_find` — headlines; `full=True` or `ids=` for bodies
 - `memory_save` / `memory_summarize` / `memory_delete` / `memory_open_questions`
 - `memory_history` — work notes, not the chat transcript
 - `memory_branch` / `memory_inspect` / `memory_inspect_done` — restore a snapshot
@@ -289,7 +289,7 @@ def _prompt_gemini_choice(root: Path, existing: str | None, source: str | None) 
     print("=== Gemini embeddings (required choice) ===")
     print("Semantic memory_find(query=...) needs a Gemini API key.")
     print("  1) Configure Gemini")
-    print("  2) Skip embeddings (substring search only) — type 2 to confirm")
+    print("  2) Skip embeddings (local FTS5 search only) — type 2 to confirm")
     print()
     if existing and source:
         print(f"Found GEMINI_API_KEY via {source}.")
@@ -300,7 +300,7 @@ def _prompt_gemini_choice(root: Path, existing: str | None, source: str | None) 
             print("Please enter 1 (configure) or 2 (skip).")
 
     if choice == "2":
-        print("Skipping Gemini — memory_find will use substring match only.")
+        print("Skipping Gemini — memory_find will use local FTS5 search only.")
         return {}
 
     if existing:

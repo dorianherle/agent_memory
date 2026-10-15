@@ -29,7 +29,7 @@ MEMORY_TOOL = {
         "strict": True,
         "description": (
             "Project memory. Actions: save (summary=true folds Recent); "
-            "find (headlines; ids= for bodies); history; "
+            "find (headlines; full=true or ids= for bodies); history; "
             "open_questions; delete; graph; branch/inspect "
             "(restores files; inspect_done to return); "
             "goal_create / goal_list / goal_use (isolated goal id + tree). "
@@ -76,8 +76,8 @@ MEMORY_TOOL = {
                 "query": {
                     "type": ["string", "null"],
                     "description": (
-                        "find only: search by meaning. Needs an "
-                        "embedding provider."
+                        "find only: search by FTS5 keywords or semantic "
+                        "meaning."
                     ),
                 },
                 "all_branches": {
@@ -319,10 +319,10 @@ def _run_action(memory: Memory, arguments: dict) -> str:
                 if not _transcript(item) or (full and item.payload.get("goal"))
             ]
             covered_by = {}
-            if branch == "current":
-                for state_item in memory.state():
-                    for cid in state_item.payload.get("covers", []):
-                        covered_by[cid] = state_item
+            state_items = memory.state() if branch == "current" else []
+            for state_item in state_items:
+                for cid in state_item.payload.get("covers", []):
+                    covered_by[cid] = state_item
             for item in items:
                 for cid in item.payload.get("covers", []):
                     covered_by.setdefault(cid, item)
@@ -336,6 +336,13 @@ def _run_action(memory: Memory, arguments: dict) -> str:
                         folded.append(target)
                 items = folded
             items = items[:k]
+            if full and items and raw_k is None:
+                goal_item = next(
+                    (it for it in state_items if it.payload.get("goal") is True),
+                    None,
+                )
+                if goal_item and all(it.id != goal_item.id for it in items):
+                    items.append(goal_item)
         cover_ids = [
             child_id
             for item in items

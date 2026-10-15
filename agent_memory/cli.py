@@ -43,7 +43,7 @@ def main(argv: list[str] | None = None) -> None:
     install.add_argument(
         "--skip-gemini",
         action="store_true",
-        help="Explicitly skip embeddings (substring memory_find only)",
+        help="Explicitly skip embeddings (local FTS5 memory_find only)",
     )
     install.add_argument(
         "--no-interactive",
@@ -84,7 +84,7 @@ def main(argv: list[str] | None = None) -> None:
             print("Gemini embeddings: ON (semantic memory_find)")
             print('  pip install "agent-memory[cursor]"  # includes google-genai')
         else:
-            print("Gemini embeddings: OFF (substring memory_find only)")
+            print("Gemini embeddings: OFF (local FTS5 memory_find only)")
             print("  You chose --skip-gemini (or cleared credentials).")
         print()
         from agent_memory.cursor.install import sdk_next_steps_lines
