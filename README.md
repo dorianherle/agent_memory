@@ -1,6 +1,4 @@
-# agent-memory
-
-![agent-memory](docs/assets/banner.svg)
+<img src="docs/assets/banner.png" alt="agent-memory" width="100%">
 
 Local Git-backed memory for agents that work across sessions.
 

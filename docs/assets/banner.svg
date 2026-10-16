@@ -5,15 +5,16 @@
     </clipPath>
   </defs>
   <g clip-path="url(#card)">
-    <rect width="1200" height="300" fill="#0B1220"/>
+    <rect width="1200" height="300" fill="#111827"/>
+    <rect x="1.5" y="1.5" width="1197" height="297" rx="16" fill="none" stroke="#334155" stroke-width="3"/>
     <rect width="1200" height="4" fill="#38BDF8"/>
 
     <g transform="translate(48,72)">
       <line x1="10" y1="14" x2="10" y2="34" stroke="#334155" stroke-width="2"/>
       <line x1="14" y1="12" x2="30" y2="22" stroke="#38BDF8" stroke-width="2"/>
       <line x1="14" y1="36" x2="30" y2="26" stroke="#34D399" stroke-width="2"/>
-      <circle cx="10" cy="10" r="5" fill="#0B1220" stroke="#38BDF8" stroke-width="2"/>
-      <circle cx="10" cy="38" r="5" fill="#0B1220" stroke="#34D399" stroke-width="2"/>
+      <circle cx="10" cy="10" r="5" fill="#111827" stroke="#38BDF8" stroke-width="2"/>
+      <circle cx="10" cy="38" r="5" fill="#111827" stroke="#34D399" stroke-width="2"/>
       <circle cx="34" cy="24" r="6" fill="#F8FAFC"/>
     </g>
 
