@@ -10,7 +10,7 @@ Every turn the agent receives a state packet of at most 1,200 characters (about 
 
 [Overview (PDF)](paper/agent_memory_overview.pdf) · [Technical paper (PDF)](paper/agent_memory_paper.pdf) · [Paper (Markdown)](paper/PAPER.md)
 
-## Results
+## Benchmarks
 
 [MemoryArena](https://huggingface.co/datasets/ZexueHe/memoryarena) `formal_reasoning_phys` (ICML 2026): 20 physics papers, 86 subtasks, chains up to 12 steps. Figures below are from [`benchmarks/memoryarena/results_2026_10_14.json`](benchmarks/memoryarena/results_2026_10_14.json) (14 Oct 2026).
 

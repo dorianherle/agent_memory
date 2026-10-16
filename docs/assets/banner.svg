@@ -1,15 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" width="1200" height="300">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 220" width="1200" height="220">
   <defs>
     <clipPath id="card">
-      <rect width="1200" height="300" rx="18"/>
+      <rect width="1200" height="220" rx="18"/>
     </clipPath>
   </defs>
   <g clip-path="url(#card)">
-    <rect width="1200" height="300" fill="#111827"/>
-    <rect x="1.5" y="1.5" width="1197" height="297" rx="16" fill="none" stroke="#334155" stroke-width="3"/>
-    <rect width="1200" height="4" fill="#38BDF8"/>
+    <rect width="1200" height="220" fill="#111827"/>
+    <rect x="1.5" y="1.5" width="1197" height="217" rx="16" fill="none" stroke="#334155" stroke-width="3"/>
 
-    <g transform="translate(48,72)">
+    <g transform="translate(578, 36)">
       <line x1="10" y1="14" x2="10" y2="34" stroke="#334155" stroke-width="2"/>
       <line x1="14" y1="12" x2="30" y2="22" stroke="#38BDF8" stroke-width="2"/>
       <line x1="14" y1="36" x2="30" y2="26" stroke="#34D399" stroke-width="2"/>
@@ -18,22 +17,7 @@
       <circle cx="34" cy="24" r="6" fill="#F8FAFC"/>
     </g>
 
-    <text x="104" y="104" fill="#F8FAFC" font-family="Helvetica, Arial, sans-serif" font-size="40" font-weight="700">agent-memory</text>
-    <text x="48" y="150" fill="#CBD5E1" font-family="Helvetica, Arial, sans-serif" font-size="18">Git-backed memory for multi-session agents</text>
-    <text x="48" y="196" fill="#94A3B8" font-family="Helvetica, Arial, sans-serif" font-size="15">A state packet of at most 1,200 characters.</text>
-    <text x="48" y="220" fill="#94A3B8" font-family="Helvetica, Arial, sans-serif" font-size="15">Original notes stay uncut.</text>
-    <text x="48" y="262" fill="#64748B" font-family="Helvetica, Arial, sans-serif" font-size="13">MemoryArena physics, 20 papers, 86 subtasks, 14 Oct 2026</text>
-
-    <line x1="720" y1="72" x2="720" y2="244" stroke="#1E293B" stroke-width="1"/>
-
-    <text x="760" y="64" fill="#38BDF8" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">gpt-5.6-sol</text>
-    <text x="760" y="100" fill="#F8FAFC" font-family="Helvetica, Arial, sans-serif" font-size="32" font-weight="700">86/86</text>
-    <text x="760" y="124" fill="#94A3B8" font-family="Helvetica, Arial, sans-serif" font-size="14">subtasks solved, full lookup</text>
-
-    <text x="760" y="172" fill="#F8FAFC" font-family="Helvetica, Arial, sans-serif" font-size="32" font-weight="700">15/20</text>
-    <text x="760" y="196" fill="#94A3B8" font-family="Helvetica, Arial, sans-serif" font-size="14">papers solved, state packet only</text>
-
-    <text x="760" y="244" fill="#F8FAFC" font-family="Helvetica, Arial, sans-serif" font-size="32" font-weight="700">66/66</text>
-    <text x="760" y="268" fill="#94A3B8" font-family="Helvetica, Arial, sans-serif" font-size="14">equations kept</text>
+    <text x="600" y="128" text-anchor="middle" fill="#F8FAFC" font-family="Helvetica, Arial, sans-serif" font-size="44" font-weight="700">agent-memory</text>
+    <text x="600" y="168" text-anchor="middle" fill="#94A3B8" font-family="Helvetica, Arial, sans-serif" font-size="20">Git-backed memory for multi-session agents</text>
   </g>
 </svg>
