@@ -1,46 +1,71 @@
-<div align="center">
+# agent-memory
 
 ![agent-memory](docs/assets/banner.svg)
 
-**[📘 General Overview (PDF)](paper/agent_memory_overview.pdf)** · **[📄 Technical Paper (PDF)](paper/agent_memory_paper.pdf)** · **[📖 Paper (Markdown)](paper/PAPER.md)** · **[⚡ Install](#install)** · **[🛠️ How to Use](#how-to-use)** · **[🏆 Benchmarks](#benchmark-results)**
+Local Git-backed memory for agents that work across sessions.
 
-*Author: **Dorian Herle** (`herle.dorian@gmail.com`)*
+Every turn the agent receives a state packet of at most 1,200 characters (about 200 tokens). The packet is rendered from the notebook, with no model call. When that is not enough, one `memory_find` call returns the original note.
 
-</div>
+- **State packet.** Goal, steering, handoff, open questions, and related notes.
+- **File lineage.** Each note is a Git commit. Declared files are hashed, and a later edit marks the note `[stale]`. `memory_inspect` opens the saved snapshot.
+- **Compression.** `memory_summarize` folds finished steps into one summary.
 
----
+[Overview (PDF)](paper/agent_memory_overview.pdf) · [Technical paper (PDF)](paper/agent_memory_paper.pdf) · [Paper (Markdown)](paper/PAPER.md)
 
-**`agent-memory`** is a local, Git-backed memory system for AI agents that work across long, multi-session tasks.
+## Results
 
-Long-context chat buffers rot and explode in token cost. External fact extractors (`Mem0`) paraphrase away exact equations and code constants. Fixed-window RAG (`BM25` / vector chunks) slices multi-line definitions in half.
+[MemoryArena](https://huggingface.co/datasets/ZexueHe/memoryarena) `formal_reasoning_phys` (ICML 2026): 20 physics papers, 86 subtasks, chains up to 12 steps. Figures below are from [`benchmarks/memoryarena/results_2026_10_14.json`](benchmarks/memoryarena/results_2026_10_14.json) (14 Oct 2026).
 
-**`agent-memory` fixes this with three mechanisms:**
-1. **Bounded State Packet (`<= 1,200 chars`):** Every turn injects a deterministic `# MEMORY STATE` view (`Goal`, `Steering`, `Handoff`, `Open questions`, `Related`) in **~200 tokens with 0 LLM calls**.
-2. **Git Snapshot Lineage:** Every saved note is a commit in an isolated Git DAG with SHA-256 file hashes—giving agents automatic `[stale]` warnings when files change and time-travel (`memory_inspect` / `memory_branch`).
-3. **Consecutive Compression & 1-Call Full Retrieval:** Completed steps fold into rolling summaries (`memory_summarize`), while `memory_find(query=..., full=True)` retrieves uncut note bodies with **100% equation & symbol recall**.
+Success rate is the share of papers whose last subtask is correct. Progress is the share of subtasks solved.
 
----
+### Papers solved
 
-## Benchmark Results
+| System | Model | Success | Progress | Memory tokens |
+| --- | --- | ---: | ---: | ---: |
+| agent-memory, one full lookup | gpt-5.6-sol | 100% (20/20) | 100% | 968 |
+| agent-memory, state packet only | gpt-5.6-sol | 75% (15/20) | 85.8% | 197 |
+| no memory | gpt-5.6-sol | 35% (7/20) | 59.3% | 0 |
+| agent-memory, one full lookup | gpt-5-mini | 50% (10/20) | 60.2% | 1,435 |
+| agent-memory, state packet only | gpt-5-mini | 50% (10/20) | 56.9% | 198 |
+| BM25 chunks, same harness | gpt-5-mini | 25% (5/20) | 50.5% | 244 |
+| Mem0-style facts, same harness | gpt-5-mini | 15% (3/20) | 38.9% | 109 |
+| no memory | gpt-5-mini | 5% (1/20) | 32.2% | 0 |
 
-Evaluated on the [**ICML 2026 MemoryArena (`formal_reasoning_phys`)**](https://huggingface.co/datasets/ZexueHe/memoryarena) benchmark (**all 20 multi-session physics papers, 86 interdependent subtasks, chain depths up to $k=12$**):
+On `gpt-5.6-sol`, step 1 is already 20/20, and one full lookup then passes all 86 subtasks. The state packet alone finishes 15 of 20 papers, at 197 memory tokens and no tool call. On `gpt-5-mini`, step 1 is 12/20. One full lookup finishes 10 of 20 papers, against 1 of 20 with no memory.
 
-![MemoryArena Benchmark Chart](docs/assets/benchmark_chart.svg)
+Published MemoryArena physics rows, for context (not rerun in this repo): Letta / MemGPT 45% success and 65% progress; GPT-5.1-mini long context 45% and 60%.
 
-- **#1 Overall (Frontier `gpt-5.6-sol` Backbone, 20/20 Papers):** **`100.0%` Success Rate (SR) / `100.0%` Progress Score (PS)** (`86/86` subtasks solved, `968` avg memory tokens)—and **`75.0%` SR / `85.8%` PS** in passive **0-tool-call** mode (`197` avg memory tokens).
-- **#1 External Memory (Official `gpt-5-mini` + `MathEnvironment.judge()`, 20/20 Papers):** **`50.0%` SR / `60.2%` PS** (retaining **83%** of `gpt-5-mini`'s `60%` single-turn math ceiling), beating `Letta / MemGPT` (`45.0%` SR), `GPT-5.1-mini Long Context` (`45.0%` SR), `BM25` (`25.0%` SR), and `Mem0` (`15.0%`–`25.0%` SR).
-- **100.0% Symbolic Recall:** Preserves **100.0%** of ground-truth LaTeX equations across all 66 dependent subtasks (vs. `53.9%` for BM25 chunking and `37.0%` for Mem0 fact extraction).
+### Depth on gpt-5.6-sol
+
+Subtasks passed. The count of papers still in the chain drops as the step number rises.
+
+| Step | Papers | No memory | State packet | Full lookup |
+| ---: | ---: | ---: | ---: | ---: |
+| 1 | 20 | 20 | 20 | 20 |
+| 2 | 20 | 9 | 18 | 20 |
+| 4 | 10 | 4 | 6 | 10 |
+| 8 | 3 | 2 | 2 | 3 |
+| 12 | 1 | 0 | 0 | 1 |
+
+Full lookup passes every step, including steps 11 and 12 of the 12-step paper. The state packet misses those two steps.
+
+### Equations kept
+
+Exact ground-truth equation recall on the 66 subtasks that depend on an earlier step. Prompt size is the memory text for that subtask, in estimated tokens.
+
+| System | Recall | Prompt tokens |
+| --- | ---: | ---: |
+| no memory | 10.4% | 66 |
+| Mem0-style facts | 37.0% | 187 |
+| BM25 chunks | 53.9% | 374 |
+| agent-memory, state packet | 52.5% | 338 |
+| agent-memory, one full lookup | 100% | 1,565 |
 
 ```bash
-# Reproduce the full 20-paper benchmark
 python3 examples/memoryarena_online_benchmark.py --official-gpt5mini
 ```
 
----
-
 ## Install
-
-### Option 1: Install in Cursor (CLI)
 
 ```bash
 pip install "agent-memory[cursor] @ git+https://github.com/dorianherle/agent_memory.git@main"
@@ -48,24 +73,21 @@ cd your-project
 agent-memory cursor install
 ```
 
-Then reload MCP in **Cursor Settings → Tools & MCP** and open a new Agent chat.
+Reload MCP in Cursor Settings, then Tools & MCP, and open a new Agent chat.
 
-### Option 2: Paste this prompt into your Cursor Agent
+Or paste this into a Cursor agent:
 
 ```text
 Install agent-memory in this project (.venv/bin/python -m pip install "agent-memory[cursor] @ git+https://github.com/dorianherle/agent_memory.git@main") and run `.venv/bin/python -m agent_memory.cli cursor install --python .venv/bin/python --skip-gemini --no-interactive`. Verify `.cursor/mcp.json`, `.cursor/hooks.json`, and `.agent_memory/` exist, and ensure `.agent_memory/` is in `.gitignore`.
 ```
 
-*(Want semantic search in addition to local SQLite FTS5? Pass `--gemini-api-key "$GEMINI_API_KEY"` instead of `--skip-gemini`.)*
+For semantic search on top of local SQLite FTS5, pass `--gemini-api-key "$GEMINI_API_KEY"` instead of `--skip-gemini`.
 
----
+## Use
 
-## How to Use
+### Cursor
 
-### 1. In Cursor (Automatic via Hooks + MCP)
-
-Once installed, `agent-memory` works automatically:
-- **Every turn**, the agent sees a compact `<= 1,200`-character `# MEMORY STATE` packet in its system rules:
+After install, each turn includes a `# MEMORY STATE` block:
 
 ```text
 ## Goal
@@ -83,22 +105,18 @@ Next: pytest tests/test_checkout.py -k retry
 [22222222] Does the timeout fixture reproduce production?
 ```
 
-- **During work**, the agent uses MCP tools to save checkpoints, search full notes, compress completed steps, or inspect old file snapshots:
+| Tool | What it does |
+| --- | --- |
+| `memory_save` | Save a finding, decision, or handoff |
+| `memory_find` | Search notes. `full=True` returns the uncut body |
+| `memory_summarize` | Fold finished notes into one summary |
+| `memory_open_questions` | Track or close an open question |
+| `memory_inspect` / `memory_branch` | Open an older snapshot, or continue from it |
+| `memory_goal_create` / `memory_goal_list` / `memory_goal_use` | Isolated goal workspaces |
 
-| MCP Tool | What it does |
-| :--- | :--- |
-| `memory_save` | Save a finding, decision, or handoff (`files=[...]`, `handoff=True`, or `payload={...}`) |
-| `memory_find` | Search notes by query or ID (`memory_find(query="...", full=True, limit=5)` for uncut bodies) |
-| `memory_summarize` | Compress completed notes into a single rolling summary commit |
-| `memory_open_questions` | Track or close unresolved blockers |
-| `memory_inspect` / `memory_branch` | Rewind working files to an earlier memory snapshot or branch from it |
-| `memory_goal_create` / `memory_goal_list` / `memory_goal_use` | Create and bind isolated goal workspaces |
+The live timeline is `.agent_memory/live/index.html`.
 
-- **Live Browser View:** Open `.agent_memory/live/index.html` to watch the memory timeline update in real time.
-
-### 2. In Python (OpenAI SDK Wrapper)
-
-Wrap any OpenAI-compatible client in 2 lines to inject `# MEMORY STATE` before every turn:
+### Python
 
 ```python
 from openai import OpenAI
@@ -114,7 +132,7 @@ resp = client.chat.completions.create(
 )
 ```
 
-### 3. In Cursor SDK
+### Cursor SDK
 
 ```python
 from cursor_sdk import Agent, LocalAgentOptions
@@ -126,19 +144,16 @@ with Agent.create(
     print(agent.send("What do we already know?").wait().result)
 ```
 
----
+## Citation
 
-## Paper & Citation
-
-- **General Audience Overview (PDF):** [`paper/agent_memory_overview.pdf`](paper/agent_memory_overview.pdf) ([LaTeX Source](paper/agent_memory_overview.tex)) — *"Giving AI Assistants a Reliable Notebook"*
-- **Technical Paper (PDF):** [`paper/agent_memory_paper.pdf`](paper/agent_memory_paper.pdf) ([LaTeX Source](paper/agent_memory_paper.tex) · [Markdown](paper/PAPER.md)) — *"Agent Memory: Deterministic Bounded State Packets, Git-Snapshot Lineage, and Consecutive Compression for Long-Horizon AI Agents"*
+Dorian Herle (`herle.dorian@gmail.com`)
 
 ```bibtex
 @article{herle2026agentmemory,
-  title   = {Agent Memory: Deterministic Bounded State Packets, Git-Snapshot Lineage, and Consecutive Compression for Long-Horizon AI Agents},
-  author  = {Herle, Dorian},
-  year    = {2026},
-  month   = {October},
-  url     = {https://github.com/dorianherle/agent_memory}
+  title  = {Agent Memory: Deterministic Bounded State Packets, Git-Snapshot Lineage, and Consecutive Compression for Long-Horizon AI Agents},
+  author = {Herle, Dorian},
+  year   = {2026},
+  month  = {October},
+  url    = {https://github.com/dorianherle/agent_memory}
 }
 ```

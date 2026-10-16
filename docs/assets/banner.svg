@@ -1,164 +1,38 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 360" width="1280" height="360">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" width="1200" height="300">
   <defs>
-    <style>
-      .sans { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", sans-serif; }
-      .mono { font-family: "SF Mono", "JetBrains Mono", "Menlo", monospace; }
-    </style>
-    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
-      <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#E2E8F0" stroke-width="1"/>
-    </pattern>
+    <clipPath id="card">
+      <rect width="1200" height="300" rx="18"/>
+    </clipPath>
   </defs>
+  <g clip-path="url(#card)">
+    <rect width="1200" height="300" fill="#0B1220"/>
+    <rect width="1200" height="4" fill="#38BDF8"/>
 
-  <!-- Outer Frame -->
-  <rect x="1" y="1" width="1278" height="358" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
-
-  <!-- Right Schematic Background -->
-  <path d="M 520 1.75 L 1271 1.75 Q 1278.25 1.75 1278.25 9 L 1278.25 351 Q 1278.25 358.25 1271 358.25 L 520 358.25 Z" fill="#F8FAFC"/>
-  <path d="M 520 1.75 L 1271 1.75 Q 1278.25 1.75 1278.25 9 L 1278.25 351 Q 1278.25 358.25 1271 358.25 L 520 358.25 Z" fill="url(#grid)"/>
-  <line x1="520" y1="1.5" x2="520" y2="358.5" stroke="#CBD5E1" stroke-width="1.5"/>
-
-  <!-- ================= LEFT PANE: IDENTITY ================= -->
-  <!-- 2D Git-DAG + Notebook Mark -->
-  <g transform="translate(46, 48)">
-    <rect x="0" y="0" width="42" height="42" rx="7" fill="#0F172A"/>
-    <line x1="13" y1="11" x2="13" y2="31" stroke="#64748B" stroke-width="2"/>
-    <path d="M 13 11 L 28 21 L 13 31" fill="none" stroke="#38BDF8" stroke-width="2" stroke-linejoin="round"/>
-    <circle cx="13" cy="11" r="3.2" fill="#0F172A" stroke="#38BDF8" stroke-width="2"/>
-    <circle cx="13" cy="31" r="3.2" fill="#0F172A" stroke="#34D399" stroke-width="2"/>
-    <circle cx="28" cy="21" r="3.5" fill="#FFFFFF"/>
-  </g>
-
-  <!-- Title -->
-  <text x="102" y="83" class="sans" font-size="42" font-weight="750" letter-spacing="-1.4" fill="#0F172A">agent-memory</text>
-
-  <!-- Subtitle -->
-  <text x="46" y="132" class="sans" font-size="16.5" font-weight="430" fill="#334155">
-    <tspan x="46" dy="0">Local, Git-backed working memory for </tspan>
-    <tspan font-weight="600" fill="#0F172A">multi-session AI agents</tspan><tspan>.</tspan>
-    <tspan x="46" dy="25">Keeps uncut notes, file snapshots, and a deterministic</tspan>
-    <tspan x="46" dy="25">state packet across fresh contexts.</tspan>
-  </text>
-
-  <!-- Divider -->
-  <line x1="46" y1="224" x2="474" y2="224" stroke="#E2E8F0" stroke-width="1"/>
-
-  <!-- Clean 2D Spec Table (No rounded SaaS pills) -->
-  <g transform="translate(46, 246)" class="mono" font-size="11.5">
-    <text x="0" y="0" font-weight="600" fill="#0F172A">STATE PACKET</text>
-    <text x="132" y="0" fill="#475569">&le; 1,200 chars (~200 tok) &middot; 0 LLM calls</text>
-
-    <text x="0" y="26" font-weight="600" fill="#0F172A">FILE LINEAGE</text>
-    <text x="132" y="26" fill="#475569">Git snapshots + SHA-256 [stale] checks</text>
-
-    <text x="0" y="52" font-weight="600" fill="#0F172A">FULL LOOKUP</text>
-    <text x="132" y="52" fill="#475569">Uncut notes via SQLite FTS5 + RRF</text>
-  </g>
-
-  <!-- ================= RIGHT PANE: 2D SCHEMATIC ================= -->
-  <!-- Card 1: .agent_memory/ (Git DAG + FTS5) -->
-  <g transform="translate(552, 34)">
-    <rect x="0" y="0" width="276" height="292" rx="6" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
-    <path d="M 0.75 6 Q 0.75 0.75 6 0.75 L 270 0.75 Q 275.25 0.75 275.25 6 L 275.25 36 L 0.75 36 Z" fill="#F1F5F9"/>
-    <line x1="0" y1="36" x2="276" y2="36" stroke="#CBD5E1" stroke-width="1.5"/>
-    <text x="14" y="23" class="mono" font-size="11.5" font-weight="600" fill="#0F172A">.agent_memory/</text>
-    <text x="262" y="23" text-anchor="end" class="mono" font-size="10" fill="#64748B">Git DAG + FTS5</text>
-
-    <!-- Git Commit Rail -->
-    <line x1="24" y1="62" x2="24" y2="196" stroke="#CBD5E1" stroke-width="2"/>
-
-    <!-- Node 1: Goal -->
-    <circle cx="24" cy="62" r="6" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
-    <text x="40" y="61" class="mono" font-size="11" font-weight="600" fill="#0F172A">a1b2c3d</text>
-    <rect x="95" y="50" width="36" height="15" rx="3" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1"/>
-    <text x="113" y="61" text-anchor="middle" class="mono" font-size="9.5" font-weight="600" fill="#1D4ED8">goal</text>
-    <text x="40" y="77" class="sans" font-size="11.5" fill="#475569">Fix duplicate checkout writes</text>
-
-    <!-- Node 2: Step -->
-    <circle cx="24" cy="107" r="6" fill="#FFFFFF" stroke="#475569" stroke-width="2"/>
-    <text x="40" y="106" class="mono" font-size="11" font-weight="600" fill="#0F172A">9f8e7d6</text>
-    <rect x="95" y="95" width="36" height="15" rx="3" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="113" y="106" text-anchor="middle" class="mono" font-size="9.5" font-weight="600" fill="#334155">step</text>
-    <text x="40" y="122" class="sans" font-size="11.5" fill="#475569">Traced timeout retry path</text>
-
-    <!-- Node 3: Summary -->
-    <circle cx="24" cy="152" r="6" fill="#CCFBF1" stroke="#0D9488" stroke-width="2"/>
-    <text x="40" y="151" class="mono" font-size="11" font-weight="600" fill="#0F172A">e5f6a7b</text>
-    <rect x="95" y="140" width="54" height="15" rx="3" fill="#F0FDFA" stroke="#99F6E4" stroke-width="1"/>
-    <text x="122" y="151" text-anchor="middle" class="mono" font-size="9.5" font-weight="600" fill="#0F766E">summary</text>
-    <text x="40" y="167" class="sans" font-size="11.5" fill="#475569">Folded steps 1..2 findings</text>
-
-    <!-- Node 4: Handoff -->
-    <circle cx="24" cy="196" r="6" fill="#0F172A" stroke="#0F172A" stroke-width="2"/>
-    <text x="40" y="195" class="mono" font-size="11" font-weight="600" fill="#0F172A">7c4d2e1</text>
-    <rect x="95" y="184" width="52" height="15" rx="3" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="121" y="195" text-anchor="middle" class="mono" font-size="9.5" font-weight="600" fill="#0F172A">handoff</text>
-    <text x="40" y="211" class="sans" font-size="11.5" fill="#475569">Idempotency key wired</text>
-
-    <!-- Divider -->
-    <line x1="14" y1="228" x2="262" y2="228" stroke="#E2E8F0" stroke-width="1"/>
-
-    <!-- File SHA-256 Guard -->
-    <text x="14" y="250" class="mono" font-size="10.5" fill="#334155">src/checkout.py</text>
-    <text x="262" y="250" text-anchor="end" class="mono" font-size="10.5" font-weight="600" fill="#0F766E">sha256 &#10003;</text>
-
-    <text x="14" y="272" class="mono" font-size="10.5" fill="#334155">src/retry.py</text>
-    <rect x="216" y="260" width="46" height="16" rx="3" fill="#FEF3C7" stroke="#FDE68A" stroke-width="1"/>
-    <text x="239" y="272" text-anchor="middle" class="mono" font-size="10" font-weight="600" fill="#B45309">[stale]</text>
-  </g>
-
-  <!-- Center 2D Connectors -->
-  <g transform="translate(836, 118)">
-    <rect x="6" y="0" width="84" height="20" rx="4" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1"/>
-    <text x="48" y="14" text-anchor="middle" class="mono" font-size="9.5" font-weight="600" fill="#0F172A">render_packet</text>
-    <line x1="4" y1="30" x2="84" y2="30" stroke="#0F172A" stroke-width="1.75"/>
-    <polygon points="84,26 92,30 84,34" fill="#0F172A"/>
-    <text x="48" y="45" text-anchor="middle" class="mono" font-size="9" fill="#475569">every turn</text>
-  </g>
-
-  <g transform="translate(836, 198)">
-    <rect x="6" y="0" width="84" height="20" rx="4" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1"/>
-    <text x="48" y="14" text-anchor="middle" class="mono" font-size="9.5" font-weight="600" fill="#0F172A">memory_find</text>
-    <line x1="12" y1="30" x2="84" y2="30" stroke="#2563EB" stroke-width="1.75" stroke-dasharray="4,2.5"/>
-    <polygon points="84,26 92,30 84,34" fill="#2563EB"/>
-    <polygon points="12,26 4,30 12,34" fill="#2563EB"/>
-    <text x="48" y="45" text-anchor="middle" class="mono" font-size="9" fill="#475569">uncut lookup</text>
-  </g>
-
-  <!-- Card 2: # MEMORY STATE Packet -->
-  <g transform="translate(936, 34)">
-    <rect x="0" y="0" width="312" height="292" rx="6" fill="#FFFFFF" stroke="#0F172A" stroke-width="1.5"/>
-    <path d="M 0.75 6 Q 0.75 0.75 6 0.75 L 306 0.75 Q 311.25 0.75 311.25 6 L 311.25 36 L 0.75 36 Z" fill="#0F172A"/>
-    <text x="14" y="23" class="mono" font-size="11.5" font-weight="600" fill="#FFFFFF"># MEMORY STATE</text>
-    <text x="298" y="23" text-anchor="end" class="mono" font-size="10" fill="#94A3B8">&le; 1,200 chars</text>
-
-    <!-- Section: Goal -->
-    <g transform="translate(16, 54)" class="mono" font-size="11">
-      <line x1="0" y1="2" x2="0" y2="38" stroke="#2563EB" stroke-width="2.5"/>
-      <text x="10" y="12" font-size="10.5" font-weight="700" fill="#0F172A">## Goal</text>
-      <text x="10" y="31" fill="#1E293B"><tspan font-weight="600" fill="#2563EB">[a1b2c3d]</tspan> Fix duplicate writes</text>
+    <g transform="translate(48,72)">
+      <line x1="10" y1="14" x2="10" y2="34" stroke="#334155" stroke-width="2"/>
+      <line x1="14" y1="12" x2="30" y2="22" stroke="#38BDF8" stroke-width="2"/>
+      <line x1="14" y1="36" x2="30" y2="26" stroke="#34D399" stroke-width="2"/>
+      <circle cx="10" cy="10" r="5" fill="#0B1220" stroke="#38BDF8" stroke-width="2"/>
+      <circle cx="10" cy="38" r="5" fill="#0B1220" stroke="#34D399" stroke-width="2"/>
+      <circle cx="34" cy="24" r="6" fill="#F8FAFC"/>
     </g>
 
-    <!-- Section: Steering -->
-    <g transform="translate(16, 106)" class="mono" font-size="11">
-      <line x1="0" y1="2" x2="0" y2="38" stroke="#64748B" stroke-width="2.5"/>
-      <text x="10" y="12" font-size="10.5" font-weight="700" fill="#0F172A">## Steering</text>
-      <text x="10" y="31" fill="#1E293B"><tspan font-weight="600" fill="#2563EB">[3e4f5a6]</tspan> Keep public API intact</text>
-    </g>
+    <text x="104" y="104" fill="#F8FAFC" font-family="Helvetica, Arial, sans-serif" font-size="40" font-weight="700">agent-memory</text>
+    <text x="48" y="150" fill="#CBD5E1" font-family="Helvetica, Arial, sans-serif" font-size="18">Git-backed memory for multi-session agents</text>
+    <text x="48" y="196" fill="#94A3B8" font-family="Helvetica, Arial, sans-serif" font-size="15">A state packet of at most 1,200 characters.</text>
+    <text x="48" y="220" fill="#94A3B8" font-family="Helvetica, Arial, sans-serif" font-size="15">Original notes stay uncut.</text>
+    <text x="48" y="262" fill="#64748B" font-family="Helvetica, Arial, sans-serif" font-size="13">MemoryArena physics, 20 papers, 86 subtasks, 14 Oct 2026</text>
 
-    <!-- Section: Handoff -->
-    <g transform="translate(16, 158)" class="mono" font-size="11">
-      <line x1="0" y1="2" x2="0" y2="72" stroke="#0D9488" stroke-width="2.5"/>
-      <text x="10" y="12" font-size="10.5" font-weight="700" fill="#0F172A">## Handoff</text>
-      <text x="10" y="31" fill="#1E293B"><tspan font-weight="600" fill="#2563EB">[7c4d2e1]</tspan> Wired idempotency key</text>
-      <text x="10" y="49" fill="#1E293B"><tspan font-weight="600" fill="#0F766E">Rejected:</tspan> blind retry duplicates</text>
-      <text x="10" y="67" fill="#1E293B"><tspan font-weight="600" fill="#0F766E">Next:</tspan> pytest test_checkout.py</text>
-    </g>
+    <line x1="720" y1="72" x2="720" y2="244" stroke="#1E293B" stroke-width="1"/>
 
-    <!-- Section: Related -->
-    <g transform="translate(16, 244)" class="mono" font-size="11">
-      <line x1="0" y1="2" x2="0" y2="36" stroke="#D97706" stroke-width="2.5"/>
-      <text x="10" y="12" font-size="10.5" font-weight="700" fill="#0F172A">## Related</text>
-      <text x="10" y="31" fill="#1E293B"><tspan font-weight="600" fill="#2563EB">[9f8e7d6]</tspan> <tspan font-weight="600" fill="#B45309">[stale]</tspan> Retry trace</text>
-    </g>
+    <text x="760" y="64" fill="#38BDF8" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">gpt-5.6-sol</text>
+    <text x="760" y="100" fill="#F8FAFC" font-family="Helvetica, Arial, sans-serif" font-size="32" font-weight="700">86/86</text>
+    <text x="760" y="124" fill="#94A3B8" font-family="Helvetica, Arial, sans-serif" font-size="14">subtasks solved, full lookup</text>
+
+    <text x="760" y="172" fill="#F8FAFC" font-family="Helvetica, Arial, sans-serif" font-size="32" font-weight="700">15/20</text>
+    <text x="760" y="196" fill="#94A3B8" font-family="Helvetica, Arial, sans-serif" font-size="14">papers solved, state packet only</text>
+
+    <text x="760" y="244" fill="#F8FAFC" font-family="Helvetica, Arial, sans-serif" font-size="32" font-weight="700">66/66</text>
+    <text x="760" y="268" fill="#94A3B8" font-family="Helvetica, Arial, sans-serif" font-size="14">equations kept</text>
   </g>
 </svg>
