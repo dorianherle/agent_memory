@@ -100,7 +100,8 @@ _RELATIVE_TIME_PATTERNS = (
     (re.compile(r"\b(next\s+year)\b", re.IGNORECASE), 1, "year"),
 )
 
-_MAX_SEARCH_RESPONSE_BYTES = 24 * 1024 * 1024  # Safely below AML's 30 MiB multimodal Search cap
+_MAX_SEARCH_RESPONSE_BYTES = 4 * 1024 * 1024  # Fast upload while keeping full images on top matches
+_MAX_MULTIMODAL_IMAGES_PER_SEARCH = 12
 
 
 def _unescape_json_code(text: str) -> str:
@@ -449,8 +450,10 @@ class UserMemoryPartition:
             )
 
         self.ids: list[str] = []
+        self.id_to_pos: dict[str, int] = {}
         self.messages: list[str] = []
         self.return_contents: list[object] = []
+        self._mm_ids: set[str] = set()
         self.created_at: list[str | None] = []
         self.timestamps: list[int | float | None] = []
         self.session_ids: list[str] = []
@@ -480,9 +483,9 @@ class UserMemoryPartition:
     def _hydrate_from_catalog(self) -> None:
         with self.lock:
             mm_rows = self.catalog.connection.execute(
-                "SELECT memory_id, content_json FROM multimodal_contents"
+                "SELECT memory_id FROM multimodal_contents"
             ).fetchall()
-            mm_by_id = {row["memory_id"]: json.loads(row["content_json"]) for row in mm_rows}
+            self._mm_ids = {row["memory_id"] for row in mm_rows}
             rows = self.catalog.connection.execute(
                 "SELECT id, message, payload FROM memories WHERE kind = 'put' ORDER BY sequence ASC"
             ).fetchall()
@@ -496,7 +499,7 @@ class UserMemoryPartition:
                 sess_id = payload.get("session_id", "")
                 if not seen_sessions or seen_sessions[-1] != sess_id:
                     seen_sessions.append(sess_id)
-                mm_val = mm_by_id.get(row["id"]) or payload.get("multimodal")
+                mm_val = payload.get("multimodal")
                 self._index_memory_in_ram(
                     memory_id=row["id"],
                     message=row["message"],
@@ -520,6 +523,7 @@ class UserMemoryPartition:
     ) -> int:
         pos = len(self.ids)
         self.ids.append(memory_id)
+        self.id_to_pos[memory_id] = pos
         self.messages.append(message)
         self.return_contents.append(return_content)
         self.created_at.append(created_at)
@@ -721,26 +725,42 @@ class UserMemoryPartition:
         scores.sort(key=lambda item: (-item[0], item[1]))
         return [pos for _, pos in scores[:depth]]
 
+    def _fts_positions(self, query_text: str, depth: int) -> list[int]:
+        raw_words = re.findall(r"\w+", query_text)
+        expanded: list[str] = []
+        for token in raw_words:
+            expanded.append(token)
+            if "_" in token:
+                expanded.extend(part for part in token.split("_") if part)
+        words = [w for w in expanded if w.lower() not in _STOPWORDS] or expanded
+        if not words:
+            return []
+        match_expr = " OR ".join(f'"{word}"' for word in dict.fromkeys(words))
+        try:
+            with self.catalog.lock:
+                rows = self.catalog.connection.execute(
+                    "SELECT memory_id FROM memory_fts WHERE memory_fts MATCH ? ORDER BY bm25(memory_fts) ASC LIMIT ?",
+                    (match_expr, depth),
+                ).fetchall()
+        except Exception:
+            return []
+        id_to_pos = self.id_to_pos
+        return [id_to_pos[row["memory_id"]] for row in rows if row["memory_id"] in id_to_pos]
+
     def search(self, query_text: str, options: list[str] | None, top_k: int) -> list[dict]:
         with self.lock:
             total = len(self.ids)
             if total == 0 or top_k <= 0:
                 return []
 
-            id_to_pos = {mid: idx for idx, mid in enumerate(self.ids)}
             depth = max(200, top_k * 3)
             rrf_k = 60.0
             channels: list[tuple[list[int], float]] = []
 
-            # Channel 1: agent_memory Catalog SQLite FTS5 BM25
-            try:
-                fts_hits = self.catalog.fts(query_text, depth, branch="main")
-            except Exception:
-                fts_hits = []
-            if fts_hits:
-                channels.append(
-                    ([id_to_pos[mid] for mid, _ in fts_hits if mid in id_to_pos], 1.0)
-                )
+            # Channel 1: Direct SQLite FTS5 BM25
+            fts_pos = self._fts_positions(query_text, depth)
+            if fts_pos:
+                channels.append((fts_pos, 1.0))
 
             # Channel 2: Fine-grained word + CJK BM25
             bm25_main = self._bm25_positions(query_text, depth)
@@ -765,14 +785,9 @@ class UserMemoryPartition:
                 bm25_opt = self._bm25_positions(opt_query, depth)
                 if bm25_opt:
                     channels.append((bm25_opt, 0.65))
-                try:
-                    fts_opt = self.catalog.fts(opt_query, depth, branch="main")
-                except Exception:
-                    fts_opt = []
+                fts_opt = self._fts_positions(opt_query, depth)
                 if fts_opt:
-                    channels.append(
-                        ([id_to_pos[mid] for mid, _ in fts_opt if mid in id_to_pos], 0.55)
-                    )
+                    channels.append((fts_opt, 0.55))
 
             # Channel 5: Code symbol & filepath exact overlap (crucial for CAMBench Coding)
             coding_mode = self.has_coding_trajectories or is_code_context(self.user_id, query_text)
@@ -855,27 +870,51 @@ class UserMemoryPartition:
         results: list[dict] = []
         seen_keys: set[str] = set()
         used_bytes = 0
+        mm_images_included = 0
         for pos, score in ordered:
             if len(results) >= limit:
                 break
             norm_key = _NORMALISE_RE.sub(" ", self.messages[pos].lower()).strip()
             if not norm_key or norm_key in seen_keys:
                 continue
+            mid = self.ids[pos]
             content = self.return_contents[pos]
-            est_bytes = len(self.messages[pos]) if isinstance(content, str) else len(json.dumps(content))
-            if results and used_bytes + est_bytes > _MAX_SEARCH_RESPONSE_BYTES:
-                if isinstance(content, list):
+            if isinstance(content, str) and mid in self._mm_ids:
+                if mm_images_included < _MAX_MULTIMODAL_IMAGES_PER_SEARCH and used_bytes < _MAX_SEARCH_RESPONSE_BYTES:
+                    with self.catalog.lock:
+                        mm_row = self.catalog.connection.execute(
+                            "SELECT content_json FROM multimodal_contents WHERE memory_id = ?",
+                            (mid,),
+                        ).fetchone()
+                    if mm_row is not None:
+                        content = json.loads(mm_row["content_json"])
+                else:
+                    content = [{"type": "text", "text": self.messages[pos]}]
+            if isinstance(content, str):
+                est_bytes = len(content)
+            else:
+                if mm_images_included >= _MAX_MULTIMODAL_IMAGES_PER_SEARCH:
+                    text_only = [p for p in content if isinstance(p, dict) and p.get("type") == "text"]
+                    content = text_only or [{"type": "text", "text": self.messages[pos]}]
+                est_bytes = sum(
+                    len(p.get("text", "")) if p.get("type") == "text" else len((p.get("image_url") or {}).get("url", ""))
+                    for p in content
+                    if isinstance(p, dict)
+                ) + 64
+                if results and used_bytes + est_bytes > _MAX_SEARCH_RESPONSE_BYTES:
                     text_only = [p for p in content if isinstance(p, dict) and p.get("type") == "text"]
                     if text_only:
                         content = text_only
-                        est_bytes = len(json.dumps(content))
-                if used_bytes + est_bytes > _MAX_SEARCH_RESPONSE_BYTES:
-                    continue
+                        est_bytes = sum(len(p.get("text", "")) for p in content) + 32
+                    if used_bytes + est_bytes > _MAX_SEARCH_RESPONSE_BYTES:
+                        continue
+                if any(isinstance(p, dict) and p.get("type") == "image_url" for p in content):
+                    mm_images_included += 1
             seen_keys.add(norm_key)
             used_bytes += est_bytes
             results.append(
                 {
-                    "id": self.ids[pos],
+                    "id": mid,
                     "content": content,
                     "score": round(float(score), 6),
                     "created_at": self.created_at[pos],
@@ -899,6 +938,7 @@ class AMLMemoryEngine:
         self.api_key = api_key
         self.auth_mode = auth_mode.lower().strip() or "auto"
         self._lock = threading.Lock()
+        self._user_locks: dict[str, threading.Lock] = {}
         self._partitions: dict[str, UserMemoryPartition] = {}
 
     def _partition_dir(self, user_id: str) -> Path:
@@ -913,8 +953,18 @@ class AMLMemoryEngine:
             pdir = self._partition_dir(user_id)
             if not create and not pdir.exists():
                 return None
+            ulock = self._user_locks.get(user_id)
+            if ulock is None:
+                ulock = threading.Lock()
+                self._user_locks[user_id] = ulock
+        with ulock:
+            with self._lock:
+                part = self._partitions.get(user_id)
+                if part is not None:
+                    return part
             part = UserMemoryPartition(user_id, pdir)
-            self._partitions[user_id] = part
+            with self._lock:
+                self._partitions[user_id] = part
             return part
 
     def check_auth(self, headers: dict[str, str]) -> bool:
