@@ -10,9 +10,21 @@ Every turn the agent receives a state packet of at most 1,200 characters (about 
 
 [Overview (PDF)](paper/agent_memory_overview.pdf) · [Technical paper (PDF)](paper/agent_memory_paper.pdf) · [Paper (Markdown)](paper/PAPER.md)
 
-## Benchmarks
+## Independent evaluation — AML Cycle 2 (2026)
 
-[MemoryArena](https://huggingface.co/datasets/ZexueHe/memoryarena) `formal_reasoning_phys` (ICML 2026): 20 physics papers, 86 subtasks, chains up to 12 steps. Figures below are from [`benchmarks/memoryarena/results_2026_10_14.json`](benchmarks/memoryarena/results_2026_10_14.json) (14 Oct 2026).
+The `agent-memory` submission was accepted on all three tracks of the **Agent Memory League (AML) Cycle 2 Open-source Methods leaderboard**. The organizing committee verified the final scores on 19 November 2026.
+
+| Track | Score | Rank |
+| --- | ---: | ---: |
+| [Textual](https://agentmemories.ai/leaderboard/academic/textual) | 56.56 | 52 / 89 |
+| [Multimodal](https://agentmemories.ai/leaderboard/academic/multimodal) | 34.34 | 13 / 18 |
+| [Coding](https://agentmemories.ai/leaderboard/academic/coding) | 56.67 | 16 / 20 |
+
+These are **official competition results**, not author-run benchmark numbers. Track scores are not directly comparable. See [AML results and provenance](benchmarks/aml/README.md) for limitations and submission-reproduction status.
+
+## Author-run experiments — MemoryArena
+
+[MemoryArena](https://huggingface.co/datasets/ZexueHe/memoryarena) `formal_reasoning_phys` (ICML 2026): 20 physics papers, 86 subtasks, chains up to 12 steps. The following results were obtained in author-run experiments; they are **not independently certified AML scores**. Figures below are from [`benchmarks/memoryarena/results_2026_10_14.json`](benchmarks/memoryarena/results_2026_10_14.json) (14 Oct 2026).
 
 Success rate is the share of papers whose last subtask is correct. Progress is the share of subtasks solved.
 
